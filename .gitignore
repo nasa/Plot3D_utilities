@@ -1,0 +1,8 @@
+
+*.xyz
+
+
+# vs code folders
+.vscode/
+*.pickle
+*.p3d
