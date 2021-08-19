@@ -1,0 +1,767 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>plot3d.connectivity &mdash; Plot3D 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/_static/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Plot3D
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../notes/installation.html#installation-via-pip">Installation via Pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notes/installation.html#installation-from-source">Installation from Source</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/connectivity.html#periodicity">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/connectivity.html#exporting-to-glennht-connectivity-files">Exporting to GlennHT Connectivity Files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Plot3D.Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Plot3D.Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Plot3D.Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Plot3D.Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Plot3D.Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Plot3D.Write</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Plot3D</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>plot3d.connectivity</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for plot3d.connectivity</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pandas.core.algorithms</span> <span class="kn">import</span> <span class="n">unique</span>
+<span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
+<span class="kn">from</span> <span class="nn">.face</span> <span class="kn">import</span> <span class="n">Face</span><span class="p">,</span> <span class="n">create_face_from_diagonals</span><span class="p">,</span> <span class="n">split_face</span>
+<span class="kn">import</span> <span class="nn">math</span> 
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span><span class="p">,</span> <span class="n">combinations</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">from</span> <span class="nn">.differencing</span> <span class="kn">import</span> <span class="n">find_face_edges</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">eq</span> 
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">plot3d_point_match</span> <span class="kn">import</span> <span class="n">plot3d_point_match</span>
+<span class="c1"># from .module.plot3d_point_match import plot3d_point_match</span>
+
+<div class="viewcode-block" id="get_outer_faces"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.get_outer_faces">[docs]</a><span class="k">def</span> <span class="nf">get_outer_faces</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the outer faces of a block</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        block1 (Block): A plot3D block</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[Face]: Non matching faces of the block </span>
+<span class="sd">        List[(Face,Face)]: Matching faces inside the block </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">block1</span><span class="o">.</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>               <span class="c1"># Python index starts at 0, need to subtract 1 for it to get the i,j,k</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">block1</span><span class="o">.</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">block1</span><span class="o">.</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># Create the outer faces        </span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">i</span><span class="o">=</span><span class="n">I</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">i</span><span class="o">=</span><span class="n">I</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">j</span><span class="o">=</span><span class="n">J</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">I</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">j</span><span class="o">=</span><span class="n">J</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">I</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">k</span><span class="o">=</span><span class="n">K</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">I</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">k</span><span class="o">=</span><span class="n">K</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">I</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+
+    <span class="c1"># Check if faces match each other</span>
+    <span class="n">matching</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">non_matching</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)):</span>
+        <span class="n">matchFound</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">!=</span><span class="n">j</span> <span class="ow">and</span> <span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">faces</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+                <span class="n">matching</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
+                <span class="n">matchFound</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">matchFound</span><span class="p">:</span>
+            <span class="n">non_matching</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="c1"># these are guaranteed to be exterior </span>
+    <span class="n">matching</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">unique_pairs</span><span class="p">(</span><span class="n">matching</span><span class="p">))</span>
+    <span class="n">matching</span> <span class="o">=</span> <span class="p">[(</span><span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">faces</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">matching</span><span class="p">]</span>
+    
+    <span class="c1"># Make sure normals do not intersect </span>
+    <span class="c1"># block_center_to_face_center =  block1.cx</span>
+    <span class="k">return</span> <span class="n">non_matching</span><span class="p">,</span> <span class="n">matching</span> <span class="c1"># these should be the outer faces</span></div>
+
+<div class="viewcode-block" id="unique_pairs"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.unique_pairs">[docs]</a><span class="k">def</span> <span class="nf">unique_pairs</span><span class="p">(</span><span class="n">listOfItems</span><span class="p">:</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks if an item is not already in the list </span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        listOfItems (list): list of combinations e.g. (1,2),(3,4),(2,1)</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        unique pair: [description]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1">#use set to keep track of already seen items, sets provide O(1) lookup  </span>
+    <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="n">listOfItems</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">!=</span><span class="n">y</span> <span class="ow">and</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))</span> 
+            <span class="k">yield</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="find_matching_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks">[docs]</a><span class="k">def</span> <span class="nf">find_matching_blocks</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span> <span class="n">full_face_match</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  
+    <span class="sd">&quot;&quot;&quot;Takes two blocks and finds all matching pairs</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        block1 (Block): Any plot3d Block that is not the same as block2</span>
+<span class="sd">        block2 (Block): Any plot3d Block that is not the same as block1</span>
+<span class="sd">        full_face_match (bool): use full face matching (Much faster)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.DataFrame: corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check to see if outer face of block 1 matches any of the outer faces of block 2</span>
+    <span class="n">block_match_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="n">block1_outer</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">block1</span><span class="p">)</span>
+    <span class="n">block2_outer</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">block2</span><span class="p">)</span>
+    <span class="n">block1_split_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">block2_split_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
+    <span class="c1"># Create a dataframe for block1 and block 2 inner matches, add to df later</span>
+    <span class="c1"># df,split_faces1,split_faces2 = get_face_intersection(block1_outer[3],block2_outer[4],block1,block2)                </span>
+
+    <span class="c1"># Checks the nodes of the outer faces to see if any of them match </span>
+    <span class="n">block1MatchingFace</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">block2MatchingFace</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">match</span><span class="p">):</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">block1_outer</span><span class="p">)):</span>
+            <span class="n">block1_face</span> <span class="o">=</span> <span class="n">block1_outer</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">block2_outer</span><span class="p">)):</span>
+                <span class="n">block2_face</span> <span class="o">=</span> <span class="n">block2_outer</span><span class="p">[</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">df</span><span class="p">,</span><span class="n">split_faces1</span><span class="p">,</span><span class="n">split_faces2</span> <span class="o">=</span> <span class="n">get_face_intersection</span><span class="p">(</span><span class="n">block1_face</span><span class="p">,</span><span class="n">block2_face</span><span class="p">,</span><span class="n">block1</span><span class="p">,</span><span class="n">block2</span><span class="p">,</span><span class="n">full_face_match</span><span class="p">)</span>                
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">2</span><span class="p">:</span>
+                    <span class="n">block_match_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+                    <span class="n">block1MatchingFace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block1_face</span><span class="p">)</span>
+                    <span class="n">block2MatchingFace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block2_face</span><span class="p">)</span>
+                    <span class="n">block1_split_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_faces1</span><span class="p">)</span>
+                    <span class="n">block2_split_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_faces2</span><span class="p">)</span>
+                    <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="p">[</span><span class="n">block1_outer</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block1MatchingFace</span> <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block1_outer</span><span class="p">]</span>
+        <span class="p">[</span><span class="n">block2_outer</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block2MatchingFace</span> <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block2_outer</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">block1_split_faces</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">block1_outer</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">block1_split_faces</span><span class="p">)</span>
+            <span class="n">block1_split_faces</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">block2_split_faces</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">block2_outer</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">block2_split_faces</span><span class="p">)</span>
+            <span class="n">block2_split_faces</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">block_match_indices</span><span class="p">,</span> <span class="n">block1_outer</span><span class="p">,</span> <span class="n">block2_outer</span> <span class="c1"># Remove duplicates using set and list </span></div>
+
+
+
+<div class="viewcode-block" id="get_face_intersection"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.get_face_intersection">[docs]</a><span class="k">def</span> <span class="nf">get_face_intersection</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">full_face_match</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the index of the intersection between two faces located on two different blocks </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        face1 (Face): An exterior face</span>
+<span class="sd">        face2 (Face): An exterior face from a different block</span>
+<span class="sd">        block1 (Block): block containing face1</span>
+<span class="sd">        block2 (Block): block containing face2</span>
+<span class="sd">        full_face_match (bool): use full face matching (Much faster)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (Tuple): containing</span>
+
+<span class="sd">            - (pandas.DataFrame): dataframe with matches. Columns = I1, J1, K1, I2, J2, K2</span>
+<span class="sd">            - (List[Face]): any split faces from block 1</span>
+<span class="sd">            - (List[Face]): any split faces from block 2 </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">select_multi_dimensional</span><span class="p">(</span><span class="n">T</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">dim1</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span><span class="n">dim2</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">dim3</span><span class="p">:</span><span class="nb">tuple</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes a block (T) and selects X,Y,Z from the block given a face&#39;s dimensions</span>
+<span class="sd">            theres really no good way to do this in python </span>
+<span class="sd">        Args:</span>
+<span class="sd">            T (np.ndarray): arbitrary array so say a full matrix containing X</span>
+<span class="sd">            dim1 (tuple): 20,50 this selects X in the i direction from i=20 to 50</span>
+<span class="sd">            dim2 (tuple): 40,60 this selects X in the j direction from j=40 to 60</span>
+<span class="sd">            dim3 (tuple): 10,20 this selects X in the k direction from k=10 to 20</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: returns X or Y or Z given some range of I,J,K</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">dim1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">T</span><span class="p">[</span> <span class="n">dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dim2</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim3</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span>
+        <span class="k">if</span> <span class="n">dim2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">dim2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">T</span><span class="p">[</span> <span class="n">dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dim3</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span>
+        <span class="k">if</span> <span class="n">dim3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">dim3</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">T</span><span class="p">[</span> <span class="n">dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim2</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span>
+        
+        <span class="k">return</span> <span class="n">T</span><span class="p">[</span><span class="n">dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim2</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim3</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim3</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+    
+    <span class="n">match_location</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">,</span><span class="s1">&#39;j1&#39;</span><span class="p">,</span><span class="s1">&#39;k1&#39;</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">])</span>
+    <span class="n">split_faces1</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">split_faces2</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">matchedIndicies</span> <span class="o">=</span> <span class="n">face1</span><span class="o">.</span><span class="n">match_indices</span><span class="p">(</span><span class="n">face2</span><span class="p">)</span> <span class="c1"># face1 == face2</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matchedIndicies</span><span class="p">)</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span> <span class="c1"># Checks to see if the two faces corners are actually equal</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">matchedIndicies</span><span class="p">:</span>
+            <span class="n">i1</span><span class="p">,</span><span class="n">j1</span><span class="p">,</span><span class="n">k1</span> <span class="o">=</span> <span class="n">face1</span><span class="o">.</span><span class="n">I</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">face1</span><span class="o">.</span><span class="n">J</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">face1</span><span class="o">.</span><span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i2</span><span class="p">,</span><span class="n">j2</span><span class="p">,</span><span class="n">k2</span> <span class="o">=</span> <span class="n">face2</span><span class="o">.</span><span class="n">I</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">face2</span><span class="o">.</span><span class="n">J</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">face2</span><span class="o">.</span><span class="n">K</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">i1</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">j1</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">k1</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">i2</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">j2</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">k2</span><span class="p">})</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_location</span><span class="p">,</span><span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">split_faces1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">split_faces2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
+    <span class="k">elif</span><span class="p">(</span><span class="ow">not</span> <span class="n">full_face_match</span><span class="p">):</span> <span class="c1"># Check all points interior of the block</span>
+        <span class="n">I1</span> <span class="o">=</span> <span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">IMIN</span><span class="p">,</span><span class="n">face1</span><span class="o">.</span><span class="n">IMAX</span><span class="p">]</span>
+        <span class="n">J1</span> <span class="o">=</span> <span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span><span class="n">face1</span><span class="o">.</span><span class="n">JMAX</span><span class="p">]</span>
+        <span class="n">K1</span> <span class="o">=</span> <span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">face1</span><span class="o">.</span><span class="n">KMAX</span><span class="p">]</span>
+
+        <span class="n">I2</span> <span class="o">=</span> <span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">IMIN</span><span class="p">,</span><span class="n">face2</span><span class="o">.</span><span class="n">IMAX</span><span class="p">]</span>
+        <span class="n">J2</span> <span class="o">=</span> <span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span><span class="n">face2</span><span class="o">.</span><span class="n">JMAX</span><span class="p">]</span>
+        <span class="n">K2</span> <span class="o">=</span> <span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">face2</span><span class="o">.</span><span class="n">KMAX</span><span class="p">]</span>
+
+        <span class="n">X1</span> <span class="o">=</span> <span class="n">select_multi_dimensional</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="p">(</span><span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">I1</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">J1</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K1</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">Y1</span> <span class="o">=</span> <span class="n">select_multi_dimensional</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="p">(</span><span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">I1</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">J1</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K1</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">Z1</span> <span class="o">=</span> <span class="n">select_multi_dimensional</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="p">(</span><span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">I1</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">J1</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K1</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">X2</span> <span class="o">=</span> <span class="n">select_multi_dimensional</span><span class="p">(</span><span class="n">block2</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="p">(</span><span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">I2</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">J2</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K2</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">Y2</span> <span class="o">=</span> <span class="n">select_multi_dimensional</span><span class="p">(</span><span class="n">block2</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="p">(</span><span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">I2</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">J2</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K2</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">Z2</span> <span class="o">=</span> <span class="n">select_multi_dimensional</span><span class="p">(</span><span class="n">block2</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="p">(</span><span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">I2</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">J2</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K2</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="c1"># General Search</span>
+
+        <span class="k">if</span> <span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">I1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># I is constant in Face 1</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">combo</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">J1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">:</span>
+                <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">c</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">X1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">Y1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">Z1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">block2_match_location</span> <span class="o">=</span> <span class="n">plot3d_point_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">Y2</span><span class="p">,</span> <span class="n">Z2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">)</span><span class="o">!=-</span><span class="mi">2</span><span class="p">:</span>
+                    <span class="n">p2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">q2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="c1"># if __edge_match2(df1_edges,df2_edges, p, q, p2, q2):</span>
+                    <span class="k">if</span> <span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">I2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">p2</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">q2</span><span class="p">})</span>
+                    <span class="k">if</span> <span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">J2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">p2</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">q2</span><span class="p">})</span>
+                    <span class="k">if</span> <span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">K2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">p2</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">q2</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_location</span><span class="p">,</span><span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">J1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># J is constant in face 1 </span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">combo</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">I1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="nb">range</span><span class="p">(</span><span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">:</span>
+                <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">c</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">X1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">Y1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">Z1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">block2_match_location</span> <span class="o">=</span> <span class="n">plot3d_point_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">Y2</span><span class="p">,</span> <span class="n">Z2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">)</span><span class="o">!=-</span><span class="mi">2</span><span class="p">:</span>
+                    <span class="n">p2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">q2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="c1"># if __edge_match2(df1_edges,df2_edges, p, q, p2, q2):</span>
+                    <span class="k">if</span> <span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">I2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">p2</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">q2</span><span class="p">})</span>
+                    <span class="k">if</span> <span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">J2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">p2</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">q2</span><span class="p">})</span>
+                    <span class="k">if</span> <span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">K2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">p2</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">q2</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_location</span><span class="p">,</span><span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">K1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># K is constant in face 1 </span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">combo</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">I1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">J1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">:</span>
+                <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">c</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">X1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">Y1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">Z1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">block2_match_location</span> <span class="o">=</span> <span class="n">plot3d_point_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">Y2</span><span class="p">,</span> <span class="n">Z2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span> <span class="c1"># pm,qm are the p and q indicies where match occurs </span>
+                <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">)</span><span class="o">!=-</span><span class="mi">2</span><span class="p">:</span>
+                    <span class="n">p2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">q2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="c1"># if __edge_match2(df1_edges,df2_edges, p, q, p2, q2):</span>
+                    <span class="k">if</span> <span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">I2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">p2</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">q2</span><span class="p">})</span>
+                    <span class="k">if</span> <span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">J2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">p2</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">q2</span><span class="p">})</span>
+                    <span class="k">if</span> <span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">K2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">p2</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">q2</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_location</span><span class="p">,</span><span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="c1"># Checking for split faces </span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span> <span class="ow">or</span>  <span class="n">__check_edge</span><span class="p">(</span><span class="n">df</span><span class="p">)):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Filter match increasing - This keeps uniqueness</span>
+                <span class="k">if</span> <span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">I1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;j1&#39;</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;k1&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">J1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;i1&#39;</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;k1&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">K1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;i1&#39;</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;j1&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">I2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">J2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">K2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">)</span>
+
+                <span class="c1"># Check for Split faces</span>
+                <span class="c1">## Block 1</span>
+                <span class="n">main_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block1</span><span class="p">,</span><span class="n">imin</span><span class="o">=</span><span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">imax</span><span class="o">=</span><span class="n">I1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">jmin</span><span class="o">=</span><span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">jmax</span><span class="o">=</span><span class="n">J1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">kmin</span><span class="o">=</span><span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">kmax</span><span class="o">=</span><span class="n">K1</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">imin</span><span class="p">,</span> <span class="n">jmin</span><span class="p">,</span> <span class="n">kmin</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;j1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+                <span class="n">imax</span><span class="p">,</span> <span class="n">jmax</span><span class="p">,</span> <span class="n">kmax</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;j1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">imin</span><span class="o">==</span><span class="n">imax</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">jmin</span><span class="o">==</span><span class="n">jmax</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">kmin</span><span class="o">==</span><span class="n">kmax</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">split_faces1</span> <span class="o">=</span> <span class="n">split_face</span><span class="p">(</span><span class="n">main_face</span><span class="p">,</span><span class="n">block1</span><span class="p">,</span><span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span><span class="n">jmin</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span><span class="n">kmin</span><span class="o">=</span><span class="n">kmin</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">kmax</span><span class="p">)</span>
+
+                <span class="c1">## Block 2</span>
+                <span class="n">main_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block2</span><span class="p">,</span><span class="n">imin</span><span class="o">=</span><span class="n">I2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">imax</span><span class="o">=</span><span class="n">I2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">jmin</span><span class="o">=</span><span class="n">J2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">jmax</span><span class="o">=</span><span class="n">J2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">kmin</span><span class="o">=</span><span class="n">K2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">kmax</span><span class="o">=</span><span class="n">K2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">imin</span><span class="p">,</span> <span class="n">jmin</span><span class="p">,</span> <span class="n">kmin</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;i2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;j2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+                <span class="n">imax</span><span class="p">,</span> <span class="n">jmax</span><span class="p">,</span> <span class="n">kmax</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;i2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;j2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">imin</span><span class="o">==</span><span class="n">imax</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">jmin</span><span class="o">==</span><span class="n">jmax</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">kmin</span><span class="o">==</span><span class="n">kmax</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">split_faces2</span> <span class="o">=</span> <span class="n">split_face</span><span class="p">(</span><span class="n">main_face</span><span class="p">,</span><span class="n">block2</span><span class="p">,</span><span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span><span class="n">jmin</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span><span class="n">kmin</span><span class="o">=</span><span class="n">kmin</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">kmax</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">split_faces1</span><span class="p">,</span> <span class="n">split_faces2</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span><span class="n">key1</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filters dataframe results of get_face_intersection to make sure both key1 is increasing. </span>
+<span class="sd">        When searching through a plot3D we check based on the planes e.g. const i, j, or k </span>
+<span class="sd">        values will be removed if they are not</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pd.DataFrame): DataFrame containing matching points </span>
+<span class="sd">        key1 (str): column that you want to be in increasing order </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame: sorted dataframe</span>
+<span class="sd">    &quot;&quot;&quot;</span>        
+    <span class="n">key1_vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="c1"># get the unique values </span>
+    <span class="n">key1_vals</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">key1_vals_to_use</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">key1_vals</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">key1_vals</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">key1_vals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="c1"># Remove</span>
+            <span class="n">key1_vals_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key1_vals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">key1_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">key1_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="c1"># Remove</span>
+            <span class="n">key1_vals_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key1_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">key1_vals_to_use</span><span class="p">)]</span>        
+    <span class="k">return</span> <span class="n">df</span>
+
+<span class="k">def</span> <span class="nf">__check_edge</span><span class="p">(</span><span class="n">df</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if the results of get_face_intersection is an edge instead of a face</span>
+<span class="sd">        if it&#39;s an edge then both intersecting blocks are connected by an edge on both blocks </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pd.DataFrame): dataframe containing columns i1, j1, k1, i2, j2, k2</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        boolean: True = It is an edge, False = not edge </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">block</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;i1&#39;</span><span class="p">,</span><span class="s1">&#39;j1&#39;</span><span class="p">,</span><span class="s1">&#39;k1&#39;</span><span class="p">],[</span><span class="s1">&#39;i2&#39;</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">]]</span>
+    <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block</span><span class="p">:</span>        
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">b</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># example i1 = 1,2,3,4,5</span>
+    <span class="k">return</span> <span class="n">c</span><span class="o">&lt;</span><span class="mi">4</span> <span class="c1">#  If &quot;c&quot; is less than 4 then it&#39;s an edge </span>
+    
+
+<div class="viewcode-block" id="connectivity"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity">[docs]</a><span class="k">def</span> <span class="nf">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">full_face_match</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blocks (List[Block]): [description]</span>
+<span class="sd">        full_face_match (bool): assume the entire face of a block is a perfect match on the opposite block (much faster)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        [list]: All matching faces formatted as a list of { &#39;block1&#39;: {&#39;index&#39;, &#39;IMIN&#39;, &#39;JMIN&#39;,&#39;KMIN&#39;, &#39;IMAX&#39;,&#39;JMAX&#39;,&#39;KMAX&#39;} }</span>
+<span class="sd">        [list]: All exterior surfaces formatted as a list of { &#39;block_index&#39;, &#39;surfaces&#39;: [{&#39;IMIN&#39;, &#39;JMIN&#39;,&#39;KMIN&#39;, &#39;IMAX&#39;,&#39;JMAX&#39;,&#39;KMAX&#39;, &#39;ID&#39;}] }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">nearest_nblocks</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the indices of the nearest 6 blocks based on their centroid</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            block (Block): block you are interested in</span>
+<span class="sd">            blocks (List[Block]): list of all your blocks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [type]: [description]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">combos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)),</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">))</span><span class="o">&lt;=</span><span class="mi">48</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">combos</span>
+        
+        <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">combos</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">indx</span><span class="p">,(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">combos</span><span class="p">):</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cx</span> <span class="o">-</span> <span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">cx</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cy</span> <span class="o">-</span> <span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">cy</span>
+            <span class="n">dz</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cz</span> <span class="o">-</span> <span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">cz</span>
+            <span class="n">distances</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">*</span><span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span><span class="o">*</span><span class="n">dy</span> <span class="o">+</span> <span class="n">dz</span><span class="o">*</span><span class="n">dz</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">combos</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span><span class="p">[</span><span class="s1">&#39;block_i&#39;</span><span class="p">,</span> <span class="s1">&#39;block_j&#39;</span><span class="p">])</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">distances</span> 
+
+        <span class="n">block_i</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">block_i</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>        
+        <span class="n">main_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">block_df</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">block_i</span><span class="p">:</span>
+            <span class="n">df2</span> <span class="o">=</span> <span class="n">main_df</span><span class="p">[</span><span class="n">main_df</span><span class="p">[</span><span class="s1">&#39;block_i&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;distance&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df2</span><span class="p">)</span><span class="o">&gt;</span><span class="n">nearest_nblocks</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">nearest_nblocks</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">distance</span>
+                <span class="n">block_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">main_df</span><span class="p">[(</span><span class="n">main_df</span><span class="p">[</span><span class="s1">&#39;block_i&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">main_df</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">)])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">block_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">main_df</span><span class="p">[(</span><span class="n">main_df</span><span class="p">[</span><span class="s1">&#39;block_i&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">i</span><span class="p">)])</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">block_df</span><span class="p">)</span>
+        <span class="n">subset</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;block_i&#39;</span><span class="p">,</span> <span class="s1">&#39;block_j&#39;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subset</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()]</span> 
+        
+
+
+    <span class="k">def</span> <span class="nf">find_block_index_in_outer_faces</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">block_indx</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Looks through an array of faces (outer_faces). Outer faces can include multiple blocks</span>
+<span class="sd">            This function finds the face of corresponding block index</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            outer_faces ([type]): List of faces</span>
+<span class="sd">            block_indx (int): block index</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [type]: [description]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">outer_faces</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">block_indx</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">i</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> 
+        
+    <span class="k">def</span> <span class="nf">update_outer_faces</span><span class="p">(</span><span class="n">prev_outer_faces</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span> <span class="n">new_outer_faces</span><span class="p">:</span><span class="nb">list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes a previous set of outer faces and a new set of outer faces. </span>
+<span class="sd">            If a face id is present in the &quot;previous&quot; but not in the &quot;new&quot; remove that face </span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prev_outer_faces (list): previous set of non matching outer faces of a given block </span>
+<span class="sd">            new_outer_faces (list): new set of non-matching outer faces of the same block</span>
+<span class="sd">        &quot;&quot;&quot;</span>                
+        <span class="n">face_intersection</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">prev_outer_faces</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">new_outer_faces</span><span class="p">))</span>             <span class="c1"># Find the intersection </span>
+        <span class="k">return</span> <span class="n">face_intersection</span>                                     
+            
+
+    <span class="n">outer_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>      
+    <span class="n">face_matches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="c1"># Find the 6 nearest Blocks and search through all that.     </span>
+    <span class="c1"># combos = list(combinations(range(len(blocks)),2))</span>
+    <span class="n">combos</span> <span class="o">=</span> <span class="n">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combos</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">indx</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>     <span class="c1"># block i        </span>
+        <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="o">=</span> <span class="n">combos</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Checking connections block </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Takes 2 blocks, gets the matching faces exterior faces of both blocks </span>
+        <span class="n">df_matches</span><span class="p">,</span> <span class="n">blocki_outerfaces</span><span class="p">,</span> <span class="n">blockj_outerfaces</span> <span class="o">=</span> <span class="n">find_matching_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">full_face_match</span><span class="p">)</span>
+        <span class="c1"># Update connectivity for blocks with matching faces </span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df_matches</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">df_matches</span><span class="p">:</span>
+                <span class="n">face_matches</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;block1&#39;</span><span class="p">:{</span>
+                                            <span class="s1">&#39;index&#39;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;IMIN&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;JMIN&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;j1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;KMIN&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                                            <span class="s1">&#39;IMAX&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;JMAX&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;j1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;KMAX&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                                        <span class="p">},</span>
+                                    <span class="s1">&#39;block2&#39;</span><span class="p">:{</span>
+                                            <span class="s1">&#39;index&#39;</span><span class="p">:</span><span class="n">j</span><span class="p">,</span><span class="s1">&#39;IMIN&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;i2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;JMIN&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;j2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;KMIN&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                                            <span class="s1">&#39;IMAX&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;i2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;JMAX&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;j2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;KMAX&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                                        <span class="p">},</span>
+                                    <span class="s1">&#39;match&#39;</span><span class="p">:</span><span class="n">df</span><span class="p">})</span>
+
+        <span class="c1"># Update Outer Faces </span>
+        <span class="c1">## 01 Find block i and block j</span>
+        <span class="n">block_iloc</span> <span class="o">=</span> <span class="n">find_block_index_in_outer_faces</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">block_jloc</span> <span class="o">=</span> <span class="n">find_block_index_in_outer_faces</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
+        
+        <span class="c1"># Update or Append to list of outer faces </span>
+        <span class="k">if</span> <span class="n">block_iloc</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>      <span class="c1"># outer face does not exist </span>
+            <span class="n">outer_faces</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;block&quot;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;outer_faces&quot;</span><span class="p">:</span><span class="n">blocki_outerfaces</span><span class="p">})</span>                            
+        <span class="k">else</span><span class="p">:</span>                   <span class="c1"># Block i is in outer faces </span>
+            <span class="n">outer_faces</span><span class="p">[</span><span class="n">block_iloc</span><span class="p">][</span><span class="s1">&#39;outer_faces&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">update_outer_faces</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">[</span><span class="n">block_iloc</span><span class="p">][</span><span class="s1">&#39;outer_faces&#39;</span><span class="p">],</span> <span class="n">blocki_outerfaces</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">block_jloc</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">outer_faces</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;block&quot;</span><span class="p">:</span><span class="n">j</span><span class="p">,</span> <span class="s2">&quot;outer_faces&quot;</span><span class="p">:</span><span class="n">blockj_outerfaces</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>                   <span class="c1"># Block j is in outer faces </span>
+            <span class="n">outer_faces</span><span class="p">[</span><span class="n">block_jloc</span><span class="p">][</span><span class="s1">&#39;outer_faces&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">update_outer_faces</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">[</span><span class="n">block_jloc</span><span class="p">][</span><span class="s1">&#39;outer_faces&#39;</span><span class="p">],</span> <span class="n">blockj_outerfaces</span><span class="p">)</span>
+        
+    <span class="c1"># Find self-matches, do any faces of for example block1 match another face in block 1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
+        <span class="n">_</span><span class="p">,</span><span class="n">self_matches</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
+        <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">self_matches</span><span class="p">:</span> <span class="c1"># Append to face matches </span>
+            <span class="n">face_matches</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;block1&#39;</span><span class="p">:{</span>
+                                            <span class="s1">&#39;index&#39;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;IMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;JMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;KMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                                            <span class="s1">&#39;IMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;JMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;KMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                                        <span class="p">},</span>
+                                    <span class="s1">&#39;block2&#39;</span><span class="p">:{</span>
+                                            <span class="s1">&#39;index&#39;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;IMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;JMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;KMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                                            <span class="s1">&#39;IMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;JMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;KMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                                        <span class="p">},</span>
+                                    <span class="s1">&#39;match&#39;</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span>
+                                            <span class="s1">&#39;index&#39;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;IMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;JMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;KMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                                            <span class="s1">&#39;IMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;JMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;KMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                                        <span class="p">},{</span>
+                                            <span class="s1">&#39;index&#39;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;IMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;JMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="s1">&#39;KMIN&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                                            <span class="s1">&#39;IMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;JMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="s1">&#39;KMAX&#39;</span><span class="p">:</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                                        <span class="p">}])</span>
+                                    <span class="p">})</span>
+
+
+
+    <span class="c1"># Update the outer faces</span>
+    <span class="n">outer_faces_formatted</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> <span class="c1"># This will contain </span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="mi">1</span> 
+    <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">outer_faces</span><span class="p">:</span>        
+        <span class="n">block</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;index&#39;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">]}</span>      <span class="c1"># Grabs the index </span>
+        <span class="n">surfaces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="n">temp</span><span class="p">[</span><span class="s1">&#39;outer_faces&#39;</span><span class="p">]:</span>            
+            <span class="n">surfaces</span><span class="o">.</span><span class="n">append</span><span class="p">({</span> <span class="s1">&#39;IMIN&#39;</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="n">face</span><span class="o">.</span><span class="n">I</span><span class="p">),</span> <span class="s1">&#39;JMIN&#39;</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="n">face</span><span class="o">.</span><span class="n">J</span><span class="p">),</span> <span class="s1">&#39;KMIN&#39;</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="n">face</span><span class="o">.</span><span class="n">K</span><span class="p">),</span>
+                                <span class="s1">&#39;IMAX&#39;</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="n">face</span><span class="o">.</span><span class="n">I</span><span class="p">),</span> <span class="s1">&#39;JMAX&#39;</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="n">face</span><span class="o">.</span><span class="n">J</span><span class="p">),</span> <span class="s1">&#39;KMAX&#39;</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="n">face</span><span class="o">.</span><span class="n">K</span><span class="p">),</span>
+                                <span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="nb">id</span> <span class="p">})</span>
+            <span class="nb">id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">block</span><span class="p">[</span><span class="s1">&#39;surfaces&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">surfaces</span>
+        <span class="n">outer_faces_formatted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> </div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Paht Juangphanich.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
