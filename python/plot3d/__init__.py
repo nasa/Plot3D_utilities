@@ -5,3 +5,4 @@ from .read import read_plot3D
 from .write import write_plot3D
 from .differencing import find_edges, find_face_edges
 from .periodicity import find_periodicity
+from .point_match import point_match

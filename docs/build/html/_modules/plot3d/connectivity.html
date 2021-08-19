@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/_static/style.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/static/style.css" type="text/css" />
 
   
   
@@ -41,9 +41,7 @@
 
     
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link href="../../_static/style.css" rel="stylesheet" type="text/css">
-
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,7 +90,7 @@
               
             
             
-              <p class="caption" role="heading"><span class="caption-text">Notes</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../notes/installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../notes/installation.html#installation-via-pip">Installation via Pip</a></li>
@@ -105,7 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../notes/connectivity.html#periodicity">Periodicity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notes/connectivity.html#exporting-to-glennht-connectivity-files">Exporting to GlennHT Connectivity Files</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Plot3D.Connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Plot3D.Block</a></li>
@@ -192,8 +190,7 @@
 <span class="kn">import</span> <span class="nn">tqdm</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">plot3d_point_match</span> <span class="kn">import</span> <span class="n">plot3d_point_match</span>
-<span class="c1"># from .module.plot3d_point_match import plot3d_point_match</span>
+<span class="kn">from</span> <span class="nn">.point_match</span> <span class="kn">import</span> <span class="n">point_match</span>
 
 <div class="viewcode-block" id="get_outer_faces"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.get_outer_faces">[docs]</a><span class="k">def</span> <span class="nf">get_outer_faces</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get the outer faces of a block</span>
@@ -418,7 +415,7 @@
                 <span class="n">x</span> <span class="o">=</span> <span class="n">X1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
                 <span class="n">y</span> <span class="o">=</span> <span class="n">Y1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
                 <span class="n">z</span> <span class="o">=</span> <span class="n">Z1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
-                <span class="n">block2_match_location</span> <span class="o">=</span> <span class="n">plot3d_point_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">Y2</span><span class="p">,</span> <span class="n">Z2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span>
+                <span class="n">block2_match_location</span> <span class="o">=</span> <span class="n">point_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">Y2</span><span class="p">,</span> <span class="n">Z2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">)</span><span class="o">!=-</span><span class="mi">2</span><span class="p">:</span>
                     <span class="n">p2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">q2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -439,7 +436,7 @@
                 <span class="n">x</span> <span class="o">=</span> <span class="n">X1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
                 <span class="n">y</span> <span class="o">=</span> <span class="n">Y1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
                 <span class="n">z</span> <span class="o">=</span> <span class="n">Z1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
-                <span class="n">block2_match_location</span> <span class="o">=</span> <span class="n">plot3d_point_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">Y2</span><span class="p">,</span> <span class="n">Z2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span>
+                <span class="n">block2_match_location</span> <span class="o">=</span> <span class="n">point_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">Y2</span><span class="p">,</span> <span class="n">Z2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">)</span><span class="o">!=-</span><span class="mi">2</span><span class="p">:</span>
                     <span class="n">p2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">q2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -460,7 +457,7 @@
                 <span class="n">x</span> <span class="o">=</span> <span class="n">X1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
                 <span class="n">y</span> <span class="o">=</span> <span class="n">Y1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
                 <span class="n">z</span> <span class="o">=</span> <span class="n">Z1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
-                <span class="n">block2_match_location</span> <span class="o">=</span> <span class="n">plot3d_point_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">Y2</span><span class="p">,</span> <span class="n">Z2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span> <span class="c1"># pm,qm are the p and q indicies where match occurs </span>
+                <span class="n">block2_match_location</span> <span class="o">=</span> <span class="n">point_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">Y2</span><span class="p">,</span> <span class="n">Z2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span> <span class="c1"># pm,qm are the p and q indicies where match occurs </span>
                 <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">)</span><span class="o">!=-</span><span class="mi">2</span><span class="p">:</span>
                     <span class="n">p2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">q2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">block2_match_location</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>

@@ -6,10 +6,12 @@
 PLOT3D DOCUMENTATION
 ==================================
 
+This tool is currently a python library. Julia version is in the works. 
+
 .. toctree::
    :glob:
    :maxdepth: 1
-   :caption: Notes
+   :caption: Python Notes
 
    notes/installation
    notes/plot3d
@@ -20,7 +22,7 @@ PLOT3D DOCUMENTATION
 .. toctree::
    :glob:
    :maxdepth: 1
-   :caption: Package Reference
+   :caption: Python Package Reference
 
    modules/connectivity
    modules/block

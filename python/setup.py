@@ -1,10 +1,8 @@
 from setuptools import setup
-from Cython.Build import cythonize
-
 
 _config = {
     "name": "Plot3D",
-    "version":"0.1.1",
+    "version":"0.1.5",
     "url": "",
     "author": "Paht Juangphanich",
     "author_email": "paht.juangphanich@nasa.gov",    
@@ -26,7 +24,7 @@ def main() -> int:
         "version": version(),
     })
 
-    setup(**_config, ext_modules = cythonize('plot3d/module/plot3d_point_match.pyx',language="3"))
+    setup(**_config)
     return 0
 
 

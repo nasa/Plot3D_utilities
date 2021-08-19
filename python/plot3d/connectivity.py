@@ -11,8 +11,7 @@ from operator import eq
 import tqdm
 from typing import List
 import math
-from plot3d_point_match import plot3d_point_match
-# from .module.plot3d_point_match import plot3d_point_match
+from .point_match import point_match
 
 def get_outer_faces(block1:Block):
     """Get the outer faces of a block
@@ -237,7 +236,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
                 x = X1[p,q]
                 y = Y1[p,q]
                 z = Z1[p,q]
-                block2_match_location = plot3d_point_match(x, y, z, X2, Y2, Z2,tol)
+                block2_match_location = point_match(x, y, z, X2, Y2, Z2,tol)
                 if sum(block2_match_location)!=-2:
                     p2 = int(block2_match_location[0])
                     q2 = int(block2_match_location[1])
@@ -258,7 +257,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
                 x = X1[p,q]
                 y = Y1[p,q]
                 z = Z1[p,q]
-                block2_match_location = plot3d_point_match(x, y, z, X2, Y2, Z2,tol)
+                block2_match_location = point_match(x, y, z, X2, Y2, Z2,tol)
                 if sum(block2_match_location)!=-2:
                     p2 = int(block2_match_location[0])
                     q2 = int(block2_match_location[1])
@@ -279,7 +278,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
                 x = X1[p,q]
                 y = Y1[p,q]
                 z = Z1[p,q]
-                block2_match_location = plot3d_point_match(x, y, z, X2, Y2, Z2,tol) # pm,qm are the p and q indicies where match occurs 
+                block2_match_location = point_match(x, y, z, X2, Y2, Z2,tol) # pm,qm are the p and q indicies where match occurs 
                 if sum(block2_match_location)!=-2:
                     p2 = int(block2_match_location[0])
                     q2 = int(block2_match_location[1])
