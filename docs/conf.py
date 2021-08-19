@@ -23,8 +23,8 @@ copyright = '2021, Paht Juangphanich'
 author = 'Paht Juangphanich <paht.juangphanich@nasa.gov>'
 
 # The full version, including alpha/beta/rc tags
-version = '1.0.0' # plot3d.__version__
-release = '1.0.0' # plot3d.__version__
+version = '0.1.5' # plot3d.__version__
+release = '0.1.5' # plot3d.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -58,14 +58,16 @@ napoleon_use_keyword = True
 napoleon_custom_sections = None
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ['templates']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects htmlstatic_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['build', 'Thumbs.db', '.DS_Store']
 
-
+srclink_project = 'https://github.com/nasa/Plot3D_utilities'
+srclink_branch = 'main'
+srclink_src_path = './'
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
