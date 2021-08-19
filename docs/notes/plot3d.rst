@@ -1,7 +1,7 @@
 Plot3D Data Format
 ====================
 
-Data format for plot3D comes from this 1990s manual  :download:`pdf <../_static/plot3d_manual.pdf>` Plot3D is a simple way to construct a structured grid using 4 points to define a cell in 2D and 8 points for 3D. 
+Data format for plot3D comes from this 1990s manual  :download:`pdf <../static/plot3d_manual.pdf>` Plot3D is a simple way to construct a structured grid using 4 points to define a cell in 2D and 8 points for 3D. 
 
 Plot3D files are organized as follows 
 

@@ -62,7 +62,7 @@ templates_path = ['_templates']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
+# This pattern also affects htmlstatic_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 
@@ -83,10 +83,10 @@ html_theme_options = {
     'navigation_depth': 2,
 }
 
-html_static_path = ['_static']
+htmlstatic_path = ['static']
 rst_context = {'plot3d': plot3d}
 html_css_files = [
-    '_static/style.css',
+    'static/style.css',
 ]
 def setup(app):
     def skip(app, what, name, obj, skip, options):

@@ -7,7 +7,7 @@ The plot3D python library has a function for determining the connectivity. This 
 
 Below is an example of a turbine domain with two blocks: HGrid in (red) and ogrid in (white). The two share a connected face with partial matching. There's also the o-mesh which within itself has a connected face. 
 
-.. figure:: ../_static/turbine_domain-blocking.png
+.. figure:: ../static/turbine_domain-blocking.png
     :width: 800px
     :align: center
     :alt: Two blocks, one in red for h mesh and white for omesh
@@ -25,7 +25,7 @@ To find connectivity simply call the function *connectivity* and pass in the blo
 
 This is an example of the output. The figure below shows the block 1 and 2 matching faces found in the variable *face_matches*.
 
-.. figure:: ../_static/turbine_domain-matching1-2.png
+.. figure:: ../static/turbine_domain-matching1-2.png
     :width: 800px
     :align: center
     :alt: matching block 1 and block 2 faces 
@@ -33,7 +33,7 @@ This is an example of the output. The figure below shows the block 1 and 2 match
 
 This is the matching face within the omesh 
 
-.. figure:: ../_static/turbine_domain-matching1-1.png
+.. figure:: ../static/turbine_domain-matching1-1.png
     :width: 800px
     :align: center
     :alt: matching block 1 and block 2 faces 
@@ -56,19 +56,19 @@ The domain above has a periodicity on the side walls and from block 1 to block 2
     # Append periodic surfaces to face_matches
     face_matches.extend(periodic_surfaces)
 
-.. figure:: ../_static/turbine_domain-periodic-block1-2.png
+.. figure:: ../static/turbine_domain-periodic-block1-2.png
     :width: 800px
     :align: center
     :alt: periodic surface from block 1 to block 2
     :figclass: align-center
 
-.. figure:: ../_static/turbine_domain-periodic-block2-inlet.png
+.. figure:: ../static/turbine_domain-periodic-block2-inlet.png
     :width: 800px
     :align: center
     :alt: periodic surface block 2 entrance of the domain
     :figclass: align-center
 
-.. figure:: ../_static/turbine_domain-periodic-block2-outlet.png
+.. figure:: ../static/turbine_domain-periodic-block2-outlet.png
     :width: 800px
     :align: center
     :alt: periodic surface block 2 exit of the domain
