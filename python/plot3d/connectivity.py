@@ -1,4 +1,5 @@
 from pandas.core.algorithms import unique
+from collections import namedtuple
 from .block import Block
 from .face import Face, create_face_from_diagonals, split_face
 import math 
@@ -9,7 +10,7 @@ from .differencing import find_face_edges
 import pandas as pd
 from operator import eq 
 import tqdm
-from typing import List
+from typing import List, NamedTuple
 import math
 from .point_match import point_match
 
@@ -378,6 +379,7 @@ def __check_edge(df:pd.DataFrame):
             c += int(len(df[k].unique())>1) # example i1 = 1,2,3,4,5
     return c<4 #  If "c" is less than 4 then it's an edge 
     
+
 
 def connectivity(blocks:List[Block],full_face_match=False):
     """Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces 
