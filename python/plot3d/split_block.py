@@ -2,6 +2,8 @@
 Split blocks is combination of help from Dave Rigby and Tim Beach 
 '''
 
+from face import Face
+import face
 from .block import Block
 from typing import List
 from enum import Enum
@@ -71,6 +73,35 @@ def max_aspect_ratio(X:np.ndarray,Y:np.ndarray,Z:np.ndarray,ix:int,jx:int,kx:int
 
     return max(aspect) 
 
+"""Divide the matched block according to a direction 
+
+    Args:
+        block (Block): [description]
+        n_cells (int): [description]
+        direction (Direction): [description]
+        face_to_match (Face): This is the new face on a different block that we will match.
+    
+    Returns:
+        
+    """
+def __divide_matched_block(block:Block,istep:int, jstep:int, kstep:int,face_to_split:Face,face_to_match:Face):
+    """Divides the matched block with consideration to it's connectivity. face_to_split is the face on the block. face_to_match is the new face from a different block. 
+    
+    This function is only called if:   
+        Connectivity block 1 and 2 starting (I,J,K) <= block 1 split (I, J, or K <= Connectivity block 1 and 2 ending (I,J,K)
+
+    Args:
+        block (Block): [description]
+        istep (int): [description]
+        jstep (int): [description]
+        kstep (int): [description]
+        face_to_split (Face): [description]
+        face_to_match (Face): [description]
+    """
+    # Check if to advance in i forward or backward by looking at the verticies 
+    
+    face_to_match.x
+
 def split_blocks(blocks:List[Block], ncells_per_block:int, face_matches:dict, outer_faces_formatted:dict,direction:Direction,split_matching_faces:bool=False):
     """Split an array of blocks based on number of cells per block. This takes into account the outer faces and matching faces in the block
         So say you had a block with 2M cells and you wanted to split into blocks containing around 400K cells. This function will allow you to do that. 
@@ -90,10 +121,9 @@ def split_blocks(blocks:List[Block], ncells_per_block:int, face_matches:dict, ou
         direction (Direction): direction to split the blocks in. Direction.(i,j,k)
         split_matching_faces (bool): choose whether or not to split where the faces are matching. Defaults to False.
 
-    """
+    Returns:
 
-
-    
+    """  
 
     new_blocks = list()
     new_face_matches = list()
@@ -109,7 +139,7 @@ def split_blocks(blocks:List[Block], ncells_per_block:int, face_matches:dict, ou
             step_size = round(ncells_per_block/max_divisions_in_direction)
             cells_per_step = step_size * max_divisions_in_direction 
             for i in range(0,block.IMAX,step=step_size):
-                X = block.X[iprev:i-1,:,:]
+                X = block.X[iprev:i-1,:,:]      # New X, Y, Z splits 
                 Y = block.Y[iprev:i-1,:,:]
                 Z = block.Z[iprev:i-1,:,:]
 
@@ -120,7 +150,8 @@ def split_blocks(blocks:List[Block], ncells_per_block:int, face_matches:dict, ou
                             if m[block_name]['block_index']['IMIN'] < iprev: 
                                 # if the split is larger than one of the matching blocks 
                                 if split_matching_faces: # if we are splitting matching faces
-                                    # Insert logic to divide up the connectivity file 
+                                    # Logic to divide up the connectivity file 
+                                    
                                     iprev = i
                             else:
                                 iprev = i

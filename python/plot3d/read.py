@@ -88,7 +88,8 @@ def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False):
                 IMAX = list(); JMAX = list(); KMAX = list()
                 
                 for b in range(nblocks):
-                    tokens = [int(w.replace('\n','')) for w in f.readline().split(' ') if w]
+                    IJK = f.readline().replace('\n','').split(' ')
+                    tokens = [int(w) for w in IJK if w]
                     IMAX.append(tokens[0])
                     JMAX.append(tokens[1])
                     KMAX.append(tokens[2])

@@ -442,7 +442,7 @@ def connectivity(blocks:List[Block],full_face_match=False):
             block_indx (int): block index
 
         Returns:
-            [type]: [description]
+            int: block index 
         """
         for i in range(len(outer_faces)):
             if outer_faces[i]['block'] == block_indx:
