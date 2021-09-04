@@ -14,8 +14,11 @@ import pickle
 
 if not os.path.exists('connectivity.pickle'):
     blocks = read_plot3D('../../../testfiles/Darmstadt_compressor_Example.xyz', binary = False)
+<<<<<<< HEAD
     # write_plot3D('compressor_binary.xyz',blocks, binary = True)
 
+=======
+>>>>>>> 58edbf3d88b6e12a23a57e6f9da59c58a5869c2d
     # Block 1 is the blade O-Mesh k=0
     face_matches, outer_faces_formatted = connectivity(blocks)
     with open('connectivity.pickle','wb') as f:
