@@ -230,7 +230,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
 
         if I1[0] == I1[1]: # I is constant in Face 1
             i = I1[0]
-            combo = product(range(0,X1.shape[0]-1), range(0,X1.shape[1]-1))
+            combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
             for c in combo:
                 p, q = c
                 x = X1[p,q]
@@ -251,7 +251,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
 
         elif J1[0] == J1[1]: # J is constant in face 1 
             j = J1[0]
-            combo = product(range(0,X1.shape[0]-1), range(0,X1.shape[1]-1))
+            combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
             for c in combo:
                 p, q = c
                 x = X1[p,q]
@@ -272,7 +272,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
 
         elif K1[0] == K1[1]: # K is constant in face 1 
             k = K1[0]
-            combo = product(range(0,X1.shape[0]-1), range(0,X1.shape[1]-1))
+            combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
             for c in combo:
                 p, q = c
                 x = X1[p,q]
