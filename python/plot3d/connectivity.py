@@ -363,6 +363,9 @@ def __filter_block_increasing(df:pd.DataFrame,key1:str):
     key1_vals.sort()
     key1_vals_to_use = list()
 
+    if len(key1_vals)<=1:
+        return pd.DataFrame() # Returning an empty dataframe. This solves the condition where you have edge matching 
+
     for i in range(len(key1_vals)-1):
         if (key1_vals[i+1] - key1_vals[i])==1: # Remove
             key1_vals_to_use.append(key1_vals[i])
