@@ -122,14 +122,16 @@ def find_matching_blocks(block1:Block,block2:Block, full_face_match=False):
     block2_outer,_ = get_outer_faces(block2)
     block1_split_faces = list()
     block2_split_faces = list() 
+    block1MatchingFace = list()
+    block2MatchingFace = list()
     # Create a dataframe for block1 and block 2 inner matches, add to df later
     # df,split_faces1,split_faces2 = get_face_intersection(block1_outer[3],block2_outer[4],block1,block2,tol=1E-6)
 
     # Checks the nodes of the outer faces to see if any of them match 
-    block1MatchingFace = list()
-    block2MatchingFace = list()
     match = True
     while match:
+        block1MatchingFace.clear()
+        block2MatchingFace.clear()
         match = False
         for p in range(len(block1_outer)):
             block1_face = block1_outer[p]
