@@ -123,14 +123,16 @@ def find_matching_blocks(block1:Block,block2:Block, full_face_match=False):
     block2_outer,_ = get_outer_faces(block2)
     block1_split_faces = list()
     block2_split_faces = list() 
-    # Create a dataframe for block1 and block 2 inner matches, add to df later
-    # df,split_faces1,split_faces2 = get_face_intersection(block1_outer[3],block2_outer[4],block1,block2)                
-
-    # Checks the nodes of the outer faces to see if any of them match 
     block1MatchingFace = list()
     block2MatchingFace = list()
+    # Create a dataframe for block1 and block 2 inner matches, add to df later
+    # df,split_faces1,split_faces2 = get_face_intersection(block1_outer[3],block2_outer[4],block1,block2,tol=1E-6)
+
+    # Checks the nodes of the outer faces to see if any of them match 
     match = True
-    while (match):
+    while match:
+        block1MatchingFace.clear()
+        block2MatchingFace.clear()
         match = False
         for p in range(len(block1_outer)):
             block1_face = block1_outer[p]
@@ -199,17 +201,17 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
     
     match_location = list()
     df =pd.DataFrame(columns=['i1','j1','k1','i2','j2','k2'])
-    split_faces1 = None
-    split_faces2 = None
-    matchedIndicies = face1.match_indices(face2) # face1 == face2
+    split_faces1 = list()
+    split_faces2 = list()
+    
+    matchedIndicies = face1.match_indices(face2) # face1 == face2, Full face match is automatically checked first. If this is not 4 then code proceeds to partial match
     if len(matchedIndicies)==4: # Checks to see if the two faces corners are actually equal
         for i,j in matchedIndicies:
             i1,j1,k1 = face1.I[i],face1.J[i],face1.K[i]
             i2,j2,k2 = face2.I[j],face2.J[j],face2.K[j]
             match_location.append({"i1":i1,"j1":j1,"k1":k1,'i2':i2,'j2':j2,'k2':k2})
         df = df.append(match_location,ignore_index=True)
-        split_faces1 = list()
-        split_faces2 = list() 
+         
     elif(not full_face_match): # Check all points interior of the block
         I1 = [face1.IMIN,face1.IMAX]
         J1 = [face1.JMIN,face1.JMAX]
@@ -231,7 +233,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
 
         if I1[0] == I1[1]: # I is constant in Face 1
             i = I1[0]
-            combo = product(range(J1[0],J1[1]+1), range(K1[0],K1[1]+1))
+            combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
             for c in combo:
                 p, q = c
                 x = X1[p,q]
@@ -252,7 +254,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
 
         elif J1[0] == J1[1]: # J is constant in face 1 
             j = J1[0]
-            combo = product(range(I1[0],I1[1]+1),range(K1[0],K1[1]+1))
+            combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
             for c in combo:
                 p, q = c
                 x = X1[p,q]
@@ -273,7 +275,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
 
         elif K1[0] == K1[1]: # K is constant in face 1 
             k = K1[0]
-            combo = product(range(I1[0],I1[1]+1), range(J1[0],J1[1]+1))
+            combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
             for c in combo:
                 p, q = c
                 x = X1[p,q]
@@ -294,7 +296,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
         
         # Checking for split faces 
         if len(df)>0:
-            if (len(df)==2 or  __check_edge(df)):
+            if (len(df)==2 or __check_edge(df)):
                 df = pd.DataFrame()
             else:
                 # Filter match increasing - This keeps uniqueness
@@ -308,6 +310,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
                     df = __filter_block_increasing(df,'i1')
                     df = __filter_block_increasing(df,'j1')
 
+                
                 if I2[0]==I2[1]:
                     df = __filter_block_increasing(df,'j2')
                     df = __filter_block_increasing(df,'k2')
@@ -318,20 +321,21 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
                     df = __filter_block_increasing(df,'i2')
                     df = __filter_block_increasing(df,'j2')
 
-                # Check for Split faces
-                ## Block 1
-                main_face = create_face_from_diagonals(block1,imin=I1[0],imax=I1[1], jmin=J1[0],jmax=J1[1],kmin=K1[0],kmax=K1[1])
-                imin, jmin, kmin = df['i1'].min(), df['j1'].min(), df['k1'].min()
-                imax, jmax, kmax = df['i1'].max(), df['j1'].max(), df['k1'].max()
-                if int(imin==imax) + int(jmin==jmax) + int(kmin==kmax)==1:
-                    split_faces1 = split_face(main_face,block1,imin=imin,imax=imax,jmin=jmin,jmax=jmax,kmin=kmin,kmax=kmax)
+                if len(df)>0:
+                    # Check for Split faces
+                    ## Block 1
+                    main_face = create_face_from_diagonals(block1,imin=I1[0],imax=I1[1], jmin=J1[0],jmax=J1[1],kmin=K1[0],kmax=K1[1])
+                    imin, jmin, kmin = df['i1'].min(), df['j1'].min(), df['k1'].min()
+                    imax, jmax, kmax = df['i1'].max(), df['j1'].max(), df['k1'].max()
+                    if int(imin==imax) + int(jmin==jmax) + int(kmin==kmax)==1:
+                        split_faces1 = split_face(main_face,block1,imin=imin,imax=imax,jmin=jmin,jmax=jmax,kmin=kmin,kmax=kmax)
 
-                ## Block 2
-                main_face = create_face_from_diagonals(block2,imin=I2[0],imax=I2[1], jmin=J2[0],jmax=J2[1],kmin=K2[0],kmax=K2[1])
-                imin, jmin, kmin = df['i2'].min(), df['j2'].min(), df['k2'].min()
-                imax, jmax, kmax = df['i2'].max(), df['j2'].max(), df['k2'].max()
-                if int(imin==imax) + int(jmin==jmax) + int(kmin==kmax)==1:
-                    split_faces2 = split_face(main_face,block2,imin=imin,imax=imax,jmin=jmin,jmax=jmax,kmin=kmin,kmax=kmax)
+                    ## Block 2
+                    main_face = create_face_from_diagonals(block2,imin=I2[0],imax=I2[1], jmin=J2[0],jmax=J2[1],kmin=K2[0],kmax=K2[1])
+                    imin, jmin, kmin = df['i2'].min(), df['j2'].min(), df['k2'].min()
+                    imax, jmax, kmax = df['i2'].max(), df['j2'].max(), df['k2'].max()
+                    if int(imin==imax) + int(jmin==jmax) + int(kmin==kmax)==1:
+                        split_faces2 = split_face(main_face,block2,imin=imin,imax=imax,jmin=jmin,jmax=jmax,kmin=kmin,kmax=kmax)
 
     return df, split_faces1, split_faces2
 
@@ -349,13 +353,26 @@ def __filter_block_increasing(df:pd.DataFrame,key1:str):
     Returns:
         pd.DataFrame: sorted dataframe
     """        
+
+    '''
+        Sometimes there's a match on 2 edges and we do not want to keep that 
+            | face1 | face2 | face1  | 
+        Above shows face 2 touching face 1 at 2 edges. this is not a match. 
+    '''
+    if len(df)==0:
+        return df
+    
     key1_vals = list(df[key1].unique()) # get the unique values 
     key1_vals.sort()
     key1_vals_to_use = list()
 
+    if len(key1_vals)<=1:
+        return pd.DataFrame() # Returning an empty dataframe. This solves the condition where you have edge matching 
+
     for i in range(len(key1_vals)-1):
         if (key1_vals[i+1] - key1_vals[i])==1: # Remove
             key1_vals_to_use.append(key1_vals[i])
+    # Look backwards 
     if (key1_vals[-1] - key1_vals[-2])==1: # Remove
             key1_vals_to_use.append(key1_vals[-1])
     df = df[df[key1].isin(key1_vals_to_use)]        
@@ -465,6 +482,7 @@ def connectivity(blocks:List[Block],full_face_match=False):
     face_matches = list()
     # Find the 6 nearest Blocks and search through all that.     
     # combos = list(combinations(range(len(blocks)),2))
+
     combos = combinations_of_nearest_blocks(blocks)
     t = trange(len(combos))
     for indx in t:     # block i        
