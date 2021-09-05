@@ -1,8 +1,6 @@
 use monte_carlo_pi::monte_carlo_pi;
 use std::time::Instant;
 
-// cd into monte_carlo_pi folder and to run `cargo run --example pi` 
-
 fn main(){
     // Print pi and average calculations per second
     let now = Instant::now();

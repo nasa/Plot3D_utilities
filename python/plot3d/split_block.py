@@ -2,7 +2,8 @@
 Split blocks is combination of help from Dave Rigby and Tim Beach 
 '''
 
-from .face import Face
+from face import Face
+import face
 from .block import Block
 from typing import List
 from enum import Enum

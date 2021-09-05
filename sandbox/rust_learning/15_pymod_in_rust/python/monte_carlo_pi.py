@@ -9,14 +9,12 @@ import psutil
 import multiprocessing
 
 
-def monte_carlo_pi(iterations,option:int=0):
+def monte_carlo_pi(iterations):
     num_cpus = psutil.cpu_count(logical=True)  # real and virtual
 
     now = time.time()
-    if option == 0:
-        total_inside = thread_monte_carlo_pi(num_cpus, iterations)
-    elif option == 1: 
-        total_inside = proc_monte_carlo_pi(num_cpus, iterations)    
+    #total_inside = thread_monte_carlo_pi(num_cpus, iterations)
+    total_inside = proc_monte_carlo_pi(num_cpus, iterations)
 
     stop = time.time()
     total_iterations = num_cpus * iterations
@@ -53,20 +51,8 @@ def thread_monte_carlo_pi(num_cpus, iterations):
 
 
 if __name__ == "__main__":
-    num_cpu = psutil.cpu_count(logical=True)
-    
-    print("using multi-processor")
     start = time.time()
-    pi, calcs_p_sec = monte_carlo_pi(1_000_000,0)
-    stop = time.time()
-    print(f'{stop - start:.2f}secs runtime')
-    print(pi)
-    print(f"{calcs_p_sec} calculations per second")
-    
-    print("using concurrent threads")
-    print("using multi-processor")
-    start = time.time()
-    pi, calcs_p_sec = monte_carlo_pi(1_000_000,1)
+    pi, calcs_p_sec = monte_carlo_pi(1_000_000)
     stop = time.time()
     print(f'{stop - start:.2f}secs runtime')
     print(pi)
