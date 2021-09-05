@@ -54,7 +54,7 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
     periodic_surfaces = list()      # This is the output of the code 
     periodic_angle = 0
     rotation_matrix = None
-
+    outer_faces_to_keep = list()
     # Check periodic within a block 
     block_match = True
     while block_match:
@@ -204,7 +204,6 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                             block_outer_faces_to_remove.append({'block_indx':b2,'surface_indx':b2_surf_indx})
         
         # Lets remove the outer faces
-        outer_faces_to_keep = list()
         for b in range(len(outer_faces)):
             outer_faces_to_keep.append({'index':b, 'surfaces':[]})
             for s in range(len(outer_faces[b]['surfaces'])):                

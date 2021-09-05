@@ -139,6 +139,7 @@ def find_matching_blocks(block1:Block,block2:Block, full_face_match=False):
                 block2_face = block2_outer[q]
                 df,split_faces1,split_faces2 = get_face_intersection(block1_face,block2_face,block1,block2,full_face_match)                
                 if len(df)>2:
+                    # if not block1_face in block1MatchingFace and not block2_face in block2MatchingFace:
                     block_match_indices.append(df)
                     block1MatchingFace.append(block1_face)
                     block2MatchingFace.append(block2_face)
@@ -154,7 +155,7 @@ def find_matching_blocks(block1:Block,block2:Block, full_face_match=False):
         if len(block2_split_faces)>0:
             block2_outer.extend(block2_split_faces)
             block2_split_faces.clear()
-    
+
     return block_match_indices, block1_outer, block2_outer # Remove duplicates using set and list 
 
 
@@ -378,7 +379,7 @@ def __filter_block_increasing(df:pd.DataFrame,key1:str):
     return df
 
 def __check_edge(df:pd.DataFrame):
-    """Check if the results of get_face_intersection is an edge instead of a face
+    """ Check if the results of get_face_intersection is an edge instead of a face.  
         if it's an edge then both intersecting blocks are connected by an edge on both blocks 
 
     Args:
@@ -389,10 +390,13 @@ def __check_edge(df:pd.DataFrame):
     """
     
     block = [['i1','j1','k1'],['i2','j2','k2']]
+    # Single edge matching check
     c=0
     for b in block:        
-        for k in b:
-            c += int(len(df[k].unique())>1) # example i1 = 1,2,3,4,5
+        for k in b: # loop for i,j,k
+            unq = df[k].unique()
+            c += int(len(unq)>1 and len(unq)>2) # example i1 = 1,2,3,4,5
+
     return c<4 #  If "c" is less than 4 then it's an edge 
     
 
