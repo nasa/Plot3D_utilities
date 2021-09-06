@@ -11,5 +11,11 @@ name = "montecarlopi"
 crate-type = ["cdylib"]
 
 [dependencies.cpython]
-version = "0.5"
+version = "0.6"
 features = ["extension-module"]
+
+[target.x86_64-apple-darwin]
+rustflags = [
+  "-C", "link-arg=-undefined",
+  "-C", "link-arg=dynamic_lookup",
+]
