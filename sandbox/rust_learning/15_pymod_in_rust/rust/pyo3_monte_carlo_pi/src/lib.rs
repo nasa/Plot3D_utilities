@@ -2,8 +2,8 @@ use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
 use monte_carlo_pi::monte_carlo_pi;
-
-#[pyfunction]
+/// PyResult<(f64, String) are the return arguments 
+#[pyfunction] // This makes it a python function 
 fn mcpi(iterations: u32) -> PyResult<(f64, String)> {
     Ok(monte_carlo_pi(iterations as u32))
 }

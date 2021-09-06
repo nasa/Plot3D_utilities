@@ -1,6 +1,7 @@
 use cpython::{py_fn, py_module_initializer, PyResult, Python};
 use monte_carlo_pi::monte_carlo_pi;
 
+// montecarlopi must be same name as in Cargo.toml or else we cannot import it 
 py_module_initializer!(montecarlopi, |py, m| {
     m.add(py, "__doc__", "This module is implemented in Rust.")?;
     m.add(
@@ -13,12 +14,13 @@ py_module_initializer!(montecarlopi, |py, m| {
 });
 
 fn sum_as_string(a: i64, b: i64) -> String {
-    format!("{}", a + b).to_string()
+    format!("{}", a + b).to_string() // expressions without semicolon is when a result is expected. 
+    // Above is a return statement
 }
 
 fn sum_as_string_py(_: Python, a: i64, b: i64) -> PyResult<String> {
     let out = sum_as_string(a, b);
-    Ok(out)
+    Ok(out) // return output
 }
 
 fn mcpi_py(_: Python, iterations: i64) -> PyResult<(f64, String)> {

@@ -13,5 +13,5 @@ crate-type = ["cdylib"]
 monte_carlo_pi = {path = "../monte_carlo_pi"}
 
 [dependencies.pyo3]
-version = "0.13.1"
+version = "0.14.5"
 features = ["extension-module"]
