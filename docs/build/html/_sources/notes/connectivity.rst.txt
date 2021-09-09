@@ -88,3 +88,10 @@ For windows this looks like this. You have the `[working folder]>"[path to parav
 .. literalinclude:: ../static/paraview_code_part2.py
   :language: python
 
+The output should look like the following 
+
+.. figure:: ../static/connectivity_paraview.png
+    :width: 800px
+    :align: center
+    :alt: screenshot of a mesh with connected faces in paraview
+    :figclass: align-center
