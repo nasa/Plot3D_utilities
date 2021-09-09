@@ -2,7 +2,7 @@ from setuptools import setup
 
 _config = {
     "name": "Plot3D",
-    "version":"0.1.5",
+    "version":"0.1.6",
     "url": "",
     "author": "Paht Juangphanich",
     "author_email": "paht.juangphanich@nasa.gov",    

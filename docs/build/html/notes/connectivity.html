@@ -219,6 +219,9 @@ You do not have full access to this library, so pip installs won’t work. This 
 <p><strong>Part 1</strong> One code runs on python from your own environment.</p>
 <p><strong>Part 2</strong> the other code runs from paraview’s python environment.</p>
 </div>
+<div class="section" id="part-1-processing-the-data-locally-for-paraview-import">
+<h3>Part 1 - Processing the data locally for paraview import<a class="headerlink" href="#part-1-processing-the-data-locally-for-paraview-import" title="Permalink to this headline">¶</a></h3>
+<p>The goal if this code is to create a pickle file that is read in part 2. This pickle file contains the matching faces and outer faces.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
 <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;../../&#39;</span><span class="p">)</span>
@@ -239,13 +242,16 @@ You do not have full access to this library, so pip installs won’t work. This 
         <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s2">&quot;face_matches&quot;</span><span class="p">:</span><span class="n">face_matches</span><span class="p">,</span> <span class="s2">&quot;outer_faces&quot;</span><span class="p">:</span><span class="n">outer_faces_formatted</span><span class="p">},</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="calling-paraview-with-script">
-<h3>Calling Paraview with script<a class="headerlink" href="#calling-paraview-with-script" title="Permalink to this headline">¶</a></h3>
-<p>The script below is what paraview will run. What you can do to run this script is call the run command from command line
-For windows this looks like this. You have the <cite>[working folder]&gt;”[path to paraview executable]” –script=[your_python_script.py]</cite>
-.. note:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="p">:</span>\<span class="n">Github</span>\<span class="n">Plot3D_utilities</span>\<span class="n">python</span>\<span class="n">test</span>\<span class="n">paraview_plot</span> <span class="o">&gt;</span> <span class="s2">&quot;C:\Program Files\ParaView 5.9.1-Windows-Python3.8-msvc2017-64bit</span><span class="se">\b</span><span class="s2">in\paraview.exe&quot;</span> <span class="o">--</span><span class="n">script</span><span class="o">=</span><span class="n">compressor_plot_test</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
+</div>
+<div class="section" id="part-2-calling-paraview-in-script-mode">
+<h3>Part 2 - Calling Paraview in script mode<a class="headerlink" href="#part-2-calling-paraview-in-script-mode" title="Permalink to this headline">¶</a></h3>
+<p>This part of the code shows how you can read the pickle file in part 1 from within paraview to display all your plots.</p>
+<p>This code was tested with Paraview version 5.9 <a class="reference external" href="https://www.paraview.org/download/">https://www.paraview.org/download/</a></p>
+<p>Paraview executable can be called with the script option to have it automatically create the plots for you.</p>
+<p>For windows this looks like this. You have the <cite>[working folder]&gt;”[path to paraview executable]” –script=[your_python_script.py]</cite></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>C:GithubPlot3D_utilitiespythontestparaview_plot &gt; “C:Program FilesParaView 5.9.1-Windows-Python3.8-msvc2017-64bitbinparaview.exe” –script=compressor_plot_test.py</p>
 </div>
 <div class="align-center figure">
 <a class="reference internal image-reference" href="../_images/paraview_launch_command.png"><img alt="screenshot of command prompt to launch paraview in script mode" src="../_images/paraview_launch_command.png" style="width: 800px;" /></a>

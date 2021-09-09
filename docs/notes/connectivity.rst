@@ -55,16 +55,25 @@ This example shows how you can take a mesh created Numeca Autogrid and plot the 
     
     **Part 2** the other code runs from paraview's python environment. 
 
+Part 1 - Processing the data locally for paraview import 
+--------------------------------------------------------------
+The goal if this code is to create a pickle file that is read in part 2. This pickle file contains the matching faces and outer faces. 
 
 .. literalinclude:: ../static/paraview_code_part1.py
   :language: python
 
 
 
-Calling Paraview with script
-------------------------------
-The script below is what paraview will run. What you can do to run this script is call the run command from command line
+Part 2 - Calling Paraview in script mode 
+---------------------------------------------------------
+This part of the code shows how you can read the pickle file in part 1 from within paraview to display all your plots.
+
+This code was tested with Paraview version 5.9 https://www.paraview.org/download/ 
+
+Paraview executable can be called with the script option to have it automatically create the plots for you. 
+
 For windows this looks like this. You have the `[working folder]>"[path to paraview executable]" --script=[your_python_script.py]`
+
 .. note::
     
     C:\Github\Plot3D_utilities\python\test\paraview_plot > "C:\Program Files\ParaView 5.9.1-Windows-Python3.8-msvc2017-64bit\bin\paraview.exe" --script=compressor_plot_test.py
