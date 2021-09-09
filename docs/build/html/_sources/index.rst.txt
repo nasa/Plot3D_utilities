@@ -17,6 +17,8 @@ This tool is currently a python library. Julia version is in the works.
    notes/plot3d
    notes/reading_writing
    notes/connectivity
+   notes/periodicity
+   notes/exporting
    
 
 .. toctree::
