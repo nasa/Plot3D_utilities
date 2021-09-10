@@ -72,34 +72,25 @@ def max_aspect_ratio(X:np.ndarray,Y:np.ndarray,Z:np.ndarray,ix:int,jx:int,kx:int
 
     return max(aspect) 
 
-"""Divide the matched block according to a direction 
 
-    Args:
-        block (Block): [description]
-        n_cells (int): [description]
-        direction (Direction): [description]
-        face_to_match (Face): This is the new face on a different block that we will match.
-    
-    Returns:
-        
-    """
-def __divide_matched_block(block:Block,istep:int, jstep:int, kstep:int,face_to_split:Face,face_to_match:Face):
+def __split_matched_block(matched_block:Block,isplit:int, jsplit:int, ksplit:int,face_to_split:Face):
     """Divides the matched block with consideration to it's connectivity. face_to_split is the face on the block. face_to_match is the new face from a different block. 
     
     This function is only called if:   
         Connectivity block 1 and 2 starting (I,J,K) <= block 1 split (I, J, or K <= Connectivity block 1 and 2 ending (I,J,K)
 
     Args:
-        block (Block): [description]
+        block (Block): Block that face split will occur on 
         istep (int): [description]
         jstep (int): [description]
         kstep (int): [description]
-        face_to_split (Face): [description]
-        face_to_match (Face): [description]
+        face_to_split (Face): Face located on block. This face will need to be split by the matched face 
+        face_to_match (Face): This is the new face on a different block that we will match.
     """
-    # Check if to advance in i forward or backward by looking at the verticies 
     
-    face_to_match.x
+    face_to_match.IMIN
+    face_to_match.IMAX
+
 
 def split_blocks(blocks:List[Block], ncells_per_block:int, face_matches:dict, outer_faces_formatted:dict,direction:Direction,split_matching_faces:bool=False):
     """Split an array of blocks based on number of cells per block. This takes into account the outer faces and matching faces in the block
@@ -128,29 +119,36 @@ def split_blocks(blocks:List[Block], ncells_per_block:int, face_matches:dict, ou
     new_face_matches = list()
     for block_indx in range(len(blocks)):
         block = blocks[block_indx]
-        total_cells = block.IMAX*block.JMAX*block.KMAX
+        total_block_cells = block.IMAX*block.JMAX*block.KMAX
         # Use greatest common divsor to maintain multi-grid so say the entire block is divisible by 4 then we want to maintain than for all the splits! 
         greatest_common_divisor = gcd(block.IMAX, block.JMAX, block.KMAX) # Gets the maximum number of partitions that we can make for this given block 
-        if direction == Direction.i: 
+        if direction == Direction.i: # Partion direction is i 
             iprev = 0
             # In order to get close to the number of cells per block, we need to control how many steps of the greatest_common_divisor to advance so for example if you have a multigrid mesh that has gcd of 16 (fine) => 8 (coarse) => 4 (coarser) => 2 (coarsest) and you want 400K cells per block then JMAX*KMAX*gcd*some_factor has to be close to 400K cells
-            max_divisions_in_direction = total_cells/(block.JMAX*block.KMAX*greatest_common_divisor)
-            step_size = round(ncells_per_block/max_divisions_in_direction)
-            cells_per_step = step_size * max_divisions_in_direction 
+            max_divisions_in_direction = total_block_cells/(block.JMAX*block.KMAX*greatest_common_divisor)
+            step_size = ncells_per_block/max_divisions_in_direction      
+            if not (step_size).is_integer():
+                assert('Mesh isn\'t very good. Check to see if mesh size in each of the 3 directions is divisible by ' + str(max_divisions_in_direction) )
+            
+            cells_per_step = step_size * max_divisions_in_direction             #! not sure if I want to use this 
             for i in range(0,block.IMAX,step=step_size):
                 X = block.X[iprev:i-1,:,:]      # New X, Y, Z splits 
-                Y = block.Y[iprev:i-1,:,:]
+                Y = block.Y[iprev:i-1,:,:]      # TODO Check if this is actually a multiple of 4
                 Z = block.Z[iprev:i-1,:,:]
 
                 # Check face matches 
                 for m in face_matches:
                     for block_name in ['block1', 'block2']:
-                        if m[block_name]['block_index'] == block_indx: 
+                        if m[block_name]['block_index'] != block_indx: 
+                            other_block_indx = m[block_name]['block_index']
                             if m[block_name]['block_index']['IMIN'] < iprev: 
                                 # if the split is larger than one of the matching blocks 
                                 if split_matching_faces: # if we are splitting matching faces
                                     # Logic to divide up the connectivity file 
-                                    
+                                    f = Face(4)
+                                    f.IMIN = iprev
+                                    f.IMAX = 
+                                    __divide_matched_block(blocks[other_block_indx],istep=i)
                                     iprev = i
                             else:
                                 iprev = i
