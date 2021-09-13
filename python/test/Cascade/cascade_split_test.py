@@ -7,5 +7,6 @@ from glennht_con import export_to_glennht_conn
 import pickle
 
 blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=True)
+blocks_split = split_blocks(blocks,400000,face_matches=None,outer_faces_formatted=None, direction=Direction.i)
 
-blocks2 = split_blocks(blocks,400000,face_matches=None,outer_faces_formatted=None, direction=Direction.i)
+print('done')

@@ -72,29 +72,8 @@ def max_aspect_ratio(X:np.ndarray,Y:np.ndarray,Z:np.ndarray,ix:int,jx:int,kx:int
 
     return max(aspect) 
 
-
-def __split_matched_block(matched_block:Block,isplit:int, jsplit:int, ksplit:int,face_to_split:Face):
-    """Divides the matched block with consideration to it's connectivity. face_to_split is the face on the block. face_to_match is the new face from a different block. 
-    
-    This function is only called if:   
-        Connectivity block 1 and 2 starting (I,J,K) <= block 1 split (I, J, or K <= Connectivity block 1 and 2 ending (I,J,K)
-
-    Args:
-        block (Block): Block that face split will occur on 
-        istep (int): [description]
-        jstep (int): [description]
-        kstep (int): [description]
-        face_to_split (Face): Face located on block. This face will need to be split by the matched face 
-        face_to_match (Face): This is the new face on a different block that we will match.
-    """
-    
-    face_to_match.IMIN
-    face_to_match.IMAX
-
-
-def split_blocks(blocks:List[Block], ncells_per_block:int, face_matches:dict, outer_faces_formatted:dict,direction:Direction,split_matching_faces:bool=False):
-    """Split an array of blocks based on number of cells per block. This takes into account the outer faces and matching faces in the block
-        So say you had a block with 2M cells and you wanted to split into blocks containing around 400K cells. This function will allow you to do that. 
+def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction):
+    """Split an array of blocks based on number of cells per block. For example if you had a block with 2M cells and you wanted to split into blocks containing around 400K cells. This function will allow you to do that. 
 
         Wisdom from Dave Rigby:
             For example, for radial equilibrium we must integrate across the span.  Some codes (GlennHT used to) would want a single block across the entire span.  In that case you would want some additional control.
@@ -104,60 +83,49 @@ def split_blocks(blocks:List[Block], ncells_per_block:int, face_matches:dict, ou
     Args:
         blocks (List[Block]): List of blocks
         ncells_per_block (int): number of cells desired per block 
-
-        face_matches (dict): This dictionary describes how the face of a block matches the face of another block or within itself. The format is {'block1': {'block_index','IMIN','IMAX','JMIN','JMAX','KMIN','KMAX'}}
-
-        outer_faces_formatted (dict): [description]
         direction (Direction): direction to split the blocks in. Direction.(i,j,k)
-        split_matching_faces (bool): choose whether or not to split where the faces are matching. Defaults to False.
 
     Returns:
-
+        Blocks (List[Block]): list of blocks split in the specified direction 
     """  
 
     new_blocks = list()
-    new_face_matches = list()
     for block_indx in range(len(blocks)):
         block = blocks[block_indx]
-        total_block_cells = block.IMAX*block.JMAX*block.KMAX
-        # Use greatest common divsor to maintain multi-grid so say the entire block is divisible by 4 then we want to maintain than for all the splits! 
-        greatest_common_divisor = gcd(block.IMAX, block.JMAX, block.KMAX) # Gets the maximum number of partitions that we can make for this given block 
-        if direction == Direction.i: # Partion direction is i 
-            iprev = 0
-            # In order to get close to the number of cells per block, we need to control how many steps of the greatest_common_divisor to advance so for example if you have a multigrid mesh that has gcd of 16 (fine) => 8 (coarse) => 4 (coarser) => 2 (coarsest) and you want 400K cells per block then JMAX*KMAX*gcd*some_factor has to be close to 400K cells
-            max_divisions_in_direction = total_block_cells/(block.JMAX*block.KMAX*greatest_common_divisor)
-            step_size = ncells_per_block/max_divisions_in_direction      
-            if not (step_size).is_integer():
-                assert('Mesh isn\'t very good. Check to see if mesh size in each of the 3 directions is divisible by ' + str(max_divisions_in_direction) )
-            
-            cells_per_step = step_size * max_divisions_in_direction             #! not sure if I want to use this 
-            for i in range(0,block.IMAX,step=step_size):
-                X = block.X[iprev:i-1,:,:]      # New X, Y, Z splits 
-                Y = block.Y[iprev:i-1,:,:]      # TODO Check if this is actually a multiple of 4
-                Z = block.Z[iprev:i-1,:,:]
-
-                # Check face matches 
-                for m in face_matches:
-                    for block_name in ['block1', 'block2']:
-                        if m[block_name]['block_index'] != block_indx: 
-                            other_block_indx = m[block_name]['block_index']
-                            if m[block_name]['block_index']['IMIN'] < iprev: 
-                                # if the split is larger than one of the matching blocks 
-                                if split_matching_faces: # if we are splitting matching faces
-                                    # Logic to divide up the connectivity file 
-                                    f = Face(4)
-                                    f.IMIN = iprev
-                                    f.IMAX = 
-                                    __divide_matched_block(blocks[other_block_indx],istep=i)
-                                    iprev = i
-                            else:
-                                iprev = i
-                
-                # Check outer faces. Keep same surface ID but do the split
-                        
-                
-                # There needs to be an adjustment when we overlap a matched face, we don't want to break the match or if we do we rematch it perfectly. So before appending the block, need to check face_matches and outer faces to see if we are splitting it right
-
+        total_cells = block.IMAX*block.JMAX*block.KMAX
+        if total_cells>ncells_per_block:
+            # Use greatest common divsor to maintain multi-grid so say the entire block is divisible by 4 then we want to maintain than for all the splits! 
+            greatest_common_divisor = gcd(block.IMAX, block.JMAX, block.KMAX) # Gets the maximum number of partitions that we can make for this given block 
+            if direction == Direction.i: 
+                iprev = 0
+                # In order to get close to the number of cells per block, we need to control how many steps of the greatest_common_divisor to advance so for example if you have a multigrid mesh that has gcd of 16 (fine) => 8 (coarse) => 4 (coarser) => 2 (coarsest) and you want 400K cells per block then JMAX*KMAX*gcd*some_factor has to be close to 400K cells
+                max_divisions_in_direction = total_cells/(block.JMAX*block.KMAX*greatest_common_divisor)
+                step_size = round(ncells_per_block/max_divisions_in_direction)
+                for i in range(0,block.IMAX,step=step_size):
+                    X = block.X[iprev:i-1,:,:]      # New X, Y, Z splits 
+                    Y = block.Y[iprev:i-1,:,:]
+                    Z = block.Z[iprev:i-1,:,:]
                 new_blocks.append(Block(X,Y,Z))
-                
-    # Check if any of the splits is in the face_matches with a different block or outer_faces of each block 
+
+            elif direction == Direction.j:
+                jprev = 0
+                max_divisions_in_direction = total_cells/(block.IMAX*block.KMAX*greatest_common_divisor)
+                step_size = round(ncells_per_block/max_divisions_in_direction)
+                for j in range(0,block.JMAX,step=step_size):
+                    X = block.X[jprev:j-1,:,:]      # New X, Y, Z splits 
+                    Y = block.Y[jprev:j-1,:,:]
+                    Z = block.Z[jprev:j-1,:,:]
+                new_blocks.append(Block(X,Y,Z))
+
+            else:
+                kprev = 0
+                max_divisions_in_direction = total_cells/(block.IMAX*block.JMAX*greatest_common_divisor)
+                step_size = round(ncells_per_block/max_divisions_in_direction)
+                for k in range(0,block.KMAX,step=step_size):
+                    X = block.X[kprev:k-1,:,:]      # New X, Y, Z splits 
+                    Y = block.Y[kprev:k-1,:,:]
+                    Z = block.Z[kprev:k-1,:,:]
+                new_blocks.append(Block(X,Y,Z))
+    return new_blocks
+
+        
