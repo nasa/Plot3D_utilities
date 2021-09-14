@@ -72,6 +72,42 @@ def max_aspect_ratio(X:np.ndarray,Y:np.ndarray,Z:np.ndarray,ix:int,jx:int,kx:int
 
     return max(aspect) 
 
+
+def __step_search(total_cells:int,greatest_common_divisor:int,ncells_per_block:int,denominator:float,direction:str='forward'):
+    """Searches for the right step size that leads to block splits with the same greatest common divisor. Same greatest common denominator means you will always have the same multi-grid when you solve. 
+
+    Args:
+        total_cells (int): [description]
+        greatest_common_divisor (int): [description]
+        ncells_per_block (int): [description]
+        denominator (float): If the direction is "i" then denominator is JMAX*KMAX
+        direction (str, optional): 'forward' or 'backward' This chooses to increment step direction by +1 or -1. Defaults to 'forward'.
+
+    Returns:
+        [type]: [description]
+    """
+    step_size = round(ncells_per_block/denominator)     # initial Guess
+    initial_guess = step_size
+    Number_of_Cells_Remaining = total_cells % (step_size*denominator)
+    IJK_MAX_Remainder = Number_of_Cells_Remaining/denominator
+    increment = -1
+    if direction.lower() == 'forward':
+        increment=1 
+    while ( ((step_size-1) %greatest_common_divisor != 0) or 
+            ((IJK_MAX_Remainder-1)%greatest_common_divisor !=0) and 
+            step_size>initial_guess/2 and 
+            step_size<initial_guess*1.5):
+        if ((step_size-1) %greatest_common_divisor == 0) and (IJK_MAX_Remainder-1)%greatest_common_divisor ==0:
+            break
+        step_size+=increment 
+        Number_of_Cells_Remaining = total_cells % ((step_size)*denominator)
+        IJK_MAX_Remainder = Number_of_Cells_Remaining/denominator
+    
+    if (step_size-1) %greatest_common_divisor != 0:             # This checks if each of the split blocks is divisible by gcd
+        if (IJK_MAX_Remainder-1)%greatest_common_divisor !=0:   #  This checks the remaining/final block to see if it is divisible by gcd
+            return -1                                       
+    return step_size
+
 def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction):
     """Split an array of blocks based on number of cells per block. For example if you had a block with 2M cells and you wanted to split into blocks containing around 400K cells. This function will allow you to do that. 
 
@@ -87,7 +123,9 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction):
 
     Returns:
         Blocks (List[Block]): list of blocks split in the specified direction 
-    """  
+    """ 
+
+    
 
     new_blocks = list()
     for block_indx in range(len(blocks)):
@@ -95,37 +133,63 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction):
         total_cells = block.IMAX*block.JMAX*block.KMAX
         if total_cells>ncells_per_block:
             # Use greatest common divsor to maintain multi-grid so say the entire block is divisible by 4 then we want to maintain than for all the splits! 
-            greatest_common_divisor = gcd(block.IMAX, block.JMAX, block.KMAX) # Gets the maximum number of partitions that we can make for this given block 
+            greatest_common_divisor = gcd(block.IMAX-1, block.JMAX-1, block.KMAX-1) # Gets the maximum number of partitions that we can make for this given block
             if direction == Direction.i: 
-                iprev = 0
+                
                 # In order to get close to the number of cells per block, we need to control how many steps of the greatest_common_divisor to advance so for example if you have a multigrid mesh that has gcd of 16 (fine) => 8 (coarse) => 4 (coarser) => 2 (coarsest) and you want 400K cells per block then JMAX*KMAX*gcd*some_factor has to be close to 400K cells
-                max_divisions_in_direction = total_cells/(block.JMAX*block.KMAX*greatest_common_divisor)
-                step_size = round(ncells_per_block/max_divisions_in_direction)
-                for i in range(0,block.IMAX,step=step_size):
-                    X = block.X[iprev:i-1,:,:]      # New X, Y, Z splits 
-                    Y = block.Y[iprev:i-1,:,:]
-                    Z = block.Z[iprev:i-1,:,:]
-                new_blocks.append(Block(X,Y,Z))
+                denominator = block.JMAX*block.KMAX
+                step_size = __step_search(greatest_common_divisor,ncells_per_block,denominator)
+                # step_size-1 is the IMAX of the sub_blocks e.g. 0 to 92 this shows IMAX=93, (93-1) % 4 = 0 (good)
+                
+                iprev = 0
+                for i in range(step_size,block.IMAX,step_size):
+                    X = block.X[iprev:i,:,:]      # New X, Y, Z splits 
+                    Y = block.Y[iprev:i,:,:]
+                    Z = block.Z[iprev:i,:,:]
+                    iprev=i
+                    new_blocks.append(Block(X,Y,Z))
 
-            elif direction == Direction.j:
+                # Check for remainder
+                if i < block.IMAX:
+                    X = block.X[i:,:,:]      # New X, Y, Z splits 
+                    Y = block.Y[i:,:,:]
+                    Z = block.Z[i:,:,:]
+                    new_blocks.append(Block(X,Y,Z))
+                print('done')
+            elif direction == Direction.j:                
+                denominator = block.IMAX*block.KMAX
+                step_size = __step_search(greatest_common_divisor,ncells_per_block,denominator)
                 jprev = 0
-                max_divisions_in_direction = total_cells/(block.IMAX*block.KMAX*greatest_common_divisor)
-                step_size = round(ncells_per_block/max_divisions_in_direction)
-                for j in range(0,block.JMAX,step=step_size):
-                    X = block.X[jprev:j-1,:,:]      # New X, Y, Z splits 
-                    Y = block.Y[jprev:j-1,:,:]
-                    Z = block.Z[jprev:j-1,:,:]
-                new_blocks.append(Block(X,Y,Z))
+                for j in range(step_size,block.JMAX,step_size):
+                    X = block.X[:,jprev:j,:]      # New X, Y, Z splits 
+                    Y = block.Y[:,jprev:j,:]
+                    Z = block.Z[:,jprev:j,:]
+                    jprev=j
+                    new_blocks.append(Block(X,Y,Z))
 
+                # Check for remainder
+                if j < block.JMAX:
+                    X = block.X[:,j:,:]      # New X, Y, Z splits 
+                    Y = block.Y[:,j:,:] 
+                    Z = block.Z[:,j:,:] 
+                    new_blocks.append(Block(X,Y,Z))
             else:
+                denominator = block.IMAX*block.JMAX
+                step_size = __step_search(greatest_common_divisor,ncells_per_block,denominator)
                 kprev = 0
-                max_divisions_in_direction = total_cells/(block.IMAX*block.JMAX*greatest_common_divisor)
-                step_size = round(ncells_per_block/max_divisions_in_direction)
-                for k in range(0,block.KMAX,step=step_size):
-                    X = block.X[kprev:k-1,:,:]      # New X, Y, Z splits 
-                    Y = block.Y[kprev:k-1,:,:]
-                    Z = block.Z[kprev:k-1,:,:]
-                new_blocks.append(Block(X,Y,Z))
+                for k in range(step_size,block.KMAX,step_size):
+                    X = block.X[:,:,kprev:k]     # New X, Y, Z splits 
+                    Y = block.Y[:,:,kprev:k]
+                    Z = block.Z[:,:,kprev:k]
+                    kprev=k
+                    new_blocks.append(Block(X,Y,Z))
+
+                # Check for remainder
+                if k < block.KMAX:
+                    X = block.X[:,:,k:]      # New X, Y, Z splits 
+                    Y = block.Y[:,:,k:] 
+                    Z = block.Z[:,:,k:] 
+                    new_blocks.append(Block(X,Y,Z))
     return new_blocks
 
         
