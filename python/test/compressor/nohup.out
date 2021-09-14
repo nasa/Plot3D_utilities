@@ -1,11 +1,0 @@
-  0%|          | 0/36 [00:00<?, ?it/s]Checking connections block 0 with 1:   0%|          | 0/36 [00:00<?, ?it/s]Checking connections block 0 with 1:   0%|          | 0/36 [02:11<?, ?it/s]
-Traceback (most recent call last):
-  File "/u/pjuangph/github/public/Plot3D_utilities/python/test/compressor/compressor_test.py", line 18, in <module>
-    face_matches, outer_faces_formatted = connectivity(blocks)
-  File "../../plot3d/connectivity.py", line 472, in connectivity
-    df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j],full_face_match)
-  File "../../plot3d/connectivity.py", line 138, in find_matching_blocks
-    df,split_faces1,split_faces2 = get_face_intersection(block1_face,block2_face,block1,block2,full_face_match)                
-  File "../../plot3d/connectivity.py", line 278, in get_face_intersection
-    x = X1[p,q]
-IndexError: index 33 is out of bounds for axis 0 with size 33

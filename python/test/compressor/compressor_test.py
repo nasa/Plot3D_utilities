@@ -9,8 +9,8 @@ import pickle
 
 # Convert to binary because of size 
 if not os.path.exists('connectivity.pickle'):
-    blocks = read_plot3D('../../../testfiles/Darmstadt_compressor_Example.xyz', binary = False)
-    write_plot3D('compressor_binary.xyz',blocks, binary = True)
+    blocks = read_plot3D('../../../testfiles/Darmstadt_compressor_ASCII.xyz', binary = False)
+    write_plot3D('Darmstadt_compressor.xyz',blocks, binary = True)
 
     # Block 1 is the blade O-Mesh k=0
     face_matches, outer_faces_formatted = connectivity(blocks)
@@ -22,7 +22,7 @@ with open('connectivity.pickle','rb') as f:
     face_matches = data['face_matches']
     outer_faces = data['outer_faces']
 
-blocks = read_plot3D('../../../testfiles/Darmstadt_compressor_Example.xyz', binary = False)
+blocks = read_plot3D('../../../testfiles/Darmstadt_compressor_ASCII.xyz', binary = False)
 faces_non_matching, faces_matching = get_outer_faces(blocks[0])
 
 # periodic_surfaces, outer_faces_to_keep = find_periodicity(blocks,outer_faces,periodic_direction='k')

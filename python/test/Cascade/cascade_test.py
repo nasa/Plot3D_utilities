@@ -12,7 +12,7 @@ import pickle
 # blocks2 = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=True)
 
 if not os.path.exists('connectivity.pickle'):
-    blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=True)
+    blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=False)
     # Block 1 is the blade O-Mesh k=0
     # outer_faces, _ = get_outer_faces(blocks[0]) # lets check
     face_matches, outer_faces_formatted = connectivity(blocks)
@@ -24,7 +24,7 @@ with open('connectivity.pickle','rb') as f:
     face_matches = data['face_matches']
     outer_faces = data['outer_faces']
 
-blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=True)
+blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=False)
 periodic_surfaces, outer_faces_to_keep = find_periodicity(blocks,outer_faces,periodic_direction='k')
 # Append periodic surfaces to face_matches
 face_matches.extend(periodic_surfaces)
