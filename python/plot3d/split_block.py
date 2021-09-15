@@ -168,10 +168,11 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
                     new_blocks.append(Block(X,Y,Z))
 
                 # Check for remainder
-                if i < block.IMAX:
-                    X = block.X[i:,:,:]      # New X, Y, Z splits 
-                    Y = block.Y[i:,:,:]
-                    Z = block.Z[i:,:,:]
+                if i+1 < block.IMAX:
+                    # Add remainder to last block
+                    new_blocks[-1].X = np.append(new_blocks[-1].X, block.X[i+1:,:,:],0) # New X, Y, Z splits 
+                    new_blocks[-1].Y = np.append(new_blocks[-1].Y, block.Y[i+1:,:,:],0)
+                    new_blocks[-1].Z = np.append(new_blocks[-1].Z, block.Z[i+1:,:,:],0)
                     new_blocks.append(Block(X,Y,Z))
                 
             elif direction_to_use == Direction.j:                
@@ -192,10 +193,11 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
                     new_blocks.append(Block(X,Y,Z))
 
                 # Check for remainder
-                if j < block.JMAX:
-                    X = block.X[:,j:,:]      # New X, Y, Z splits 
-                    Y = block.Y[:,j:,:] 
-                    Z = block.Z[:,j:,:] 
+                if j+1 < block.JMAX:
+                    # Add remainder to last block
+                    new_blocks[-1].X = np.append(new_blocks[-1].X, block.X[:,j+1:,:],0) # New X, Y, Z splits 
+                    new_blocks[-1].Y = np.append(new_blocks[-1].Y, block.Y[:,j+1:,:],0)
+                    new_blocks[-1].Z = np.append(new_blocks[-1].Z, block.Z[:,j+1:,:],0)
                     new_blocks.append(Block(X,Y,Z))
             else:
                 denominator = block.IMAX*block.JMAX
@@ -215,10 +217,11 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
                     new_blocks.append(Block(X,Y,Z))
 
                 # Check for remainder
-                if k < block.KMAX:
-                    X = block.X[:,:,k:]      # New X, Y, Z splits 
-                    Y = block.Y[:,:,k:] 
-                    Z = block.Z[:,:,k:] 
+                if k+1 < block.KMAX:
+                   # Add remainder to last block
+                    new_blocks[-1].X = np.append(new_blocks[-1].X, block.X[:,:,k+1:],0) # New X, Y, Z splits 
+                    new_blocks[-1].Y = np.append(new_blocks[-1].Y, block.Y[:,:,k+1:],0)
+                    new_blocks[-1].Z = np.append(new_blocks[-1].Z, block.Z[:,:,k+1:],0)
                     new_blocks.append(Block(X,Y,Z))
     return new_blocks
 
