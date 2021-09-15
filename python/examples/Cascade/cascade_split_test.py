@@ -6,10 +6,6 @@ from plot3d import find_matching_blocks, get_outer_faces, connectivity
 from glennht_con import export_to_glennht_conn
 import pickle
 
-blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=False)
-blocks_split = split_blocks(blocks,400000, direction=Direction.i)
-write_plot3D('finalmesh_split.xyz',blocks_split,binary=True)
-
 if not os.path.exists('connectivity-block-split.pickle'):
     blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=False)
     blocks_split = split_blocks(blocks,400000, direction=Direction.i)
@@ -26,6 +22,9 @@ with open('connectivity-block-split.pickle','rb') as f:
 
 blocks = read_plot3D('finalmesh_split.xyz', binary = True, big_endian=True)
 periodic_surfaces, outer_faces_to_keep = find_periodicity(blocks,outer_faces,periodic_direction='k')
+with open('connectivity-block-split.pickle','wb') as f:
+    pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
+
 # Append periodic surfaces to face_matches
 face_matches.extend(periodic_surfaces)
 
