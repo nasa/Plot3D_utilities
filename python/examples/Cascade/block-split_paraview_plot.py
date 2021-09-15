@@ -115,6 +115,7 @@ if __name__=="__main__":
         data = pickle.load(f)
         face_matches = data['face_matches']
         outer_faces = data['outer_faces']
+        periodic_faces = data['periodic_surfaces']
 
     blocks_to_extract = [f['block1']['index'] for f in face_matches]
     blocks_to_extract.extend([f['block2']['index'] for f in face_matches])
@@ -164,4 +165,13 @@ if __name__=="__main__":
                 for surface in o['surfaces']:
                     voi = [surface['IMIN'], surface['IMAX'], surface['JMIN'], surface['JMAX'],surface['KMIN'], surface['KMAX']]
                     CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
+                    surface_indx +=1 
+        
+        # Plot the outer faces  
+        for p in periodic_faces:
+            # Add Plots for Outer Faces
+            if p['index'] == b:
+                for surface in p['surfaces']:
+                    voi = [surface['IMIN'], surface['IMAX'], surface['JMIN'], surface['JMAX'],surface['KMIN'], surface['KMAX']]
+                    CreateSubset(block_source, voi, name='periodic_face '+str(surface_indx),opacity=1.0)
                     surface_indx +=1 
