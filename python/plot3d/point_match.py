@@ -11,11 +11,11 @@ def point_match(x:float, y:float, z:float, X2:np.ndarray, Y2:np.ndarray, Z2:np.n
         X2 (np.ndarray): X(i,j,k)
         Y2 (np.ndarray): Y(i,j,k)
         Z2 (np.ndarray): Z(i,j,k)
+        tol (float, optional): Matching tolerance. If the distance between points x,y,z and X2[i,j,k],Y2[i,j,k],Z2[i,j,k] . Defaults to 1E-6.
 
     Returns:
-        [np.ndarray]: indicies where match is found.  (-1,-1) if no match found
+        (tuple[int,int]): Face indicies where the match occurs 
     """
-    location = np.zeros(X2.ndim) - 1 
     dx = x - X2
     dy = y - Y2
     dz = z - Z2

@@ -78,41 +78,25 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                 surface2 = create_face(blocks[blk_indx], surfaces[s2]['IMIN'], surfaces[s2]['IMAX'], 
                                                 surfaces[s2]['JMIN'], surfaces[s2]['JMAX'], 
                                                 surfaces[s2]['KMIN'], surfaces[s2]['KMAX'])
+                is_periodic = False
                 if periodic_direction.lower() == "i":
                     if (surfaces[s1]['IMIN'] == surfaces[s1]['IMAX']) and (surfaces[s2]['IMIN'] == surfaces[s2]['IMAX']): 
-                        periodic, split_surf, faces_to_remove, angle, rot_mat = __periodicity_within_block__(surface1,surface2,blocks,surf1_index, surf2_index, blk_indx)
-                        if periodic:
-                            periodic_surfaces.append(periodic)
-                            outer_faces_to_remove.extend(faces_to_remove)
-                            split_surfaces.extend(split_surf)
-                            periodic_angle = angle
-                            rotation_matrix = rot_mat
-                            block_match = True
-                        break
-
-                if periodic_direction.lower() == "i":
-                    if (surfaces[s1]['IMIN'] == surfaces[s1]['IMAX']) and (surfaces[s2]['IMIN'] == surfaces[s2]['IMAX']): 
-                        periodic, split_surf,faces_to_remove, angle, rot_mat = __periodicity_within_block__(surface1,surface2,blocks,surf1_index, surf2_index, blk_indx)
-                        if periodic:
-                            periodic_surfaces.append(periodic)
-                            outer_faces_to_remove.extend(faces_to_remove)
-                            split_surfaces.extend(split_surf)
-                            periodic_angle = angle
-                            rotation_matrix = rot_mat
-                            block_match = True
-                        break
-
-                if periodic_direction.lower() == 'k':       # constant k between surfaces 
+                        is_periodic, split_surf, faces_to_remove, angle, rot_mat = __periodicity_within_block__(surface1,surface2,blocks,surf1_index, surf2_index, blk_indx)
+                elif periodic_direction.lower() == "j":
+                    if (surfaces[s1]['JMIN'] == surfaces[s1]['JMAX']) and (surfaces[s2]['JMIN'] == surfaces[s2]['JMAX']): 
+                        is_periodic, split_surf,faces_to_remove, angle, rot_mat = __periodicity_within_block__(surface1,surface2,blocks,surf1_index, surf2_index, blk_indx)
+                else:  # periodic_direction.lower() == 'k':       # constant k between surfaces 
                     if (surfaces[s1]['KMIN'] == surfaces[s1]['KMAX']) and (surfaces[s2]['KMIN'] == surfaces[s2]['KMAX']): 
-                        periodic, split_surf, faces_to_remove, angle, rot_mat = __periodicity_within_block__(surface1,surface2,blocks,surf1_index, surf2_index, blk_indx)
-                        if periodic:
-                            periodic_surfaces.append(periodic)
-                            outer_faces_to_remove.extend(faces_to_remove)
-                            split_surfaces.extend(split_surf)
-                            periodic_angle = angle
-                            rotation_matrix = rot_mat
-                            block_match = True
-                        break
+                        is_periodic, split_surf, faces_to_remove, angle, rot_mat = __periodicity_within_block__(surface1,surface2,blocks,surf1_index, surf2_index, blk_indx)
+                
+                if is_periodic:
+                    periodic_surfaces.append(is_periodic)
+                    outer_faces_to_remove.extend(faces_to_remove)
+                    split_surfaces.extend(split_surf)
+                    periodic_angle = angle
+                    rotation_matrix = rot_mat
+                    block_match = True
+                    break
                     
             if block_match:
                 break

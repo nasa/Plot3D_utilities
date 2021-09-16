@@ -115,7 +115,10 @@ if __name__=="__main__":
         data = pickle.load(f)
         face_matches = data['face_matches']
         outer_faces = data['outer_faces']
-        periodic_faces = data['periodic_surfaces']
+        if 'periodic_surfaces' in data:
+            periodic_faces = data['periodic_surfaces']
+        else:
+            periodic_faces = []
     blocks_to_extract = [f['block1']['index'] for f in face_matches]
     blocks_to_extract.extend([f['block2']['index'] for f in face_matches])
     blocks_to_extract = list(set(blocks_to_extract))
