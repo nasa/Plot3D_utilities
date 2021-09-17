@@ -139,7 +139,7 @@ def find_matching_blocks(block1:Block,block2:Block):
             for q in range(len(block2_outer)):
                 block2_face = block2_outer[q]
                 df,split_faces1,split_faces2 = get_face_intersection(block1_face,block2_face,block1,block2)
-                if len(df)>4:   # the number of intersection points has to be more than 4
+                if len(df)>0:   # the number of intersection points has to be more than 4
                     # if not block1_face in block1MatchingFace and not block2_face in block2MatchingFace:
                     block_match_indices.append(df)
                     block1MatchingFace.append(block1_face)
@@ -147,14 +147,7 @@ def find_matching_blocks(block1:Block,block2:Block):
                     block1_split_faces.extend(split_faces1)
                     block2_split_faces.extend(split_faces2)
                     match = True
-                else:
-                    if len(df)>2:
-                        block_match_indices.append(df)
-                        block1MatchingFace.append(block1_face)
-                        block2MatchingFace.append(block2_face)
-                        block1_split_faces.extend(split_faces1)
-                        block2_split_faces.extend(split_faces2)
-                        match = True
+                    
         [block1_outer.remove(b) for b in block1MatchingFace if b in block1_outer]
         [block2_outer.remove(b) for b in block2MatchingFace if b in block2_outer]
         if len(block1_split_faces)>0:
@@ -351,7 +344,8 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,full_f
                 imax, jmax, kmax = df['i2'].max(), df['j2'].max(), df['k2'].max()
                 if int(imin==imax) + int(jmin==jmax) + int(kmin==kmax)==1:
                     split_faces2 = split_face(main_face,block2,imin=imin,imax=imax,jmin=jmin,jmax=jmax,kmin=kmin,kmax=kmax)
-
+    else:
+        df = pd.DataFrame() # set df to empty dataframe
     return df, split_faces1, split_faces2
 
 
@@ -496,10 +490,10 @@ def connectivity(blocks:List[Block],full_face_match=False):
 
     outer_faces = list()      
     face_matches = list()
-    # Find the 6 nearest Blocks and search through all that.     
-    # combos = list(combinations(range(len(blocks)),2))
+    
+    # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[1],blocks[2])    # This function finds partial matches between blocks
 
-    combos = combinations_of_nearest_blocks(blocks)
+    combos = combinations_of_nearest_blocks(blocks) # Find the 6 nearest Blocks and search through all that. 
     t = trange(len(combos))
     for indx in t:     # block i        
         i,j = combos[indx]

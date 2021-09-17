@@ -27,7 +27,7 @@ with open('connectivity-block-split.pickle','rb') as f:
     outer_faces = data['outer_faces']
 
 blocks = read_plot3D('finalmesh_split.xyz', binary = True, big_endian=True)
-periodic_surfaces, outer_faces_to_keep = find_periodicity(blocks,outer_faces,periodic_direction='k')
+periodic_surfaces, outer_faces_to_keep = find_periodicity(blocks,outer_faces,periodic_direction='k',rotation_axis='x',nblades=55)
 with open('connectivity-block-split_v02.pickle','wb') as f:
     pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
 

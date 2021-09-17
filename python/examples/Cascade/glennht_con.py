@@ -42,5 +42,3 @@ def export_to_glennht_conn(matches:dict,block_surfaces:dict,filename:str):
         
         f.write(f'{len(lines)}\n')
         [f.write(line) for line in lines]
-        
-    print('stop')
