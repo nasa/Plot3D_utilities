@@ -1,5 +1,5 @@
 import itertools
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 import numpy as np
 from numpy.lib import math
 from .block import Block
@@ -26,6 +26,13 @@ class Face:
         self.nvertex=0
         self.blockIndex = 0 # not really needed except in periodicity 
     
+    def to_dict(self):
+        """Returns a dictionary representaon of a face
+        """
+        return {'IMIN':min(self.I), 'JMIN':min(self.J), 'KMIN':min(self.K),
+                    'IMAX':max(self.I), 'JMAX':max(self.J), 'KMAX':max(self.K),
+                    'id':0, 'block_index':self.blockIndex}
+
     @property
     def IMIN(self):
         return self.I.min()
@@ -410,5 +417,5 @@ def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:i
     
     faces = [top_face,bottom_face,left_face,right_face]
     faces = [f for f in faces if not f.isEdge and not f.index_equals(center_face)] # Remove edges
-    faces = [f.set_block_index(face_to_split.blockIndex) for f in faces] 
+    [f.set_block_index(face_to_split.blockIndex) for f in faces] 
     return faces 

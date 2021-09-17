@@ -114,7 +114,11 @@ def find_matching_blocks(block1:Block,block2:Block):
         full_face_match (bool): (Depreciated) use full face matching (Much faster) Full face match can be deceiving. There could be some cases where the face is a wrap and 4 corners match but the insides do not. This kind of connection shouldn't be considered
 
     Returns:
-        pandas.DataFrame: corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])
+        (tuple): containing
+
+            - **df** (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])
+            - **block1_outer** (List[Face]):
+            - **block2_outer** (List[Face]): 
     """
     # Check to see if outer face of block 1 matches any of the outer faces of block 2
     block_match_indices = list()
@@ -337,7 +341,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                 imax, jmax, kmax = df['i1'].max(), df['j1'].max(), df['k1'].max()
                 if int(imin==imax) + int(jmin==jmax) + int(kmin==kmax)==1:
                     split_faces1 = split_face(main_face,block1,imin=imin,imax=imax,jmin=jmin,jmax=jmax,kmin=kmin,kmax=kmax)
-                    
+
                 ## Block 2
                 main_face = create_face_from_diagonals(block2,imin=I2[0],imax=I2[1], jmin=J2[0],jmax=J2[1],kmin=K2[0],kmax=K2[1])
                 imin, jmin, kmin = df['i2'].min(), df['j2'].min(), df['k2'].min()
@@ -475,12 +479,11 @@ def update_outer_faces(prev_outer_faces:list, new_outer_faces:list):
     face_intersection = list(set(prev_outer_faces) & set(new_outer_faces))             # Find the intersection 
     return face_intersection
 
-def connectivity(blocks:List[Block],full_face_match=False):
+def connectivity(blocks:List[Block]):
     """Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces 
 
     Args:
-        blocks (List[Block]): [description]
-        full_face_match (bool): assume the entire face of a block is a perfect match on the opposite block (much faster)
+        blocks (List[Block]): List of all blocks in multi-block plot3d mesh
 
     Returns:
         (List[Dict]): All matching faces formatted as a list of { 'block1': {'index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'} }
