@@ -24,6 +24,7 @@ class Face:
         self.cy = 0
         self.cz = 0
         self.nvertex=0
+        self.blockIndex = 0 # not really needed except in periodicity 
     
     @property
     def IMIN(self):
@@ -48,6 +49,10 @@ class Face:
     @property
     def KMAX(self):
         return self.K.max()
+    
+    @property 
+    def BlockIndex(self):
+        return self.blockIndex
     
     @property
     def isEdge(self):
@@ -117,6 +122,9 @@ class Face:
             self.cy = self.y.mean()
             self.cz = self.z.mean()
 
+    def set_block_index(self,val):
+        self.blockIndex = val
+        
     def __normal__(self):
         """Computes the normal vector of the face 
             not really used but if anyone wants it. 
@@ -176,7 +184,7 @@ class Face:
             Boolean: True if faces match, False if no match is found 
         """
         matchedIndices = self.match_indices(f)
-        return (len(matchedIndices)==self.nvertex)
+        return (len(matchedIndices)==self.nvertex) and (self.BlockIndex == f.BlockIndex)
         
     def __ne__(self,f):
         """Checks if two faces are not equal 
@@ -272,7 +280,7 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
         kmax (int): Upper Corner
 
     Returns:
-        [type]: [description]
+        (Face): Face created from diagonals 
     """
     newFace = Face(4)           # This is because two of the corners either imin or imax can be equal
     if imin==imax:
@@ -401,5 +409,6 @@ def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:i
             kmin=face_to_split.KMIN, kmax=kmin)
     
     faces = [top_face,bottom_face,left_face,right_face]
-    faces = [f for f in faces if not f.isEdge and not f.index_equals(center_face)] # Remove edges 
+    faces = [f for f in faces if not f.isEdge and not f.index_equals(center_face)] # Remove edges
+    faces = [f.set_block_index(face_to_split.blockIndex) for f in faces] 
     return faces 
