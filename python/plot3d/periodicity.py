@@ -67,7 +67,6 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
     """
     
 
-    periodic_faces = list()      # This is the output of the code 
     rotation_angle = radians(360/nblades)
     if rotation_axis=='x':
         rotation_matrix1 = np.array([[1,0,0],
@@ -96,6 +95,8 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
     
     # Here we make a list of all the outer faces
     outer_faces_all = list() 
+    periodic_faces = list()      # This is the output of the code 
+
     for o in outer_faces:
         for s in o['surfaces']:
             s['block_indx'] = o['index']
@@ -124,9 +125,9 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                 if (face1.IMIN == face1.IMAX) and (face2.IMIN == face2.IMAX):
                     block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
                     block2 = blocks[face2.blockIndex]
-                    periodic_faces, split_faces, outer_faces_to_remove = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
+                    periodic_faces_temp, split_faces_temp, outer_faces_to_remove = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
                 
-                if len(periodic_faces) == 0:
+                if len(periodic_faces_temp) == 0:
                     block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix2)
                     block2 = blocks[face2.blockIndex]
                     periodic_faces_temp, split_faces_temp, outer_faces_to_remove = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
@@ -144,9 +145,9 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                 if (face1.JMIN == face1.JMAX) and (face2.JMIN == face2.JMAX): 
                     block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
                     block2 = blocks[face2.blockIndex]
-                    periodic_faces, split_faces, outer_faces_to_remove = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
+                    periodic_faces_temp, split_faces_temp, outer_faces_to_remove = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
 
-                if len(periodic_faces) == 0:
+                if len(periodic_faces_temp) == 0:
                     block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix2)
                     block2 = blocks[face2.blockIndex]
                     periodic_faces_temp, split_faces_temp, outer_faces_to_remove = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
@@ -167,9 +168,9 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                     block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
                     block2 = blocks[face2.blockIndex]
                     #   Check periodicity
-                    periodic_faces, split_faces, outer_faces_to_remove = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
+                    periodic_faces_temp, split_faces_temp, outer_faces_to_remove = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
 
-                if len(periodic_faces) == 0:
+                if len(periodic_faces_temp) == 0:
                     block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix2)
                     block2 = blocks[face2.blockIndex]
                     periodic_faces_temp, split_faces_temp, outer_faces_to_remove = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
@@ -313,27 +314,35 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,face1
     df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2)
     
     periodic_faces = list()
-    split_faces = list() 
+    split_faces_dict = list() 
     outer_faces_to_remove = list() 
     if len(df)>4:
-        periodic_faces = {
-                'block1':
-                    {
-                        'index':face1.blockIndex,'IMIN':df['i1'].min(),'JMIN':df['j1'].min(),'KMIN':df['k1'].min(),
-                        'IMAX':df['i1'].max(),'JMAX':df['j1'].max(),'KMAX':df['k1'].max()
-                    },
-                'block2':
-                    {
-                        'index':face2.blockIndex,'IMIN':df['i2'].min(),'JMIN':df['j2'].min(),'KMIN':df['k2'].min(),
-                        'IMAX':df['i2'].max(),'JMAX':df['j2'].max(),'KMAX':df['k2'].max()
-                    },
-                'match':df
-            }
+        f1 = create_face(block1,imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(), imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max())
+        f1.set_block_index(face1.blockIndex)
+        periodic_faces.append(f1)
+
+        f2 = create_face(block2,imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(), imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max())
+        f2.set_block_index(face2.blockIndex)
+        periodic_faces.append(f2)
+
+        # periodic_faces_dict = {
+        #         'block1':
+        #             {
+        #                 'index':face1.blockIndex,'IMIN':df['i1'].min(),'JMIN':df['j1'].min(),'KMIN':df['k1'].min(),
+        #                 'IMAX':df['i1'].max(),'JMAX':df['j1'].max(),'KMAX':df['k1'].max()
+        #             },
+        #         'block2':
+        #             {
+        #                 'index':face2.blockIndex,'IMIN':df['i2'].min(),'JMIN':df['j2'].min(),'KMIN':df['k2'].min(),
+        #                 'IMAX':df['i2'].max(),'JMAX':df['j2'].max(),'KMAX':df['k2'].max()
+        #             },
+        #         'match':df
+        #     }
         for s in split_face1:
-            split_faces.append(s.to_dict())
+            split_faces_dict.append(s.to_dict())
         for s in split_face2:
-            split_faces.append(s.to_dict())
-        outer_faces_to_remove = [face1_index, face2_index]
+            split_faces_dict.append(s.to_dict())
+        outer_faces_to_remove = [face1_indx, face2_indx]
     
 
-    return periodic_faces,split_faces, outer_faces_to_remove
+    return periodic_faces,split_faces_dict, outer_faces_to_remove
