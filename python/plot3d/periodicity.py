@@ -67,7 +67,7 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
     """
     
 
-    rotation_angle = radians(360/nblades)
+    rotation_angle = radians(360.0/nblades)
     if rotation_axis=='x':
         rotation_matrix1 = np.array([[1,0,0],
                             [0,cos(rotation_angle),-sin(rotation_angle)],
@@ -86,10 +86,9 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
         rotation_matrix1 = np.array([[1,0,0],
                             [0,cos(rotation_angle),-sin(rotation_angle)],
                             [0,sin(rotation_angle),cos(rotation_angle)]])
-        rotation_matrix2 = np.array([[cos(-rotation_angle),-sin(-rotation_angle),0],
-                            [sin(-rotation_angle),cos(-rotation_angle),0],
-                            [0,0,1]])
-    outer_faces_to_keep = list()
+        rotation_matrix2 = np.array([[1,0,0],
+                            [0,cos(-rotation_angle),-sin(-rotation_angle)],
+                            [0,sin(-rotation_angle),cos(-rotation_angle)]])
     # Check periodic within a block 
     periodic_found = True
     
@@ -98,11 +97,9 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
     periodic_faces = list()      # This is the output of the code 
 
     for o in outer_faces:
-        for s in o['surfaces']:
-            s['block_indx'] = o['block_index']
-            face = create_face(blocks[o['block_index']], s['IMIN'], s['IMAX'], s['JMIN'], s['JMAX'], s['KMIN'], s['KMAX'])
-            face.set_block_index(o['block_index'])
-            outer_faces_all.append(face)
+        face = create_face(blocks[o['block_index']], o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'], o['KMIN'], o['KMAX'])
+        face.set_block_index(o['block_index'])
+        outer_faces_all.append(face)
 
     split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
     while periodic_found:
