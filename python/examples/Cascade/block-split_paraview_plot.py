@@ -111,7 +111,7 @@ if __name__=="__main__":
     '''
     Read the connectivity file
     '''
-    with open('connectivity-block-split.pickle','rb') as f:
+    with open('connectivity-block-split_v02.pickle','rb') as f:
         data = pickle.load(f)
         face_matches = data['face_matches']
         outer_faces = data['outer_faces']
@@ -119,8 +119,8 @@ if __name__=="__main__":
             periodic_faces = data['periodic_surfaces']
         else:
             periodic_faces = []
-    blocks_to_extract = [f['block1']['index'] for f in face_matches]
-    blocks_to_extract.extend([f['block2']['index'] for f in face_matches])
+    blocks_to_extract = [f['block1']['block_index'] for f in face_matches]
+    blocks_to_extract.extend([f['block2']['block_index'] for f in face_matches])
     blocks_to_extract = list(set(blocks_to_extract))
 
     '''
@@ -145,6 +145,8 @@ if __name__=="__main__":
     '''
     Loop through all the blocks and create within each block the match and the outer surfaces
     '''
+    surface_indx =0 
+    periodic_indx = 0
     for b in blocks_to_extract: # Block indicies 
         block_source,block_display,LUT = ExtractBlocks(plot3D_source,View,[b+1])
         RenameSource('Block '+str(b), block_source)
@@ -153,8 +155,8 @@ if __name__=="__main__":
         # Plot the face matches 
         for match_indx, f in enumerate(face_matches):
             # Add Plots for Matched Faces 
-            if f['block1']['index'] == b or f['block2']['index'] == b : 
-                if f['block1']['index'] == b:
+            if f['block1']['block_index'] == b or f['block2']['block_index'] == b : 
+                if f['block1']['block_index'] == b:
                     voi = [f['block1']['IMIN'], f['block1']['IMAX'], f['block1']['JMIN'], f['block1']['JMAX'],f['block1']['KMIN'], f['block1']['KMAX']]
                 else:
                     voi = [f['block2']['IMIN'], f['block2']['IMAX'], f['block2']['JMIN'], f['block2']['JMAX'],f['block2']['KMIN'], f['block2']['KMAX']]
@@ -163,18 +165,17 @@ if __name__=="__main__":
         # Plot the outer faces  
         for o in outer_faces:
             # Add Plots for Outer Faces
-            if o['index'] == b:
-                for surface in o['surfaces']:
-                    voi = [surface['IMIN'], surface['IMAX'], surface['JMIN'], surface['JMAX'],surface['KMIN'], surface['KMAX']]
-                    CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
-                    surface_indx +=1 
+            if o['block_index'] == b:
+                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
+                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
+                surface_indx +=1 
         
         # Plot the outer faces  
-        for p in periodic_faces:
+        for periodic_indx, p in enumerate(periodic_faces):
             # Add Plots for Outer Faces
-            if p['block1']['index'] == b or p['block2']['index'] == b : 
-                if p['block1']['index'] == b:
+            if p['block1']['block_index'] == b or p['block2']['block_index'] == b : 
+                if p['block1']['block_index'] == b:
                     voi = [p['block1']['IMIN'], p['block1']['IMAX'], p['block1']['JMIN'], p['block1']['JMAX'],p['block1']['KMIN'], p['block1']['KMAX']]
                 else:
                     voi = [p['block2']['IMIN'], p['block2']['IMAX'], p['block2']['JMIN'], p['block2']['JMAX'],p['block2']['KMIN'], p['block2']['KMAX']]
-                CreateSubset(block_source, voi, name='periodic '+str(match_indx))
+                CreateSubset(block_source, voi, name='periodic '+str(periodic_indx))

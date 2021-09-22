@@ -489,7 +489,7 @@ def connectivity(blocks:List[Block]):
         blocks (List[Block]): List of all blocks in multi-block plot3d mesh
 
     Returns:
-        (List[Dict]): All matching faces formatted as a list of { 'block1': {'index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'} }
+        (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'} }
         (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'surfaces': [{'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX', 'ID'}] }
     """
  
@@ -510,11 +510,11 @@ def connectivity(blocks:List[Block]):
         if (len(df_matches)>0):
             for df in df_matches:
                 face_matches.append({'block1':{
-                                            'index':i,'IMIN':df['i1'].min(),'JMIN':df['j1'].min(),'KMIN':df['k1'].min(),
+                                            'block_index':i,'IMIN':df['i1'].min(),'JMIN':df['j1'].min(),'KMIN':df['k1'].min(),
                                             'IMAX':df['i1'].max(),'JMAX':df['j1'].max(),'KMAX':df['k1'].max()
                                         },
                                     'block2':{
-                                            'index':j,'IMIN':df['i2'].min(),'JMIN':df['j2'].min(),'KMIN':df['k2'].min(),
+                                            'block_index':j,'IMIN':df['i2'].min(),'JMIN':df['j2'].min(),'KMIN':df['k2'].min(),
                                             'IMAX':df['i2'].max(),'JMAX':df['j2'].max(),'KMAX':df['k2'].max()
                                         },
                                     'match':df})
@@ -540,18 +540,18 @@ def connectivity(blocks:List[Block]):
         _,self_matches = get_outer_faces(blocks[i]) 
         for match in self_matches: # Append to face matches 
             face_matches.append({'block1':{
-                                            'index':i,'IMIN':match[0].I.min(),'JMIN':match[0].J.min(),'KMIN':match[0].K.min(),
+                                            'block_index':i,'IMIN':match[0].I.min(),'JMIN':match[0].J.min(),'KMIN':match[0].K.min(),
                                             'IMAX':match[0].I.max(),'JMAX':match[0].J.max(),'KMAX':match[0].K.max()
                                         },
                                     'block2':{
-                                            'index':i,'IMIN':match[1].I.min(),'JMIN':match[1].J.min(),'KMIN':match[1].K.min(),
+                                            'block_index':i,'IMIN':match[1].I.min(),'JMIN':match[1].J.min(),'KMIN':match[1].K.min(),
                                             'IMAX':match[1].I.max(),'JMAX':match[1].J.max(),'KMAX':match[1].K.max()
                                         },
                                     'match':pd.DataFrame([{
-                                            'index':i,'IMIN':match[0].I.min(),'JMIN':match[0].J.min(),'KMIN':match[0].K.min(),
+                                            'block_index':i,'IMIN':match[0].I.min(),'JMIN':match[0].J.min(),'KMIN':match[0].K.min(),
                                             'IMAX':match[0].I.max(),'JMAX':match[0].J.max(),'KMAX':match[0].K.max()
                                         },{
-                                            'index':i,'IMIN':match[1].I.min(),'JMIN':match[1].J.min(),'KMIN':match[1].K.min(),
+                                            'block_index':i,'IMIN':match[1].I.min(),'JMIN':match[1].J.min(),'KMIN':match[1].K.min(),
                                             'IMAX':match[1].I.max(),'JMAX':match[1].J.max(),'KMAX':match[1].K.max()
                                         }])
                                     })
@@ -560,7 +560,7 @@ def connectivity(blocks:List[Block]):
     outer_faces_formatted = list() # This will contain 
     id = 1 
     for temp in outer_faces:        
-        block = {'index':temp['block']}      # Grabs the index 
+        block = {'block_index':temp['block']}      # Grabs the index 
         surfaces = list()
         for face in temp['outer_faces']:            
             surfaces.append({ 'IMIN':min(face.I), 'JMIN':min(face.J), 'KMIN':min(face.K),

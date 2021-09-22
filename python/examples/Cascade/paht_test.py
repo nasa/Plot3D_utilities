@@ -8,13 +8,13 @@ sys.path.insert(0,os.getcwd())
 import random
 
 
-with open('connectivity-block-split.pickle','rb') as f:
+with open('connectivity-block-split_v02.pickle','rb') as f:
     data = pickle.load(f)
     face_matches = data['face_matches']
     outer_faces = data['outer_faces']
 
-blocks_to_extract = [f['block1']['index'] for f in face_matches]
-blocks_to_extract.extend([f['block2']['index'] for f in face_matches])
+blocks_to_extract = [f['block1']['block_index'] for f in face_matches]
+blocks_to_extract.extend([f['block2']['block_index'] for f in face_matches])
 blocks_to_extract = list(set(blocks_to_extract))
 
 

@@ -99,9 +99,9 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
 
     for o in outer_faces:
         for s in o['surfaces']:
-            s['block_indx'] = o['index']
-            face = create_face(blocks[o['index']], s['IMIN'], s['IMAX'], s['JMIN'], s['JMAX'], s['KMIN'], s['KMAX'])
-            face.set_block_index(o['index'])
+            s['block_indx'] = o['block_index']
+            face = create_face(blocks[o['block_index']], s['IMIN'], s['IMAX'], s['JMIN'], s['JMAX'], s['KMIN'], s['KMAX'])
+            face.set_block_index(o['block_index'])
             outer_faces_all.append(face)
 
     split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
@@ -206,12 +206,12 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
     for f in periodic_faces:
         periodic_faces_export.append({
                                 'block1':{
-                                            'index':f[0].blockIndex,
+                                            'block_index':f[0].blockIndex,
                                             'IMIN':f[0].IMIN,'JMIN':f[0].JMIN,'KMIN':f[0].KMIN,
                                             'IMAX':f[0].IMAX,'JMAX':f[0].JMAX,'KMAX':f[0].KMAX
                                         },
                                 'block2':{
-                                            'index':f[1].blockIndex,
+                                            'block_index':f[1].blockIndex,
                                             'IMIN':f[1].IMIN,'JMIN':f[1].JMIN,'KMIN':f[1].KMIN,
                                             'IMAX':f[1].IMAX,'JMAX':f[1].JMAX,'KMAX':f[1].KMAX
                                         },
@@ -302,20 +302,20 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block):
             - **outer_faces_to_remove** (List[int]): Indicies containing [face1_indx, face2_indx]. These are not needed anymore and split_blocks should be added to the list of outer faces 
 
     """
-    outer_faces_to_remove = list() 
-    if (face2.diagonal_length < face1.diagonal_length): # switch so that face 2 is always longer
-        temp_face = deepcopy(face1)     # Swap face 1 with face 2
-        face1 = deepcopy(face2)
-        face2 = temp_face
-        
-        temp_block = deepcopy(block1)
-        block1 = deepcopy(block2)
-        block2 = temp_block 
-
-    df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2)
-    
     periodic_faces = list()
     split_faces = list()
+
+    if (face2.diagonal_length < face1.diagonal_length): # switch so that face 2 is always longer
+        temp = deepcopy(face1)
+        face1 = deepcopy(face2)
+        face2 = temp
+
+        temp_block = deepcopy(block1)
+        block1 = deepcopy(block2)
+        block2 = temp_block
+
+    df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2)
+
     if len(df)>4:
         f1 = create_face(block1,imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(), imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max())
         f1.set_block_index(face1.blockIndex)
@@ -325,19 +325,6 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block):
         f2.set_block_index(face2.blockIndex)
         periodic_faces.append(f2)
 
-        # periodic_faces_dict = {
-        #         'block1':
-        #             {
-        #                 'index':face1.blockIndex,'IMIN':df['i1'].min(),'JMIN':df['j1'].min(),'KMIN':df['k1'].min(),
-        #                 'IMAX':df['i1'].max(),'JMAX':df['j1'].max(),'KMAX':df['k1'].max()
-        #             },
-        #         'block2':
-        #             {
-        #                 'index':face2.blockIndex,'IMIN':df['i2'].min(),'JMIN':df['j2'].min(),'KMIN':df['k2'].min(),
-        #                 'IMAX':df['i2'].max(),'JMAX':df['j2'].max(),'KMAX':df['k2'].max()
-        #             },
-        #         'match':df
-        #     }
         split_faces.extend(split_face1)
         split_faces.extend(split_face2)
 
