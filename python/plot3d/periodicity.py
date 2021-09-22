@@ -305,13 +305,13 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block):
     outer_faces_to_remove = list() 
     if (face2.diagonal_length < face1.diagonal_length): # switch so that face 2 is always longer
         temp_face = deepcopy(face1)     # Swap face 1 with face 2
-        face1 = deepcopy(face1)
+        face1 = deepcopy(face2)
         face2 = temp_face
         
-        temp = deepcopy(block1)
-        block1 = block2
-        block2 = temp 
-        
+        temp_block = deepcopy(block1)
+        block1 = deepcopy(block2)
+        block2 = temp_block 
+
     df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2)
     
     periodic_faces = list()
