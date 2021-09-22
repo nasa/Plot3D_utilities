@@ -484,7 +484,7 @@ def connectivity(blocks:List[Block]):
  
 
     outer_faces = list()      
-    face_matches_dict = list()
+    face_matches = list()
     matches_to_remove = list()
     # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[1],blocks[2])    # This function finds partial matches between blocks
 
@@ -508,7 +508,7 @@ def connectivity(blocks:List[Block]):
                                                                                     imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max()))
                 matches_to_remove[-1].set_block_index(j)
 
-                face_matches_dict.append({'block1':{
+                face_matches.append({'block1':{
                                             'block_index':i,'IMIN':df['i1'].min(),'JMIN':df['j1'].min(),'KMIN':df['k1'].min(),
                                             'IMAX':df['i1'].max(),'JMAX':df['j1'].max(),'KMAX':df['k1'].max()
                                         },
