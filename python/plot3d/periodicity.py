@@ -123,12 +123,12 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                 if (face1.IMIN == face1.IMAX) and (face2.IMIN == face2.IMAX):
                     block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
                     block2 = blocks[face2.blockIndex]
-                    periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
+                    periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
                 
                     if len(periodic_faces_temp) == 0:
                         block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix2)
                         block2 = blocks[face2.blockIndex]
-                        periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
+                        periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
                         if len(periodic_faces_temp)>0:  # Save the data
                             outer_faces_to_remove.append(face1)
                             outer_faces_to_remove.append(face2)
@@ -147,12 +147,12 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                 if (face1.JMIN == face1.JMAX) and (face2.JMIN == face2.JMAX): 
                     block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
                     block2 = blocks[face2.blockIndex]
-                    periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
+                    periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
 
                     if len(periodic_faces_temp) == 0:
                         block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix2)
                         block2 = blocks[face2.blockIndex]
-                        periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
+                        periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
                         if len(periodic_faces_temp)>0:  # Save the data
                             outer_faces_to_remove.append(face1)
                             outer_faces_to_remove.append(face2)
@@ -174,12 +174,12 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                     block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
                     block2 = blocks[face2.blockIndex]
                     #   Check periodicity
-                    periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
+                    periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
 
                     if len(periodic_faces_temp) == 0:
                         block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix2)
                         block2 = blocks[face2.blockIndex]
-                        periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2,face1_indx, face2_indx)
+                        periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
                         if len(periodic_faces_temp)>0:  # Save the data
                             outer_faces_to_remove.append(face1)
                             outer_faces_to_remove.append(face2)
@@ -276,7 +276,7 @@ def linear_real_transform(face1:Face,face2:Face) -> Tuple:
             ang*=-1
     return ang, rotation_matrix
 
-def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,face1_indx:int, face2_indx:int):
+def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block):
     """General function to find periodicity within a given block. 
     
     Steps:
@@ -307,6 +307,10 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,face1
         temp_face = deepcopy(face1)     # Swap face 1 with face 2
         face1 = deepcopy(face1)
         face2 = temp_face
+        
+        temp = deepcopy(block1)
+        block1 = block2
+        block2 = temp 
         
     df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2)
     
