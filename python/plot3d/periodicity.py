@@ -96,17 +96,6 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
     outer_faces_all = list() 
     periodic_faces = list()      # This is the output of the code 
 
-    # Testing 
-    # face1 = create_face_from_diagonals(blocks[1],24,0,32,56,100,32)
-    # face1.set_block_index(1)
-    # face2 = create_face_from_diagonals(blocks[2],40,0,52,56,100,52)
-    # face2.set_block_index(2)
-
-    # block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
-    # block2 = blocks[face2.blockIndex]
-    # periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
-
-    # End testing 
     for o in outer_faces:
         face = create_face(blocks[o['block_index']], o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'], o['KMIN'], o['KMAX'])
         face.set_block_index(o['block_index'])
@@ -213,6 +202,9 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
         for j in range(i+1,len(periodic_faces)):
             if periodic_faces[i][0] == periodic_faces[j][0]:
                 if periodic_faces[i][1] == periodic_faces[j][1]:
+                    indx_to_remove.append(j)
+            if periodic_faces[i][1] == periodic_faces[j][0]:
+                if periodic_faces[i][0] == periodic_faces[j][1]:
                     indx_to_remove.append(j)
     periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
     # Export periodic faces and outer faces
