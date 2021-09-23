@@ -3,7 +3,7 @@ from itertools import combinations, product, permutations
 import numpy as np
 from numpy.core.shape_base import block
 from .block import Block, rotate_block
-from .face import Face, split_face
+from .face import Face, create_face_from_diagonals, split_face
 from .connectivity import get_face_intersection
 from .write import write_plot3D
 from math import cos, radians, sin, sqrt, acos, radians
@@ -96,6 +96,17 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
     outer_faces_all = list() 
     periodic_faces = list()      # This is the output of the code 
 
+    # Testing 
+    # face1 = create_face_from_diagonals(blocks[1],24,0,32,56,100,32)
+    # face1.set_block_index(1)
+    # face2 = create_face_from_diagonals(blocks[2],40,0,52,56,100,52)
+    # face2.set_block_index(2)
+
+    # block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
+    # block2 = blocks[face2.blockIndex]
+    # periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
+
+    # End testing 
     for o in outer_faces:
         face = create_face(blocks[o['block_index']], o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'], o['KMIN'], o['KMAX'])
         face.set_block_index(o['block_index'])
@@ -191,7 +202,7 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                         periodic_found = True
 
         if (periodic_found):
-            [outer_faces_all.remove(p) for p in outer_faces_to_remove if p in outer_faces_all]
+            outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]
             if len(split_faces)>0:
                 outer_faces_all.extend(split_faces)
                 split_faces.clear()
