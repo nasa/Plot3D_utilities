@@ -190,9 +190,9 @@ class Face:
         Returns:
             Boolean: True if faces match, False if no match is found 
         """
-        matchedIndices = self.match_indices(f)
-        
-        return ((len(matchedIndices)==self.nvertex) and (self.BlockIndex == f.BlockIndex) 
+        # matchedIndices = self.match_indices(f)
+        # (len(matchedIndices)==self.nvertex) and
+        return ((self.BlockIndex == f.BlockIndex) 
             and (self.IMIN == f.IMIN) and (self.IMAX == f.IMAX) 
             and (self.JMIN == f.JMIN) and (self.JMAX == f.JMAX) 
             and (self.KMIN == f.KMIN) and (self.KMAX == f.KMAX) )
@@ -230,9 +230,9 @@ class Face:
             
     def __str__(self):
         if (len(self.I)>0):
-            return '{:d},{:d},{:d},{:d},{:d},{:d}'.format(self.IMIN, self.JMIN, self.KMIN, self.IMAX, self.JMAX, self.KMAX)
+            return 'blk: {:d} [{:d},{:d},{:d},{:d},{:d},{:d}]'.format(self.blockIndex,self.IMIN, self.JMIN, self.KMIN, self.IMAX, self.JMAX, self.KMAX)
         else:
-            return '{:d},{:d},{:d},{:d},{:d},{:d}'.format(0,0,0,0,0,0)
+            return 'blk: {:d} [{:d},{:d},{:d},{:d},{:d},{:d}]'.format(self.blockIndex,0,0,0,0,0,0)
     
     def __repr__(self):
         return str(self)

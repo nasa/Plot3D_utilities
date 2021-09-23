@@ -101,6 +101,13 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
         face.set_block_index(o['block_index'])
         outer_faces_all.append(face)
 
+    # Debug
+    debug_per1 = create_face(blocks[2], 0, 40, 0, 100,0,0) 
+    debug_per1.set_block_index(2)
+    debug_per2 = create_face(blocks[2], 0, 40, 0, 100,52,52) 
+    debug_per2.set_block_index(2)
+    # End debug 
+
     split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
     while periodic_found:
         periodic_found = False        
@@ -132,12 +139,16 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                         if len(periodic_faces_temp)>0:  # Save the data
                             outer_faces_to_remove.append(face1)
                             outer_faces_to_remove.append(face2)
+                            outer_faces_to_remove.append(periodic_faces_temp[0])    # Make sure periodic faces are also removed from outer faces during the loop
+                            outer_faces_to_remove.append(periodic_faces_temp[1])
                             periodic_faces.append(periodic_faces_temp)
                             split_faces.extend(split_faces_temp)
                             periodic_found = True
                     else:   # Save the data
                         outer_faces_to_remove.append(face1)
                         outer_faces_to_remove.append(face2)
+                        outer_faces_to_remove.append(periodic_faces_temp[0])
+                        outer_faces_to_remove.append(periodic_faces_temp[1])
                         periodic_faces.append(periodic_faces_temp)
                         split_faces.extend(split_faces_temp)
                         periodic_found = True
@@ -159,19 +170,22 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                         if len(periodic_faces_temp)>0:  # Save the data
                             outer_faces_to_remove.append(face1)
                             outer_faces_to_remove.append(face2)
+                            outer_faces_to_remove.append(periodic_faces_temp[0])
+                            outer_faces_to_remove.append(periodic_faces_temp[1])
                             periodic_faces.append(periodic_faces_temp)
                             split_faces.extend(split_faces_temp)
                             periodic_found = True
                     else:   # Save the data
                         outer_faces_to_remove.append(face1)
                         outer_faces_to_remove.append(face2)
+                        outer_faces_to_remove.append(periodic_faces_temp[0])
+                        outer_faces_to_remove.append(periodic_faces_temp[1])
                         periodic_faces.append(periodic_faces_temp)
                         split_faces.extend(split_faces_temp)
                         periodic_found = True
 
             elif periodic_direction.lower() == 'k':       # constant k between surfaces 
-                
-                if (face1.KMIN == face1.KMAX) and (face2.KMIN == face2.KMAX): 
+                 if (face1.KMIN == face1.KMAX) and (face2.KMIN == face2.KMAX): 
                     # Rotate Block 1 -> Check periodicity -> if not periodic -> Rotate Block 1 opposite direction -> Check periodicity
                     #   Rotate Block 1
                     block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
@@ -186,12 +200,16 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                         if len(periodic_faces_temp)>0:  # Save the data
                             outer_faces_to_remove.append(face1)
                             outer_faces_to_remove.append(face2)
+                            outer_faces_to_remove.append(periodic_faces_temp[0])
+                            outer_faces_to_remove.append(periodic_faces_temp[1])
                             periodic_faces.append(periodic_faces_temp)
                             split_faces.extend(split_faces_temp)
                             periodic_found = True
                     else:   # Save the data
                         outer_faces_to_remove.append(face1)
                         outer_faces_to_remove.append(face2)
+                        outer_faces_to_remove.append(periodic_faces_temp[0])
+                        outer_faces_to_remove.append(periodic_faces_temp[1])
                         periodic_faces.append(periodic_faces_temp)
                         split_faces.extend(split_faces_temp)
                         periodic_found = True
@@ -243,7 +261,7 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
         outer_faces_export.append(o.to_dict())
                         
 
-    return periodic_faces_export, outer_faces_export
+    return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
                         
 
 
