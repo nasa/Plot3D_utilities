@@ -207,6 +207,14 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                 outer_faces_all.extend(split_faces)
                 split_faces.clear()
 
+    # remove any duplicate periodic face pairs 
+    indx_to_remove = list()
+    for i in range(len(periodic_faces)):
+        for j in range(i+1,len(periodic_faces)):
+            if periodic_faces[i][0] == periodic_faces[j][0]:
+                if periodic_faces[i][1] == periodic_faces[j][1]:
+                    indx_to_remove.append(j)
+    periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
     # Export periodic faces and outer faces
     periodic_faces_export = list() 
     outer_faces_export = list() 
