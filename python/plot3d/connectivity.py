@@ -1,3 +1,4 @@
+from numpy.core.fromnumeric import diagonal
 from pandas.core.algorithms import unique
 from collections import namedtuple
 from .block import Block
@@ -257,15 +258,14 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                 q2 = int(block2_match_location[1])
                 # if __edge_match2(df1_edges,df2_edges, p, q, p2, q2):
                 if I2[0]==I2[1]:
-                    match_location.append({"i1":i,"j1":p,"k1":q,'i2':I2[0],'j2':p2,'k2':q2})
+                    match_location.append({"i1":I1[0],"j1":p+J1[0],"k1":q+K1[0],'i2':I2[0],'j2':p2+J2[0],'k2':q2+K2[0]})
                 if J2[0]==J2[1]:
-                    match_location.append({"i1":i,"j1":p,"k1":q,'i2':p2,'j2':J2[0],'k2':q2})
+                    match_location.append({"i1":I1[0],"j1":p+J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':J2[0],'k2':q2+K2[0]})
                 if K2[0]==K2[1]:
-                    match_location.append({"i1":i,"j1":p,"k1":q,'i2':p2,'j2':q2,'k2':K2[0]})
+                    match_location.append({"i1":I1[0],"j1":p+J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':q2+J2[0],'k2':K2[0]})
         df = df.append(match_location,ignore_index=True)
 
     elif J1[0] == J1[1]: # J is constant in face 1 
-        j = J1[0]
         combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
         for c in combo:
             p, q = c
@@ -278,15 +278,14 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                 q2 = int(block2_match_location[1])
                 # if __edge_match2(df1_edges,df2_edges, p, q, p2, q2):
                 if I2[0]==I2[1]:
-                    match_location.append({"i1":p,"j1":J1[0],"k1":q,'i2':I2[0],'j2':p2,'k2':q2})
+                    match_location.append({"i1":p+I1[0],"j1":J1[0],"k1":q+K1[0],'i2':I2[0],'j2':p2+J2[0],'k2':q2+K2[0]})    # Added an offset because some faces don't start at I=0 or J=0 or K=0 
                 if J2[0]==J2[1]:
-                    match_location.append({"i1":p,"j1":J1[0],"k1":q,'i2':p2,'j2':J2[0],'k2':q2})
+                    match_location.append({"i1":p+I1[0],"j1":J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':J2[0],'k2':q2+K2[0]})
                 if K2[0]==K2[1]:
-                    match_location.append({"i1":p,"j1":J1[0],"k1":q,'i2':p2,'j2':q2,'k2':K2[0]})
+                    match_location.append({"i1":p+I1[0],"j1":J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':q2+J2[0],'k2':K2[0]})
             df = df.append(match_location,ignore_index=True)
 
     elif K1[0] == K1[1]: # K is constant in face 1 
-        k = K1[0]
         combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
         for c in combo:
             p, q = c
@@ -299,11 +298,11 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                 q2 = int(block2_match_location[1])
                 # if __edge_match2(df1_edges,df2_edges, p, q, p2, q2):
                 if I2[0]==I2[1]:
-                    match_location.append({"i1":p,"j1":q,"k1":K1[0],'i2':I2[0],'j2':p2,'k2':q2})
+                    match_location.append({"i1":p+I1[0],"j1":q+J1[0],"k1":K1[0],'i2':I2[0],'j2':p2+J2[0],'k2':q2+K2[0]})
                 if J2[0]==J2[1]:
-                    match_location.append({"i1":p,"j1":q,"k1":K1[0],'i2':p2,'j2':J2[0],'k2':q2})
+                    match_location.append({"i1":p+I1[0],"j1":q+J1[0],"k1":K1[0],'i2':p2+I2[0],'j2':J2[0],'k2':q2+K2[0]})
                 if K2[0]==K2[1]:
-                    match_location.append({"i1":p,"j1":q,"k1":K1[0],'i2':p2,'j2':q2,'k2':K2[0]})
+                    match_location.append({"i1":p+I1[0],"j1":q+J1[0],"k1":K1[0],'i2':p2+I2[0],'j2':q2+J2[0],'k2':K2[0]})
         df = df.append(match_location,ignore_index=True)
     
     # Checking for split faces 
@@ -470,17 +469,6 @@ def find_block_index_in_outer_faces(outer_faces:List[Face], block_indx:int):
         if outer_faces[i]['block'] == block_indx:
             return i
     return -1 
-    
-def update_outer_faces(prev_outer_faces:list, new_outer_faces:list):
-    """Takes a previous set of outer faces and a new set of outer faces. 
-        If a face id is present in the "previous" but not in the "new" remove that face 
-
-    Args:
-        prev_outer_faces (list): previous set of non matching outer faces of a given block 
-        new_outer_faces (list): new set of non-matching outer faces of the same block
-    """                
-    face_intersection = list(set(prev_outer_faces) & set(new_outer_faces))             # Find the intersection 
-    return face_intersection
 
 def connectivity(blocks:List[Block]):
     """Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces 
@@ -496,7 +484,7 @@ def connectivity(blocks:List[Block]):
 
     outer_faces = list()      
     face_matches = list()
-    
+    matches_to_remove = list()
     # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[1],blocks[2])    # This function finds partial matches between blocks
 
     combos = combinations_of_nearest_blocks(blocks) # Find the 6 nearest Blocks and search through all that. 
@@ -506,9 +494,19 @@ def connectivity(blocks:List[Block]):
         t.set_description(f"Checking connections block {i} with {j}")
         # Takes 2 blocks, gets the matching faces exterior faces of both blocks 
         df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j])    # This function finds partial matches between blocks
+        [o.set_block_index(i) for o in blocki_outerfaces]
+        [o.set_block_index(j) for o in blockj_outerfaces]
         # Update connectivity for blocks with matching faces 
         if (len(df_matches)>0):
             for df in df_matches:
+                matches_to_remove.append(create_face_from_diagonals(block=blocks[i],imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(),
+                                                                                    imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max()))
+                matches_to_remove[-1].set_block_index(i)
+
+                matches_to_remove.append(create_face_from_diagonals(block=blocks[j],imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(),
+                                                                                    imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max()))
+                matches_to_remove[-1].set_block_index(j)
+
                 face_matches.append({'block1':{
                                             'block_index':i,'IMIN':df['i1'].min(),'JMIN':df['j1'].min(),'KMIN':df['k1'].min(),
                                             'IMAX':df['i1'].max(),'JMAX':df['j1'].max(),'KMAX':df['k1'].max()
@@ -520,21 +518,29 @@ def connectivity(blocks:List[Block]):
                                     'match':df})
 
         # Update Outer Faces 
-        ## 01 Find block i and block j
-        block_iloc = find_block_index_in_outer_faces(outer_faces,i)
-        block_jloc = find_block_index_in_outer_faces(outer_faces,j)
+        outer_faces.extend(blocki_outerfaces)
+        outer_faces.extend(blockj_outerfaces)
+        outer_faces = list(set(outer_faces))    # Get most unique
         
-        # Update or Append to list of outer faces 
-        if block_iloc==-1:      # outer face does not exist 
-            outer_faces.append({"block":i, "outer_faces":blocki_outerfaces})                            
-        else:                   # Block i is in outer faces 
-            outer_faces[block_iloc]['outer_faces'] = update_outer_faces(outer_faces[block_iloc]['outer_faces'], blocki_outerfaces)
-        
-        if block_jloc==-1:
-            outer_faces.append({"block":j, "outer_faces":blockj_outerfaces})
-        else:                   # Block j is in outer faces 
-            outer_faces[block_jloc]['outer_faces'] = update_outer_faces(outer_faces[block_jloc]['outer_faces'], blockj_outerfaces)
-        
+    outer_faces = [o for o in outer_faces if o not in matches_to_remove]
+    # Remove any outer faces that may have been found by mistake
+    # Check I,J,K if J and K are the same with another outer face, select the face with shorter I 
+    outer_faces_to_remove = list() 
+    for i in range(len(blocks)):
+        block_outerfaces = [o for o in outer_faces if o.BlockIndex == i]
+        for o in block_outerfaces:
+            IJK = np.array([o.IMIN,o.JMIN,o.KMIN,o.IMAX,o.JMAX,o.KMAX])
+            for o2 in block_outerfaces:
+                IJK2 = np.array([o2.IMIN,o2.JMIN,o2.KMIN,o2.IMAX,o2.JMAX,o2.KMAX])
+                if sum((IJK-IJK2)==0) == 5: # [0,0,0,40,100,0] (outer) [0,0,0,56,100,0] (outer) -> remove the longer face
+                    if (o2.diagonal_length>o.diagonal_length):
+                        outer_faces_to_remove.append(o2)
+                    else:
+                        outer_faces_to_remove.append(o)
+
+    outer_faces = [o for o in outer_faces if o not in outer_faces_to_remove]
+
+
     # Find self-matches: Do any faces of, for example, block1 match another face in block 1
     for i in range(len(blocks)):
         _,self_matches = get_outer_faces(blocks[i]) 
@@ -559,15 +565,10 @@ def connectivity(blocks:List[Block]):
     # Update the outer faces
     outer_faces_formatted = list() # This will contain 
     id = 1 
-    for temp in outer_faces:        
-        block = {'block_index':temp['block']}      # Grabs the index 
-        surfaces = list()
-        for face in temp['outer_faces']:            
-            surfaces.append({ 'IMIN':min(face.I), 'JMIN':min(face.J), 'KMIN':min(face.K),
-                                'IMAX':max(face.I), 'JMAX':max(face.J), 'KMAX':max(face.K),
-                                'id':id })
-            id += 1
-        block['surfaces'] = surfaces
-        outer_faces_formatted.append(block)
+    for face in outer_faces:        
+        outer_faces_formatted.append({ 'IMIN':min(face.I), 'JMIN':min(face.J), 'KMIN':min(face.K),
+                            'IMAX':max(face.I), 'JMAX':max(face.J), 'KMAX':max(face.K),
+                            'id':id, 'block_index':face.BlockIndex })
+        id += 1
 
     return face_matches, outer_faces_formatted 

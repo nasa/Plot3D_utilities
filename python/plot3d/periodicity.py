@@ -3,7 +3,7 @@ from itertools import combinations, product, permutations
 import numpy as np
 from numpy.core.shape_base import block
 from .block import Block, rotate_block
-from .face import Face, split_face
+from .face import Face, create_face_from_diagonals, split_face
 from .connectivity import get_face_intersection
 from .write import write_plot3D
 from math import cos, radians, sin, sqrt, acos, radians
@@ -67,7 +67,7 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
     """
     
 
-    rotation_angle = radians(360/nblades)
+    rotation_angle = radians(360.0/nblades)
     if rotation_axis=='x':
         rotation_matrix1 = np.array([[1,0,0],
                             [0,cos(rotation_angle),-sin(rotation_angle)],
@@ -86,10 +86,9 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
         rotation_matrix1 = np.array([[1,0,0],
                             [0,cos(rotation_angle),-sin(rotation_angle)],
                             [0,sin(rotation_angle),cos(rotation_angle)]])
-        rotation_matrix2 = np.array([[cos(-rotation_angle),-sin(-rotation_angle),0],
-                            [sin(-rotation_angle),cos(-rotation_angle),0],
-                            [0,0,1]])
-    outer_faces_to_keep = list()
+        rotation_matrix2 = np.array([[1,0,0],
+                            [0,cos(-rotation_angle),-sin(-rotation_angle)],
+                            [0,sin(-rotation_angle),cos(-rotation_angle)]])
     # Check periodic within a block 
     periodic_found = True
     
@@ -98,11 +97,9 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
     periodic_faces = list()      # This is the output of the code 
 
     for o in outer_faces:
-        for s in o['surfaces']:
-            s['block_indx'] = o['block_index']
-            face = create_face(blocks[o['block_index']], s['IMIN'], s['IMAX'], s['JMIN'], s['JMAX'], s['KMIN'], s['KMAX'])
-            face.set_block_index(o['block_index'])
-            outer_faces_all.append(face)
+        face = create_face(blocks[o['block_index']], o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'], o['KMIN'], o['KMAX'])
+        face.set_block_index(o['block_index'])
+        outer_faces_all.append(face)
 
     split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
     while periodic_found:
@@ -194,11 +191,22 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
                         periodic_found = True
 
         if (periodic_found):
-            [outer_faces_all.remove(p) for p in outer_faces_to_remove if p in outer_faces_all]
+            outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]
             if len(split_faces)>0:
                 outer_faces_all.extend(split_faces)
                 split_faces.clear()
 
+    # remove any duplicate periodic face pairs 
+    indx_to_remove = list()
+    for i in range(len(periodic_faces)):
+        for j in range(i+1,len(periodic_faces)):
+            if periodic_faces[i][0] == periodic_faces[j][0]:
+                if periodic_faces[i][1] == periodic_faces[j][1]:
+                    indx_to_remove.append(j)
+            if periodic_faces[i][1] == periodic_faces[j][0]:
+                if periodic_faces[i][0] == periodic_faces[j][1]:
+                    indx_to_remove.append(j)
+    periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
     # Export periodic faces and outer faces
     periodic_faces_export = list() 
     outer_faces_export = list() 

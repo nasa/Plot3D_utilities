@@ -191,7 +191,11 @@ class Face:
             Boolean: True if faces match, False if no match is found 
         """
         matchedIndices = self.match_indices(f)
-        return (len(matchedIndices)==self.nvertex) and (self.BlockIndex == f.BlockIndex)
+        
+        return ((len(matchedIndices)==self.nvertex) and (self.BlockIndex == f.BlockIndex) 
+            and (self.IMIN == f.IMIN) and (self.IMAX == f.IMAX) 
+            and (self.JMIN == f.JMIN) and (self.JMAX == f.JMAX) 
+            and (self.KMIN == f.KMIN) and (self.KMAX == f.KMAX) )
         
     def __ne__(self,f):
         """Checks if two faces are not equal 
