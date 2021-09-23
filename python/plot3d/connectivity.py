@@ -1,3 +1,4 @@
+from numpy.core.fromnumeric import diagonal
 from pandas.core.algorithms import unique
 from collections import namedtuple
 from .block import Block
@@ -524,7 +525,24 @@ def connectivity(blocks:List[Block]):
         outer_faces = list(set(outer_faces))    # Get most unique
         
     outer_faces = [o for o in outer_faces if o not in matches_to_remove]
-        
+    # Remove any outer faces that may have been found by mistake
+    # Check I,J,K if J and K are the same with another outer face, select the face with shorter I 
+    outer_faces_to_remove = list() 
+    for i in range(len(blocks)):
+        block_outerfaces = [o for o in outer_faces if o.BlockIndex == i]
+        for o in block_outerfaces:
+            IJK = np.array([o.IMIN,o.JMIN,o.KMIN,o.IMAX,o.JMAX,o.KMAX])
+            for o2 in block_outerfaces:
+                IJK2 = np.array([o2.IMIN,o2.JMIN,o2.KMIN,o2.IMAX,o2.JMAX,o2.KMAX])
+                if sum((IJK-IJK2)==0) == 5: # [0,0,0,40,100,0] (outer) [0,0,0,56,100,0] (outer) -> remove the longer face
+                    if (o2.diagonal_length>o.diagonal_length):
+                        outer_faces_to_remove.append(o2)
+                    else:
+                        outer_faces_to_remove.append(o)
+
+    outer_faces = [o for o in outer_faces if o not in outer_faces_to_remove]
+
+
     # Find self-matches: Do any faces of, for example, block1 match another face in block 1
     for i in range(len(blocks)):
         _,self_matches = get_outer_faces(blocks[i]) 
