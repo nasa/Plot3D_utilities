@@ -7,10 +7,10 @@ def export_to_glennht_conn(matches:dict,block_surfaces:dict,filename:str):
     """
 
     blocks = ['block1','block2']
-    with open(filename + '.ght_conn','w') as f:
+    with open(filename + '.ght_conn','w') as fp:
         # Print matches
         nMatches = len(matches)
-        f.write(f'{nMatches}\n') # Print number of matches 
+        fp.write(f'{nMatches}\n') # Print number of matches 
         for match in matches:                        
             for block in blocks:
                 block_indx = match[block]['block_index']+1 # block1 and block2 are arbitrary names, the key is the block index 
@@ -22,11 +22,11 @@ def export_to_glennht_conn(matches:dict,block_surfaces:dict,filename:str):
                 block_JMAX = match[block]['JMAX']+1
                 block_KMAX = match[block]['KMAX']+1
 
-                f.write(f"{block_indx:3d}\t{block_IMIN:5d} {block_JMIN:5d} {block_KMIN:5d}\t{block_IMAX:5d} {block_JMAX:5d} {block_KMAX:5d}\n")
+                fp.write(f"{block_indx:3d}\t{block_IMIN:5d} {block_JMIN:5d} {block_KMIN:5d}\t{block_IMAX:5d} {block_JMAX:5d} {block_KMAX:5d}\n")
         # Print Surfaces 
         # Get total number of surfaces 
-        lines = list()
         id = 1
+        lines = list()
         for surface in block_surfaces:
             block_indx = surface['block_index']+1
             IMIN = surface['IMIN']+1
@@ -38,6 +38,6 @@ def export_to_glennht_conn(matches:dict,block_surfaces:dict,filename:str):
             KMAX = surface['KMAX']+1
             lines.append(f"{block_indx:3d}\t{IMIN:5d} {JMIN:5d} {KMIN:5d}\t{IMAX:5d} {JMAX:5d} {KMAX:5d}\t{id:4d}\n")
             id += 1
-        
-        f.write(f'{len(lines)}\n')
-        [f.write(line) for line in lines]
+             
+        fp.write(f'{len(lines)}\n')
+        [fp.write(line) for line in lines]
