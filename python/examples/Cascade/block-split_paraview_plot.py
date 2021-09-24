@@ -111,7 +111,7 @@ if __name__=="__main__":
     '''
     Read the connectivity file
     '''
-    with open('connectivity-block-split_v02.pickle','rb') as f:
+    with open('connectivity_v02.pickle','rb') as f:
         data = pickle.load(f)
         face_matches = data['face_matches']
         outer_faces = data['outer_faces']
@@ -122,7 +122,8 @@ if __name__=="__main__":
     blocks_to_extract = [f['block1']['block_index'] for f in face_matches]
     blocks_to_extract.extend([f['block2']['block_index'] for f in face_matches])
     blocks_to_extract = list(set(blocks_to_extract))
-
+    blocks_to_extract.sort()
+    print(blocks_to_extract)
     '''
     Generate Random Colors 
     
@@ -140,13 +141,10 @@ if __name__=="__main__":
     # Load mesh
     plot3d_binary_filename = 'finalmesh_split.xyz'
     plot3D_source,plot3D_Display,View,LUT = Load(plot3d_binary_filename)
-    surface_indx = 1 
     
     '''
     Loop through all the blocks and create within each block the match and the outer surfaces
     '''
-    surface_indx =0 
-    periodic_indx = 0
     for b in blocks_to_extract: # Block indicies 
         block_source,block_display,LUT = ExtractBlocks(plot3D_source,View,[b+1])
         RenameSource('Block '+str(b), block_source)
@@ -163,17 +161,22 @@ if __name__=="__main__":
                 CreateSubset(block_source, voi, name='match '+str(match_indx))
         
         # Plot the outer faces  
-        for o in outer_faces:
+        for surface_indx, o in enumerate(outer_faces):
             # Add Plots for Outer Faces
             if o['block_index'] == b:
                 voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
-                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
-                surface_indx +=1 
+                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx+1),opacity=0.2) 
         
         # Plot the outer faces  
         for periodic_indx, p in enumerate(periodic_faces):
             # Add Plots for Outer Faces
-            if p['block1']['block_index'] == b or p['block2']['block_index'] == b : 
+            if p['block1']['block_index'] == b and p['block2']['block_index'] == b: # Periodicity within the block 
+                voi = [p['block1']['IMIN'], p['block1']['IMAX'], p['block1']['JMIN'], p['block1']['JMAX'],p['block1']['KMIN'], p['block1']['KMAX']]
+                CreateSubset(block_source, voi, name='periodic '+str(periodic_indx))
+                voi = [p['block2']['IMIN'], p['block2']['IMAX'], p['block2']['JMIN'], p['block2']['JMAX'],p['block2']['KMIN'], p['block2']['KMAX']]
+                CreateSubset(block_source, voi, name='periodic '+str(periodic_indx))
+
+            elif p['block1']['block_index'] == b or p['block2']['block_index'] == b: # Periodicity from block to block 
                 if p['block1']['block_index'] == b:
                     voi = [p['block1']['IMIN'], p['block1']['IMAX'], p['block1']['JMIN'], p['block1']['JMAX'],p['block1']['KMIN'], p['block1']['KMAX']]
                 else:
