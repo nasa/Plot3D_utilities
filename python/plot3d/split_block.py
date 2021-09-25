@@ -144,7 +144,7 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
 
         if total_cells>ncells_per_block:
             # Use greatest common divsor to maintain multi-grid so say the entire block is divisible by 4 then we want to maintain than for all the splits! 
-            greatest_common_divisor = gcd(block.IMAX-1, block.JMAX-1, block.KMAX-1) # Gets the maximum number of partitions that we can make for this given block
+            greatest_common_divisor =gcd(block.IMAX-1, gcd(block.JMAX-1, block.KMAX-1)) # Gets the maximum number of partitions that we can make for this given block
             if direction_to_use == Direction.i: 
                 
                 # In order to get close to the number of cells per block, we need to control how many steps of the greatest_common_divisor to advance so for example if you have a multigrid mesh that has gcd of 16 (fine) => 8 (coarse) => 4 (coarser) => 2 (coarsest) and you want 400K cells per block then JMAX*KMAX*gcd*some_factor has to be close to 400K cells
