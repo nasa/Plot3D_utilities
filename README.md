@@ -6,6 +6,9 @@ To install simply do a `pip install plot3d`
 
 > [Link to documentation](https://nasa.github.io/Plot3D_utilities/docs/build/html/index.html)
 
+# Tutorials
+[Reading Writing and Viewing Plot3D files](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_SplitBlocksExample.ipynb)
+
 # Contributors
 
 | Name               	| Position 	| Dates     	| Contribution                              	|                             	|
