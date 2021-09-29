@@ -102,10 +102,10 @@ def find_periodicity(blocks:List[Block],outer_faces:List, periodic_direction:str
         outer_faces_all.append(face)
 
     # Debug
-    debug_per1 = create_face(blocks[2], 0, 40, 0, 100,0,0) 
-    debug_per1.set_block_index(2)
-    debug_per2 = create_face(blocks[2], 0, 40, 0, 100,52,52) 
-    debug_per2.set_block_index(2)
+    # debug_per1 = create_face(blocks[2], 0, 40, 0, 100,0,0) 
+    # debug_per1.set_block_index(2)
+    # debug_per2 = create_face(blocks[2], 0, 40, 0, 100,52,52) 
+    # debug_per2.set_block_index(2)
     # End debug 
 
     split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
