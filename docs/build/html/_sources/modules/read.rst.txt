@@ -1,4 +1,4 @@
-Plot3D.Read
+Read 
 ====================
 
 .. automodule:: plot3d.read

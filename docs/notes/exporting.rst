@@ -1,6 +1,7 @@
 Exporting to GlennHT Connectivity Files
 ###############################################
 This is an example of how I read a mesh, convert it to ascii, save it, find connectivity, find periodicty and export to glennht format. 
+In this example we will use the file `PahtCascade-ASCII <https://nasa-public-data.s3.amazonaws.com/plot3d_utilities/PahtCascade-ASCII.xyz>`_
 
 .. code-block:: python 
     :linenos: 
@@ -14,11 +15,13 @@ This is an example of how I read a mesh, convert it to ascii, save it, find conn
     import pickle
 
     # Convert to binary because of size 
-    blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True)
-    write_plot3D('../../../testfiles/finalmesh.xyz',blocks,binary=True)
+    blocks = read_plot3D('PahtCascade-ASCII.xyz', binary = False)
+    write_plot3D('PahtCascade.xyz',blocks,binary=True)
+
+    blocks = read_plot3D('PahtCascade.xyz', binary = True, big_endian=True)
 
     if not os.path.exists('connectivity.pickle'):
-        blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=True)
+        blocks = read_plot3D('PahtCascade.xyz', binary = True, big_endian=True)
         # Block 1 is the blade O-Mesh k=0
         # outer_faces, _ = get_outer_faces(blocks[0]) # lets check
         face_matches, outer_faces_formatted = connectivity(blocks)
@@ -30,7 +33,7 @@ This is an example of how I read a mesh, convert it to ascii, save it, find conn
         face_matches = data['face_matches']
         outer_faces = data['outer_faces']
 
-    blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=True)
+    blocks = read_plot3D('PahtCascade.xyz', binary = True, big_endian=True)
     periodic_surfaces, outer_faces_to_keep = find_periodicity(blocks,outer_faces,periodic_direction='k')
     # Append periodic surfaces to face_matches
     face_matches.extend(periodic_surfaces)

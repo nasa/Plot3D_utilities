@@ -1,4 +1,4 @@
-Plot3D.Connectivity
+Connectivity
 ===================================
 
 .. automodule:: plot3d.connectivity

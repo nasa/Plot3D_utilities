@@ -1,4 +1,4 @@
-Plot3D.Block
+Block
 ====================
 
 .. automodule:: plot3d.block

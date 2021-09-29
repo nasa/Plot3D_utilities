@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Index &mdash; Plot3D 0.1.5 documentation</title>
+  <title>Index &mdash; Plot3D 1.3.9 documentation</title>
   
 
   
@@ -15,7 +15,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/static/style.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/style.css" type="text/css" />
 
   
   
@@ -36,14 +37,14 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="#" />
-    <link rel="search" title="Search" href="search.html" />
-    <link href="_static/style.css" rel="stylesheet" type="text/css">
-
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -67,7 +68,7 @@
             
             
               <div class="version">
-                0.1.5
+                1.3.9
               </div>
             
           
@@ -107,15 +108,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="notes/periodicity.html">Periodicity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notes/split-blocks.html">Split Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notes/split-blocks.html#multi-grid-concept">Multi-grid concept</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notes/split-blocks.html#splitting-blocks-example">Splitting Blocks Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notes/split-blocks.html#plotting-split-blocks-with-paraview">Plotting Split Blocks with Paraview</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Python Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules/connectivity.html">Plot3D.Connectivity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/block.html">Plot3D.Block</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/differencing.html">Plot3D.Differencing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/face.html">Plot3D.Face</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/read.html">Plot3D.Read</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/write.html">Plot3D.Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/write.html">Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/periodicity.html">Periodicity</a></li>
 </ul>
 
             
@@ -193,10 +202,12 @@
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
@@ -208,11 +219,13 @@
 </li>
       <li><a href="modules/face.html#plot3d.face.Face.__hash__">__hash__() (plot3d.face.Face method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/face.html#plot3d.face.Face.__ne__">__ne__() (plot3d.face.Face method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/face.html#plot3d.face.Face.__normal__">__normal__() (plot3d.face.Face method)</a>
+</li>
+      <li><a href="modules/periodicity.html#plot3d.periodicity.__periodicity_check__">__periodicity_check__() (in module plot3d.periodicity)</a>
 </li>
       <li><a href="modules/face.html#plot3d.face.Face.__str__">__str__() (plot3d.face.Face method)</a>
 </li>
@@ -240,10 +253,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/block.html#plot3d.block.Block.cell_volumes">cell_volumes() (plot3d.block.Block method)</a>
 </li>
+      <li><a href="modules/connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks">combinations_of_nearest_blocks() (in module plot3d.connectivity)</a>
+</li>
       <li><a href="modules/connectivity.html#plot3d.connectivity.connectivity">connectivity() (in module plot3d.connectivity)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/periodicity.html#plot3d.periodicity.create_face">create_face() (in module plot3d.periodicity)</a>
+</li>
       <li><a href="modules/face.html#plot3d.face.create_face_from_diagonals">create_face_from_diagonals() (in module plot3d.face)</a>
 </li>
       <li><a href="modules/block.html#plot3d.block.Block.cylindrical">cylindrical() (plot3d.block.Block method)</a>
@@ -257,12 +274,18 @@
       <li><a href="modules/face.html#plot3d.face.Face.diagonal_length">diagonal_length (plot3d.face.Face property)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/split_block.html#plot3d.split_block.Direction">Direction (class in plot3d.split_block)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/face.html#plot3d.face.Face">Face (class in plot3d.face)</a>
+</li>
+      <li><a href="modules/connectivity.html#plot3d.connectivity.find_block_index_in_outer_faces">find_block_index_in_outer_faces() (in module plot3d.connectivity)</a>
 </li>
       <li><a href="modules/differencing.html#plot3d.differencing.find_edges">find_edges() (in module plot3d.differencing)</a>
 </li>
@@ -271,6 +294,8 @@
       <li><a href="modules/differencing.html#plot3d.differencing.find_face_edges">find_face_edges() (in module plot3d.differencing)</a>
 </li>
       <li><a href="modules/connectivity.html#plot3d.connectivity.find_matching_blocks">find_matching_blocks() (in module plot3d.connectivity)</a>
+</li>
+      <li><a href="modules/periodicity.html#plot3d.periodicity.find_periodicity">find_periodicity() (in module plot3d.periodicity)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -305,10 +330,20 @@
   </ul></td>
 </tr></table>
 
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/periodicity.html#plot3d.periodicity.linear_real_transform">linear_real_transform() (in module plot3d.periodicity)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/face.html#plot3d.face.Face.match_indices">match_indices() (plot3d.face.Face method)</a>
+</li>
+      <li><a href="modules/split_block.html#plot3d.split_block.max_aspect_ratio">max_aspect_ratio() (in module plot3d.split_block)</a>
 </li>
       <li>
     module
@@ -322,7 +357,11 @@
 </li>
         <li><a href="modules/face.html#module-plot3d.face">plot3d.face</a>
 </li>
+        <li><a href="modules/periodicity.html#module-plot3d.periodicity">plot3d.periodicity</a>
+</li>
         <li><a href="modules/read.html#module-plot3d.read">plot3d.read</a>
+</li>
+        <li><a href="modules/split_block.html#module-plot3d.split_block">plot3d.split_block</a>
 </li>
         <li><a href="modules/write.html#module-plot3d.write">plot3d.write</a>
 </li>
@@ -354,8 +393,6 @@
         <li><a href="modules/differencing.html#module-plot3d.differencing">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     plot3d.face
 
@@ -363,11 +400,27 @@
         <li><a href="modules/face.html#module-plot3d.face">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    plot3d.periodicity
+
+      <ul>
+        <li><a href="modules/periodicity.html#module-plot3d.periodicity">module</a>
+</li>
+      </ul></li>
       <li>
     plot3d.read
 
       <ul>
         <li><a href="modules/read.html#module-plot3d.read">module</a>
+</li>
+      </ul></li>
+      <li>
+    plot3d.split_block
+
+      <ul>
+        <li><a href="modules/split_block.html#module-plot3d.split_block">module</a>
 </li>
       </ul></li>
       <li>
@@ -397,7 +450,21 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/connectivity.html#plot3d.connectivity.select_multi_dimensional">select_multi_dimensional() (in module plot3d.connectivity)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/split_block.html#plot3d.split_block.split_blocks">split_blocks() (in module plot3d.split_block)</a>
+</li>
       <li><a href="modules/face.html#plot3d.face.split_face">split_face() (in module plot3d.face)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/face.html#plot3d.face.Face.to_dict">to_dict() (plot3d.face.Face method)</a>
 </li>
   </ul></td>
 </tr></table>

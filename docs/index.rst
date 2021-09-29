@@ -19,7 +19,7 @@ This tool is currently a python library. Julia version is in the works.
    notes/connectivity
    notes/periodicity
    notes/exporting
-   
+   notes/split-blocks
 
 .. toctree::
    :glob:
@@ -32,6 +32,8 @@ This tool is currently a python library. Julia version is in the works.
    modules/face
    modules/read
    modules/write
+   modules/split_block
+   modules/periodicity
    
 
 

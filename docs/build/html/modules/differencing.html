@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Plot3D.Differencing &mdash; Plot3D 0.1.5 documentation</title>
+  <title>Differencing &mdash; Plot3D 1.3.9 documentation</title>
   
 
   
@@ -15,7 +15,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/static/style.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
 
   
   
@@ -36,16 +37,16 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Plot3D.Face" href="face.html" />
-    <link rel="prev" title="Plot3D.Block" href="block.html" />
-    <link href="../_static/style.css" rel="stylesheet" type="text/css">
-
+    <link rel="next" title="Face" href="face.html" />
+    <link rel="prev" title="Block" href="block.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -69,7 +70,7 @@
             
             
               <div class="version">
-                0.1.5
+                1.3.9
               </div>
             
           
@@ -109,15 +110,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../notes/periodicity.html">Periodicity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/split-blocks.html">Split Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notes/split-blocks.html#multi-grid-concept">Multi-grid concept</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notes/split-blocks.html#splitting-blocks-example">Splitting Blocks Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notes/split-blocks.html#plotting-split-blocks-with-paraview">Plotting Split Blocks with Paraview</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Python Package Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Plot3D.Connectivity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="block.html">Plot3D.Block</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Plot3D.Differencing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="face.html">Plot3D.Face</a></li>
-<li class="toctree-l1"><a class="reference internal" href="read.html">Plot3D.Read</a></li>
-<li class="toctree-l1"><a class="reference internal" href="write.html">Plot3D.Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
 </ul>
 
             
@@ -166,7 +175,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Plot3D.Differencing</li>
+      <li>Differencing</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -186,7 +195,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-plot3d.differencing">
-<span id="plot3d-differencing"></span><h1>Plot3D.Differencing<a class="headerlink" href="#module-plot3d.differencing" title="Permalink to this headline">¶</a></h1>
+<span id="differencing"></span><h1>Differencing<a class="headerlink" href="#module-plot3d.differencing" title="Permalink to this headline">¶</a></h1>
 <p>This code computes all the edges of a block or block face</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.differencing.find_edges">
@@ -249,8 +258,8 @@ Find edges will always deal with faces and not something that is in 3D</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="face.html" class="btn btn-neutral float-right" title="Plot3D.Face" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="block.html" class="btn btn-neutral float-left" title="Plot3D.Block" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="face.html" class="btn btn-neutral float-right" title="Face" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="block.html" class="btn btn-neutral float-left" title="Block" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
