@@ -1,5 +1,8 @@
 # Plot3D
-A python and julia plot3D library for reading, writing, finding connectivity, and post processing for Plot3D data files
+A python and julia plot3D library for reading, writing, finding connectivity, and post processing for Plot3D data files. 
+
+# Funding
+The development of this library was supported by NASA AATT (Advance Air Transport Technology). The development is supported by NASA Glenn LTE Branch however anyone is welcome to contribute by submitting a pull request. 
 
 ## Install Instructions
 To install simply do a `pip install plot3d` 
