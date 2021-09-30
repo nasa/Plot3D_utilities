@@ -181,7 +181,7 @@ class Face:
         return matchedIndices
 
     def __eq__(self, f):
-        """Check to see if two faces are the same by looking at the value of their vertices 
+        """Check to see if two faces are the same by looking at the I,J,K
         Checks to see if any of vertices x,y,z match
 
         Args:
@@ -196,7 +196,19 @@ class Face:
             and (self.IMIN == f.IMIN) and (self.IMAX == f.IMAX) 
             and (self.JMIN == f.JMIN) and (self.JMAX == f.JMAX) 
             and (self.KMIN == f.KMIN) and (self.KMAX == f.KMAX) )
-        
+    
+    def vertices_equals(self,f):
+        """Checks to see if two faces are the same by looking at the vertices
+
+        Args:
+            f (Face): Another face
+
+        Returns:
+            bool: True = face vertices are equal
+        """
+        matchedIndices = self.match_indices(f)
+        return (len(matchedIndices)==self.nvertex)
+
     def __ne__(self,f):
         """Checks if two faces are not equal 
 

@@ -22,7 +22,7 @@ def __write_plot3D_block_binary(f,B:Block):
         for k in range(B.KMAX):
             for j in range(B.JMAX):
                 for i in range(B.IMAX):
-                    f.write(struct.pack('>f',V[i,j,k]))
+                    f.write(struct.pack('f',V[i,j,k]))
     write_var(B.X)
     write_var(B.Y)
     write_var(B.Z)
@@ -61,16 +61,16 @@ def write_plot3D(filename:str,blocks:List[Block],binary:bool=True):
     Args:
         filename (str): name of the file to create 
         blocks (List[Block]): List containing all the blocks to write
-        binary (bool, optional): Format required. Defaults to True.
+        binary (bool, optional): Binary big endian. Defaults to True.
     """
     if binary:
         with open(filename,'wb') as f:
-            f.write(struct.pack('>I',len(blocks)))
+            f.write(struct.pack('I',len(blocks)))
             for b in blocks:
                 IMAX,JMAX,KMAX = b.X.shape
-                f.write(struct.pack('>I',IMAX))
-                f.write(struct.pack('>I',JMAX))
-                f.write(struct.pack('>I',KMAX))
+                f.write(struct.pack('I',IMAX))
+                f.write(struct.pack('I',JMAX))
+                f.write(struct.pack('I',KMAX))
             for b in blocks:
                 __write_plot3D_block_binary(f,b)
     else:

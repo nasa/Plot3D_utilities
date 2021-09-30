@@ -26,13 +26,13 @@ with open('connectivity-block-split.pickle','rb') as f:
     face_matches = data['face_matches']
     outer_faces = data['outer_faces']
 
-blocks = read_plot3D('finalmesh_split.xyz', binary = True, big_endian=True)
-periodic_surfaces, outer_faces_to_keep = find_periodicity(blocks,outer_faces,periodic_direction='k',rotation_axis='x',nblades=55)
+blocks = read_plot3D('finalmesh_split.xyz', binary = True, big_endian=False)
+
+periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = find_periodicity(blocks,outer_faces,periodic_direction='k',rotation_axis='x',nblades=55)
+face_matches.extend(periodic_surfaces)
 with open('connectivity-block-split_v02.pickle','wb') as f:
     [m.pop('match',None) for m in face_matches] # Remove the dataframe
     pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
 
 # Append periodic surfaces to face_matches
-face_matches.extend(periodic_surfaces)
-
 export_to_glennht_conn(face_matches,outer_faces_to_keep,'finalmesh-block-split')

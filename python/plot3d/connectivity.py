@@ -78,7 +78,7 @@ def get_outer_faces(block1:Block):
     for i in range(len(faces)):
         matchFound = False
         for j in range(len(faces)):
-            if (i!=j and faces[i] == faces[j]):
+            if (i!=j and faces[i].vertices_equals(faces[j])):
                 matching.append((i,j))
                 matchFound = True
         if not matchFound:
@@ -106,7 +106,7 @@ def unique_pairs(listOfItems:list):
             yield x,y
 
 
-def find_matching_blocks(block1:Block,block2:Block):  
+def find_matching_blocks(block1:Block,block2:Block,tol:float=5E-5):  
     """Takes two blocks and finds all matching pairs
 
     Args:
@@ -143,7 +143,7 @@ def find_matching_blocks(block1:Block,block2:Block):
             block1_face = block1_outer[p]
             for q in range(len(block2_outer)):
                 block2_face = block2_outer[q]
-                df,split_faces1,split_faces2 = get_face_intersection(block1_face,block2_face,block1,block2)
+                df,split_faces1,split_faces2 = get_face_intersection(block1_face,block2_face,block1,block2,tol)
                 if len(df)>0:   # the number of intersection points has to be more than 4
                     # if not block1_face in block1MatchingFace and not block2_face in block2MatchingFace:
                     block_match_indices.append(df)
@@ -493,7 +493,7 @@ def connectivity(blocks:List[Block]):
         i,j = combos[indx]
         t.set_description(f"Checking connections block {i} with {j}")
         # Takes 2 blocks, gets the matching faces exterior faces of both blocks 
-        df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j])    # This function finds partial matches between blocks
+        df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j],1E-5)    # This function finds partial matches between blocks
         [o.set_block_index(i) for o in blocki_outerfaces]
         [o.set_block_index(j) for o in blockj_outerfaces]
         # Update connectivity for blocks with matching faces 

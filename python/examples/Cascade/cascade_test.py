@@ -13,10 +13,12 @@ import pickle
 
 if not os.path.exists('connectivity.pickle'):
     blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=False)
+    write_plot3D('finalmesh.xyz',blocks,binary=True)
     # Block 1 is the blade O-Mesh k=0
     # outer_faces, _ = get_outer_faces(blocks[0]) # lets check
     face_matches, outer_faces_formatted = connectivity(blocks)
     with open('connectivity.pickle','wb') as f:
+        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_formatted},f)
 
 with open('connectivity.pickle','rb') as f:
@@ -25,12 +27,15 @@ with open('connectivity.pickle','rb') as f:
     outer_faces = data['outer_faces']
 
 blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=False)
-periodic_surfaces, outer_faces_to_keep = find_periodicity(blocks,outer_faces,periodic_direction='k')
-with open('connectivity_periodic.pickle','wb') as f:
-    pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
 
+periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = find_periodicity(blocks,outer_faces,periodic_direction='k',rotation_axis='x',nblades=55)
 # Append periodic surfaces to face_matches
 face_matches.extend(periodic_surfaces)
+
+with open('connectivity_periodic.pickle','wb') as f:
+    [m.pop('match',None) for m in face_matches] # Remove the dataframe
+    pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
+
 export_to_glennht_conn(face_matches,outer_faces_to_keep,'finalmesh')
 
 

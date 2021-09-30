@@ -19,8 +19,7 @@ def Load(filename:str):
             - **View** (paraview.source): source object for plot3d 
 
     """
-    extension = os.path.basename(filename).split('.')[1]
-    plot3D = PLOT3DReader(registrationName=os.path.splitext(filename)[0],
+    plot3D = PLOT3DReader(registrationName=filename,
             QFileName='',
             FileName=filename,
             FunctionFileName='')
@@ -109,7 +108,7 @@ def ExtractSurface(source,name:str,VOI:List[int]):
     renderView1 = GetActiveViewOrCreate('RenderView')
     extractSubset1Display = Show(extractSubset1, renderView1, 'StructuredGridRepresentation')
     # trace defaults for the display properties.
-    extractSubset1Display.Representation = 'Surface'
+    extractSubset1Display.Representation = 'Outline'
     extractSubset1Display.ColorArrayName = [None, '']
     extractSubset1Display.SelectTCoordArray = 'None'
     extractSubset1Display.SelectNormalArray = 'None'
@@ -132,7 +131,7 @@ def ExtractSurface(source,name:str,VOI:List[int]):
     # update the view to ensure updated data information
     renderView1.Update()
 
-    extractSubset1Display.SetRepresentationType('Surface')
+    extractSubset1Display.SetRepresentationType('Outline')
 
     return extractSubset1,extractSubset1Display
 
@@ -161,7 +160,7 @@ def Periodicity(source,nBlades,BlockIndices,View):
     # show data in view
     angularPeriodicFilter1Display = Show(angularPeriodicFilter1, View)
     # trace defaults for the display properties.
-    angularPeriodicFilter1Display.Representation = 'Surface'
+    angularPeriodicFilter1Display.Representation = 'Outline'
     angularPeriodicFilter1Display.ColorArrayName = ['POINTS', 'Density']
     angularPeriodicFilter1Display.LookupTable = LUT
     angularPeriodicFilter1Display.OSPRayScaleArray = 'Density'

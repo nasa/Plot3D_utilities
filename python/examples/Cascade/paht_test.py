@@ -8,7 +8,7 @@ sys.path.insert(0,os.getcwd())
 import random
 
 
-with open('connectivity-block-split_v02.pickle','rb') as f:
+with open('connectivity_periodic.pickle','rb') as f:
     data = pickle.load(f)
     face_matches = data['face_matches']
     outer_faces = data['outer_faces']
