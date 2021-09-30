@@ -7,7 +7,7 @@ The plot3D python library has a function for determining the connectivity. This 
 
 Below is an example of a turbine domain with two blocks: HGrid in (red) and ogrid in (white). The two share a connected face with partial matching. There's also the o-mesh which within itself has a connected face. 
 
-.. figure:: ../static/turbine_domain-blocking.png
+.. figure:: ../_static/turbine_domain-blocking.png
     :width: 800px
     :align: center
     :alt: Two blocks, one in red for h mesh and white for omesh
@@ -18,14 +18,14 @@ To find connectivity simply call the function *connectivity* and pass in the blo
 .. code-block:: python
     :linenos:
 
-    blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=True)
+    blocks = read_plot3D('PahtCascade.xyz', binary = True, big_endian=True)
     # Block 1 is the blade O-Mesh k=0
     # outer_faces, _ = get_outer_faces(blocks[0]) # lets check
     face_matches, outer_faces_formatted = connectivity(blocks)
 
 This is an example of the output. The figure below shows the block 1 and 2 matching faces found in the variable *face_matches*.
 
-.. figure:: ../static/turbine_domain-matching1-2.png
+.. figure:: ../_static/turbine_domain-matching1-2.png
     :width: 800px
     :align: center
     :alt: matching block 1 and block 2 faces 
@@ -33,7 +33,7 @@ This is an example of the output. The figure below shows the block 1 and 2 match
 
 This is the matching face within the omesh 
 
-.. figure:: ../static/turbine_domain-matching1-1.png
+.. figure:: ../_static/turbine_domain-matching1-1.png
     :width: 800px
     :align: center
     :alt: matching block 1 and block 2 faces 
@@ -59,7 +59,7 @@ Part 1 - Processing the data locally for paraview import
 --------------------------------------------------------------
 The goal if this code is to create a pickle file that is read in part 2. This pickle file contains the matching faces and outer faces. 
 
-.. literalinclude:: ../static/paraview_code_part1.py
+.. literalinclude:: ../_static/paraview_code_part1.py
   :language: python
 
 
@@ -78,19 +78,19 @@ For windows this looks like this. You have the `[working folder]>"[path to parav
     
     C:\Github\Plot3D_utilities\python\test\paraview_plot > "C:\Program Files\ParaView 5.9.1-Windows-Python3.8-msvc2017-64bit\bin\paraview.exe" --script=compressor_plot_test.py
 
-.. figure:: ../static/paraview_launch_command.png
+.. figure:: ../_static/paraview_launch_command.png
     :width: 800px
     :align: center
     :alt: screenshot of command prompt to launch paraview in script mode
     :figclass: align-center
 
 
-.. literalinclude:: ../static/paraview_code_part2.py
+.. literalinclude:: ../_static/paraview_code_part2.py
   :language: python
 
 The output should look like the following 
 
-.. figure:: ../static/connectivity_paraview.png
+.. figure:: ../_static/connectivity_paraview.png
     :width: 800px
     :align: center
     :alt: screenshot of a mesh with connected faces in paraview

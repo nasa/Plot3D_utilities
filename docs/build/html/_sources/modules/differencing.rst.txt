@@ -1,4 +1,4 @@
-Plot3D.Differencing
+Differencing
 ====================
 
 .. automodule:: plot3d.differencing

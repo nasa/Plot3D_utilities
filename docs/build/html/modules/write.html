@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Plot3D.Write &mdash; Plot3D 0.1.5 documentation</title>
+  <title>Write &mdash; Plot3D 1.3.9 documentation</title>
   
 
   
@@ -15,7 +15,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/static/style.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
 
   
   
@@ -36,15 +37,16 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Plot3D.Read" href="read.html" />
-    <link href="../_static/style.css" rel="stylesheet" type="text/css">
-
+    <link rel="next" title="Splitting Blocks" href="split_block.html" />
+    <link rel="prev" title="Read" href="read.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -68,7 +70,7 @@
             
             
               <div class="version">
-                0.1.5
+                1.3.9
               </div>
             
           
@@ -93,7 +95,7 @@
               
             
             
-              <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
+              <p class="caption"><span class="caption-text">Python Notes</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../notes/installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../notes/installation.html#installation-via-pip">Installation via Pip</a></li>
@@ -106,17 +108,25 @@
 <li class="toctree-l2"><a class="reference internal" href="../notes/connectivity.html#plotting-connectivity-using-paraview">Plotting Connectivity using Paraview</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../notes/connectivity.html#exporting-to-glennht-connectivity-files">Exporting to GlennHT Connectivity Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/split-blocks.html">Split Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notes/split-blocks.html#multi-grid-concept">Multi-grid concept</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notes/split-blocks.html#splitting-blocks-example">Splitting Blocks Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notes/split-blocks.html#plotting-split-blocks-with-paraview">Plotting Split Blocks with Paraview</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Python Package Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Plot3D.Connectivity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="block.html">Plot3D.Block</a></li>
-<li class="toctree-l1"><a class="reference internal" href="differencing.html">Plot3D.Differencing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="face.html">Plot3D.Face</a></li>
-<li class="toctree-l1"><a class="reference internal" href="read.html">Plot3D.Read</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Plot3D.Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read.html">Read</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
 </ul>
 
             
@@ -165,7 +175,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Plot3D.Write</li>
+      <li>Write</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -185,7 +195,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-plot3d.write">
-<span id="plot3d-write"></span><h1>Plot3D.Write<a class="headerlink" href="#module-plot3d.write" title="Permalink to this headline">¶</a></h1>
+<span id="write"></span><h1>Write<a class="headerlink" href="#module-plot3d.write" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.write.write_plot3D">
 <span class="sig-prename descclassname"><span class="pre">plot3d.write.</span></span><span class="sig-name descname"><span class="pre">write_plot3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/write.html#write_plot3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.write.write_plot3D" title="Permalink to this definition">¶</a></dt>
@@ -209,7 +219,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="read.html" class="btn btn-neutral float-left" title="Plot3D.Read" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="split_block.html" class="btn btn-neutral float-right" title="Splitting Blocks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="read.html" class="btn btn-neutral float-left" title="Read" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

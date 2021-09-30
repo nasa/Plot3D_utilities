@@ -13,7 +13,6 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
-import sphinx_rtd_theme
 import plot3d
 
 # -- Project information -----------------------------------------------------
@@ -23,8 +22,8 @@ copyright = '2021, Paht Juangphanich'
 author = 'Paht Juangphanich <paht.juangphanich@nasa.gov>'
 
 # The full version, including alpha/beta/rc tags
-version = '0.1.5' # plot3d.__version__
-release = '0.1.5' # plot3d.__version__
+version = '1.3.9' # plot3d.__version__
+release = version # plot3d.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -39,7 +38,8 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.napoleon'
+    'sphinxcontrib.napoleon',
+    'sphinx_copybutton',
 ]
 autosummary_generate = True
 
@@ -85,11 +85,12 @@ html_theme_options = {
     'navigation_depth': 2,
 }
 
-htmlstatic_path = ['static']
-rst_context = {'plot3d': plot3d}
+html_static_path  = ['_static']
 html_css_files = [
-    'static/style.css',
+    'css/style.css',
 ]
+rst_context = {'plot3d': plot3d}
+
 def setup(app):
     def skip(app, what, name, obj, skip, options):
         members = [

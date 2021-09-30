@@ -1,4 +1,4 @@
-Plot3D.Write
+Write
 ====================
 
 .. automodule:: plot3d.write

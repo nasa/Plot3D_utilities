@@ -1,4 +1,4 @@
-Plot3D.Face
+Face
 ====================
 
 .. automodule:: plot3d.face
