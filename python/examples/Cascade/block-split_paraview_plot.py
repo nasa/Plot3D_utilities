@@ -111,7 +111,7 @@ if __name__=="__main__":
     '''
     Read the connectivity file
     '''
-    with open('connectivity_v02.pickle','rb') as f:
+    with open('connectivity-block-split_v02.pickle','rb') as f:
         data = pickle.load(f)
         face_matches = data['face_matches']
         outer_faces = data['outer_faces']

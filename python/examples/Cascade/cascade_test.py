@@ -29,6 +29,7 @@ with open('connectivity.pickle','rb') as f:
 blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=False)
 
 periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = find_periodicity(blocks,outer_faces,periodic_direction='k',rotation_axis='x',nblades=55)
+
 # Append periodic surfaces to face_matches
 face_matches.extend(periodic_surfaces)
 

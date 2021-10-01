@@ -1,4 +1,5 @@
 from numpy.core.fromnumeric import diagonal
+from numpy.core.shape_base import block
 from pandas.core.algorithms import unique
 from collections import namedtuple
 from .block import Block
@@ -108,15 +109,12 @@ def unique_pairs(listOfItems:list):
 
 def find_matching_blocks(block1:Block,block2:Block,tol:float=5E-5):  
     """Takes two blocks and finds all matching pairs
-
     Args:
         block1 (Block): Any plot3d Block that is not the same as block2
         block2 (Block): Any plot3d Block that is not the same as block1
         full_face_match (bool): (Depreciated) use full face matching (Much faster) Full face match can be deceiving. There could be some cases where the face is a wrap and 4 corners match but the insides do not. This kind of connection shouldn't be considered
-
     Returns:
         (tuple): containing
-
             - **df** (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])
             - **block1_outer** (List[Face]):
             - **block2_outer** (List[Face]): 
@@ -126,6 +124,7 @@ def find_matching_blocks(block1:Block,block2:Block,tol:float=5E-5):
 
     block1_outer,_ = get_outer_faces(block1)
     block2_outer,_ = get_outer_faces(block2)
+
     block1_split_faces = list()
     block2_split_faces = list() 
     block1MatchingFace = list()
@@ -143,7 +142,7 @@ def find_matching_blocks(block1:Block,block2:Block,tol:float=5E-5):
             block1_face = block1_outer[p]
             for q in range(len(block2_outer)):
                 block2_face = block2_outer[q]
-                df,split_faces1,split_faces2 = get_face_intersection(block1_face,block2_face,block1,block2,tol)
+                df, split_faces1, split_faces2 = get_face_intersection(block1_face,block2_face,block1,block2,tol)
                 if len(df)>0:   # the number of intersection points has to be more than 4
                     # if not block1_face in block1MatchingFace and not block2_face in block2MatchingFace:
                     block_match_indices.append(df)
@@ -152,7 +151,10 @@ def find_matching_blocks(block1:Block,block2:Block,tol:float=5E-5):
                     block1_split_faces.extend(split_faces1)
                     block2_split_faces.extend(split_faces2)
                     match = True
-                    
+                    break
+            if match:
+                break
+
         [block1_outer.remove(b) for b in block1MatchingFace if b in block1_outer]
         [block2_outer.remove(b) for b in block2MatchingFace if b in block2_outer]
         if len(block1_split_faces)>0:
@@ -163,6 +165,9 @@ def find_matching_blocks(block1:Block,block2:Block,tol:float=5E-5):
             block2_split_faces.clear()
 
     return block_match_indices, block1_outer, block2_outer # Remove duplicates using set and list 
+                    
+        
+        
 
 
 def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
@@ -209,30 +214,31 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
     split_faces1 = list()
     split_faces2 = list()
     
+    # * Note: The code below attempts to speed things up but it sometimes misses connected faces. 
     # See if we can speed up the match by looking at the match indicies 
-    matchedIndicies = face1.match_indices(face2) # face1 == face2, Full face match is automatically checked first. If this is not 4 then code proceeds to partial match
-    if len(matchedIndicies)>0: # Checks to see if the two faces corners are actually 
-        for i,j in matchedIndicies:
-            i1,j1,k1 = face1.I[i],face1.J[i],face1.K[i]
-            i2,j2,k2 = face2.I[j],face2.J[j],face2.K[j]
-            match_location.append({"i1":i1,"j1":j1,"k1":k1,'i2':i2,'j2':j2,'k2':k2})
-        df_temp = pd.DataFrame(match_location)
-        I1 = [df_temp['i1'].min(), df_temp['i1'].max()]
-        J1 = [df_temp['j1'].min(), df_temp['j1'].max()]
-        K1 = [df_temp['k1'].min(), df_temp['k1'].max()]
+    # matchedIndicies = face1.match_indices(face2) # face1 == face2, Full face match is automatically checked first. If this is not 4 then code proceeds to partial match
+    # if len(matchedIndicies)>0: # Checks to see if the two faces corners are actually 
+    #     for i,j in matchedIndicies:
+    #         i1,j1,k1 = face1.I[i],face1.J[i],face1.K[i]
+    #         i2,j2,k2 = face2.I[j],face2.J[j],face2.K[j]
+    #         match_location.append({"i1":i1,"j1":j1,"k1":k1,'i2':i2,'j2':j2,'k2':k2})
+    #     df_temp = pd.DataFrame(match_location)
+    #     I1 = [df_temp['i1'].min(), df_temp['i1'].max()]
+    #     J1 = [df_temp['j1'].min(), df_temp['j1'].max()]
+    #     K1 = [df_temp['k1'].min(), df_temp['k1'].max()]
 
-        I2 = [df_temp['i2'].min(), df_temp['i2'].max()]
-        J2 = [df_temp['j2'].min(), df_temp['j2'].max()]
-        K2 = [df_temp['k2'].min(), df_temp['k2'].max()]
-    else:
+    #     I2 = [df_temp['i2'].min(), df_temp['i2'].max()]
+    #     J2 = [df_temp['j2'].min(), df_temp['j2'].max()]
+    #     K2 = [df_temp['k2'].min(), df_temp['k2'].max()]
+    # else:
         # Check all points interior of the block
-        I1 = [face1.IMIN,face1.IMAX]
-        J1 = [face1.JMIN,face1.JMAX]
-        K1 = [face1.KMIN,face1.KMAX]
+    I1 = [face1.IMIN,face1.IMAX]
+    J1 = [face1.JMIN,face1.JMAX]
+    K1 = [face1.KMIN,face1.KMAX]
 
-        I2 = [face2.IMIN,face2.IMAX]
-        J2 = [face2.JMIN,face2.JMAX]
-        K2 = [face2.KMIN,face2.KMAX]
+    I2 = [face2.IMIN,face2.IMAX]
+    J2 = [face2.JMIN,face2.JMAX]
+    K2 = [face2.KMIN,face2.KMAX]
     
     # Grab the points of Face 1 and Face 2
     X1 = select_multi_dimensional(block1.X, (I1[0],I1[1]),(J1[0],J1[1]),(K1[0],K1[1]))
@@ -472,10 +478,8 @@ def find_block_index_in_outer_faces(outer_faces:List[Face], block_indx:int):
 
 def connectivity(blocks:List[Block]):
     """Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces 
-
     Args:
         blocks (List[Block]): List of all blocks in multi-block plot3d mesh
-
     Returns:
         (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'} }
         (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'surfaces': [{'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX', 'ID'}] }
@@ -493,7 +497,7 @@ def connectivity(blocks:List[Block]):
         i,j = combos[indx]
         t.set_description(f"Checking connections block {i} with {j}")
         # Takes 2 blocks, gets the matching faces exterior faces of both blocks 
-        df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j],1E-5)    # This function finds partial matches between blocks
+        df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j])    # This function finds partial matches between blocks
         [o.set_block_index(i) for o in blocki_outerfaces]
         [o.set_block_index(j) for o in blockj_outerfaces]
         # Update connectivity for blocks with matching faces 
@@ -571,4 +575,4 @@ def connectivity(blocks:List[Block]):
                             'id':id, 'block_index':face.BlockIndex })
         id += 1
 
-    return face_matches, outer_faces_formatted 
+    return face_matches, outer_faces_formatted  

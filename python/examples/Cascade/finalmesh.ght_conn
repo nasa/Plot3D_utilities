@@ -7,20 +7,13 @@
   2	  169     1    53	  269   101    53
   2	    1     1     1	   41   101     1
   2	    1     1    53	   41   101    53
-  1	    1     1    33	  129   101    33
   2	   41     1    53	  169   101    53
-9
-  2	    1     1     1	    1   101    53	   1    # Inlet
-  2	    1   101     1	  269   101    53	   2    # Shroud
-  1	    1   101     1	  257   101    33	   3    # blade shroud
-  2	  269     1     1	  269   101    53	   4    # Outlet
-  2	    1     1     1	  269     1    53	   5    # Hub 
-  1	    1     1     1	  257     1    33	   6    # Blade hub
-  1	    1     1     1	  257   101     1	   7    # Blade wall
-  2	    1     1    53	  169   101    53	   8    # Periodic extra
-  2	   41     1    53	  269   101    53	   9    # Periodic extra
-
-# Need to add feature to remove overlapping surfaces in outer surfaces and also remove the extra from periodic match 
-
-# TODO: Update simulatioin to simply check for negative volumes
-# 
+  1	    1     1    33	  129   101    33
+7
+  2	    1     1     1	    1   101    53	   1
+  2	    1   101     1	  269   101    53	   2
+  1	    1   101     1	  257   101    33	   3
+  2	  269     1     1	  269   101    53	   4
+  2	    1     1     1	  269     1    53	   5
+  1	    1     1     1	  257     1    33	   6
+  1	    1     1     1	  257   101     1	   7
