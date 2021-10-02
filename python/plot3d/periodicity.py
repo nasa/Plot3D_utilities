@@ -104,8 +104,8 @@ def periodicity(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Fa
     for m in matched_faces:
         face1 = create_face(blocks[m['block1']['block_index']], m['block1']['IMIN'], m['block1']['IMAX'], m['block1']['JMIN'], m['block1']['JMAX'], m['block1']['KMIN'], m['block1']['KMAX'])
         face2 = create_face(blocks[m['block2']['block_index']], m['block2']['IMIN'], m['block2']['IMAX'], m['block2']['JMIN'], m['block2']['JMAX'], m['block2']['KMIN'], m['block2']['KMAX'])
-        face1.set_block_index(blocks[m['block1']['block_index']])
-        face2.set_block_index(blocks[m['block2']['block_index']])
+        face1.set_block_index(m['block1']['block_index'])
+        face2.set_block_index(m['block2']['block_index'])
         matched_faces_all.append(face1)
         matched_faces_all.append(face2)
     # Debug
