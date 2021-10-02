@@ -173,6 +173,7 @@ def find_matching_blocks(block1:Block,block2:Block,tol:float=5E-5):
 def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
     """Takes a block (T) and selects X,Y,Z from the block given a face's dimensions
         theres really no good way to do this in python 
+        
     Args:
         T (np.ndarray): arbitrary array so say a full matrix containing X
         dim1 (tuple): 20,50 this selects X in the i direction from i=20 to 50
@@ -181,6 +182,7 @@ def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
 
     Returns:
         np.ndarray: returns X or Y or Z given some range of I,J,K
+
     """
     if dim1[0] == dim1[1]:
         return T[ dim1[0], dim2[0]:dim2[1]+1, dim3[0]:dim3[1]+1 ]
@@ -214,24 +216,6 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
     split_faces1 = list()
     split_faces2 = list()
     
-    # * Note: The code below attempts to speed things up but it sometimes misses connected faces. 
-    # See if we can speed up the match by looking at the match indicies 
-    # matchedIndicies = face1.match_indices(face2) # face1 == face2, Full face match is automatically checked first. If this is not 4 then code proceeds to partial match
-    # if len(matchedIndicies)>0: # Checks to see if the two faces corners are actually 
-    #     for i,j in matchedIndicies:
-    #         i1,j1,k1 = face1.I[i],face1.J[i],face1.K[i]
-    #         i2,j2,k2 = face2.I[j],face2.J[j],face2.K[j]
-    #         match_location.append({"i1":i1,"j1":j1,"k1":k1,'i2':i2,'j2':j2,'k2':k2})
-    #     df_temp = pd.DataFrame(match_location)
-    #     I1 = [df_temp['i1'].min(), df_temp['i1'].max()]
-    #     J1 = [df_temp['j1'].min(), df_temp['j1'].max()]
-    #     K1 = [df_temp['k1'].min(), df_temp['k1'].max()]
-
-    #     I2 = [df_temp['i2'].min(), df_temp['i2'].max()]
-    #     J2 = [df_temp['j2'].min(), df_temp['j2'].max()]
-    #     K2 = [df_temp['k2'].min(), df_temp['k2'].max()]
-    # else:
-        # Check all points interior of the block
     I1 = [face1.IMIN,face1.IMAX]
     J1 = [face1.JMIN,face1.JMAX]
     K1 = [face1.KMIN,face1.KMAX]

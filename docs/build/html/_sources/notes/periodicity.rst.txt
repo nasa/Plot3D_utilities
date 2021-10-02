@@ -8,11 +8,11 @@ In this example we will use the file  `PahtCascade-ASCII <https://nasa-public-da
 .. code-block:: python
     :linenos: 
 
-    from plot3d import write_plot3D, read_plot3D, find_periodicity, connectivity
+    from plot3d import write_plot3D, read_plot3D, periodicity, connectivity
 
     blocks = read_plot3D('PahtCascade-ASCII.xyz', binary = False)
     face_matches, outer_faces_formatted = connectivity(blocks)
-    periodic_surfaces, outer_faces_to_keep = find_periodicity(blocks,outer_faces,periodic_direction='k')
+    periodic_surfaces, outer_faces_to_keep = periodicity(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
     # Append periodic surfaces to face_matches
     face_matches.extend(periodic_surfaces)
 

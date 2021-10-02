@@ -1,81 +1,38 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>plot3d.connectivity &mdash; Plot3D 1.3.9 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/static/style.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/style.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link href="../../_static/style.css" rel="stylesheet" type="text/css">
-
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> Plot3D
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 1.3.9
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -83,19 +40,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Python Notes</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../notes/installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../notes/installation.html#installation-via-pip">Installation via Pip</a></li>
@@ -113,87 +59,49 @@
 <li class="toctree-l1"><a class="reference internal" href="../../notes/split-blocks.html">Split Blocks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../notes/split-blocks.html#multi-grid-concept">Multi-grid concept</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../notes/split-blocks.html#splitting-blocks-example">Splitting Blocks Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notes/split-blocks.html#plotting-split-blocks-with-paraview">Plotting Split Blocks with Paraview</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../notes/split-blocks.html#plotting-split-blocks-with-paraview">Plotting Split Blocks with Paraview</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python Package Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Plot3D.Connectivity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Plot3D.Block</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Plot3D.Differencing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Plot3D.Face</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Plot3D.Read</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Plot3D.Write</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/split_block.html">Plot3D.split_block</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Plot3D.periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Periodicity</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">Plot3D</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
       <li>plot3d.connectivity</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for plot3d.connectivity</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">numpy.core.fromnumeric</span> <span class="kn">import</span> <span class="n">diagonal</span>
+<span class="kn">from</span> <span class="nn">numpy.core.shape_base</span> <span class="kn">import</span> <span class="n">block</span>
 <span class="kn">from</span> <span class="nn">pandas.core.algorithms</span> <span class="kn">import</span> <span class="n">unique</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
@@ -273,7 +181,7 @@
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)):</span>
         <span class="n">matchFound</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">!=</span><span class="n">j</span> <span class="ow">and</span> <span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">faces</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">!=</span><span class="n">j</span> <span class="ow">and</span> <span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vertices_equals</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">j</span><span class="p">])):</span>
                 <span class="n">matching</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
                 <span class="n">matchFound</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">matchFound</span><span class="p">:</span>
@@ -301,17 +209,14 @@
             <span class="k">yield</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
 
 
-<div class="viewcode-block" id="find_matching_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks">[docs]</a><span class="k">def</span> <span class="nf">find_matching_blocks</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>  
+<div class="viewcode-block" id="find_matching_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks">[docs]</a><span class="k">def</span> <span class="nf">find_matching_blocks</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">5E-5</span><span class="p">):</span>  
     <span class="sd">&quot;&quot;&quot;Takes two blocks and finds all matching pairs</span>
-
 <span class="sd">    Args:</span>
 <span class="sd">        block1 (Block): Any plot3d Block that is not the same as block2</span>
 <span class="sd">        block2 (Block): Any plot3d Block that is not the same as block1</span>
 <span class="sd">        full_face_match (bool): (Depreciated) use full face matching (Much faster) Full face match can be deceiving. There could be some cases where the face is a wrap and 4 corners match but the insides do not. This kind of connection shouldn&#39;t be considered</span>
-
 <span class="sd">    Returns:</span>
 <span class="sd">        (tuple): containing</span>
-
 <span class="sd">            - **df** (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])</span>
 <span class="sd">            - **block1_outer** (List[Face]):</span>
 <span class="sd">            - **block2_outer** (List[Face]): </span>
@@ -321,6 +226,7 @@
 
     <span class="n">block1_outer</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">block1</span><span class="p">)</span>
     <span class="n">block2_outer</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">block2</span><span class="p">)</span>
+
     <span class="n">block1_split_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">block2_split_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
     <span class="n">block1MatchingFace</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -338,7 +244,7 @@
             <span class="n">block1_face</span> <span class="o">=</span> <span class="n">block1_outer</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">block2_outer</span><span class="p">)):</span>
                 <span class="n">block2_face</span> <span class="o">=</span> <span class="n">block2_outer</span><span class="p">[</span><span class="n">q</span><span class="p">]</span>
-                <span class="n">df</span><span class="p">,</span><span class="n">split_faces1</span><span class="p">,</span><span class="n">split_faces2</span> <span class="o">=</span> <span class="n">get_face_intersection</span><span class="p">(</span><span class="n">block1_face</span><span class="p">,</span><span class="n">block2_face</span><span class="p">,</span><span class="n">block1</span><span class="p">,</span><span class="n">block2</span><span class="p">)</span>
+                <span class="n">df</span><span class="p">,</span> <span class="n">split_faces1</span><span class="p">,</span> <span class="n">split_faces2</span> <span class="o">=</span> <span class="n">get_face_intersection</span><span class="p">(</span><span class="n">block1_face</span><span class="p">,</span><span class="n">block2_face</span><span class="p">,</span><span class="n">block1</span><span class="p">,</span><span class="n">block2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>   <span class="c1"># the number of intersection points has to be more than 4</span>
                     <span class="c1"># if not block1_face in block1MatchingFace and not block2_face in block2MatchingFace:</span>
                     <span class="n">block_match_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -347,7 +253,10 @@
                     <span class="n">block1_split_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_faces1</span><span class="p">)</span>
                     <span class="n">block2_split_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_faces2</span><span class="p">)</span>
                     <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
-                    
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="k">break</span>
+
         <span class="p">[</span><span class="n">block1_outer</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block1MatchingFace</span> <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block1_outer</span><span class="p">]</span>
         <span class="p">[</span><span class="n">block2_outer</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block2MatchingFace</span> <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block2_outer</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">block1_split_faces</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
@@ -358,11 +267,15 @@
             <span class="n">block2_split_faces</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">block_match_indices</span><span class="p">,</span> <span class="n">block1_outer</span><span class="p">,</span> <span class="n">block2_outer</span> <span class="c1"># Remove duplicates using set and list </span></div>
+                    
+        
+        
 
 
 <div class="viewcode-block" id="select_multi_dimensional"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.select_multi_dimensional">[docs]</a><span class="k">def</span> <span class="nf">select_multi_dimensional</span><span class="p">(</span><span class="n">T</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">dim1</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span><span class="n">dim2</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">dim3</span><span class="p">:</span><span class="nb">tuple</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Takes a block (T) and selects X,Y,Z from the block given a face&#39;s dimensions</span>
 <span class="sd">        theres really no good way to do this in python </span>
+<span class="sd">        </span>
 <span class="sd">    Args:</span>
 <span class="sd">        T (np.ndarray): arbitrary array so say a full matrix containing X</span>
 <span class="sd">        dim1 (tuple): 20,50 this selects X in the i direction from i=20 to 50</span>
@@ -371,6 +284,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        np.ndarray: returns X or Y or Z given some range of I,J,K</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">dim1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">T</span><span class="p">[</span> <span class="n">dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dim2</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim3</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span>
@@ -404,30 +318,13 @@
     <span class="n">split_faces1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">split_faces2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     
-    <span class="c1"># See if we can speed up the match by looking at the match indicies </span>
-    <span class="n">matchedIndicies</span> <span class="o">=</span> <span class="n">face1</span><span class="o">.</span><span class="n">match_indices</span><span class="p">(</span><span class="n">face2</span><span class="p">)</span> <span class="c1"># face1 == face2, Full face match is automatically checked first. If this is not 4 then code proceeds to partial match</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matchedIndicies</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span> <span class="c1"># Checks to see if the two faces corners are actually </span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">matchedIndicies</span><span class="p">:</span>
-            <span class="n">i1</span><span class="p">,</span><span class="n">j1</span><span class="p">,</span><span class="n">k1</span> <span class="o">=</span> <span class="n">face1</span><span class="o">.</span><span class="n">I</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">face1</span><span class="o">.</span><span class="n">J</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">face1</span><span class="o">.</span><span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">i2</span><span class="p">,</span><span class="n">j2</span><span class="p">,</span><span class="n">k2</span> <span class="o">=</span> <span class="n">face2</span><span class="o">.</span><span class="n">I</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">face2</span><span class="o">.</span><span class="n">J</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">face2</span><span class="o">.</span><span class="n">K</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-            <span class="n">match_location</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i1&quot;</span><span class="p">:</span><span class="n">i1</span><span class="p">,</span><span class="s2">&quot;j1&quot;</span><span class="p">:</span><span class="n">j1</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="n">k1</span><span class="p">,</span><span class="s1">&#39;i2&#39;</span><span class="p">:</span><span class="n">i2</span><span class="p">,</span><span class="s1">&#39;j2&#39;</span><span class="p">:</span><span class="n">j2</span><span class="p">,</span><span class="s1">&#39;k2&#39;</span><span class="p">:</span><span class="n">k2</span><span class="p">})</span>
-        <span class="n">df_temp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">match_location</span><span class="p">)</span>
-        <span class="n">I1</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
-        <span class="n">J1</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;j1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;j1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
-        <span class="n">K1</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
+    <span class="n">I1</span> <span class="o">=</span> <span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">IMIN</span><span class="p">,</span><span class="n">face1</span><span class="o">.</span><span class="n">IMAX</span><span class="p">]</span>
+    <span class="n">J1</span> <span class="o">=</span> <span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span><span class="n">face1</span><span class="o">.</span><span class="n">JMAX</span><span class="p">]</span>
+    <span class="n">K1</span> <span class="o">=</span> <span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">face1</span><span class="o">.</span><span class="n">KMAX</span><span class="p">]</span>
 
-        <span class="n">I2</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;i2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;i2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
-        <span class="n">J2</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;j2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;j2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
-        <span class="n">K2</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df_temp</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># Check all points interior of the block</span>
-        <span class="n">I1</span> <span class="o">=</span> <span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">IMIN</span><span class="p">,</span><span class="n">face1</span><span class="o">.</span><span class="n">IMAX</span><span class="p">]</span>
-        <span class="n">J1</span> <span class="o">=</span> <span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span><span class="n">face1</span><span class="o">.</span><span class="n">JMAX</span><span class="p">]</span>
-        <span class="n">K1</span> <span class="o">=</span> <span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">face1</span><span class="o">.</span><span class="n">KMAX</span><span class="p">]</span>
-
-        <span class="n">I2</span> <span class="o">=</span> <span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">IMIN</span><span class="p">,</span><span class="n">face2</span><span class="o">.</span><span class="n">IMAX</span><span class="p">]</span>
-        <span class="n">J2</span> <span class="o">=</span> <span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span><span class="n">face2</span><span class="o">.</span><span class="n">JMAX</span><span class="p">]</span>
-        <span class="n">K2</span> <span class="o">=</span> <span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">face2</span><span class="o">.</span><span class="n">KMAX</span><span class="p">]</span>
+    <span class="n">I2</span> <span class="o">=</span> <span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">IMIN</span><span class="p">,</span><span class="n">face2</span><span class="o">.</span><span class="n">IMAX</span><span class="p">]</span>
+    <span class="n">J2</span> <span class="o">=</span> <span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span><span class="n">face2</span><span class="o">.</span><span class="n">JMAX</span><span class="p">]</span>
+    <span class="n">K2</span> <span class="o">=</span> <span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">face2</span><span class="o">.</span><span class="n">KMAX</span><span class="p">]</span>
     
     <span class="c1"># Grab the points of Face 1 and Face 2</span>
     <span class="n">X1</span> <span class="o">=</span> <span class="n">select_multi_dimensional</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="p">(</span><span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">I1</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">J1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">J1</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K1</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
@@ -667,10 +564,8 @@
 
 <div class="viewcode-block" id="connectivity"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity">[docs]</a><span class="k">def</span> <span class="nf">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
     <span class="sd">&quot;&quot;&quot;Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces </span>
-
 <span class="sd">    Args:</span>
 <span class="sd">        blocks (List[Block]): List of all blocks in multi-block plot3d mesh</span>
-
 <span class="sd">    Returns:</span>
 <span class="sd">        (List[Dict]): All matching faces formatted as a list of { &#39;block1&#39;: {&#39;block_index&#39;, &#39;IMIN&#39;, &#39;JMIN&#39;,&#39;KMIN&#39;, &#39;IMAX&#39;,&#39;JMAX&#39;,&#39;KMAX&#39;} }</span>
 <span class="sd">        (List[Dict]): All exterior surfaces formatted as a list of { &#39;block_index&#39;, &#39;surfaces&#39;: [{&#39;IMIN&#39;, &#39;JMIN&#39;,&#39;KMIN&#39;, &#39;IMAX&#39;,&#39;JMAX&#39;,&#39;KMAX&#39;, &#39;ID&#39;}] }</span>
@@ -766,50 +661,34 @@
                             <span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="nb">id</span><span class="p">,</span> <span class="s1">&#39;block_index&#39;</span><span class="p">:</span><span class="n">face</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="p">})</span>
         <span class="nb">id</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">return</span> <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> </div>
+    <span class="k">return</span> <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span>  </div>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Paht Juangphanich.
-
-    </p>
+    <p>&#169; Copyright 2021, Paht Juangphanich.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
