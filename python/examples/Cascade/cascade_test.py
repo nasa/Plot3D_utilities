@@ -34,7 +34,7 @@ periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity(
 face_matches.extend(periodic_surfaces)
 
 with open('connectivity_periodic.pickle','wb') as f:
-    [m.pop('match',None) for m in face_matches] # Remove the dataframe
+    # [m.pop('match',None) for m in face_matches] # Remove the dataframe
     pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
 
 export_to_glennht_conn(face_matches,outer_faces_to_keep,'finalmesh')

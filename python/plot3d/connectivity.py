@@ -1,7 +1,3 @@
-from numpy.core.fromnumeric import diagonal
-from numpy.core.shape_base import block
-from pandas.core.algorithms import unique
-from collections import namedtuple
 from .block import Block
 from .face import Face, create_face_from_diagonals, split_face
 import math 
@@ -11,7 +7,6 @@ import numpy as np
 from .differencing import find_face_edges
 import pandas as pd
 from operator import eq 
-import tqdm
 from typing import List, NamedTuple
 import math
 from .point_match import point_match
@@ -195,6 +190,7 @@ def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
 
 def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:float=1E-6):
     """Get the index of the intersection between two faces located on two different blocks 
+        Face1 needs to be the smaller face. 
 
     Args:
         face1 (Face): An exterior face
@@ -494,16 +490,14 @@ def connectivity(blocks:List[Block]):
                 matches_to_remove.append(create_face_from_diagonals(block=blocks[j],imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(),
                                                                                     imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max()))
                 matches_to_remove[-1].set_block_index(j)
+                
+                face1 = matches_to_remove[-2]
+                face2 = matches_to_remove[-1]
 
-                face_matches.append({'block1':{
-                                            'block_index':i,'IMIN':df['i1'].min(),'JMIN':df['j1'].min(),'KMIN':df['k1'].min(),
-                                            'IMAX':df['i1'].max(),'JMAX':df['j1'].max(),'KMAX':df['k1'].max()
-                                        },
-                                    'block2':{
-                                            'block_index':j,'IMIN':df['i2'].min(),'JMIN':df['j2'].min(),'KMIN':df['k2'].min(),
-                                            'IMAX':df['i2'].max(),'JMAX':df['j2'].max(),'KMAX':df['k2'].max()
-                                        },
-                                    'match':df})
+                temp = face_matches_to_dict(face1,face2,blocks[i],blocks[j])
+                temp['match'] = df
+                # ! Paht check 
+                face_matches.append(temp)
 
         # Update Outer Faces 
         outer_faces.extend(blocki_outerfaces)
@@ -560,3 +554,85 @@ def connectivity(blocks:List[Block]):
         id += 1
 
     return face_matches, outer_faces_formatted  
+
+
+def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
+    """Makes sure the diagonal of face 1 match the diagonal of face 2
+
+    Args:
+        face1 (Face): Face 1 with block index 
+        face2 (Face): Face 2 with block index
+        block1 (Block): Block 1 
+        block2 (Block): Block 2 
+    
+    Returns:
+        (dict): dictionary describing the corner matches 
+
+    """
+    match = {
+            'block1':{
+                            'block_index':face1.BlockIndex,
+                            'IMIN':-1,'JMIN':-1,'KMIN':-1,  # Lower Corner
+                            'IMAX':-1,'JMAX':-1,'KMAX':-1   # Upper Corner
+                        },
+                'block2':{
+                            'block_index':face2.BlockIndex,
+                            'IMIN':-1,'JMIN':-1,'KMIN':-1,  # Lower Corner
+                            'IMAX':-1,'JMAX':-1,'KMAX':-1   # Upper Corner
+                        }
+                }
+            
+    I1 = [face1.IMIN,face1.IMAX]
+    J1 = [face1.JMIN,face1.JMAX]
+    K1 = [face1.KMIN,face1.KMAX]
+
+    I2 = [face2.IMIN,face2.IMAX]
+    J2 = [face2.JMIN,face2.JMAX]
+    K2 = [face2.KMIN,face2.KMAX]
+
+    # Search for corners     
+    x1_l = block1.X[I1[0],J1[0],K1[0]]    # lower corner of block 1 
+    y1_l = block1.Y[I1[0],J1[0],K1[0]]
+    z1_l = block1.Z[I1[0],J1[0],K1[0]]
+    # Matches which corner in block 2 
+    search_results = list()
+    for p in I2: 
+        for q in J2:
+            for r in K2:
+                x2 = block2.X[p,q,r]  
+                y2 = block2.Y[p,q,r]
+                z2 = block2.Z[p,q,r]
+                dx = x2-x1_l; dy = y2-y1_l; dz = z2 -z1_l                
+                search_results.append({'I':p,'J':q,'K':r,'d':math.sqrt(dx*dx + dy*dy + dz*dz)})    
+    df = pd.DataFrame(search_results)
+    df = df.sort_values(by=['d'])
+    match['block1']['IMIN'] = face1.IMIN
+    match['block1']['JMIN'] = face1.JMIN
+    match['block1']['KMIN'] = face1.KMIN
+    match['block2']['IMIN'] = int(df.iloc[0]['I'])
+    match['block2']['JMIN'] = int(df.iloc[0]['J'])
+    match['block2']['KMIN'] = int(df.iloc[0]['K'])
+    
+    # Search for corners     
+    x1_u = block1.X[I1[1],J1[1],K1[1]]    # lower corner of block 1 
+    y1_u = block1.Y[I1[1],J1[1],K1[1]]
+    z1_u = block1.Z[I1[1],J1[1],K1[1]]
+    # Matches which corner in block 2 
+    search_results = list()
+    for p in I2: 
+        for q in J2:
+            for r in K2:
+                x2 = block2.X[p,q,r]  
+                y2 = block2.Y[p,q,r]
+                z2 = block2.Z[p,q,r]
+                dx = x2-x1_u; dy = y2-y1_u; dz = z2 -z1_u
+                search_results.append({'I':p,'J':q,'K':r,'d':math.sqrt(dx*dx + dy*dy + dz*dz)})
+    df = pd.DataFrame(search_results)
+    df = df.sort_values(by=['d'])
+    match['block1']['IMAX'] = face1.IMAX
+    match['block1']['JMAX'] = face1.JMAX
+    match['block1']['KMAX'] = face1.KMAX
+    match['block2']['IMAX'] = int(df.iloc[0]['I'])
+    match['block2']['JMAX'] = int(df.iloc[0]['J'])
+    match['block2']['KMAX'] = int(df.iloc[0]['K'])
+    return match
