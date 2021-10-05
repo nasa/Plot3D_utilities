@@ -62,5 +62,5 @@ def debug():
             },f)
 
 if __name__=="__main__":
-    # find_connectivity()
+    find_connectivity()
     find_periodicity()
