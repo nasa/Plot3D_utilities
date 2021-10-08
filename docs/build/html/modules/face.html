@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face &mdash; Plot3D 1.3.9 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Read" href="read.html" />
+    <link rel="prev" title="Differencing" href="differencing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Plot3D
+          </a>
+              <div class="version">
+                1.3.9
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notes/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notes/installation.html#installation-via-pip">Installation via Pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notes/installation.html#installation-from-source">Installation from Source</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/connectivity.html">Block to Block Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notes/connectivity.html#plotting-connectivity-using-paraview">Plotting Connectivity using Paraview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/split-blocks.html">Split Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notes/split-blocks.html#multi-grid-concept">Multi-grid concept</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notes/split-blocks.html#splitting-blocks-example">Splitting Blocks Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notes/split-blocks.html#plotting-split-blocks-with-paraview">Plotting Split Blocks with Paraview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Face</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/face.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-plot3d.face">
+<span id="face"></span><h1>Face<a class="headerlink" href="#module-plot3d.face" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="plot3d.face.Face">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">plot3d.face.</span></span><span class="sig-name descname"><span class="pre">Face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvertex</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face" title="Permalink to this definition"></a></dt>
+<dd><p>Defines a Face of a block for example IMIN,JMIN,JMIN to IMAX,JMIN,JMIN</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__eq__" title="Permalink to this definition"></a></dt>
+<dd><p>Check to see if two faces are the same by looking at the I,J,K
+Checks to see if any of vertices x,y,z match</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>f</strong> (<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – another face</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if faces match, False if no match is found</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Boolean</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__hash__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__hash__" title="Permalink to this definition"></a></dt>
+<dd><p>Return hash(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.__ne__">
+<span class="sig-name descname"><span class="pre">__ne__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__ne__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__ne__" title="Permalink to this definition"></a></dt>
+<dd><p>Checks if two faces are not equal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>f</strong> (<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – another face</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if faces match, False if no match is found</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Boolean</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.__normal__">
+<span class="sig-name descname"><span class="pre">__normal__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__normal__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__normal__" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the normal vector of the face
+not really used but if anyone wants it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__str__" title="Permalink to this definition"></a></dt>
+<dd><p>Return str(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.add_vertex">
+<span class="sig-name descname"><span class="pre">add_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.add_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.add_vertex" title="Permalink to this definition"></a></dt>
+<dd><p>Add vertex to define a face</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – x-coordinate</p></li>
+<li><p><strong>y</strong> (<em>float</em>) – y-coordinate</p></li>
+<li><p><strong>z</strong> (<em>float</em>) – z-coordinate</p></li>
+<li><p><strong>i</strong> (<em>int</em>) – i-th index of the coordinates (x,y,z)</p></li>
+<li><p><strong>j</strong> (<em>int</em>) – j-th index of the coordinates (x,y,z)</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – k-th index of the coordinates (x,y,z)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.diagonal_length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">diagonal_length</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><a class="headerlink" href="#plot3d.face.Face.diagonal_length" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the diagonal length of the face</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>diagonal length computed using IMIN, IMAX, JMIN, JMAX, KMIN, KMAX</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.get_corners">
+<span class="sig-name descname"><span class="pre">get_corners</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.get_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.get_corners" title="Permalink to this definition"></a></dt>
+<dd><p>Get the corners defined by (IMIN,JMIN,KMIN), (IMAX,JMAX,KMAX),</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>containing</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>(x,y,z)</strong> (float,float,float): at IMIN,JMIN,KMIN</p></li>
+<li><p><strong>(x,y,z)</strong> (float,float,float): at IMAX,JMAX,KMAX</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Tuple</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Reference:</dt><dd><ul class="simple">
+<li><p>GlennHT source code <a class="reference external" href="https://gitlab.grc.nasa.gov/lte-turbo/GlennHT/-/blob/master/src/M_ccMBMesh.F">https://gitlab.grc.nasa.gov/lte-turbo/GlennHT/-/blob/master/src/M_ccMBMesh.F</a> function computeLRT</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.get_val">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">get_val</span></span><a class="headerlink" href="#plot3d.face.Face.get_val" title="Permalink to this definition"></a></dt>
+<dd><p>Get the value where key (I,J,K) is equal to val</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i_val</strong> (<em>int</em>) – value of I</p></li>
+<li><p><strong>j_val</strong> (<em>int</em>) – value of J</p></li>
+<li><p><strong>k_val</strong> (<em>int</em>) – value of K</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>x value
+[float]: y value
+[float]: z value</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.index_equals">
+<span class="sig-name descname"><span class="pre">index_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.index_equals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.index_equals" title="Permalink to this definition"></a></dt>
+<dd><p>Check to see of the face indices are equal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>f2</strong> (<em>[</em><em>type</em><em>]</em>) – [description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.isEdge">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isEdge</span></span><a class="headerlink" href="#plot3d.face.Face.isEdge" title="Permalink to this definition"></a></dt>
+<dd><p>check if the face is actually an edge. This is an edge if two indicies IMIN == IMAX or JMIN=JMAX or KMIN=KMAX</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if face is really an edge</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>[bool]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.isPoint">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isPoint</span></span><a class="headerlink" href="#plot3d.face.Face.isPoint" title="Permalink to this definition"></a></dt>
+<dd><p>check if the face is actually an edge. This is an edge if two indicies IMIN == IMAX or JMIN=JMAX or KMIN=KMAX</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if face is really a point</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>[type]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.match_indices">
+<span class="sig-name descname"><span class="pre">match_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.match_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.match_indices" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Check to see if two faces are the same. Checks to see if any of vertices x,y,z match</dt><dd><p>Normally this is used by Face1==Face2</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>f</strong> (<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – another face</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of indicies where there’s a match.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[(int,int)]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.to_dict" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a dictionary representaon of a face</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.vertices_equals">
+<span class="sig-name descname"><span class="pre">vertices_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.vertices_equals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.vertices_equals" title="Permalink to this definition"></a></dt>
+<dd><p>Checks to see if two faces are the same by looking at the vertices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>f</strong> (<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – Another face</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True = face vertices are equal</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.face.create_face_from_diagonals">
+<span class="sig-prename descclassname"><span class="pre">plot3d.face.</span></span><span class="sig-name descname"><span class="pre">create_face_from_diagonals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">imin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#create_face_from_diagonals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.create_face_from_diagonals" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a face on a block given a the diagonals defined as (IMIN,JMIN,KMIN), (IMAX, JMAX, KMAX)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>block</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block to create a face on</p></li>
+<li><p><strong>imin</strong> (<em>int</em>) – Lower Corner IMIN</p></li>
+<li><p><strong>jmin</strong> (<em>int</em>) – Lower Corner JMIN</p></li>
+<li><p><strong>kmin</strong> (<em>int</em>) – Lower Corner KMIN</p></li>
+<li><p><strong>imax</strong> (<em>int</em>) – Upper Corner IMAX</p></li>
+<li><p><strong>jmax</strong> (<em>int</em>) – Upper Corner JMAX</p></li>
+<li><p><strong>kmax</strong> (<em>int</em>) – Upper Corner</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Face created from diagonals</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face">Face</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.face.split_face">
+<span class="sig-prename descclassname"><span class="pre">plot3d.face.</span></span><span class="sig-name descname"><span class="pre">split_face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_to_split</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">imin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#split_face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.split_face" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Splits a face with another face within the same block</dt><dd><p>picture the split as a two rectangles inside each other</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>face_to_split</strong> (<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – Face on the block to be split</p></li>
+<li><p><strong>block</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block the split is occuring on</p></li>
+<li><p><strong>imin</strong> (<em>int</em>) – IMIN index of the split (diagonals)</p></li>
+<li><p><strong>jmin</strong> (<em>int</em>) – JMIN index of the split (diagonals)</p></li>
+<li><p><strong>kmin</strong> (<em>int</em>) – KMIN index of the split (diagonals)</p></li>
+<li><p><strong>imax</strong> (<em>int</em>) – IMAX index of the split</p></li>
+<li><p><strong>jmax</strong> (<em>int</em>) – JMAX index of the split</p></li>
+<li><p><strong>kmax</strong> (<em>int</em>) – KMAX index of the split</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>            <span class="n">left</span> <span class="n">face</span>    <span class="n">top</span> <span class="n">face</span>     <span class="n">right</span> <span class="n">face</span>
+ <span class="n">________</span>       <span class="n">__</span>          <span class="n">__</span>            <span class="n">__</span>
+<span class="o">|</span>   <span class="n">__</span>   <span class="o">|</span>     <span class="o">|</span>  <span class="o">|</span>        <span class="o">|</span><span class="n">__</span><span class="o">|</span>          <span class="o">|</span>  <span class="o">|</span>     <span class="n">__</span>
+<span class="o">|</span>  <span class="o">|</span><span class="n">__</span><span class="o">|</span>  <span class="o">|</span>     <span class="o">|</span>  <span class="o">|</span>         <span class="n">__</span>           <span class="o">|</span>  <span class="o">|</span>    <span class="o">|</span><span class="n">__</span><span class="o">|</span>  <span class="n">face_to_split</span><span class="o">/</span><span class="n">center</span> <span class="n">face</span>
+<span class="o">|</span><span class="n">________</span><span class="o">|</span>     <span class="o">|</span><span class="n">__</span><span class="o">|</span>        <span class="o">|</span><span class="n">__</span><span class="o">|</span>          <span class="o">|</span><span class="n">__</span><span class="o">|</span>
+                        <span class="n">bottom</span> <span class="n">face</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of unique faces from the split</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>[List[Faces]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="differencing.html" class="btn btn-neutral float-left" title="Differencing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="read.html" class="btn btn-neutral float-right" title="Read" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

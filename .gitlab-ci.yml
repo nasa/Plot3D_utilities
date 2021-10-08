@@ -1,0 +1,37 @@
+# This file is a template, and might need editing before it works on your project.
+# Full project: https://gitlab.com/pages/plain-html
+stages:
+  - build
+  - deploy
+  
+job:
+    stage: build
+    image: python:3.9
+    script:
+        - sudo yum update -q -y
+        - sudo yum install -y python3-pip
+        - pip uninstall pandas numpy scipy -y -y -y
+        - pip install pandas numpy scipy
+        - pip install setuptools cython
+        - cd python
+        - python3 setup.py install
+        - cd ../
+    artifacts:
+        untracked: true
+
+pages:    
+  stage: deploy
+  script:
+    - mkdir .public
+    - cd python/docs
+    - make html
+    - cd ../../
+    - cp -r python/docs/_build/html/* .public
+    - mv .public public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+    - plot3d
+  tags: [plot3d]

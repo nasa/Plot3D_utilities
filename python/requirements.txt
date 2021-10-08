@@ -1,0 +1,7 @@
+cython
+bz2file
+tqdm
+scipy
+pandas
+numpy
+matplotlib

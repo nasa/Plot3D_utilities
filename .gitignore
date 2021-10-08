@@ -1,0 +1,10 @@
+*.x
+*.g
+*.xyz
+*.DS_Store
+
+# vs code folders
+.vscode/
+*.pickle
+*.p3d
+*.x

@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "plot3d"
+version = "1.4.3"
+description = "Plot3D python utilities for reading and writing and also finding connectivity between blocks"
+authors = ["Paht Juangphanich <paht.juangphanich@nasa.gov>"]
+
+[tool.poetry.dependencies]
+python = "^3.7.1"
+numpy = "*"
+scipy = "*"
+pandas = "*"
+tqdm = "*"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=1.1.2"]
+build-backend = "poetry.masonry.api"    
