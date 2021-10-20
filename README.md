@@ -8,9 +8,19 @@ To install simply do a `pip install plot3d`
 
 # Tutorials
 [Reading Writing and Viewing Plot3D files](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_SplitBlocksExample.ipynb)
+[Learning Python with VSCode](https://www.youtube.com/watch?v=lZiK9e8b21M) 
+[Learning Bash for Automating Tasks](https://www.youtube.com/watch?v=oxuRxtrO2Ag) 
+
+## Tips
+Never use jupyter notebook unless you are done with your .py file and want to demo code. Jupyter is painful for debugging. 
+## Useful VS Code Extensions
+- Better comments https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments 
+- Python syntax highlighting https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance 
+- Remote Development https://code.visualstudio.com/docs/remote/remote-overview
+- Python doc string generator https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring 
+
 
 # Contributors
-
 | Name               	| Position 	| Dates     	| Contribution                              	|                             	|
 |--------------------	|----------	|-----------	|-------------------------------------------	|-----------------------------	|
 | Paht Juangphanich  	| Owner    	| 2021-     	| Creator                                   	| https://github.com/pjuangph 	|
