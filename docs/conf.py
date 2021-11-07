@@ -38,7 +38,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.napoleon',
     'sphinx_copybutton',
 ]
 autosummary_generate = True
@@ -83,6 +83,14 @@ html_theme_options = {
     'display_version': True,
     'logo_only': True,
     'navigation_depth': 2,
+}
+
+html_context = {
+    "display_github": True, # Integrate GitHub
+    "github_user": "nasa", # Username
+    "github_repo": "plot3d_utilities", # Repo name
+    "github_version": "main", # Version
+    "conf_py_path": "/docs/", # Path in the checkout to the docs root
 }
 
 html_static_path  = ['_static']
