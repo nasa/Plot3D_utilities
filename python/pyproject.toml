@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "plot3d"
-version = "1.4.3"
+version = "1.4.5"
 description = "Plot3D python utilities for reading and writing and also finding connectivity between blocks"
 authors = ["Paht Juangphanich <paht.juangphanich@nasa.gov>"]
 
