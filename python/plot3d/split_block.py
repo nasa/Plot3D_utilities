@@ -170,10 +170,9 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
                 # Check for remainder
                 if i+1 < block.IMAX:
                     # Add remainder to last block
-                    X = np.append(new_blocks[-1].X, block.X[i+1:,:,:],0) # New X, Y, Z splits 
-                    Y = np.append(new_blocks[-1].Y, block.Y[i+1:,:,:],0)
-                    Z = np.append(new_blocks[-1].Z, block.Z[i+1:,:,:],0)
-                    new_blocks.pop()
+                    X = block.X[i:,:,:] # New X, Y, Z splits 
+                    Y = block.Y[i:,:,:]
+                    Z = block.Z[i:,:,:]
                     new_blocks.append(Block(X,Y,Z))
                 
             elif direction_to_use == Direction.j:                
@@ -187,19 +186,18 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
                 for j in range(step_size,block.JMAX,step_size):
                     if (j+1) > block.IMAX:
                         break
-                    X = block.X[:,jprev:j+1,:]      # New X, Y, Z splits 
-                    Y = block.Y[:,jprev:j+1,:]
-                    Z = block.Z[:,jprev:j+1,:]
+                    X = block.X[:,jprev:j,:]      # New X, Y, Z splits 
+                    Y = block.Y[:,jprev:j,:]
+                    Z = block.Z[:,jprev:j,:]
                     jprev=j
                     new_blocks.append(Block(X,Y,Z))
 
                 # Check for remainder
                 if j+1 < block.JMAX:
                     # Add remainder to last block
-                    X = np.append(new_blocks[-1].X, block.X[:,j+1:,:],0) # New X, Y, Z splits 
-                    Y = np.append(new_blocks[-1].Y, block.Y[:,j+1:,:],0)
-                    Z = np.append(new_blocks[-1].Z, block.Z[:,j+1:,:],0)
-                    new_blocks.pop()
+                    X = block.X[:,j:,:] # New X, Y, Z splits 
+                    Y = block.Y[:,j:,:]
+                    Z = block.Z[:,j:,:]
                     new_blocks.append(Block(X,Y,Z))
             else:
                 denominator = block.IMAX*block.JMAX
@@ -221,10 +219,9 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
                 # Check for remainder
                 if k+1 < block.KMAX:
                    # Add remainder to last block
-                    X = np.append(new_blocks[-1].X, block.X[:,:,k+1:],0) # New X, Y, Z splits 
-                    Y = np.append(new_blocks[-1].Y, block.Y[:,:,k+1:],0)
-                    Z = np.append(new_blocks[-1].Z, block.Z[:,:,k+1:],0)
-                    new_blocks.pop()    # remove last element
+                    X = block.X[:,:,k:] # New X, Y, Z splits 
+                    Y = block.Y[:,:,k:]
+                    Z = block.Z[:,:,k:]                    
                     new_blocks.append(Block(X,Y,Z)) # replace it 
     return new_blocks
 
