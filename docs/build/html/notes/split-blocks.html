@@ -1,41 +1,81 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>Split Blocks &mdash; Plot3D 1.3.9 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-    <script src="../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Connectivity" href="../modules/connectivity.html" />
     <link rel="prev" title="Exporting to GlennHT Connectivity Files" href="exporting.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../index.html" class="icon icon-home"> Plot3D
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 1.3.9
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -43,7 +83,18 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
@@ -78,46 +129,89 @@
 <li class="toctree-l1"><a class="reference internal" href="../modules/periodicity.html">Periodicity</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Plot3D</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>Split Blocks</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
+            
               <a href="https://github.com/nasa/plot3d_utilities/blob/main/docs/notes/split-blocks.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
-  <section id="split-blocks">
-<h1>Split Blocks<a class="headerlink" href="#split-blocks" title="Permalink to this headline"></a></h1>
+            
+  <div class="section" id="split-blocks">
+<h1>Split Blocks<a class="headerlink" href="#split-blocks" title="Permalink to this headline">¶</a></h1>
 <p>When solving a plot3D block it is often useful to break it into smaller blocks of a certain size.
 This will improve the speed by splitting the blocks and allowing each CPU core to solve a part of the mesh.
 BUT we also need to maintain something called multi-grid.</p>
-<section id="multi-grid-concept">
-<h2>Multi-grid concept<a class="headerlink" href="#multi-grid-concept" title="Permalink to this headline"></a></h2>
+<div class="section" id="multi-grid-concept">
+<h2>Multi-grid concept<a class="headerlink" href="#multi-grid-concept" title="Permalink to this headline">¶</a></h2>
 <p>Mulit-grid is a concept where you take a gird say 4x4 and you solve it as a 2x2 then interpolate the results on to the larger grid.
 The idea of solving a coarse grid and translating the solution onto a finer grid allows you to reach a converged solution much faster. So that’s the benefits, what are the requirements?</p>
-</section>
-<section id="splitting-blocks-example">
-<h2>Splitting Blocks Example<a class="headerlink" href="#splitting-blocks-example" title="Permalink to this headline"></a></h2>
+</div>
+<div class="section" id="splitting-blocks-example">
+<h2>Splitting Blocks Example<a class="headerlink" href="#splitting-blocks-example" title="Permalink to this headline">¶</a></h2>
 <p>In this example we will use the file  <a class="reference external" href="https://nasa-public-data.s3.amazonaws.com/plot3d_utilities/PahtCascade-ASCII.xyz">PahtCascade-ASCII</a>
 We will go from reading -&gt; splitting -&gt; connectivity -&gt; periodicity -&gt; viewing it in paraview</p>
-<section id="reading-the-file-and-split-the-blocks">
-<h3>Reading the file and split the blocks<a class="headerlink" href="#reading-the-file-and-split-the-blocks" title="Permalink to this headline"></a></h3>
+<div class="section" id="reading-the-file-and-split-the-blocks">
+<h3>Reading the file and split the blocks<a class="headerlink" href="#reading-the-file-and-split-the-blocks" title="Permalink to this headline">¶</a></h3>
 <p>When you specify the number of cells per block to split into, the code will try to match multigrid so the number of cells may change slightly</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">split_blocks</span><span class="p">,</span> <span class="n">Direction</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span><span class="n">write_plot3D</span>
 <span class="linenos">2</span>
@@ -126,17 +220,17 @@ We will go from reading -&gt; splitting -&gt; connectivity -&gt; periodicity -&g
 <span class="linenos">5</span><span class="n">write_plot3D</span><span class="p">(</span><span class="s1">&#39;PahtCascade-Split.xyz&#39;</span><span class="p">,</span><span class="n">blocks_split</span><span class="p">,</span><span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="finding-connectivity">
-<h3>Finding Connectivity<a class="headerlink" href="#finding-connectivity" title="Permalink to this headline"></a></h3>
+</div>
+<div class="section" id="finding-connectivity">
+<h3>Finding Connectivity<a class="headerlink" href="#finding-connectivity" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">(</span><span class="n">blocks_split</span><span class="p">)</span>
 <span class="linenos">2</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;connectivity-block-split.pickle&#39;</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <span class="linenos">3</span>    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s2">&quot;face_matches&quot;</span><span class="p">:</span><span class="n">face_matches</span><span class="p">,</span> <span class="s2">&quot;outer_faces&quot;</span><span class="p">:</span><span class="n">outer_faces_formatted</span><span class="p">},</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="finding-periodicity">
-<h3>Finding Periodicity<a class="headerlink" href="#finding-periodicity" title="Permalink to this headline"></a></h3>
+</div>
+<div class="section" id="finding-periodicity">
+<h3>Finding Periodicity<a class="headerlink" href="#finding-periodicity" title="Permalink to this headline">¶</a></h3>
 <p>This will find the periodic faces of the split block</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;connectivity-block-split.pickle&#39;</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <span class="linenos"> 2</span>    <span class="n">data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -153,10 +247,10 @@ We will go from reading -&gt; splitting -&gt; connectivity -&gt; periodicity -&g
 <span class="linenos">13</span><span class="n">face_matches</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">periodic_surfaces</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="plotting-split-blocks-with-paraview">
-<h2>Plotting Split Blocks with Paraview<a class="headerlink" href="#plotting-split-blocks-with-paraview" title="Permalink to this headline"></a></h2>
+</div>
+</div>
+<div class="section" id="plotting-split-blocks-with-paraview">
+<h2>Plotting Split Blocks with Paraview<a class="headerlink" href="#plotting-split-blocks-with-paraview" title="Permalink to this headline">¶</a></h2>
 <p>Library file that you will need in the same directory</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 <span class="kn">from</span> <span class="nn">paraview.simple</span> <span class="kn">import</span> <span class="o">*</span>
@@ -558,38 +652,55 @@ We will go from reading -&gt; splitting -&gt; connectivity -&gt; periodicity -&g
                 <span class="n">CreateSubset</span><span class="p">(</span><span class="n">block_source</span><span class="p">,</span> <span class="n">voi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;periodic &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">periodic_indx</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="exporting.html" class="btn btn-neutral float-left" title="Exporting to GlennHT Connectivity Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="../modules/connectivity.html" class="btn btn-neutral float-right" title="Connectivity" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="exporting.html" class="btn btn-neutral float-left" title="Exporting to GlennHT Connectivity Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Paht Juangphanich.</p>
-  </div>
+    <p>
+        &#169; Copyright 2021, Paht Juangphanich.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

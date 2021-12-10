@@ -27,7 +27,7 @@ Never use jupyter notebook unless you are done with your .py file and want to de
 |--------------------	|----------	|-----------	|-------------------------------------------	|-----------------------------	|
 | Paht Juangphanich  	| Owner    	| 2021-     	| Creator                                   	| https://github.com/pjuangph 	|
 | David Rigby        	| Advisor  	| Fall 2021 	| Block splitting help                      	|                             	|
-| Christopher Keokot 	| Intern   	| Fall 2021 	| Documentation overhaul, code improvements 	|                             	|
+| Christopher Keokot 	| Intern   	| Fall 2021 	| Plot3D ReactJS GUI                         	|                             	|
 | Tim Beach          	| Advisor  	| Fall 2021 	| Block splitting help, testing             	|                             	|
 
 
