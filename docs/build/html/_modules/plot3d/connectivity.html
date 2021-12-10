@@ -1,38 +1,79 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>plot3d.connectivity &mdash; Plot3D 1.3.9 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/style.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../../index.html" class="icon icon-home"> Plot3D
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 1.3.9
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -40,7 +81,18 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../notes/installation.html">Installation</a><ul>
@@ -75,32 +127,72 @@
 <li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Periodicity</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">Plot3D</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="../index.html">Module code</a> &raquo;</li>
+        
       <li>plot3d.connectivity</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <h1>Source code for plot3d.connectivity</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
+<span></span><span class="kn">from</span> <span class="nn">numpy.core.numeric</span> <span class="kn">import</span> <span class="n">outer</span>
+<span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">reduce_blocks</span>
 <span class="kn">from</span> <span class="nn">.face</span> <span class="kn">import</span> <span class="n">Face</span><span class="p">,</span> <span class="n">create_face_from_diagonals</span><span class="p">,</span> <span class="n">split_face</span>
 <span class="kn">import</span> <span class="nn">math</span> 
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span><span class="p">,</span> <span class="n">combinations</span>
@@ -112,6 +204,8 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">.point_match</span> <span class="kn">import</span> <span class="n">point_match</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
 
 <div class="viewcode-block" id="get_outer_faces"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.get_outer_faces">[docs]</a><span class="k">def</span> <span class="nf">get_outer_faces</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get the outer faces of a block</span>
@@ -206,10 +300,12 @@
 
 <div class="viewcode-block" id="find_matching_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks">[docs]</a><span class="k">def</span> <span class="nf">find_matching_blocks</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">5E-5</span><span class="p">):</span>  
     <span class="sd">&quot;&quot;&quot;Takes two blocks and finds all matching pairs</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        block1 (Block): Any plot3d Block that is not the same as block2</span>
 <span class="sd">        block2 (Block): Any plot3d Block that is not the same as block1</span>
 <span class="sd">        full_face_match (bool): (Depreciated) use full face matching (Much faster) Full face match can be deceiving. There could be some cases where the face is a wrap and 4 corners match but the insides do not. This kind of connection shouldn&#39;t be considered</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        (tuple): containing</span>
 <span class="sd">            - **df** (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])</span>
@@ -558,15 +654,62 @@
             <span class="k">return</span> <span class="n">i</span>
     <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> </div>
 
-<div class="viewcode-block" id="connectivity"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity">[docs]</a><span class="k">def</span> <span class="nf">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces </span>
+<div class="viewcode-block" id="connectivity_fast"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity_fast">[docs]</a><span class="k">def</span> <span class="nf">connectivity_fast</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity </span>
+
 <span class="sd">    Args:</span>
-<span class="sd">        blocks (List[Block]): List of all blocks in multi-block plot3d mesh</span>
+<span class="sd">        blocks (List[Block]): Lists of blocks you want to find the connectivity for</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        (List[Dict]): All matching faces formatted as a list of { &#39;block1&#39;: {&#39;block_index&#39;, &#39;IMIN&#39;, &#39;JMIN&#39;,&#39;KMIN&#39;, &#39;IMAX&#39;,&#39;JMAX&#39;,&#39;KMAX&#39;} }</span>
 <span class="sd">        (List[Dict]): All exterior surfaces formatted as a list of { &#39;block_index&#39;, &#39;surfaces&#39;: [{&#39;IMIN&#39;, &#39;JMIN&#39;,&#39;KMIN&#39;, &#39;IMAX&#39;,&#39;JMAX&#39;,&#39;KMAX&#39;, &#39;ID&#39;}] }</span>
+<span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
- 
+    <span class="n">gcd_array</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="c1"># Find the gcd of all the blocks </span>
+    <span class="k">for</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">block_indx</span><span class="p">]</span>
+        <span class="n">gcd_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">gcd_to_use</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">gcd_array</span><span class="p">)</span>
+    <span class="n">new_blocks</span> <span class="o">=</span> <span class="n">reduce_blocks</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span><span class="n">gcd_to_use</span><span class="p">)</span>
+
+    <span class="c1"># Find Connectivity </span>
+    <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">(</span><span class="n">new_blocks</span><span class="p">)</span>
+    <span class="c1"># scale it up</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">face_matches</span><span class="p">)):</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">face_matches</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outer_faces_formatted</span><span class="p">)):</span>
+        <span class="n">outer_faces_formatted</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">outer_faces_formatted</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">outer_faces_formatted</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">outer_faces_formatted</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">outer_faces_formatted</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+        <span class="n">outer_faces_formatted</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
+    <span class="k">return</span> <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span></div>
+
+<div class="viewcode-block" id="connectivity"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity">[docs]</a><span class="k">def</span> <span class="nf">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blocks (List[Block]): List of all blocks in multi-block plot3d mesh</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (List[Dict]): All matching faces formatted as a list of { &#39;block1&#39;: {&#39;block_index&#39;, &#39;IMIN&#39;, &#39;JMIN&#39;,&#39;KMIN&#39;, &#39;IMAX&#39;,&#39;JMAX&#39;,&#39;KMAX&#39;} }</span>
+<span class="sd">        (List[Dict]): All exterior surfaces formatted as a list of { &#39;block_index&#39;, &#39;surfaces&#39;: [{&#39;IMIN&#39;, &#39;JMIN&#39;,&#39;KMIN&#39;, &#39;IMAX&#39;,&#39;JMAX&#39;,&#39;KMAX&#39;, &#39;ID&#39;}] }</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">outer_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>      
     <span class="n">face_matches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -741,30 +884,46 @@
 </pre></div>
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Paht Juangphanich.</p>
-  </div>
+    <p>
+        &#169; Copyright 2021, Paht Juangphanich.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

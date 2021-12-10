@@ -1,4 +1,5 @@
-from .block import Block
+from numpy.core.numeric import outer
+from .block import Block, reduce_blocks
 from .face import Face, create_face_from_diagonals, split_face
 import math 
 from itertools import product, combinations
@@ -10,6 +11,8 @@ from operator import eq
 from typing import List, NamedTuple
 import math
 from .point_match import point_match
+from copy import deepcopy
+
 
 def get_outer_faces(block1:Block):
     """Get the outer faces of a block
@@ -104,10 +107,12 @@ def unique_pairs(listOfItems:list):
 
 def find_matching_blocks(block1:Block,block2:Block,tol:float=5E-5):  
     """Takes two blocks and finds all matching pairs
+
     Args:
         block1 (Block): Any plot3d Block that is not the same as block2
         block2 (Block): Any plot3d Block that is not the same as block1
         full_face_match (bool): (Depreciated) use full face matching (Much faster) Full face match can be deceiving. There could be some cases where the face is a wrap and 4 corners match but the insides do not. This kind of connection shouldn't be considered
+
     Returns:
         (tuple): containing
             - **df** (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])
@@ -456,15 +461,62 @@ def find_block_index_in_outer_faces(outer_faces:List[Face], block_indx:int):
             return i
     return -1 
 
-def connectivity(blocks:List[Block]):
-    """Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces 
+def connectivity_fast(blocks:List[Block]):
+    """Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity 
+
     Args:
-        blocks (List[Block]): List of all blocks in multi-block plot3d mesh
+        blocks (List[Block]): Lists of blocks you want to find the connectivity for
+
     Returns:
         (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'} }
         (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'surfaces': [{'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX', 'ID'}] }
+        
     """
- 
+    gcd_array = list()
+    # Find the gcd of all the blocks 
+    for block_indx in range(len(blocks)):
+        block = blocks[block_indx]
+        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
+    gcd_to_use = min(gcd_array)
+    new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
+
+    # Find Connectivity 
+    face_matches, outer_faces_formatted = connectivity(new_blocks)
+    # scale it up
+    for i in range(len(face_matches)):
+        face_matches[i]['block1']['IMIN'] *= gcd_to_use
+        face_matches[i]['block1']['JMIN'] *= gcd_to_use
+        face_matches[i]['block1']['KMIN'] *= gcd_to_use
+        face_matches[i]['block1']['IMAX'] *= gcd_to_use
+        face_matches[i]['block1']['JMAX'] *= gcd_to_use
+        face_matches[i]['block1']['KMAX'] *= gcd_to_use
+
+        face_matches[i]['block2']['IMIN'] *= gcd_to_use
+        face_matches[i]['block2']['JMIN'] *= gcd_to_use
+        face_matches[i]['block2']['KMIN'] *= gcd_to_use
+        face_matches[i]['block2']['IMAX'] *= gcd_to_use
+        face_matches[i]['block2']['JMAX'] *= gcd_to_use
+        face_matches[i]['block2']['KMAX'] *= gcd_to_use
+    for j in range(len(outer_faces_formatted)):
+        outer_faces_formatted[j]['IMIN'] *= gcd_to_use
+        outer_faces_formatted[j]['JMIN'] *= gcd_to_use
+        outer_faces_formatted[j]['KMIN'] *= gcd_to_use
+        outer_faces_formatted[j]['IMAX'] *= gcd_to_use
+        outer_faces_formatted[j]['JMAX'] *= gcd_to_use
+        outer_faces_formatted[j]['KMAX'] *= gcd_to_use
+    return face_matches, outer_faces_formatted
+
+def connectivity(blocks:List[Block]):
+    """Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces 
+
+    Args:
+        blocks (List[Block]): List of all blocks in multi-block plot3d mesh
+
+    Returns:
+        (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'} }
+        (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'surfaces': [{'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX', 'ID'}] }
+
+    """
 
     outer_faces = list()      
     face_matches = list()
