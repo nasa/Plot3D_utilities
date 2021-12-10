@@ -5,8 +5,12 @@
 
 PLOT3D DOCUMENTATION
 ==================================
+.. image:: https://badge.fury.io/py/plot3d.svg
+    :target: https://badge.fury.io/py/plot3d
 
-This tool is currently a python library. Julia version is in the works. 
+A python library for reading, writing, finding connectivity for plot3d files.
+
+- `GitHub page <https://github.com/nasa/plot3d_utilities>`_
 
 .. toctree::
    :glob:

@@ -43,6 +43,8 @@ This is the matching face within the omesh
 Plotting Connectivity using Paraview
 ****************************************
 This example shows how you can take a mesh created Numeca Autogrid and plot the connecitivity using paraview. With this information, anyone should be able to comprehend the format and export it to whatever solver. 
+This code has been tested using paraview 5.9. Modifications may need to be added for Paraview 5.10
+
 
 .. note::
 
