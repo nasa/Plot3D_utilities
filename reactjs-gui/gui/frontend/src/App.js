@@ -9,6 +9,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
+import { useIdleTimer } from 'react-idle-timer';
+
 // TODO: update to react router v6
 // https://reactrouter.com/docs/en/v6/upgrading/v5#upgrade-to-react-v168
 function App() {
@@ -23,6 +25,31 @@ function App() {
       }),
     [prefersDarkMode],
   );
+
+  // Session timeout after 2 hours
+  const IDLE_MINUTES = 120;
+
+  const handleOnIdle = event => {
+    // Delete files if user is inactive
+    fetch(`/delete/${localStorage.getItem("fileName")}`, { method: "DELETE" })
+    console.log(`deleted file ${localStorage.getItem("fileName")}`)
+  }
+
+  const handleOnActive = event => {
+    // Do nothing
+  }
+
+  const handleOnAction = event => {
+    // Do nothing
+  }
+
+  const { getRemainingTime, getLastActiveTime } = useIdleTimer({
+    timeout: 1000 * 60 * IDLE_MINUTES,
+    onIdle: handleOnIdle,
+    onActive: handleOnActive,
+    onAction: handleOnAction,
+    debounce: 500
+  })
 
   return (
     <ThemeProvider theme={theme}>

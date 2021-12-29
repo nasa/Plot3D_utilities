@@ -1,11 +1,14 @@
 from fastapi import FastAPI, UploadFile, File, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from http import HTTPStatus
 
 from pydantic import BaseModel
 import shutil
 import os
+import json
+import pandas as pd
 
 import uuid
 
@@ -33,8 +36,28 @@ class SplitblocksItem(BaseModel):
     cellsPerBlock: int
     direction: str
 
+class DownloadItem(BaseModel):
+    fileName: str
+    fileOption: str
 
-app = FastAPI()
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, pd.DataFrame):
+            return obj.to_dict()
+        return super(NpEncoder, self).default(obj)
+
+app = FastAPI(
+    title="Plot3D ReactJS GUI Backend API",
+    description="""
+    This is the backend API for the Plot3D ReactJS GUI. For more information see the Plot3D utilities repository on GitHub.
+    """,
+)
 
 origins = [
     "http://localhost:3000",
@@ -49,18 +72,18 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-@app.get("/", tags=["root"])
+@app.get("/", tags=["test"])
 async def read_root() -> dict:
     return {"message": "Welcome to the gui"}
 
-@app.get("/test/")
+@app.get("/test/", tags=["test"])
 async def read_test() -> dict:
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     return {"message": f"testing /test/ endpoint. Time fetched: {current_time}"}
 
 # https://www.youtube.com/watch?v=N6bpBkwFdc8
-@app.post("/upload")
+@app.post("/upload", tags=["files"])
 async def upload(file: UploadFile = File(...)):
     #with open(f"{file.filename}", "wb") as buffer:
         #shutil.copyfileobj(file.file, buffer)
@@ -73,16 +96,13 @@ async def upload(file: UploadFile = File(...)):
     return {"fileName": uuid_filename}
     # return {"file_name": "PahtCascade-ASCII.xyz"} #file.filename
 
-@app.post("/avgcentroid")
+@app.post("/avgcentroid", tags=["plot3d calculations"])
 def avg_centroid(item: UUIDFilename):
     print("GET CENTROID")
 
     ret = {}
     file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName)
-    print(os.path.isfile(file_path))
-    print(file_path)
-    blocks = read_plot3D(file_path, binary=False) #testing with ascii file can i just do try excepts?
-    print("Got blocks")
+    blocks = read_plot3D(file_path, binary=False)
 
     def get_centroid_avg(blocks):
         """
@@ -112,41 +132,15 @@ def avg_centroid(item: UUIDFilename):
     return ret
 
 
-@app.post("/blocks")
+@app.post("/blocks", tags=["plot3d calculations"])
 def blocks(item: UUIDFilename):
     print("GET blocks")
 
     ret = {}
     file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName)
-    print(os.path.isfile(file_path))
-    print(file_path)
-    blocks = read_plot3D(file_path, binary=False) #testing with ascii file can i just do try excepts?
-    print("Got blocks")
 
-    def euclidian_distance_3d(points_1, points_2):
-        """
-        Calculate the euclidian distance between two sets of points in 3D
-        """
-        return ((points_1[0] - points_2[0])**2 + (points_1[1] - points_2[1])**2 + (points_1[2] - points_2[2])**2)**0.5
-
-    def get_centroid_avg(blocks):
-        """
-        Calculate the average centroid for blocks
-        """
-        cx_total = 0
-        cy_total = 0
-        cz_total = 0
-
-        for index, block in enumerate(blocks):
-            cx_total += block.cx
-            cy_total += block.cy
-            cy_total += block.cz
-        
-        cx_avg = cx_total / len(blocks)
-        cy_avg = cy_total / len(blocks)
-        cz_avg = cz_total / len(blocks)
-
-        return cx_avg, cy_avg, cz_avg
+    # We can use try excepts here if we want to check for binary as well
+    blocks = read_plot3D(file_path, binary=False)
 
     def get_coords(block):
         IMAX, JMAX, KMAX = block.X.shape
@@ -203,79 +197,24 @@ def blocks(item: UUIDFilename):
                 coords = []
 
         return total_coords
-
-    def get_coords2(block):
-        list_of_coords = []
-        coords = []
-
-        original_coords = get_coords(block)
-
-        total_dist = 0.0
-
-        dist_list = []
-
-        for index, value in enumerate(original_coords):
-            try:
-                dist = euclidian_distance_3d(original_coords[index], original_coords[index+1])
-                dist_list.append(dist)
-                total_dist += dist
-            except:
-                print("Index error line 590")
-                pass
-        dist_list.sort(reverse=True)
-        print(dist_list[:10])
-        
-        average_dist = total_dist / len(original_coords)
-
-        print(f"Total distance: {total_dist}")
-        print(f"Average distance: {average_dist}")
-
-        for index, value in enumerate(original_coords):
-            try:
-                dist = euclidian_distance_3d(original_coords[index], original_coords[index+1])
-                #if dist < average_dist*5:
-                if dist < dist_list[8]: # if greater than 10th largest distance
-                    coords.append(original_coords[index])
-                else:
-                    list_of_coords.append(coords)
-                    coords = []
-            except:
-                coords.append(original_coords[index])
-                list_of_coords.append(coords)
-                coords = []
-                print("Index error line 604")
-                pass
-        
-        return list_of_coords
-
-    
-    # Calculate all blocks
-    #blocks_coords = [get_coords(b) for b in blocks]
     
     blocks_coords = [get_coords(b) for b in blocks]
-    #print(blocks_coords)
-    #print(len(blocks_coords))
 
     # Add block0, block1, ... to return dictionary
     for num_block, b in enumerate(blocks_coords):
         for num_coords, c in enumerate(b):
             ret[f"block{num_block}-{num_coords}"] = c
-
-    #for num_block, b in enumerate(blocks_coords):
-    #    ret[f"block{num_block}"] = b
     
     print("Got all blocks")
 
     return ret
 
-@app.post("/connectivities")
+@app.post("/connectivities", tags=["plot3d calculations"])
 def connectivities(item: UUIDFilename):
     print("GET connectivities")
 
     ret = {}
     file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName)
-    print(os.path.isfile(file_path))
-    print(file_path)
     blocks = read_plot3D(file_path, binary=False)
 
     # Get connectivity
@@ -283,13 +222,10 @@ def connectivities(item: UUIDFilename):
 
     # Save results
     conn_file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName + "-conn.pickle")
-    #HARDCODE FOR NOW
-    #conn_file_path = os.path.join(os.path.abspath("."), "uploads", "804beb90-7ab0-47b5-a963-57e362a14c9b-conn.pickle")
+
     with open(conn_file_path,'wb') as f:
         pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces},f)
 
-    # HARDCODE LOADING FOR NOW
-    #804beb90-7ab0-47b5-a963-57e362a14c9b
     with open(conn_file_path,'rb') as f:
         data = pickle.load(f)
         face_matches = data['face_matches']
@@ -357,14 +293,110 @@ def connectivities(item: UUIDFilename):
 
     return ret
 
-@app.post("/periodicities")
+@app.post("/connectivities_grid", tags=["plot3d calculations"])
+def connectivities_grid(item: UUIDFilename):
+    print("GET connectivities_grid")
+
+    ret = {}
+    file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName)
+    blocks = read_plot3D(file_path, binary=False)
+
+    # Get connectivity
+    face_matches, outer_faces = connectivity_fast(blocks)
+
+    # Save results
+    conn_file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName + "-conn.pickle")
+
+    with open(conn_file_path,'wb') as f:
+        pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces},f)
+
+    conn_file_path_json = os.path.join(os.path.abspath("."), "uploads", item.fileName + "-conn.json")
+
+    with open(conn_file_path_json,'w') as f:
+        json.dump({"face_matches":face_matches, "outer_faces":outer_faces},f, cls=NpEncoder)
+
+    with open(conn_file_path,'rb') as f:
+        data = pickle.load(f)
+        face_matches = data['face_matches']
+        outer_faces = data['outer_faces']
+    
+    def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
+        """Takes a block (T) and selects X,Y,Z from the block given a face's dimensions
+            theres really no good way to do this in python 
+        Args:
+            T (np.ndarray): arbitrary array so say a full matrix containing X
+            dim1 (tuple): 20,50 this selects X in the i direction from i=20 to 50
+            dim2 (tuple): 40,60 this selects X in the j direction from j=40 to 60
+            dim3 (tuple): 10,20 this selects X in the k direction from k=10 to 20
+
+        Returns:
+            np.ndarray: returns X or Y or Z given some range of I,J,K
+        """
+        if dim1[0] == dim1[1]:
+            return T[ dim1[0], dim2[0]:dim2[1]+1, dim3[0]:dim3[1]+1 ]
+        if dim2[0] == dim2[1]:
+            return T[ dim1[0]:dim1[1]+1, dim2[0], dim3[0]:dim3[1]+1 ]
+        if dim3[0] == dim3[1]:
+            return T[ dim1[0]:dim1[1]+1, dim2[0]:dim2[1]+1, dim3[0] ]
+        
+        return T[dim1[0]:dim1[1], dim2[0]:dim2[1], dim3[0]:dim3[1]]
+
+    def plot_face(face_matches,blocks):
+        coords = []
+        for fm in face_matches:
+            nextcoords = []
+            block_index1 = fm['block1']['block_index']
+            I1 = [fm['block1']['IMIN'],fm['block1']['IMAX']] # [ IMIN IMAX ]
+            J1 = [fm['block1']['JMIN'],fm['block1']['JMAX']] # [ JMIN JMAX ]
+            K1 = [fm['block1']['KMIN'],fm['block1']['KMAX']] # [ KMIN KMAX ]
+
+            block_index2 = fm['block2']['block_index']
+            I2 = [fm['block2']['IMIN'],fm['block2']['IMAX']] # [ IMIN IMAX ]
+            J2 = [fm['block2']['JMIN'],fm['block2']['JMAX']] # [ JMIN JMAX ]
+            K2 = [fm['block2']['KMIN'],fm['block2']['KMAX']] # [ KMIN KMAX ]
+
+            X1 = select_multi_dimensional(blocks[block_index1].X, (I1[0],I1[1]), (J1[0],J1[1]), (K1[0],K1[1]))
+            Y1 = select_multi_dimensional(blocks[block_index1].Y, (I1[0],I1[1]), (J1[0],J1[1]), (K1[0],K1[1]))
+            Z1 = select_multi_dimensional(blocks[block_index1].Z, (I1[0],I1[1]), (J1[0],J1[1]), (K1[0],K1[1]))
+
+            X2 = select_multi_dimensional(blocks[block_index2].X, (I2[0],I2[1]), (J2[0],J2[1]), (K2[0],K2[1]))
+            Y2 = select_multi_dimensional(blocks[block_index2].Y, (I2[0],I2[1]), (J2[0],J2[1]), (K2[0],K2[1]))
+            Z2 = select_multi_dimensional(blocks[block_index2].Z, (I2[0],I2[1]), (J2[0],J2[1]), (K2[0],K2[1]))
+            nrow,ncol = X1.shape
+            # return list of coords
+            for n in range(nrow):
+                L = []
+                for m in range(ncol):
+                    L.append([X1[n,m], Y1[n,m], Z1[n,m]])
+                nextcoords.append(L)
+
+            for m in range(ncol):
+                L = []
+                for n in range(nrow):
+                    L.append([X1[n,m], Y1[n,m], Z1[n,m]])
+                nextcoords.append(L)
+
+            coords.append(nextcoords)
+
+        return coords
+    
+    connectivity_coords = plot_face(face_matches, blocks)
+    
+    # Add connectivity0, connectivity1, ... to return dictionary
+    for num_connectivity, c in enumerate(connectivity_coords):
+        for n, cc in enumerate(c):
+            ret[f"connectivity{num_connectivity}-{n}"] = cc
+    
+    print("Got all connectivity")
+
+    return ret
+
+@app.post("/periodicities", tags=["plot3d calculations"])
 def periodicities(item: PeriodicitiesItem):
     print("GET periodicities")
 
     ret = {}
     file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName)
-    print(os.path.isfile(file_path))
-    print(file_path)
     blocks = read_plot3D(file_path, binary=False)
 
     conn_file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName + "-conn.pickle")
@@ -383,6 +415,14 @@ def periodicities(item: PeriodicitiesItem):
         [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
     
+    # Save json
+    periodic_file_path_json = os.path.join(os.path.abspath("."), "uploads", item.fileName + "-periodic.json")
+    with open(periodic_file_path_json, "w") as f:
+        [m.pop('match',None) for m in face_matches] # Remove the dataframe
+        json.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces}, f, cls=NpEncoder)
+    
+
+
     # Load results if dont want to compute
     #with open(periodic_file_path,'rb') as f:
     #    data = pickle.load(f)
@@ -432,30 +472,34 @@ def periodicities(item: PeriodicitiesItem):
             X2 = select_multi_dimensional(blocks[block_index2].X, (I2[0],I2[1]), (J2[0],J2[1]), (K2[0],K2[1]))
             Y2 = select_multi_dimensional(blocks[block_index2].Y, (I2[0],I2[1]), (J2[0],J2[1]), (K2[0],K2[1]))
             Z2 = select_multi_dimensional(blocks[block_index2].Z, (I2[0],I2[1]), (J2[0],J2[1]), (K2[0],K2[1]))
-
+            nrow,ncol = X1.shape
             # return list of coords
-            for index in range(len(X1)):
-                for next_index in range(len(X1[index])):
-                    nextcoords.append([X1[index][next_index], Y1[index][next_index], Z1[index][next_index]])
+            for n in range(nrow):
+                L = []
+                for m in range(ncol):
+                    L.append([X1[n,m], Y1[n,m], Z1[n,m]])
+                nextcoords.append(L)
+
+            for m in range(ncol):
+                L = []
+                for n in range(nrow):
+                    L.append([X1[n,m], Y1[n,m], Z1[n,m]])
+                nextcoords.append(L)
 
             coords.append(nextcoords)
 
         return coords
-    #print(periodic_surfaces)
-    #print(len(periodic_surfaces))
-    #print(dir(periodic_surfaces))
-    #periodicity_coords = [plot_face(periodic_surfaces[i], blocks) for i in range(len(periodic_surfaces))]
-    periodicity_coords = plot_face(periodic_surfaces[:], blocks)
-    #print(periodicity_coords)
-    print(len(periodicity_coords))
-    for num_per, p in enumerate(periodicity_coords):
-        ret[f"periodicity{num_per}"] = p
 
-    print(ret.keys())
+    periodicity_coords = plot_face(periodic_surfaces[:], blocks)
+
+    for num_per, p in enumerate(periodicity_coords):
+        for n, c in enumerate(p):
+            ret[f"periodicity{num_per}_{c}"] = c
+
     
     return ret
 
-@app.post("/splitblocks")
+@app.post("/splitblocks", tags=["plot3d calculations"])
 def splitblocks(item: SplitblocksItem):
     """
     Split blocks into smaller blocks
@@ -465,8 +509,6 @@ def splitblocks(item: SplitblocksItem):
     
     # Load blocks
     file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName)
-    print(os.path.isfile(file_path))
-    print(file_path)
     blocks = read_plot3D(file_path, binary=False)
 
     # Split blocks
@@ -489,12 +531,11 @@ def splitblocks(item: SplitblocksItem):
     splitblocks_file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName +"-splitblocks")
     write_plot3D(splitblocks_file_path, blocks_split, binary=False)
 
-    # Return
     ret["fileName"] = item.fileName + "-splitblocks"
 
     return ret
 
-@app.delete("/delete/{fileName}", status_code=HTTPStatus.NO_CONTENT)
+@app.delete("/delete/{fileName}", status_code=HTTPStatus.NO_CONTENT, tags=["files"])
 def delete_file(fileName: str):
     """
     Delete an uploaded file from the server
@@ -510,15 +551,109 @@ def delete_file(fileName: str):
             return False
         return val.hex == uuid_string.replace('-', '')
     
+    removed = False
     # Validate that the fileName is a valid UUID4
     if validate_uuid4(fileName):
+        # Remove ascii file
         file_path = os.path.join(os.path.abspath("."), "uploads", fileName)
         if os.path.exists(file_path):
             os.remove(file_path)
+            removed = True
+        else:
+            print(f"file does not exist {file_path}")
+        # Remove connectivity pickle file
+        conn_pickle_file_path = os.path.join(os.path.abspath("."), "uploads", fileName + "-conn.pickle")
+        if os.path.exists(conn_pickle_file_path):
+            os.remove(file_path)
+            removed = True
+        else:
+            print(f"file does not exist {conn_pickle_file_path}")
+        # Remove connectivity json file
+        conn_json_file_path = os.path.join(os.path.abspath("."), "uploads", fileName + "-conn.json")
+        if os.path.exists(conn_json_file_path):
+            os.remove(file_path)
+            removed = True
+        else:
+            print(f"file does not exist {conn_json_file_path}")
+        # Remove periodic pickle file
+        periodic_pickle_file_path = os.path.join(os.path.abspath("."), "uploads", fileName + "-periodic.pickle")
+        if os.path.exists(periodic_pickle_file_path):
+            os.remove(file_path)
+            removed = True
+        else:
+            print(f"file does not exist {periodic_pickle_file_path}")
+        # Remove periodic json file
+        periodic_json_file_path = os.path.join(os.path.abspath("."), "uploads", fileName + "-periodic.json")
+        if os.path.exists(periodic_json_file_path):
+            os.remove(file_path)
+            removed = True
+        else:
+            print(f"file does not exist {periodic_json_file_path}")
+        # Remove split blocks file
+        split_blocks_file_path = os.path.join(os.path.abspath("."), "uploads", fileName +  "-splitblocks")
+        if os.path.exists(split_blocks_file_path):
+            os.remove(file_path)
+            removed = True
+        else:
+            print(f"file does not exist {split_blocks_file_path}")
+
+        if removed:
             return Response(status_code=HTTPStatus.NO_CONTENT.value)
         else:
-            print(f"file does not exist {fileName}")
             return Response(status_code=HTTPStatus.NOT_FOUND.value)
     else:
         print(f"file invalid {fileName}")
+        return Response(status_code=HTTPStatus.BAD_REQUEST.value)
+
+@app.post("/download", tags=["files"])
+def download(item: DownloadItem):
+    """
+    Download a specified file from the server.
+    Options are:
+    - connectivity
+    - periodicity
+    - splitblocks
+    """
+    print(item)
+    file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName)
+    print(file_path)
+    print(os.path.exists(file_path))
+    def validate_uuid4(uuid_string):
+        """
+        Validate that a UUID string is in
+        fact a valid uuid4.
+        """
+        try:
+            val = uuid.UUID(uuid_string, version=4)
+        except ValueError:
+            return False
+        return val.hex == uuid_string.replace('-', '')
+
+    def ends_in_splitblocks(file_name):
+        return file_name.endswith("-splitblocks")
+    
+    # Validate that the fileName is a valid UUID4
+    if validate_uuid4(item.fileName) or ends_in_splitblocks(item.fileName):
+        # Get file path
+        file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName)
+        conn_pickle_file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName + "-conn.json")
+        periodic_pickle_file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName + "-periodic.json")
+        if item.fileOption == "connectivity":
+            if os.path.exists(conn_pickle_file_path):
+                return FileResponse(conn_pickle_file_path, media_type="application/octet-stream")
+            else:
+                return Response(status_code=HTTPStatus.NOT_FOUND.value)
+        elif item.fileOption == "periodicity":
+            if os.path.exists(periodic_pickle_file_path):
+                return FileResponse(periodic_pickle_file_path, media_type="application/octet-stream")
+            else:
+                return Response(status_code=HTTPStatus.NOT_FOUND.value)
+        elif item.fileOption == "splitblocks":
+            if os.path.exists(file_path):
+                return FileResponse(file_path, media_type="application/octet-stream")
+            else:
+                return Response(status_code=HTTPStatus.NOT_FOUND.value)
+        else:
+            return Response(status_code=HTTPStatus.BAD_REQUEST.value)
+    else:
         return Response(status_code=HTTPStatus.BAD_REQUEST.value)

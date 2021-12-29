@@ -4,12 +4,13 @@ import { OrbitControls, Stars, Text, Environment, GizmoHelper, GizmoViewport, us
 import { BoxGeometry, BufferGeometry, InstancedMesh, LineBasicMaterial, MeshNormalMaterial, SphereGeometry, ToneMapping, Line, ConvexHull } from "three";
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 import { Suspense, useEffect, useState, useRef, useMemo, useCallback, useResource } from "react";
-import Model from "../components/Model";
 import * as THREE from 'three';
 import usePromise from 'react-promise-suspense';
 import { Line2 } from "three/examples/jsm/lines/Line2";
 import DatGui, { DatBoolean, DatButton, DatColor, DatNumber, DatSelect, DatString, DatFolder, DatPresets } from "react-dat-gui";
 import { useBeforeunload } from 'react-beforeunload';
+import { useIdleTimer } from 'react-idle-timer';
+import { saveAs } from 'file-saver';
 
 import './Visualize.css';
 
@@ -136,7 +137,9 @@ function Visualize() {
 
     //const colors = ["silver", "gray", "maroon", "red", "purple", "fuchsia", "green", "lime", "olive", "yellow", "navy", "blue", "teal", "aqua"];
 
-    const colors = ["red", "blue", "green", "yellow", "maroon", "purple"]
+    const colors = ["red", "aqua", "white", "fuchsia"]
+
+    const colors2 = ["green", "orange", "lime", "olive"]
 
     useEffect(() => {
       const requestOptions = {
@@ -190,14 +193,15 @@ function Visualize() {
 
       setCalculatingConn(true);
 
-      fetch('/connectivities', requestOptions)
+      fetch('/connectivities_grid', requestOptions)
           .then(response => response.json())
           .then(data => {
               setConnectivityData(data);
               const options = {};
               Object.keys(data).forEach(k => {
                   options[k] = true;
-                  options[k+"Color"] = randomColor(colors);
+                  options[k+"Color"] = colors2[Number(k.slice(12, 13))];
+                  // options[k+"Color"] = randomColor(colors);
                   connectivityOpts.push(k);
               });
               setOpts({...opts, ...options});
@@ -259,47 +263,50 @@ function Visualize() {
       .then(() => window.location.reload()); 
     };
 
-    const unloadHandler = () => {
-        //fetch(`/delete/${localStorage.getItem("fileName")}`, { method: "DELETE" });
+    const handleDownloadConnectivity = () => {
+      const requestOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:JSON.stringify({
+              fileName: localStorage.getItem("fileName"),
+              fileOption: "connectivity"
+          })
+        };
+
+      fetch('/download', requestOptions)
+        .then(response => response.blob())
+        .then(data => saveAs(new Blob([data]), "connectivity.json"))
     };
 
-    useBeforeunload((event) => {
-        unloadHandler();
-    });
+    const handleDownloadPeriodicity = () => {
+      const requestOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:JSON.stringify({
+              fileName: localStorage.getItem("fileName"),
+              fileOption: "periodicity"
+          })
+        };
 
-    // const CameraControls = () => {
-      // https://codeworkshop.dev/blog/2020-04-03-adding-orbit-controls-to-react-three-fiber/
-    //  const {
-    //    camera,
-    //    gl: { domElement },
-    //  } = useThree();
-    //  const controls = useRef();
-    //  useFrame((state) => controls.current.update());
-    //  return (
-    //    <OrbitControls ref={controls} args={[camera, domElement]} />
-    //  );
-    //}
+      fetch('/download', requestOptions)
+        .then(response => response.blob())
+        .then(data => saveAs(new Blob([data]), "periodicity.json"))
+    };
 
-    //const useSetLookAtHandler = () => {
-    //  const {
-    //    camera,
-    //    gl: { domElement },
-    //  } = useThree();
-    //  const controls = useRef();
-    //  camera.position.set(2, 3, 4);
-    //  camera.lookAt([2, 3, 4]);
-    //  useFrame((state) => controls.current.update());
-    //  return (<></>);
-    //};
+    const handleDownloadSplitblocks = () => {
+      const requestOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:JSON.stringify({
+              fileName: localStorage.getItem("fileName"),
+              fileOption: "splitblocks"
+          })
+        };
 
-    //const newTarget = (x, y, z) => {
-    //  setTarget(new THREE.Vector3(x, y, z));
-    //};
-
-    //const handleCameraChange = (camera, x, y, z) => {
-    //  camera.position.set(x, y, z);
-    //  return (<></>);
-    //};
+      fetch('/download', requestOptions)
+        .then(response => response.blob())
+        .then(data => saveAs(new Blob([data]), "splitblocks.xyz"))
+    };
 
     if ((blockData === null) && (avgCentroidCoords === null)) {
         return <h1>Loading, waiting for API...</h1>
@@ -363,10 +370,15 @@ function Visualize() {
                     <DatSelect path={opt+"Color"} options={colors} />
                     ))}
                 </DatFolder>
-                <DatFolder title="Splitblocks">
+                <DatFolder title="Split Blocks">
                     <DatNumber path="cellsPerBlock" min={1} step={1} />
                     <DatSelect path="direction" options={['i', 'j', 'k', "None"]} />
                     <DatButton label={CalcSplitblocksLabel(calculatingSplitblocks)} onClick={handleSplitblocks} />
+                </DatFolder>
+                <DatFolder title="Export to JSON">
+                    <DatButton label="Export Connectivity" onClick={handleDownloadConnectivity} />
+                    <DatButton label="Export Periodicity" onClick={handleDownloadPeriodicity} />
+                    <DatButton label="Export Split Blocks" onClick={handleDownloadSplitblocks} />
                 </DatFolder>
             </DatGui>
         </>
