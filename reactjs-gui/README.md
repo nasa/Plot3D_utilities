@@ -4,6 +4,7 @@ A web-based graphical user interface to interact with plot3d files.
 # Requirements
 ---
 **Note about Ubuntu**
+
 If you are using ubuntu make sure you first install build essentials. https://linuxize.com/post/how-to-install-gcc-on-ubuntu-20-04/ 
 Some of the packages require gcc.
 
