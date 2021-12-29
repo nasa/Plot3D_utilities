@@ -75,8 +75,6 @@ export default function DropzoneUploadFunctional() {
                     >
                         Visualize your file
                     </Button>
-                    <br></br>
-                    {filename}
                 </div>
             );
         } else {
