@@ -521,7 +521,7 @@ def connectivity(blocks:List[Block]):
     outer_faces = list()      
     face_matches = list()
     matches_to_remove = list()
-    # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[1],blocks[2])    # This function finds partial matches between blocks
+    # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[4],blocks[7])    # This function finds partial matches between blocks
 
     combos = combinations_of_nearest_blocks(blocks) # Find the 6 nearest Blocks and search through all that. 
     t = trange(len(combos))
@@ -548,8 +548,9 @@ def connectivity(blocks:List[Block]):
 
                 temp = face_matches_to_dict(face1,face2,blocks[i],blocks[j])
                 temp['match'] = df
-                # ! Paht check 
                 face_matches.append(temp)
+                if len(face_matches)==14:
+                    print("check")
 
         # Update Outer Faces 
         outer_faces.extend(blocki_outerfaces)

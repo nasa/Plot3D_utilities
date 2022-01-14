@@ -30,11 +30,11 @@ def create_face(block:Block,imin:int,imax:int,jmin:int,jmax:int,kmin:int,kmax:in
         for j in [jmin,jmax]:
             for k in [kmin,kmax]:
                 f.add_vertex(block.X[imin,j,k], block.Y[imin,j,k], block.Z[imin,j,k],imin,j,k)
-    if jmin==jmax:
+    elif jmin==jmax:
         for i in [imin,imax]:
             for k in [kmin,kmax]:
                 f.add_vertex(block.X[i,jmin,k], block.Y[i,jmin,k], block.Z[i,jmin,k],i,jmin,k)
-    if kmin==kmax:
+    elif kmin==kmax:
         for i in [imin,imax]:
             for j in [jmin,jmax]:
                 f.add_vertex(block.X[i,j,kmin], block.Y[i,j,kmin], block.Z[i,j,kmin],i,j,kmin)
@@ -100,7 +100,9 @@ def periodicity(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Fa
         face = create_face(blocks[o['block_index']], o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'], o['KMIN'], o['KMAX'])
         face.set_block_index(o['block_index'])
         outer_faces_all.append(face)
-    for m in matched_faces:
+    for match_face_index,m in enumerate(matched_faces):
+        if (match_face_index == 14):
+            print("check")
         face1 = create_face(blocks[m['block1']['block_index']], m['block1']['IMIN'], m['block1']['IMAX'], m['block1']['JMIN'], m['block1']['JMAX'], m['block1']['KMIN'], m['block1']['KMAX'])
         face2 = create_face(blocks[m['block2']['block_index']], m['block2']['IMIN'], m['block2']['IMAX'], m['block2']['JMIN'], m['block2']['JMAX'], m['block2']['KMIN'], m['block2']['KMAX'])
         face1.set_block_index(m['block1']['block_index'])
