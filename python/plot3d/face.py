@@ -25,7 +25,7 @@ class Face:
         self.cz = 0
         self.nvertex=0
         self.blockIndex = 0 # not really needed except in periodicity 
-    
+        
     def to_dict(self):
         """Returns a dictionary representaon of a face
         """
@@ -128,6 +128,16 @@ class Face:
             self.cx = self.x.mean()
             self.cy = self.y.mean()
             self.cz = self.z.mean()
+    @property
+    def size(self):
+        if self.IMIN==self.IMAX:
+            return (self.JMAX- self.JMIN)*(self.KMAX-self.KMIN)
+        elif (self.JMIN==self.JMAX):
+            return (self.IMAX-self.IMIN)*(self.KMAX-self.KMIN)
+        elif (self.KMIN==self.KMAX):
+            return (self.IMAX-self.IMIN)*(self.JMAX- self.JMIN)
+        else:
+            return (self.IMAX-self.IMIN)*(self.JMAX- self.JMIN)*(self.KMAX-self.KMIN)
 
     def set_block_index(self,val):
         self.blockIndex = val

@@ -8,50 +8,6 @@ from pv_library import Load, ExtractBlocks, ExtractSurface
 from paraview.simple import *
 import random
 
-# Extracts the mesh block
-# Block indicies should be an array format
-def ExtractBlocks(source,View,BlockIndicies:List[int]):
-    """Extracts block(s) from a mesh in paraview 
-
-    Args:
-        source ([unknown]): This is a paraview object that describes a source 
-        View ([unknown]): Thisi s a paraview object that describes a view 
-        BlockIndicies (List[int]): List of blocks you wish to extract to look at. Index should start at 1
-
-    Returns:
-        (tuple): tuple containing:
-
-            - **extractBlock1** (paraview source): source object representing the block.
-            - **extractBlock1Display** (paraview display): display settings for the source.
-            - **extractBlock1Display** (paraview display): display settings for the source.
-    """
-    extractBlock1 = ExtractBlock(Input=source)
-    extractBlock1.BlockIndices = BlockIndicies
-    extractBlock1Display = Show(extractBlock1, View)
-    extractBlock1Display.Representation = 'Outline'
-    extractBlock1Display.ColorArrayName = ['POINTS', '']
-    extractBlock1Display.OSPRayScaleFunction = 'PiecewiseFunction'
-    extractBlock1Display.SelectOrientationVectors = 'None'
-    extractBlock1Display.ScaleFactor = 0.2489664673805237
-    extractBlock1Display.SelectScaleArray = 'None'
-    extractBlock1Display.GlyphType = 'Arrow'
-    extractBlock1Display.PolarAxes = 'PolarAxesRepresentation'
-    extractBlock1Display.ScalarOpacityUnitDistance = 0.07851226208722488
-    Hide(source, View)
-    SetActiveSource(extractBlock1)
-    # set scalar coloring
-    ColorBy(extractBlock1Display, ('FIELD', 'vtkBlockColors'))
-
-    # show color bar/color legend
-    extractBlock1Display.SetScalarBarVisibility(View, True)
-
-    # show color bar/color legend
-    ColorBy(extractBlock1Display, ('FIELD', 'vtkBlockColors'))
-    LUT = GetColorTransferFunction('vtkBlockColors')
-    extractBlock1Display.SetRepresentationType('Surface With Edges')
-    ColorBy(extractBlock1Display, ('FIELD', 'Solid Color'))
-    HideScalarBarIfNotNeeded(LUT, View) # Change to solid color
-    return extractBlock1,extractBlock1Display,LUT
 
 def CreateSubset(block_source,voi:List[int],name:str,opacity:float=1):
     """Creates a subset within paraview to display the mesh 
@@ -116,9 +72,13 @@ if __name__=="__main__":
         data = pickle.load(f)
         face_matches = data['face_matches']
         outer_faces = data['outer_faces']
+        if 'periodic_surfaces' in data:
+            periodic_faces = data['periodic_surfaces']
+        else:
+            periodic_faces = []
 
-    blocks_to_extract = [f['block1']['index'] for f in face_matches]
-    blocks_to_extract.extend([f['block2']['index'] for f in face_matches])
+    blocks_to_extract = [f['block1']['block_index'] for f in face_matches]
+    blocks_to_extract.extend([f['block2']['block_index'] for f in face_matches])
     blocks_to_extract = list(set(blocks_to_extract))
 
     '''
@@ -136,7 +96,7 @@ if __name__=="__main__":
         rgb_outer_faces.append([random.randint(0,255)/255, random.randint(0,255)/255, random.randint(0,255)/255])
 
     # Load mesh
-    plot3d_binary_filename = '[path to your plot3d file]'
+    plot3d_binary_filename = 'R4_testfile_binary.xyz'
     plot3D_source,plot3D_Display,View,LUT = Load(plot3d_binary_filename)
     surface_indx = 1 
     
@@ -144,15 +104,15 @@ if __name__=="__main__":
     Loop through all the blocks and create within each block the match and the outer surfaces
     '''
     for b in blocks_to_extract: # Block indicies 
-        block_source,block_display,LUT = ExtractBlocks(plot3D_source,View,[b+1])
+        block_source,block_display,LUT = ExtractBlocks(plot3D_source,View,[b])
         RenameSource('Block '+str(b), block_source)
         block_source = FindSource('Block '+str(b))
         
         # Plot the face matches 
         for match_indx, f in enumerate(face_matches):
             # Add Plots for Matched Faces 
-            if f['block1']['index'] == b or f['block2']['index'] == b : 
-                if f['block1']['index'] == b:
+            if f['block1']['block_index'] == b or f['block2']['block_index'] == b : 
+                if f['block1']['block_index'] == b:
                     voi = [f['block1']['IMIN'], f['block1']['IMAX'], f['block1']['JMIN'], f['block1']['JMAX'],f['block1']['KMIN'], f['block1']['KMAX']]
                 else:
                     voi = [f['block2']['IMIN'], f['block2']['IMAX'], f['block2']['JMIN'], f['block2']['JMAX'],f['block2']['KMIN'], f['block2']['KMAX']]
@@ -161,8 +121,22 @@ if __name__=="__main__":
         # Plot the outer faces  
         for o in outer_faces:
             # Add Plots for Outer Faces
-            if o['index'] == b:
-                for surface in o['surfaces']:
-                    voi = [surface['IMIN'], surface['IMAX'], surface['JMIN'], surface['JMAX'],surface['KMIN'], surface['KMAX']]
+            if o['block_index'] == b:
+                    voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
                     CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
                     surface_indx +=1 
+               
+        for periodic_indx, p in enumerate(periodic_faces):
+            # Add Plots for Outer Faces
+            if p['block1']['block_index'] == b and p['block2']['block_index'] == b: # Periodicity within the block 
+                voi = [p['block1']['IMIN'], p['block1']['IMAX'], p['block1']['JMIN'], p['block1']['JMAX'],p['block1']['KMIN'], p['block1']['KMAX']]
+                CreateSubset(block_source, voi, name='periodic '+str(periodic_indx))
+                voi = [p['block2']['IMIN'], p['block2']['IMAX'], p['block2']['JMIN'], p['block2']['JMAX'],p['block2']['KMIN'], p['block2']['KMAX']]
+                CreateSubset(block_source, voi, name='periodic '+str(periodic_indx))
+
+            elif p['block1']['block_index'] == b or p['block2']['block_index'] == b: # Periodicity from block to block 
+                if p['block1']['block_index'] == b:
+                    voi = [p['block1']['IMIN'], p['block1']['IMAX'], p['block1']['JMIN'], p['block1']['JMAX'],p['block1']['KMIN'], p['block1']['KMAX']]
+                else:
+                    voi = [p['block2']['IMIN'], p['block2']['IMAX'], p['block2']['JMIN'], p['block2']['JMAX'],p['block2']['KMIN'], p['block2']['KMAX']]
+                CreateSubset(block_source, voi, name='periodic '+str(periodic_indx))

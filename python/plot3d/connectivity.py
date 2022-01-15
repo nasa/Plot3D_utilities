@@ -105,7 +105,7 @@ def unique_pairs(listOfItems:list):
             yield x,y
 
 
-def find_matching_blocks(block1:Block,block2:Block,tol:float=5E-5):  
+def find_matching_blocks(block1:Block,block2:Block,tol:float=1E-6):  
     """Takes two blocks and finds all matching pairs
 
     Args:
@@ -521,7 +521,7 @@ def connectivity(blocks:List[Block]):
     outer_faces = list()      
     face_matches = list()
     matches_to_remove = list()
-    # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[4],blocks[7])    # This function finds partial matches between blocks
+    # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[4],blocks[7],1E-12)    # This function finds partial matches between blocks
 
     combos = combinations_of_nearest_blocks(blocks) # Find the 6 nearest Blocks and search through all that. 
     t = trange(len(combos))
@@ -549,8 +549,6 @@ def connectivity(blocks:List[Block]):
                 temp = face_matches_to_dict(face1,face2,blocks[i],blocks[j])
                 temp['match'] = df
                 face_matches.append(temp)
-                if len(face_matches)==14:
-                    print("check")
 
         # Update Outer Faces 
         outer_faces.extend(blocki_outerfaces)

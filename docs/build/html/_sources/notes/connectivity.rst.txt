@@ -66,6 +66,8 @@ The goal if this code is to create a pickle file that is read in part 2. This pi
 
 
 
+
+
 Part 2 - Calling Paraview in script mode 
 ---------------------------------------------------------
 This part of the code shows how you can read the pickle file in part 1 from within paraview to display all your plots.
@@ -77,8 +79,9 @@ Paraview executable can be called with the script option to have it automaticall
 For windows this looks like this. You have the `[working folder]>"[path to paraview executable]" --script=[your_python_script.py]`
 
 .. note::
-    
-    C:\Github\Plot3D_utilities\python\test\paraview_plot > "C:\Program Files\ParaView 5.9.1-Windows-Python3.8-msvc2017-64bit\bin\paraview.exe" --script=compressor_plot_test.py
+    Has been tested on Paraview 5.10. Not backwards compatible with older paraview versions 
+
+    C:\\Github\\Plot3D_utilities\\python\\test\\paraview_plot > "C:\\Program Files\\ParaView 5.10.0-Windows-Python3.9-msvc2017-AMD64\\bin\\paraview.exe" --script=compressor_plot_test.py
 
 .. figure:: ../_static/paraview_launch_command.png
     :width: 800px
@@ -88,6 +91,11 @@ For windows this looks like this. You have the `[working folder]>"[path to parav
 
 
 .. literalinclude:: ../_static/paraview_code_part2.py
+  :language: python
+
+This is the contents of pv_library.py
+
+.. literalinclude:: ../_static/paraview_code_part3.py
   :language: python
 
 The output should look like the following 
