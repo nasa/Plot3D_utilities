@@ -8,7 +8,7 @@ from .write import write_plot3D
 from math import cos, radians, sin, sqrt, acos, radians
 from copy import deepcopy
 from tqdm import trange
-
+import math
 
 def create_face(block:Block,imin:int,imax:int,jmin:int,jmax:int,kmin:int,kmax:int) -> Face:
     """Creates a face/surface from IJK bounds. Face = either i is constant or j constant or k constant. 
@@ -54,6 +54,50 @@ def create_face(block:Block,imin:int,imax:int,jmin:int,jmax:int,kmin:int,kmax:in
 #     for i,f in enumerate(face_list):
 #         temp.append({'block_indx':block_indices[i], 'IMIN':f.IMIN, 'IMAX':f.IMAX, 'JMIN':f.JMIN, 'JMAX':f.JMAX,'KMIN':f.KMIN, 'KMAX':f.KMAX}) 
 #     return temp 
+
+def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Face], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
+    """Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity 
+
+    Args:
+        blocks (List[Block]): Lists of blocks you want to find the connectivity for
+
+    Returns:
+        (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'} }
+        (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'surfaces': [{'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX', 'ID'}] }
+        
+    """
+    gcd_array = list()
+    # Find the gcd of all the blocks 
+    for block_indx in range(len(blocks)):
+        block = blocks[block_indx]
+        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
+    gcd_to_use = min(gcd_array)
+    new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
+
+    # Find Connectivity 
+    face_matches, outer_faces_formatted = connectivity(new_blocks)
+    # scale it up
+    for i in range(len(face_matches)):
+        face_matches[i]['block1']['IMIN'] *= gcd_to_use
+        face_matches[i]['block1']['JMIN'] *= gcd_to_use
+        face_matches[i]['block1']['KMIN'] *= gcd_to_use
+        face_matches[i]['block1']['IMAX'] *= gcd_to_use
+        face_matches[i]['block1']['JMAX'] *= gcd_to_use
+        face_matches[i]['block1']['KMAX'] *= gcd_to_use
+
+        face_matches[i]['block2']['IMIN'] *= gcd_to_use
+        face_matches[i]['block2']['JMIN'] *= gcd_to_use
+        face_matches[i]['block2']['KMIN'] *= gcd_to_use
+        face_matches[i]['block2']['IMAX'] *= gcd_to_use
+        face_matches[i]['block2']['JMAX'] *= gcd_to_use
+        face_matches[i]['block2']['KMAX'] *= gcd_to_use
+    for j in range(len(outer_faces_formatted)):
+        outer_faces_formatted[j]['IMIN'] *= gcd_to_use
+        outer_faces_formatted[j]['JMIN'] *= gcd_to_use
+        outer_faces_formatted[j]['KMIN'] *= gcd_to_use
+        outer_faces_formatted[j]['IMAX'] *= gcd_to_use
+        outer_faces_formatted[j]['JMAX'] *= gcd_to_use
+        outer_faces_formatted[j]['KMAX'] *= gcd_to_use
 def periodicity(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Face], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """This function is used to check for periodicity of the other faces rotated about an axis 
         The way it works is to find faces of a constant i,j, or k value
