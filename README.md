@@ -1,5 +1,5 @@
 # Plot3D Utilities
-A python and julia plot3D library for reading, writing, finding connectivity, and post processing for Plot3D data files. 
+A python plot3D library for reading, writing, finding connectivity, and post processing for Plot3D data files. 
 
 ## Install Instructions
 To install simply do a `pip install plot3d` 

@@ -126,12 +126,13 @@ def periodicity(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Fa
                             [0,1,0],
                             [-sin(-rotation_angle),0,cos(-rotation_angle)]])
     elif rotation_axis=='z':
-        rotation_matrix1 = np.array([[1,0,0],
-                            [0,cos(rotation_angle),-sin(rotation_angle)],
-                            [0,sin(rotation_angle),cos(rotation_angle)]])
-        rotation_matrix2 = np.array([[1,0,0],
-                            [0,cos(-rotation_angle),-sin(-rotation_angle)],
-                            [0,sin(-rotation_angle),cos(-rotation_angle)]])
+        rotation_matrix1 = np.array([[cos(rotation_angle),-sin(rotation_angle), 0],
+                            [sin(rotation_angle),cos(rotation_angle), 0],
+                            [0, 0, 1]])
+
+        rotation_matrix2 = np.array([[cos(-rotation_angle),-sin(-rotation_angle), 0],
+                            [sin(-rotation_angle),cos(-rotation_angle), 0],
+                            [0, 0, 1]])
     # Check periodic within a block 
     periodic_found = True
     
