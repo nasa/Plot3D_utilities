@@ -254,7 +254,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                     match_location.append({"i1":I1[0],"j1":p+J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':J2[0],'k2':q2+K2[0]})
                 if K2[0]==K2[1]:
                     match_location.append({"i1":I1[0],"j1":p+J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':q2+J2[0],'k2':K2[0]})
-        df = df.append(match_location,ignore_index=True)
+        df = pd.concat([df, pd.DataFrame(match_location)], ignore_index=True)
 
     elif J1[0] == J1[1]: # J is constant in face 1 
         combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
@@ -274,7 +274,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                     match_location.append({"i1":p+I1[0],"j1":J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':J2[0],'k2':q2+K2[0]})
                 if K2[0]==K2[1]:
                     match_location.append({"i1":p+I1[0],"j1":J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':q2+J2[0],'k2':K2[0]})
-            df = df.append(match_location,ignore_index=True)
+            df = pd.concat([df, pd.DataFrame(match_location)], ignore_index=True)
 
     elif K1[0] == K1[1]: # K is constant in face 1 
         combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
@@ -294,7 +294,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                     match_location.append({"i1":p+I1[0],"j1":q+J1[0],"k1":K1[0],'i2':p2+I2[0],'j2':J2[0],'k2':q2+K2[0]})
                 if K2[0]==K2[1]:
                     match_location.append({"i1":p+I1[0],"j1":q+J1[0],"k1":K1[0],'i2':p2+I2[0],'j2':q2+J2[0],'k2':K2[0]})
-        df = df.append(match_location,ignore_index=True)
+        df = pd.concat([df, pd.DataFrame(match_location)], ignore_index=True)
     
     # Checking for split faces 
     if len(df)>4:
