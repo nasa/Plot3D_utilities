@@ -3,7 +3,7 @@ from itertools import combinations_with_replacement
 import numpy as np
 from .block import Block, rotate_block
 from .face import Face, create_face_from_diagonals, split_face
-from .connectivity import get_face_intersection, face_matches_to_dict
+from .connectivity import connectivity_fast, get_face_intersection, face_matches_to_dict
 from .write import write_plot3D
 from math import cos, radians, sin, sqrt, acos, radians
 from copy import deepcopy
@@ -66,15 +66,24 @@ def create_face(block:Block,imin:int,imax:int,jmin:int,jmax:int,kmin:int,kmax:in
 #         temp.append({'block_indx':block_indices[i], 'IMIN':f.IMIN, 'IMAX':f.IMAX, 'JMIN':f.JMIN, 'JMAX':f.JMAX,'KMIN':f.KMIN, 'KMAX':f.KMAX}) 
 #     return temp 
 
-def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Face], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
+def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity 
 
     Args:
-        blocks (List[Block]): Lists of blocks you want to find the connectivity for
+        blocks (List[Block]): List of blocks that will be scanned for perodicity
+        outer_faces (List[Dict[str,int]]): List of outer faces for each block as a dictionary format. You can get this from connectivity
+        matched_faces (ListList[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces 
+        periodic_direction (str): either i,j,k to look for
+        rotation_axis (str): either x,y,z
+        nblades (int): Number of blades to consider, this affects the rotation angle. 
 
     Returns:
-        (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'} }
-        (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'surfaces': [{'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX', 'ID'}] }
+        (Tuple): containing
+
+        - **periodic_faces_export** (List[Dict[str,int]]):  This is list of all the surfaces/faces that match when rotated by an angle formatted as a dictionary.
+        - **outer_faces_export** (List[Dict[str,int]]): These are the list of outer faces that are not periodic formatted as a dictionary.
+        - **periodic_faces** (List[Tuple[Face,Face]]): - This is a list of Face objects that are connected to each other organized as a list of tuples: [Face1, Face2] where Face 1 will contain the block number and the diagonals [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]. Example: blk: 1 [168,0,0,268,100,0].
+        - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
         
     """
     gcd_array = list()
@@ -82,45 +91,85 @@ def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:Li
     for block_indx in range(len(blocks)):
         block = blocks[block_indx]
         gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array)
-    new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
+    new_blocks = reduce_blocks(deepcopy(blocks),gcd_array)
 
-    # Find Connectivity 
-    face_matches, outer_faces_formatted = connectivity(new_blocks)
+    # Find Periodicity 
+    periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all = periodicity(new_blocks,outer_faces,matched_faces,periodic_direction,rotation_axis,nblades)
     # scale it up
-    for i in range(len(face_matches)):
-        face_matches[i]['block1']['IMIN'] *= gcd_to_use
-        face_matches[i]['block1']['JMIN'] *= gcd_to_use
-        face_matches[i]['block1']['KMIN'] *= gcd_to_use
-        face_matches[i]['block1']['IMAX'] *= gcd_to_use
-        face_matches[i]['block1']['JMAX'] *= gcd_to_use
-        face_matches[i]['block1']['KMAX'] *= gcd_to_use
+    for i in range(len(periodic_faces_export)):
+        gcd_to_use = gcd_array[periodic_faces_export[i]['block1']['block_index']]
+        periodic_faces_export[i]['block1']['IMIN'] *= gcd_to_use
+        periodic_faces_export[i]['block1']['JMIN'] *= gcd_to_use
+        periodic_faces_export[i]['block1']['KMIN'] *= gcd_to_use
+        periodic_faces_export[i]['block1']['IMAX'] *= gcd_to_use
+        periodic_faces_export[i]['block1']['JMAX'] *= gcd_to_use
+        periodic_faces_export[i]['block1']['KMAX'] *= gcd_to_use
 
-        face_matches[i]['block2']['IMIN'] *= gcd_to_use
-        face_matches[i]['block2']['JMIN'] *= gcd_to_use
-        face_matches[i]['block2']['KMIN'] *= gcd_to_use
-        face_matches[i]['block2']['IMAX'] *= gcd_to_use
-        face_matches[i]['block2']['JMAX'] *= gcd_to_use
-        face_matches[i]['block2']['KMAX'] *= gcd_to_use
-    for j in range(len(outer_faces_formatted)):
-        outer_faces_formatted[j]['IMIN'] *= gcd_to_use
-        outer_faces_formatted[j]['JMIN'] *= gcd_to_use
-        outer_faces_formatted[j]['KMIN'] *= gcd_to_use
-        outer_faces_formatted[j]['IMAX'] *= gcd_to_use
-        outer_faces_formatted[j]['JMAX'] *= gcd_to_use
-        outer_faces_formatted[j]['KMAX'] *= gcd_to_use
-def periodicity(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Face], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
+        periodic_faces_export[i]['block2']['IMIN'] *= gcd_to_use
+        periodic_faces_export[i]['block2']['JMIN'] *= gcd_to_use
+        periodic_faces_export[i]['block2']['KMIN'] *= gcd_to_use
+        periodic_faces_export[i]['block2']['IMAX'] *= gcd_to_use
+        periodic_faces_export[i]['block2']['JMAX'] *= gcd_to_use
+        periodic_faces_export[i]['block2']['KMAX'] *= gcd_to_use
+    
+    for i in range(len(periodic_faces)):
+        gcd_to_use = gcd_array[periodic_faces[i]['block1']['block_index']]
+        periodic_faces[i]['block1']['IMIN'] *= gcd_to_use
+        periodic_faces[i]['block1']['JMIN'] *= gcd_to_use
+        periodic_faces[i]['block1']['KMIN'] *= gcd_to_use
+        periodic_faces[i]['block1']['IMAX'] *= gcd_to_use
+        periodic_faces[i]['block1']['JMAX'] *= gcd_to_use
+        periodic_faces[i]['block1']['KMAX'] *= gcd_to_use
+
+        periodic_faces[i]['block2']['IMIN'] *= gcd_to_use
+        periodic_faces[i]['block2']['JMIN'] *= gcd_to_use
+        periodic_faces[i]['block2']['KMIN'] *= gcd_to_use
+        periodic_faces[i]['block2']['IMAX'] *= gcd_to_use
+        periodic_faces[i]['block2']['JMAX'] *= gcd_to_use
+        periodic_faces[i]['block2']['KMAX'] *= gcd_to_use
+
+    for j in range(len(outer_faces_export)):
+        gcd_to_use = gcd_array[outer_faces_export[i]['block_index']]
+
+        outer_faces_export[j]['IMIN'] *= gcd_to_use
+        outer_faces_export[j]['JMIN'] *= gcd_to_use
+        outer_faces_export[j]['KMIN'] *= gcd_to_use
+        outer_faces_export[j]['IMAX'] *= gcd_to_use
+        outer_faces_export[j]['JMAX'] *= gcd_to_use
+        outer_faces_export[j]['KMAX'] *= gcd_to_use
+    
+    for j in range(len(outer_faces_all)):
+        gcd_to_use = gcd_array[outer_faces_all[i]['block_index']]
+
+        outer_faces_all[j]['IMIN'] *= gcd_to_use
+        outer_faces_all[j]['JMIN'] *= gcd_to_use
+        outer_faces_all[j]['KMIN'] *= gcd_to_use
+        outer_faces_all[j]['IMAX'] *= gcd_to_use
+        outer_faces_all[j]['JMAX'] *= gcd_to_use
+        outer_faces_all[j]['KMAX'] *= gcd_to_use
+
+def periodicity(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """This function is used to check for periodicity of the other faces rotated about an axis 
         The way it works is to find faces of a constant i,j, or k value
 
     Args:
-        blocks (List[Block]): [description]
-        outer_faces (List): [description]
+        blocks (List[Block]): List of blocks that will be scanned for perodicity
+        outer_faces (List[Dict[str,int]]): List of outer faces for each block as a dictionary format. You can get this from connectivity
+        matched_faces (ListList[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces 
         periodic_direction (str): either i,j,k to look for
         rotation_axis (str): either x,y,z
+        nblades (int): Number of blades to consider, this affects the rotation angle. 
+
+    Returns:
+        (Tuple): containing
+            
+            - **periodic_faces_export** (List[Dict[str,int]]):  This is list of all the surfaces/faces that match when rotated by an angle formatted as a dictionary.
+            - **outer_faces_export** (List[Dict[str,int]]): These are the list of outer faces that are not periodic formatted as a dictionary.
+            - **periodic_faces** (List[Tuple[Face,Face]]): - This is a list of Face objects that are connected to each other organized as a list of tuples: [Face1, Face2] where Face 1 will contain the block number and the diagonals [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]. Example: blk: 1 [168,0,0,268,100,0].
+            - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
+
     """
     
-
     rotation_angle = radians(360.0/nblades)
     if rotation_axis=='x':
         rotation_matrix1 = np.array([[1,0,0],

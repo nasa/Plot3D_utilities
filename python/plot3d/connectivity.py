@@ -476,14 +476,14 @@ def connectivity_fast(blocks:List[Block]):
     # Find the gcd of all the blocks 
     for block_indx in range(len(blocks)):
         block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array)
-    new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
+        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))    
+    new_blocks = reduce_blocks(deepcopy(blocks),gcd_array)
 
     # Find Connectivity 
     face_matches, outer_faces_formatted = connectivity(new_blocks)
     # scale it up
     for i in range(len(face_matches)):
+        gcd_to_use = gcd_array[face_matches[i]['block_index']]
         face_matches[i]['block1']['IMIN'] *= gcd_to_use
         face_matches[i]['block1']['JMIN'] *= gcd_to_use
         face_matches[i]['block1']['KMIN'] *= gcd_to_use
@@ -498,6 +498,7 @@ def connectivity_fast(blocks:List[Block]):
         face_matches[i]['block2']['JMAX'] *= gcd_to_use
         face_matches[i]['block2']['KMAX'] *= gcd_to_use
     for j in range(len(outer_faces_formatted)):
+        gcd_to_use = gcd_array[outer_faces_formatted[i]['block_index']]
         outer_faces_formatted[j]['IMIN'] *= gcd_to_use
         outer_faces_formatted[j]['JMIN'] *= gcd_to_use
         outer_faces_formatted[j]['KMIN'] *= gcd_to_use
