@@ -1,7 +1,7 @@
 from typing import List, Dict, Tuple
 from itertools import combinations_with_replacement
 import numpy as np
-from .block import Block, rotate_block
+from .block import Block, rotate_block, reduce_blocks
 from .face import Face, create_face_from_diagonals, split_face
 from .connectivity import connectivity_fast, get_face_intersection, face_matches_to_dict
 from .write import write_plot3D
@@ -92,6 +92,33 @@ def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:Li
         block = blocks[block_indx]
         gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
     new_blocks = reduce_blocks(deepcopy(blocks),gcd_array)
+    # Reduce face matches for the block 
+    for i in range(len(matched_faces)):
+        gcd_to_use = gcd_array[matched_faces[i]['block1']['block_index']]
+        matched_faces[i]['block1']['IMIN'] = int(matched_faces[i]['block1']['IMIN']/gcd_to_use)
+        matched_faces[i]['block1']['JMIN'] = int(matched_faces[i]['block1']['JMIN']/gcd_to_use)
+        matched_faces[i]['block1']['KMIN'] = int(matched_faces[i]['block1']['KMIN']/gcd_to_use)
+        matched_faces[i]['block1']['IMAX'] = int(matched_faces[i]['block1']['IMAX']/gcd_to_use)
+        matched_faces[i]['block1']['JMAX'] = int(matched_faces[i]['block1']['JMAX']/gcd_to_use)
+        matched_faces[i]['block1']['KMAX'] = int(matched_faces[i]['block1']['KMAX']/gcd_to_use)
+
+        gcd_to_use = gcd_array[matched_faces[i]['block2']['block_index']]
+        matched_faces[i]['block2']['IMIN'] = int(matched_faces[i]['block2']['IMIN']/gcd_to_use)
+        matched_faces[i]['block2']['JMIN'] = int(matched_faces[i]['block2']['JMIN']/gcd_to_use)
+        matched_faces[i]['block2']['KMIN'] = int(matched_faces[i]['block2']['KMIN']/gcd_to_use)
+        matched_faces[i]['block2']['IMAX'] = int(matched_faces[i]['block2']['IMAX']/gcd_to_use)
+        matched_faces[i]['block2']['JMAX'] = int(matched_faces[i]['block2']['JMAX']/gcd_to_use)
+        matched_faces[i]['block2']['KMAX'] = int(matched_faces[i]['block2']['KMAX']/gcd_to_use)
+
+    # Reduce outer faces for the block
+    for i in range(len(outer_faces)):
+        gcd_to_use = gcd_array[outer_faces[i]['block_index']]
+        outer_faces[i]['IMIN'] = int(outer_faces[i]['IMIN']/gcd_to_use)
+        outer_faces[i]['IMAX'] = int(outer_faces[i]['IMAX']/gcd_to_use)
+        outer_faces[i]['JMIN'] = int(outer_faces[i]['JMIN']/gcd_to_use)
+        outer_faces[i]['JMAX'] = int(outer_faces[i]['JMAX']/gcd_to_use)
+        outer_faces[i]['KMIN'] = int(outer_faces[i]['KMIN']/gcd_to_use)
+        outer_faces[i]['KMAX'] = int(outer_faces[i]['KMAX']/gcd_to_use)
 
     # Find Periodicity 
     periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all = periodicity(new_blocks,outer_faces,matched_faces,periodic_direction,rotation_axis,nblades)
@@ -105,6 +132,7 @@ def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:Li
         periodic_faces_export[i]['block1']['JMAX'] *= gcd_to_use
         periodic_faces_export[i]['block1']['KMAX'] *= gcd_to_use
 
+        gcd_to_use = gcd_array[periodic_faces_export[i]['block2']['block_index']]
         periodic_faces_export[i]['block2']['IMIN'] *= gcd_to_use
         periodic_faces_export[i]['block2']['JMIN'] *= gcd_to_use
         periodic_faces_export[i]['block2']['KMIN'] *= gcd_to_use
@@ -113,24 +141,18 @@ def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:Li
         periodic_faces_export[i]['block2']['KMAX'] *= gcd_to_use
     
     for i in range(len(periodic_faces)):
-        gcd_to_use = gcd_array[periodic_faces[i]['block1']['block_index']]
-        periodic_faces[i]['block1']['IMIN'] *= gcd_to_use
-        periodic_faces[i]['block1']['JMIN'] *= gcd_to_use
-        periodic_faces[i]['block1']['KMIN'] *= gcd_to_use
-        periodic_faces[i]['block1']['IMAX'] *= gcd_to_use
-        periodic_faces[i]['block1']['JMAX'] *= gcd_to_use
-        periodic_faces[i]['block1']['KMAX'] *= gcd_to_use
+        gcd_to_use = gcd_array[periodic_faces[i][0].BlockIndex]
+        periodic_faces[i][0].I *= gcd_to_use
+        periodic_faces[i][0].J *= gcd_to_use
+        periodic_faces[i][0].K *= gcd_to_use
 
-        periodic_faces[i]['block2']['IMIN'] *= gcd_to_use
-        periodic_faces[i]['block2']['JMIN'] *= gcd_to_use
-        periodic_faces[i]['block2']['KMIN'] *= gcd_to_use
-        periodic_faces[i]['block2']['IMAX'] *= gcd_to_use
-        periodic_faces[i]['block2']['JMAX'] *= gcd_to_use
-        periodic_faces[i]['block2']['KMAX'] *= gcd_to_use
+        gcd_to_use = gcd_array[periodic_faces[i][1].BlockIndex]
+        periodic_faces[i][1].I *= gcd_to_use
+        periodic_faces[i][1].J *= gcd_to_use
+        periodic_faces[i][1].K *= gcd_to_use
 
     for j in range(len(outer_faces_export)):
         gcd_to_use = gcd_array[outer_faces_export[i]['block_index']]
-
         outer_faces_export[j]['IMIN'] *= gcd_to_use
         outer_faces_export[j]['JMIN'] *= gcd_to_use
         outer_faces_export[j]['KMIN'] *= gcd_to_use
@@ -139,14 +161,12 @@ def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:Li
         outer_faces_export[j]['KMAX'] *= gcd_to_use
     
     for j in range(len(outer_faces_all)):
-        gcd_to_use = gcd_array[outer_faces_all[i]['block_index']]
-
-        outer_faces_all[j]['IMIN'] *= gcd_to_use
-        outer_faces_all[j]['JMIN'] *= gcd_to_use
-        outer_faces_all[j]['KMIN'] *= gcd_to_use
-        outer_faces_all[j]['IMAX'] *= gcd_to_use
-        outer_faces_all[j]['JMAX'] *= gcd_to_use
-        outer_faces_all[j]['KMAX'] *= gcd_to_use
+        gcd_to_use = gcd_array[outer_faces_all[i].BlockIndex]
+        outer_faces_all[j].I *= gcd_to_use
+        outer_faces_all[j].J *= gcd_to_use
+        outer_faces_all[j].K *= gcd_to_use
+        
+    return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
 def periodicity(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """This function is used to check for periodicity of the other faces rotated about an axis 
