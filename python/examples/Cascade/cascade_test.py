@@ -1,7 +1,7 @@
 from itertools import combinations
 import os, sys
 sys.path.insert(0,'../../')
-from plot3d import write_plot3D, read_plot3D, periodicity
+from plot3d import write_plot3D, read_plot3D, periodicity, periodicity_fast
 from plot3d import find_matching_blocks, get_outer_faces, connectivity, connectivity_fast
 from glennht_con import export_to_glennht_conn
 import pickle
@@ -28,7 +28,7 @@ with open('connectivity.pickle','rb') as f:
 
 blocks = read_plot3D('PahtCascade-ASCII.xyz', binary = False)
 
-periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
+periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity_fast(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
 
 # Append periodic surfaces to face_matches
 face_matches.extend(periodic_surfaces)
