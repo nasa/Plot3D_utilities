@@ -75,7 +75,7 @@ def CreateSubset(block_source,voi:List[int],name:str,opacity:float=1):
     renderView1 = GetActiveViewOrCreate('RenderView')
     extractSubset1Display = Show(extractSubset1, renderView1, 'StructuredGridRepresentation')
     # trace defaults for the display properties.
-    extractSubset1Display.Representation = 'Outline'
+    extractSubset1Display.Representation = 'Surface'
     extractSubset1Display.ColorArrayName = [None, '']
     extractSubset1Display.SelectTCoordArray = 'None'
     extractSubset1Display.SelectNormalArray = 'None'

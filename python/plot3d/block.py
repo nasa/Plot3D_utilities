@@ -174,7 +174,7 @@ def rotate_block(block,rotation_matrix:np.ndarray) -> Block:
                     
 
 
-def reduce_blocks(blocks:List[Block],factors:List[int]):
+def reduce_blocks(blocks:List[Block],factor:int):
     """reduce the blocks by a factor of (factor)
 
     Args:
@@ -185,7 +185,6 @@ def reduce_blocks(blocks:List[Block],factors:List[int]):
         [type]: [description]
     """
     for i in range(len(blocks)):
-        factor = factors[i]
         blocks[i].X = blocks[i].X[::factor,::factor,::factor]
         blocks[i].Y = blocks[i].Y[::factor,::factor,::factor]
         blocks[i].Z = blocks[i].Z[::factor,::factor,::factor]

@@ -1,40 +1,80 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>Periodicity &mdash; Plot3D 1.3.9 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-    <script src="../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="Splitting Blocks" href="split_block.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../index.html" class="icon icon-home"> Plot3D
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 1.3.9
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -42,7 +82,18 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../notes/installation.html">Installation</a><ul>
@@ -77,35 +128,78 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Periodicity</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Plot3D</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>Periodicity</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
+            
               <a href="https://github.com/nasa/plot3d_utilities/blob/main/docs/modules/periodicity.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
-  <section id="module-plot3d.periodicity">
-<span id="periodicity"></span><h1>Periodicity<a class="headerlink" href="#module-plot3d.periodicity" title="Permalink to this headline"></a></h1>
+            
+  <div class="section" id="module-plot3d.periodicity">
+<span id="periodicity"></span><h1>Periodicity<a class="headerlink" href="#module-plot3d.periodicity" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.periodicity.__periodicity_check__">
-<span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">__periodicity_check__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/periodicity.html#__periodicity_check__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.__periodicity_check__" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">__periodicity_check__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/periodicity.html#__periodicity_check__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.__periodicity_check__" title="Permalink to this definition">¶</a></dt>
 <dd><p>General function to find periodicity within a given block.</p>
 <dl class="simple">
 <dt>Steps:</dt><dd><ul class="simple">
@@ -147,7 +241,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.periodicity.create_face">
-<span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">create_face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">imin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></span><a class="reference internal" href="../_modules/plot3d/periodicity.html#create_face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.create_face" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">create_face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">imin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></span><a class="reference internal" href="../_modules/plot3d/periodicity.html#create_face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.create_face" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a face/surface from IJK bounds. Face = either i is constant or j constant or k constant.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -172,7 +266,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.periodicity.linear_real_transform">
-<span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">linear_real_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span></span></span><a class="reference internal" href="../_modules/plot3d/periodicity.html#linear_real_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.linear_real_transform" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">linear_real_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span></span></span><a class="reference internal" href="../_modules/plot3d/periodicity.html#linear_real_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.linear_real_transform" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Computes the rotation angle from Face1 to Face2. This can be used to check if the faces are periodic</dt><dd><p>This function assumes the rotation axis is in the “x” direction. This is good for faces within the same block</p>
 </dd>
@@ -206,7 +300,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.periodicity.periodicity">
-<span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">periodicity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_faces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matched_faces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic_direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nblades</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">55</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/periodicity.html#periodicity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.periodicity" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">periodicity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_faces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matched_faces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic_direction</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nblades</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">55</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/periodicity.html#periodicity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.periodicity" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>This function is used to check for periodicity of the other faces rotated about an axis</dt><dd><p>The way it works is to find faces of a constant i,j, or k value</p>
 </dd>
@@ -214,45 +308,110 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – [description]</p></li>
-<li><p><strong>outer_faces</strong> (<em>List</em>) – [description]</p></li>
+<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – List of blocks that will be scanned for perodicity</p></li>
+<li><p><strong>outer_faces</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>,</em><em>int</em><em>]</em><em>]</em>) – List of outer faces for each block as a dictionary format. You can get this from connectivity</p></li>
+<li><p><strong>matched_faces</strong> (<em>ListList</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>,</em><em>int</em><em>]</em><em>]</em>) – List of matched faces from connectivity. Matched faces was added so that it’s always removed from outer faces</p></li>
 <li><p><strong>periodic_direction</strong> (<em>str</em>) – either i,j,k to look for</p></li>
 <li><p><strong>rotation_axis</strong> (<em>str</em>) – either x,y,z</p></li>
+<li><p><strong>nblades</strong> (<em>int</em>) – Number of blades to consider, this affects the rotation angle.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>containing</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>periodic_faces_export</strong> (List[Dict[str,int]]):  This is list of all the surfaces/faces that match when rotated by an angle formatted as a dictionary.</p></li>
+<li><p><strong>outer_faces_export</strong> (List[Dict[str,int]]): These are the list of outer faces that are not periodic formatted as a dictionary.</p></li>
+<li><p><strong>periodic_faces</strong> (List[Tuple[Face,Face]]): - This is a list of Face objects that are connected to each other organized as a list of tuples: [Face1, Face2] where Face 1 will contain the block number and the diagonals [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]. Example: blk: 1 [168,0,0,268,100,0].</p></li>
+<li><p><strong>outer_faces_all</strong> (List[Face]): This is a list of outer faces save as a list of Faces</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(Tuple)</p>
 </dd>
 </dl>
 </dd></dl>
 
-</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.periodicity.periodicity_fast">
+<span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">periodicity_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_faces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matched_faces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic_direction</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nblades</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">55</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/periodicity.html#periodicity_fast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.periodicity_fast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – List of blocks that will be scanned for perodicity</p></li>
+<li><p><strong>outer_faces</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>,</em><em>int</em><em>]</em><em>]</em>) – List of outer faces for each block as a dictionary format. You can get this from connectivity</p></li>
+<li><p><strong>matched_faces</strong> (<em>ListList</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>,</em><em>int</em><em>]</em><em>]</em>) – List of matched faces from connectivity. Matched faces was added so that it’s always removed from outer faces</p></li>
+<li><p><strong>periodic_direction</strong> (<em>str</em>) – either i,j,k to look for</p></li>
+<li><p><strong>rotation_axis</strong> (<em>str</em>) – either x,y,z</p></li>
+<li><p><strong>nblades</strong> (<em>int</em>) – Number of blades to consider, this affects the rotation angle.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>containing</p>
+<ul class="simple">
+<li><p><strong>periodic_faces_export</strong> (List[Dict[str,int]]):  This is list of all the surfaces/faces that match when rotated by an angle formatted as a dictionary.</p></li>
+<li><p><strong>outer_faces_export</strong> (List[Dict[str,int]]): These are the list of outer faces that are not periodic formatted as a dictionary.</p></li>
+<li><p><strong>periodic_faces</strong> (List[Tuple[Face,Face]]): - This is a list of Face objects that are connected to each other organized as a list of tuples: [Face1, Face2] where Face 1 will contain the block number and the diagonals [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]. Example: blk: 1 [168,0,0,268,100,0].</p></li>
+<li><p><strong>outer_faces_all</strong> (List[Face]): This is a list of outer faces save as a list of Faces</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(Tuple)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="split_block.html" class="btn btn-neutral float-left" title="Splitting Blocks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Paht Juangphanich.</p>
-  </div>
+    <p>
+        &#169; Copyright 2021, Paht Juangphanich.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
