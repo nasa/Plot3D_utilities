@@ -10,17 +10,6 @@ from copy import deepcopy
 from tqdm import trange
 import math
 
-airfoil_names = [
-                    {
-                        'name':'R149',
-                        'Reynolds':2E5,
-                    },
-                    {   
-                        'name':'E852',
-                        'Reynolds':5E4
-                    }
-                ]
-
 def create_face(block:Block,imin:int,imax:int,jmin:int,jmax:int,kmin:int,kmax:int) -> Face:
     """Creates a face/surface from IJK bounds. Face = either i is constant or j constant or k constant. 
 
