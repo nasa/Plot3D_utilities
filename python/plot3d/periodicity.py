@@ -374,28 +374,6 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
                         
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
-def rotated_connectivity(blocks:List[Block], outer_faces:List[Dict[str,int]], rotation_angle:float, rotation_axis:str = "x"):
-    """Finds the connectivity of a set of blocks rotated by an angle. This looks at the outer faces and checks the neighboring face 
-        This code looks at the Left Face and the Right most face for connectivity 
-          
-         
-
-         | x || x |
-    L -> | x || x | <- R
-         | x || x |
-
-    Example: 
-        If you have a pie with 12 cuts, but you are simulating 3 pies. Your rotation_angle is 360/12. The angle between pie 1 and pie 3 is 360/12 * 3.
-        Since we want to match the Left of pie 1 with the right of pie 3, we need to rotate by one more so that L Face matches the R face 
-    
-    Args:
-        blocks (List[Block]): List of blocks for a particular geometry. Do not duplicate the geometry and pass it in! 
-        outer_faces (List[Dict[str,int]]): List of outer faces in dictionary form
-        rotation_angle (float): rotation angle in between blades. factor in an additional blade 
-        rotation_axis (str, Optional): "x", "y", or "z" 
- 
-    """
-
 
 def rotated_periodicity(blocks:List[Block], outer_faces:List[Dict[str,int]], rotation_angle:float, rotation_axis:str = "x"):
     """Finds the peridocity/connectivity by over rotating a block. This is a bit different from "periodicity" where you specify the periodic direction. 
