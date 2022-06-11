@@ -39,11 +39,24 @@ with open('connectivity.pickle','rb') as f:
 
 
 # Find Neighbor Connectivity / Interblock-to-block matching
-periodic_faces, outer_faces_export, _, _ = rotated_periodicity(blocks,face_matches, outer_faces, rotation_angle=rotation_angle, rotation_axis = "x")
+periodic_faces, outer_faces_to_keep, _, _ = rotated_periodicity(blocks,face_matches, outer_faces, rotation_angle=rotation_angle, rotation_axis = "x")
 
-# Note if you rotate and copy the blocks by 3 periods (3 pie slices)
+# Append periodic surfaces to face_matches
+face_matches.extend(periodic_faces)
+
+with open('connectivity_periodic.pickle','wb') as f:
+    # [m.pop('match',None) for m in face_matches] # Remove the dataframe
+    pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_faces},f)
+
+export_to_glennht_conn(face_matches,outer_faces_to_keep,'finalmesh')
+
+
+# Note: 
+#   If you rotate and copy the blocks by 3 periods (3 pie slices)
 #   periodic_faces gets copied 3 times too. You have one for outer edges and 2 for adjacents
 
+#   If you rotate and copy the blocks by 4 periods (4 pie slices)
+#   periodic_faces gets copied 3 times too. You have one for outer edges and 3 for adjacents
 
  
 # Rotate the Blocks 
@@ -57,8 +70,6 @@ for i in range(1,copies):
                             [0,sin(rotation_angle*i),cos(rotation_angle*i)]])
     blocks.append(deepcopy(blocks[i].rotate_block(rotation_matrix)))
 
+write_plot3D('finalmesh_rotated_binary.xyz',blocks=blocks,binary=True)
 
-
-
-# write_plot3D('finalmesh-paht_binary.xyz',blocks=blocks,binary=True)
-# write_plot3D('finalmesh-paht_ascii.xyz',blocks=blocks,binary=False)
+# Modifying the Connectivity

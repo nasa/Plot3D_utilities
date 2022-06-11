@@ -387,6 +387,17 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         rotation_angle (float): rotation angle in between blades in degrees. factor in an additional blade 
         rotation_axis (str, Optional): "x", "y", or "z" 
 
+    
+    periodic_faces, outer_faces_export, _, _ = rotated_periodicity(blocks,face_matches, outer_faces, rotation_angle=rotation_angle, rotation_axis = "x")
+    
+    Replaces:
+        Is the same as 
+
+        periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity_fast(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
+        and
+        periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
+
+
     Returns:
         (Tuple): containing
             
