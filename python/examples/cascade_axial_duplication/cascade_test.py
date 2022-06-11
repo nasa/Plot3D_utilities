@@ -4,27 +4,48 @@ from copy import deepcopy
 from math import *  
 import numpy as np
 sys.path.insert(0,'../../')
-from plot3d import write_plot3D, read_plot3D, rotated_periodicity, get_outer_faces
+from plot3d import write_plot3D, read_plot3D, rotated_periodicity, get_outer_faces,connectivity_fast
 from glennht_con import export_to_glennht_conn
 import pickle
 
 blocks = read_plot3D('PahtCascade-ASCII.xyz', binary = False)
 number_of_blades = 55
-rotation_angle = 360/number_of_blades
+rotation_angle = 360.0/number_of_blades
 
 # Lets find the connectivity and periodicity of the rotated blocks
 copies = 3 # Lets use the example with 3 copies 
 
+if not os.path.exists('connectivity.pickle'):
+    blocks = read_plot3D('PahtCascade-ASCII.xyz', binary = False)
+    # Block 1 is the blade O-Mesh k=0
+    # outer_faces, _ = get_outer_faces(blocks[0]) # lets check
+    face_matches, outer_faces_formatted = connectivity_fast(blocks)
+    with open('connectivity.pickle','wb') as f:
+        [m.pop('match',None) for m in face_matches] # Remove the dataframe
+        pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_formatted},f)
+
+with open('connectivity.pickle','rb') as f:
+    data = pickle.load(f)
+    face_matches = data['face_matches']
+    outer_faces = data['outer_faces']
+
 # Finding Periodicity between first and last block
-outer_faces = list() 
-for block in blocks:
-    _, outer_face = get_outer_faces(block)
-    outer_faces.append(outer_face.to_dict())
+# outer_faces_all = list() 
+# for i in range(len(blocks)):
+#     outer_faces,_ = get_outer_faces(blocks[i])
+#     for o in outer_faces:
+#         o.blockIndex=i
+#     outer_faces_all.extend([o.to_dict() for o in outer_faces])
 
-periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all = rotated_periodicity(blocks, outer_faces, rotation_angle=rotation_angle*4, rotation_axis = "x")
 
-# Find Neighbor Connectivity 
+# Find Neighbor Connectivity / Interblock-to-block matching
+periodic_faces, outer_faces_export, _, _ = rotated_periodicity(blocks,face_matches, outer_faces, rotation_angle=rotation_angle, rotation_axis = "x")
 
+# Note if you rotate and copy the blocks by 3 periods (3 pie slices)
+#   periodic_faces gets copied 3 times too. You have one for outer edges and 2 for adjacents
+
+
+ 
 # Rotate the Blocks 
 rotated_blocks = list()
 rotated_blocks.extend(blocks)
