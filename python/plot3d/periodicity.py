@@ -412,7 +412,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         block = blocks[block_indx]
         gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
     gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
-    blocks = reduce_blocks(blocks,gcd_to_use)
+    blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
     rotation_matrix = create_rotation_matrix(radians(rotation_angle),rotation_axis)
     blocks_rotated = [rotate_block(b,rotation_matrix) for b in blocks] 
@@ -431,9 +431,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         face.set_block_index(o['block_index'])
         outer_faces_all.append(face)
 
-    for match_face_index,m in enumerate(matched_faces):
-        if (match_face_index == 14):
-            print("check")
+    for _,m in enumerate(matched_faces):
         face1 = create_face(blocks_rotated[m['block1']['block_index']], int(m['block1']['IMIN']/gcd_to_use), int(m['block1']['IMAX']/gcd_to_use), 
                             int(m['block1']['JMIN']/gcd_to_use), int(m['block1']['JMAX']/gcd_to_use), 
                             int(m['block1']['KMIN']/gcd_to_use), int(m['block1']['KMAX']/gcd_to_use))
@@ -469,6 +467,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
                 block2 = blocks[face2.blockIndex]
                 #   Check periodicity
                 df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
+                
                 if len(periodic_faces_temp) > 0:
                     outer_faces_to_remove.append(face1)
                     outer_faces_to_remove.append(face2)
@@ -526,6 +525,8 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         periodic_faces_export[i]['block1']['JMAX'] *= gcd_to_use
         periodic_faces_export[i]['block1']['KMAX'] *= gcd_to_use
 
+        if (periodic_faces_export[i]['block2']['IMIN'] == 168):
+            print("check")
         periodic_faces_export[i]['block2']['IMIN'] *= gcd_to_use
         periodic_faces_export[i]['block2']['JMIN'] *= gcd_to_use
         periodic_faces_export[i]['block2']['KMIN'] *= gcd_to_use
@@ -652,7 +653,7 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block):
 
         f2 = create_face(block2,imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(), imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max())
         f2.set_block_index(face2.blockIndex)
-
+        
         split_faces.extend(split_face1)
         split_faces.extend(split_face2)
         if swapped:

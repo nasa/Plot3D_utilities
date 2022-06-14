@@ -3,9 +3,9 @@ import os
 import pickle
 from typing import List
 sys.path.insert(0,os.getcwd()) # This allows you to select files locally
+import random
 from pv_library import Load, ExtractBlocks, ExtractSurface
 from paraview.simple import *
-import random
 
 # Extracts the mesh block
 # Block indicies should be an array format
@@ -119,11 +119,13 @@ if __name__=="__main__":
             periodic_faces = data['periodic_surfaces']
         else:
             periodic_faces = []
-    blocks_to_extract = [f['block1']['block_index'] for f in face_matches]
-    blocks_to_extract.extend([f['block2']['block_index'] for f in face_matches])
+    blocks_to_extract = [f['block1']['block_index'] for f in periodic_faces]
+    blocks_to_extract.extend([f['block2']['block_index'] for f in periodic_faces])
     blocks_to_extract = list(set(blocks_to_extract))
     blocks_to_extract.sort()
     print(blocks_to_extract)
+
+
     '''
     Generate Random Colors 
     
@@ -139,9 +141,15 @@ if __name__=="__main__":
         rgb_outer_faces.append([random.randint(0,255)/255, random.randint(0,255)/255, random.randint(0,255)/255])
 
     # Load mesh
-    plot3d_binary_filename = 'finalmesh.xyz'
+    plot3d_binary_filename = 'finalmesh_rotated_binary.xyz'
     plot3D_source,plot3D_Display,View,LUT = Load(plot3d_binary_filename)
     
+    def check_and_swap(ijkmin, ijkmax):
+        if (ijkmin> ijkmax):
+            temp = ijkmax
+            ijkmax = ijkmin
+            ijkmin = temp
+        return ijkmin, ijkmax
     '''
     Loop through all the blocks and create within each block the match and the outer surfaces
     '''
@@ -155,8 +163,15 @@ if __name__=="__main__":
             # Add Plots for Matched Faces 
             if f['block1']['block_index'] == b or f['block2']['block_index'] == b : 
                 if f['block1']['block_index'] == b:
+                    # Do this for plotting purposes 
+                    f['block1']['IMIN'], f['block1']['IMAX'] = check_and_swap(f['block1']['IMIN'], f['block1']['IMAX'])
+                    f['block1']['JMIN'], f['block1']['JMAX'] = check_and_swap(f['block1']['JMIN'], f['block1']['JMAX'])
+                    f['block1']['KMIN'], f['block1']['KMAX'] = check_and_swap(f['block1']['KMIN'], f['block1']['KMAX'])
                     voi = [f['block1']['IMIN'], f['block1']['IMAX'], f['block1']['JMIN'], f['block1']['JMAX'],f['block1']['KMIN'], f['block1']['KMAX']]
                 else:
+                    f['block2']['IMIN'], f['block2']['IMAX'] = check_and_swap(f['block2']['IMIN'], f['block2']['IMAX'])
+                    f['block2']['JMIN'], f['block2']['JMAX'] = check_and_swap(f['block2']['JMIN'], f['block2']['JMAX'])
+                    f['block2']['KMIN'], f['block2']['KMAX'] = check_and_swap(f['block2']['KMIN'], f['block2']['KMAX'])
                     voi = [f['block2']['IMIN'], f['block2']['IMAX'], f['block2']['JMIN'], f['block2']['JMAX'],f['block2']['KMIN'], f['block2']['KMAX']]
                 CreateSubset(block_source, voi, name='match '+str(match_indx))
         
@@ -167,18 +182,31 @@ if __name__=="__main__":
                 voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
                 CreateSubset(block_source, voi, name='outer_face '+str(surface_indx+1),opacity=0.2) 
         
-        # Plot the outer faces  
+        # Plot the periodic faces  
         for periodic_indx, p in enumerate(periodic_faces):
             # Add Plots for Outer Faces
             if p['block1']['block_index'] == b and p['block2']['block_index'] == b: # Periodicity within the block 
+                p['block1']['IMIN'], p['block1']['IMAX'] = check_and_swap(p['block1']['IMIN'], p['block1']['IMAX'])
+                p['block1']['JMIN'], p['block1']['JMAX'] = check_and_swap(p['block1']['JMIN'], p['block1']['JMAX'])
+                p['block1']['KMIN'], p['block1']['KMAX'] = check_and_swap(p['block1']['KMIN'], p['block1']['KMAX'])
                 voi = [p['block1']['IMIN'], p['block1']['IMAX'], p['block1']['JMIN'], p['block1']['JMAX'],p['block1']['KMIN'], p['block1']['KMAX']]
                 CreateSubset(block_source, voi, name='periodic '+str(periodic_indx))
+
+                p['block2']['IMIN'], p['block2']['IMAX'] = check_and_swap(p['block2']['IMIN'], p['block2']['IMAX'])
+                p['block2']['JMIN'], p['block2']['JMAX'] = check_and_swap(p['block2']['JMIN'], p['block2']['JMAX'])
+                p['block2']['KMIN'], p['block2']['KMAX'] = check_and_swap(p['block2']['KMIN'], p['block2']['KMAX'])
                 voi = [p['block2']['IMIN'], p['block2']['IMAX'], p['block2']['JMIN'], p['block2']['JMAX'],p['block2']['KMIN'], p['block2']['KMAX']]
                 CreateSubset(block_source, voi, name='periodic '+str(periodic_indx))
 
             elif p['block1']['block_index'] == b or p['block2']['block_index'] == b: # Periodicity from block to block 
                 if p['block1']['block_index'] == b:
+                    p['block1']['IMIN'], p['block1']['IMAX'] = check_and_swap(p['block1']['IMIN'], p['block1']['IMAX'])
+                    p['block1']['JMIN'], p['block1']['JMAX'] = check_and_swap(p['block1']['JMIN'], p['block1']['JMAX'])
+                    p['block1']['KMIN'], p['block1']['KMAX'] = check_and_swap(p['block1']['KMIN'], p['block1']['KMAX'])
                     voi = [p['block1']['IMIN'], p['block1']['IMAX'], p['block1']['JMIN'], p['block1']['JMAX'],p['block1']['KMIN'], p['block1']['KMAX']]
                 else:
+                    p['block2']['IMIN'], p['block2']['IMAX'] = check_and_swap(p['block2']['IMIN'], p['block2']['IMAX'])
+                    p['block2']['JMIN'], p['block2']['JMAX'] = check_and_swap(p['block2']['JMIN'], p['block2']['JMAX'])
+                    p['block2']['KMIN'], p['block2']['KMAX'] = check_and_swap(p['block2']['KMIN'], p['block2']['KMAX'])
                     voi = [p['block2']['IMIN'], p['block2']['IMAX'], p['block2']['JMIN'], p['block2']['JMAX'],p['block2']['KMIN'], p['block2']['KMAX']]
                 CreateSubset(block_source, voi, name='periodic '+str(periodic_indx))

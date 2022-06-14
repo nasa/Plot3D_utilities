@@ -1,7 +1,8 @@
 from typing import List
-from paraview.simple import *
 import os
 import math
+
+from paraview.simple import *
 #pylint: skip-file
 paraview.simple._DisableFirstRenderCameraReset()
 

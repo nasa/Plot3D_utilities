@@ -4,7 +4,7 @@ from copy import deepcopy
 from math import *  
 import numpy as np
 sys.path.insert(0,'../../')
-from plot3d import write_plot3D, read_plot3D, rotated_periodicity, get_outer_faces,connectivity_fast
+from plot3d import write_plot3D, read_plot3D, rotated_periodicity,connectivity_fast, create_rotation_matrix ,rotate_block
 from glennht_con import export_to_glennht_conn
 import pickle
 
@@ -29,24 +29,40 @@ with open('connectivity.pickle','rb') as f:
     face_matches = data['face_matches']
     outer_faces = data['outer_faces']
 
-# Finding Periodicity between first and last block
-# outer_faces_all = list() 
-# for i in range(len(blocks)):
-#     outer_faces,_ = get_outer_faces(blocks[i])
-#     for o in outer_faces:
-#         o.blockIndex=i
-#     outer_faces_all.extend([o.to_dict() for o in outer_faces])
-
 
 # Find Neighbor Connectivity / Interblock-to-block matching
 periodic_faces, outer_faces_to_keep, _, _ = rotated_periodicity(blocks,face_matches, outer_faces, rotation_angle=rotation_angle, rotation_axis = "x")
 
+# Finding Periodicity between inner blocks
+inner_periodicities = list()
+# for i in range(1,copies):
+#     temp = deepcopy(periodic_faces)
+#     for ip in temp:
+#         ip['block1']['block_index'] += int((i-1)*len(blocks))
+#         ip['block2']['block_index'] += int(i*len(blocks))
+#     inner_periodicities.extend(temp)
+
+# Add outer periodicities
+outer_periodicities = deepcopy(periodic_faces)
+for ou in outer_periodicities:
+    ou['block2']['block_index'] += int((copies-1)*len(blocks))
+
+# Copy face matches
+face_matches_all = list()
+# for i in range(1,copies):
+#     temp = deepcopy(face_matches)
+#     for ip in temp:
+#         ip['block1']['block_index'] += int(i*len(blocks))
+#         ip['block2']['block_index'] += int(i*len(blocks))
+#     face_matches_all.extend(temp)
 # Append periodic surfaces to face_matches
-face_matches.extend(periodic_faces)
+inner_periodicities.extend(outer_periodicities)
+
+face_matches_all.extend(face_matches)
 
 with open('connectivity_periodic.pickle','wb') as f:
     # [m.pop('match',None) for m in face_matches] # Remove the dataframe
-    pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_faces},f)
+    pickle.dump({"face_matches":face_matches_all, "outer_faces":outer_faces_to_keep, "periodic_surfaces":inner_periodicities},f)
 
 export_to_glennht_conn(face_matches,outer_faces_to_keep,'finalmesh')
 
@@ -60,16 +76,15 @@ export_to_glennht_conn(face_matches,outer_faces_to_keep,'finalmesh')
 
  
 # Rotate the Blocks 
-rotated_blocks = list()
-rotated_blocks.extend(blocks)
+# rotated_blocks = list()
+# rotated_blocks.extend(blocks)
 
-for i in range(1,copies):
-    # Rotation matrix can be found on https://en.wikipedia.org/wiki/Rotation_matrix
-    rotation_matrix = np.array([[1,0,0],
-                            [0,cos(rotation_angle*i),-sin(rotation_angle*i)],
-                            [0,sin(rotation_angle*i),cos(rotation_angle*i)]])
-    blocks.append(deepcopy(blocks[i].rotate_block(rotation_matrix)))
+# for i in range(1,copies):
+#     # Rotation matrix can be found on https://en.wikipedia.org/wiki/Rotation_matrix
+#     rotation_matrix = create_rotation_matrix(radians(rotation_angle*i),'x')
+#     for i in range(len(blocks)):
+#         rotated_blocks.append(deepcopy(rotate_block(blocks[i],rotation_matrix)))
 
-write_plot3D('finalmesh_rotated_binary.xyz',blocks=blocks,binary=True)
+# write_plot3D('finalmesh_rotated_binary.xyz',blocks=rotated_blocks,binary=True)
 
 # Modifying the Connectivity
