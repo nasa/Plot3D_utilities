@@ -35,12 +35,12 @@ periodic_faces, outer_faces_to_keep, _, _ = rotated_periodicity(blocks,face_matc
 
 # Finding Periodicity between inner blocks
 inner_periodicities = list()
-# for i in range(1,copies):
-#     temp = deepcopy(periodic_faces)
-#     for ip in temp:
-#         ip['block1']['block_index'] += int((i-1)*len(blocks))
-#         ip['block2']['block_index'] += int(i*len(blocks))
-#     inner_periodicities.extend(temp)
+for i in range(1,copies):
+    temp = deepcopy(periodic_faces)
+    for j in range(len(temp)):        
+        temp[j]['block1']['block_index'] += int(i*len(blocks)) # Next set of blocks matches previous set
+        temp[j]['block2']['block_index'] += int((i-1)*len(blocks)) # Right Block matches next set blocks
+    inner_periodicities.extend(temp)
 
 # Add outer periodicities
 outer_periodicities = deepcopy(periodic_faces)
