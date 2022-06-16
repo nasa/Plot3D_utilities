@@ -1,10 +1,9 @@
-from itertools import combinations
 import os, sys
 from copy import deepcopy
 from math import *  
 import numpy as np
 sys.path.insert(0,'../../')
-from plot3d import write_plot3D, read_plot3D, rotated_periodicity,connectivity_fast, create_rotation_matrix ,rotate_block
+from plot3d import write_plot3D, read_plot3D, rotated_periodicity,connectivity_fast, rotate_block, create_rotation_matrix
 from glennht_con import export_to_glennht_conn
 import pickle
 
@@ -49,12 +48,12 @@ for ou in outer_periodicities:
 
 # Copy face matches
 face_matches_all = list()
-# for i in range(1,copies):
-#     temp = deepcopy(face_matches)
-#     for ip in temp:
-#         ip['block1']['block_index'] += int(i*len(blocks))
-#         ip['block2']['block_index'] += int(i*len(blocks))
-#     face_matches_all.extend(temp)
+for i in range(1,copies):
+    temp = deepcopy(face_matches)
+    for ip in temp:
+        ip['block1']['block_index'] += int(i*len(blocks))
+        ip['block2']['block_index'] += int(i*len(blocks))
+    face_matches_all.extend(temp)
 # Append periodic surfaces to face_matches
 inner_periodicities.extend(outer_periodicities)
 
@@ -76,15 +75,14 @@ export_to_glennht_conn(face_matches,outer_faces_to_keep,'finalmesh')
 
  
 # Rotate the Blocks 
-# rotated_blocks = list()
-# rotated_blocks.extend(blocks)
+rotated_blocks = list()
+rotated_blocks.extend(blocks)
 
-# for i in range(1,copies):
-#     # Rotation matrix can be found on https://en.wikipedia.org/wiki/Rotation_matrix
-#     rotation_matrix = create_rotation_matrix(radians(rotation_angle*i),'x')
-#     for i in range(len(blocks)):
-#         rotated_blocks.append(deepcopy(rotate_block(blocks[i],rotation_matrix)))
+for i in range(1,copies):
+    # Rotation matrix can be found on https://en.wikipedia.org/wiki/Rotation_matrix
+    rotation_matrix = create_rotation_matrix(radians(rotation_angle*i),'x')
+    for i in range(len(blocks)):
+        rotated_blocks.append(deepcopy(rotate_block(blocks[i],rotation_matrix)))
 
-# write_plot3D('finalmesh_rotated_binary.xyz',blocks=rotated_blocks,binary=True)
+write_plot3D('finalmesh_rotated_binary.xyz',blocks=rotated_blocks,binary=True)
 
-# Modifying the Connectivity
