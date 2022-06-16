@@ -9,6 +9,8 @@ To install simply do a `pip install plot3d`
 # Tutorials
 [Reading Writing and Viewing Plot3D files](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_SplitBlocksExample.ipynb)
 
+[Periodicity with axially rotated and copied blocks](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_AxialDuplication.ipynb)
+
 [Learning Python with VSCode](https://www.youtube.com/watch?v=lZiK9e8b21M) 
 
 [Learning Bash for Automating Tasks](https://www.youtube.com/watch?v=oxuRxtrO2Ag) 
