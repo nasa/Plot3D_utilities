@@ -170,7 +170,7 @@ def rotate_block(block,rotation_matrix:np.ndarray) -> Block:
                 Z[i,j,k] = points_rotated[2,indx]
                 indx+=1
                 
-    return Block(X,Y,Z)    
+    return Block(X,Y,Z)
                     
 
 
