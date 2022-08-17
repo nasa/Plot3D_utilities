@@ -69,6 +69,7 @@ def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:Li
         block = blocks[block_indx]
         gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
     gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+    print(f"gcd to use {gcd_to_use}")
     new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
     # Reduce face matches for the block 
     for i in range(len(matched_faces)):

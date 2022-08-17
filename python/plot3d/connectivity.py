@@ -1,4 +1,3 @@
-from numpy.core.numeric import outer
 from .block import Block, reduce_blocks
 from .face import Face, create_face_from_diagonals, split_face
 import math 
@@ -476,8 +475,9 @@ def connectivity_fast(blocks:List[Block]):
     # Find the gcd of all the blocks 
     for block_indx in range(len(blocks)):
         block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))    
+        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))        
     gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+    print(f"gcd to use {gcd_to_use}")
     new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
     # Find Connectivity 
