@@ -223,6 +223,8 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
                     Y = block.Y[:,:,k:]
                     Z = block.Z[:,:,k:]                    
                     new_blocks.append(Block(X,Y,Z)) # replace it 
+        else:
+            new_blocks.append(block)
     return new_blocks
 
         
