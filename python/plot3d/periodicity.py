@@ -1,6 +1,6 @@
 from operator import truediv
 from typing import List, Dict, Tuple
-from itertools import combinations_with_replacement
+from itertools import combinations_with_replacement, permutations
 import numpy as np
 from .block import Block, rotate_block, reduce_blocks
 from .face import Face, create_face_from_diagonals, split_face
@@ -416,6 +416,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
     blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
     rotation_matrix = create_rotation_matrix(radians(rotation_angle),rotation_axis)
+    
     blocks_rotated = [rotate_block(b,rotation_matrix) for b in blocks] 
    
     # Check periodic within a block 
@@ -447,8 +448,8 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
     split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
     while periodic_found:
         periodic_found = False        
-        outer_faces_to_remove = list()  # Integer list of which outher surfaces to remove
-        outer_face_combos = list(combinations_with_replacement(range(len(outer_faces_all)),2))
+        outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
+        outer_face_combos = list(permutations(range(len(outer_faces_all)),2))
         t = trange(len(outer_face_combos))
         for i in t: 
             # Check if surfaces are periodic with each other
