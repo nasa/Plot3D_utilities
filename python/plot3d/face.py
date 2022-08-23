@@ -3,6 +3,8 @@ from typing import Dict, List, Tuple
 import numpy as np
 from numpy.lib import math
 from .block import Block
+from scipy.optimize import curve_fit
+
 
 class Face:
     """Defines a Face of a block for example IMIN,JMIN,JMIN to IMAX,JMIN,JMIN
@@ -341,6 +343,27 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
                 z = block.Z[i,j,k]
                 newFace.add_vertex(x,y,z,i,j,k)
     return newFace
+
+
+def find_connected_face(face:Face, faces:List[Face], look_for_linked:bool=True):
+    """Takes a face and a list of faces. Searches for any connected faces
+
+    Args:
+        face (Face): _description_
+        faces (List[Face]): _description_
+        look_for_linked (bool, optional): _description_. Defaults to True.
+    """
+
+
+def find_faces(points:np.ndarray,faces:List[Face]):
+    """Uses Scipy curvefit to fit the points with a surface defined using a mathematical equation. 
+        Then checks to see if any of the points on the face are also on the surface. 
+
+    Args:
+        points (np.ndarray): List of points in [[x,y,z], [x,y,z]]
+
+    """
+    pass 
 
 
 def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int):
