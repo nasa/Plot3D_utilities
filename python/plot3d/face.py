@@ -64,6 +64,16 @@ class Face:
         return self.blockIndex
     
     @property
+    def const_type(self):
+        if (self.IMIN == self.IMAX):
+            return 0
+        elif (self.JMIN == self.JMAX):
+            return 1
+        elif (self.KMIN == self.KMAX):
+            return 2
+        return -1
+        
+    @property
     def isEdge(self):
         """check if the face is actually an edge. This is an edge if two indicies IMIN == IMAX or JMIN=JMAX or KMIN=KMAX
 
@@ -346,24 +356,38 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
 
 
 def find_connected_face(face:Face, faces:List[Face], look_for_linked:bool=True):
-    """Takes a face and a list of faces. Searches for any connected faces
+    """Takes a face and a list of faces. Searches for any connected faces. 
+    Connections will be checked based on shared verticies. 
+    If a face shares at least 2 vertices then it's connected. 
+
+     .___. .______.
+    |     ||      |
+    |Face1||Face2 |
+    |.___.||._____|
 
     Args:
-        face (Face): _description_
-        faces (List[Face]): _description_
-        look_for_linked (bool, optional): _description_. Defaults to True.
-    """
-
-
-def find_faces(points:np.ndarray,faces:List[Face]):
-    """Uses Scipy curvefit to fit the points with a surface defined using a mathematical equation. 
-        Then checks to see if any of the points on the face are also on the surface. 
-
-    Args:
-        points (np.ndarray): List of points in [[x,y,z], [x,y,z]]
+        face (Face): This is the face that you want to find something that matches with it. 
+        faces (List[Face]): List of faces not including the face you want to match
+        look_for_linked (bool, optional): This takes Face 2 which is connected to face 1 and finds any shared vertices for that face too. Defaults to True.
 
     """
-    pass 
+    match_found = True
+    while (match_found):
+        match_found = False
+        connected_faces = list() # F
+        non_match = list() 
+        for f in faces:
+            # Look for verticies 2 that match
+            ind_x = np.argwhere(face.x == f.x) 
+            ind_y = np.argwhere(face.y == f.y)
+            if np.sum(ind_x == ind_y)==2 and face.const_type == f.const_type:
+                connected_faces.append(f)
+                match_found = True
+                if look_for_linked:
+                    face=connected_faces[-1]
+            non_match.append(f)
+        faces = non_match
+    return connected_faces
 
 
 def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int):
