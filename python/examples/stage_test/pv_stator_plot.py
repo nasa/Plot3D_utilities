@@ -16,9 +16,9 @@ if __name__=="__main__":
     '''
     Read the connectivity file
     '''
-    plot3d_ascii_filename = 'stator-ASCII-split.xyz'
+    plot3d_filename = 'stator_split.xyz'
 
-    with open('stator-ASCII-split_connectivity_periodicity.pickle','rb') as f:
+    with open('stator_split_connectivity_periodicity.pickle','rb') as f:
         data = pickle.load(f)
         face_matches = data['face_matches']
         outer_faces = data['outer_faces']
@@ -47,7 +47,7 @@ if __name__=="__main__":
         rgb_outer_faces.append([random.randint(0,255)/255, random.randint(0,255)/255, random.randint(0,255)/255])
 
     # Load mesh
-    plot3D_source,plot3D_Display,View,LUT = Load(plot3d_ascii_filename)
+    plot3D_source,plot3D_Display,View,LUT = Load(plot3d_filename,True)
     
     def check_and_swap(ijkmin, ijkmax):
         if (ijkmin> ijkmax):

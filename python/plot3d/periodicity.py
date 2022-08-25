@@ -11,35 +11,6 @@ from copy import deepcopy
 from tqdm import trange
 import math
 
-def create_face(block:Block,imin:int,imax:int,jmin:int,jmax:int,kmin:int,kmax:int) -> Face:
-    """Creates a face/surface from IJK bounds. Face = either i is constant or j constant or k constant. 
-
-    Args:
-        block (Block): Block object containing X,Y,Z as 3 dimensional arrays 
-        imin (int): Minimum I-index
-        imax (int): Maximum I-index
-        jmin (int): Minimum J-index
-        jmax (int): Maximum J-index
-        kmin (int): Minimum K-index
-        kmax (int): Maximum K-index
-
-    Returns:
-        Face: Face object with vertices of I,J,K
-    """
-    f = Face(4)
-    if imin==imax:
-        for j in [jmin,jmax]:
-            for k in [kmin,kmax]:
-                f.add_vertex(block.X[imin,j,k], block.Y[imin,j,k], block.Z[imin,j,k],imin,j,k)
-    elif jmin==jmax:
-        for i in [imin,imax]:
-            for k in [kmin,kmax]:
-                f.add_vertex(block.X[i,jmin,k], block.Y[i,jmin,k], block.Z[i,jmin,k],i,jmin,k)
-    elif kmin==kmax:
-        for i in [imin,imax]:
-            for j in [jmin,jmax]:
-                f.add_vertex(block.X[i,j,kmin], block.Y[i,j,kmin], block.Z[i,j,kmin],i,j,kmin)
-    return f
 
 
 def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
@@ -200,14 +171,14 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list() 
     for o in outer_faces:
-        face = create_face(blocks[o['block_index']], o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'], o['KMIN'], o['KMAX'])
+        face = create_face_from_diagonals(blocks[o['block_index']], o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'], o['KMIN'], o['KMAX'])
         face.set_block_index(o['block_index'])
         outer_faces_all.append(face)
     for match_face_index,m in enumerate(matched_faces):
         if (match_face_index == 14):
             print("check")
-        face1 = create_face(blocks[m['block1']['block_index']], m['block1']['IMIN'], m['block1']['IMAX'], m['block1']['JMIN'], m['block1']['JMAX'], m['block1']['KMIN'], m['block1']['KMAX'])
-        face2 = create_face(blocks[m['block2']['block_index']], m['block2']['IMIN'], m['block2']['IMAX'], m['block2']['JMIN'], m['block2']['JMAX'], m['block2']['KMIN'], m['block2']['KMAX'])
+        face1 = create_face_from_diagonals(blocks[m['block1']['block_index']], m['block1']['IMIN'], m['block1']['IMAX'], m['block1']['JMIN'], m['block1']['JMAX'], m['block1']['KMIN'], m['block1']['KMAX'])
+        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], m['block2']['IMIN'], m['block2']['IMAX'], m['block2']['JMIN'], m['block2']['JMAX'], m['block2']['KMIN'], m['block2']['KMAX'])
         face1.set_block_index(m['block1']['block_index'])
         face2.set_block_index(m['block2']['block_index'])
         matched_faces_all.append(face1)
@@ -428,16 +399,16 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list() 
     for o in outer_faces:
-        face = create_face(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), 
+        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), 
             int(o['JMIN']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMIN']/gcd_to_use), int(o['KMAX']/gcd_to_use))
         face.set_block_index(o['block_index'])
         outer_faces_all.append(face)
 
     for _,m in enumerate(matched_faces):
-        face1 = create_face(blocks_rotated[m['block1']['block_index']], int(m['block1']['IMIN']/gcd_to_use), int(m['block1']['IMAX']/gcd_to_use), 
+        face1 = create_face_from_diagonals(blocks_rotated[m['block1']['block_index']], int(m['block1']['IMIN']/gcd_to_use), int(m['block1']['IMAX']/gcd_to_use), 
                             int(m['block1']['JMIN']/gcd_to_use), int(m['block1']['JMAX']/gcd_to_use), 
                             int(m['block1']['KMIN']/gcd_to_use), int(m['block1']['KMAX']/gcd_to_use))
-        face2 = create_face(blocks[m['block2']['block_index']], int(m['block2']['IMIN']/gcd_to_use), int(m['block2']['IMAX']/gcd_to_use), 
+        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], int(m['block2']['IMIN']/gcd_to_use), int(m['block2']['IMAX']/gcd_to_use), 
                             int(m['block2']['JMIN']/gcd_to_use), int(m['block2']['JMAX']/gcd_to_use), 
                             int(m['block2']['KMIN']/gcd_to_use), int(m['block2']['KMAX']/gcd_to_use))
         face1.set_block_index(m['block1']['block_index'])
@@ -650,10 +621,10 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block):
     df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2)
 
     if len(df)>4:
-        f1 = create_face(block1,imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(), imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max())
+        f1 = create_face_from_diagonals(block1,imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(), imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max())
         f1.set_block_index(face1.blockIndex)
 
-        f2 = create_face(block2,imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(), imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max())
+        f2 = create_face_from_diagonals(block2,imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(), imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max())
         f2.set_block_index(face2.blockIndex)
         
         split_faces.extend(split_face1)

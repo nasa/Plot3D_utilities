@@ -372,9 +372,9 @@ def find_connected_face(face:Face, faces:List[Face], look_for_linked:bool=True):
 
     """
     match_found = True
+    connected_faces = list() # F
     while (match_found):
         match_found = False
-        connected_faces = list() # F
         non_match = list() 
         for f in faces:
             # Look for verticies 2 that match

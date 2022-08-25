@@ -5,7 +5,7 @@ import math
 #pylint: skip-file
 paraview.simple._DisableFirstRenderCameraReset()
 
-def Load(filename:str):
+def Load(filename:str,binary_file:bool=False):
     """Calls pvpython and displays the file
 
     Args:
@@ -23,7 +23,7 @@ def Load(filename:str):
             QFileName='',
             FileName=filename,
             FunctionFileName='',
-            BinaryFile=False,
+            BinaryFile=binary_file,
             MultiGrid=True)
 
     # set active source
