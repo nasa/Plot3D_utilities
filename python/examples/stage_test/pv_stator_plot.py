@@ -85,7 +85,7 @@ if __name__=="__main__":
             # Add Plots for Outer Faces
             if o['block_index'] == b:
                 voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
-                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx+1),opacity=0.2) 
+                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2) 
         
         # Plot the periodic faces  
         for periodic_indx, p in enumerate(periodic_faces):

@@ -376,16 +376,19 @@ def find_connected_face(face:Face, faces:List[Face], look_for_linked:bool=True):
     while (match_found):
         match_found = False
         non_match = list() 
-        for f in faces:
+        for i in range(len(faces)):
+            print(f'block {faces[i].BlockIndex} outer_face {i}')
+            if faces[i].BlockIndex == 16 and i == 54:
+                print('check')
             # Look for verticies 2 that match
-            ind_x = np.argwhere(face.x == f.x) 
-            ind_y = np.argwhere(face.y == f.y)
-            if np.sum(ind_x == ind_y)==2 and face.const_type == f.const_type:
-                connected_faces.append(f)
+            ind_x = np.argwhere(face.x == faces[i].x)
+            ind_y = np.argwhere(face.y == faces[i].y)
+            if np.sum(ind_x == ind_y)==2 and face.const_type == faces[i].const_type:
+                connected_faces.append(faces[i])
                 match_found = True
                 if look_for_linked:
                     face=connected_faces[-1]
-            non_match.append(f)
+            non_match.append(faces[i])
         faces = non_match
     return connected_faces
 

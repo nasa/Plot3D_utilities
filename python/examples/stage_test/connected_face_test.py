@@ -10,8 +10,8 @@ with open('stator_split_connectivity.pickle','rb') as f:
     outer_faces_dict = data['outer_faces']
 
 # Outerface[53] appears to be a face that is located on the stator surface
-face = outer_faces_dict[53]
-outer_faces_dict.pop(53)
+face = outer_faces_dict[51]
+# outer_faces_dict.pop(53)
 
 outer_faces = list()
 for o in outer_faces_dict:
