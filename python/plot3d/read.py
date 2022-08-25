@@ -3,6 +3,7 @@ import os.path as osp
 import struct
 from typing import List
 from .block import Block
+from scipy.io import FortranFile
 
 def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=False):
     """Reads and formats a binary chunk of data into a plot3D block
@@ -47,6 +48,60 @@ def __read_plot3D_chunk_ASCII(tokenArray:List[str],offset:int,IMAX:int,JMAX:int,
                 offset+=1
 
     return A, offset
+
+def read_ap_nasa(filename:str):
+    """Reads an AP NASA File and converts it to Block format which can be exported to a plot3d file
+        AP NASA file represents a single block. The first 7 integers are il,jl,kl,ile,ite,jtip,nbld
+    
+    Args:
+        filename (str): location of the .ap file
+
+    Returns:
+        Tuple containing: 
+
+            *block* (Block): file in block format
+            *nbld* (int): Number of blades 
+    """
+
+    f = FortranFile(filename, 'r')
+
+    ints = f.read_ints(np.int32)
+    idim = np.array([ints[0],ints[1],ints[2]])
+    mdim = np.array([3,ints[0]*ints[2]])
+    il = ints[0]
+    jl = ints[1]
+    kl = ints[2]
+    jdim = jl 
+
+    ile = ints[3]
+    ite = ints[4]
+    jtip = ints[5]
+    nbld = ints[6]
+
+    for j in range(0,jdim):
+        jmeshxrt = f.read_reals(dtype='f4').reshape(mdim)
+        meshi    = np.array(jmeshxrt[0,:])
+        meshj    = np.array(jmeshxrt[1,:])
+        meshk    = np.array(jmeshxrt[2,:])
+        if j == 0:
+            meshx   = meshi
+            meshr   = meshj
+            mesht   = meshk
+        else:
+            meshx = np.append(meshx,meshi)
+            meshr = np.append(meshr,meshj)
+            mesht = np.append(mesht,meshk)
+
+    meshx = meshx.reshape(ints[1],ints[2],ints[0])
+    meshr = meshr.reshape(ints[1],ints[2],ints[0])
+    mesht = mesht.reshape(ints[1],ints[2],ints[0])
+
+    # Convert from x,r,theta to x,y,z
+    z = meshr*np.sin(mesht)
+    y = meshr*np.cos(mesht)
+
+    return Block(X=meshx,Y=y,Z=z), nbld
+
 
 def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False):
     """Reads a plot3d file and returns Blocks
