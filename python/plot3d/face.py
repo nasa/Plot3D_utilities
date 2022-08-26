@@ -1,10 +1,11 @@
 import itertools
+from operator import truediv
 from typing import Dict, List, Tuple
 import numpy as np
 from numpy.lib import math
 from .block import Block
 from scipy.optimize import curve_fit
-
+from tqdm import trange
 
 class Face:
     """Defines a Face of a block for example IMIN,JMIN,JMIN to IMAX,JMIN,JMIN
@@ -371,24 +372,29 @@ def find_connected_face(face:Face, faces:List[Face], look_for_linked:bool=True):
         look_for_linked (bool, optional): This takes Face 2 which is connected to face 1 and finds any shared vertices for that face too. Defaults to True.
 
     """
-    match_found = True
+    faces = [f for f in faces if f!=face]
     connected_faces = list() # F
+    faces_to_search = [face]
+    match_found = True
     while (match_found):
         match_found = False
-        non_match = list() 
-        for i in range(len(faces)):
-            print(f'block {faces[i].BlockIndex} outer_face {i}')
-            if faces[i].BlockIndex == 16 and i == 54:
-                print('check')
-            # Look for verticies 2 that match
-            ind_x = np.argwhere(face.x == faces[i].x)
-            ind_y = np.argwhere(face.y == faces[i].y)
-            if np.sum(ind_x == ind_y)==2 and face.const_type == faces[i].const_type:
-                connected_faces.append(faces[i])
-                match_found = True
-                if look_for_linked:
-                    face=connected_faces[-1]
-            non_match.append(faces[i])
+        non_match = list()  
+        for face in faces_to_search:
+            t = trange(len(faces))
+            for i in t:
+                t.set_description(f"Matches found {len(connected_faces)}")
+                # Look for verticies 2 that match
+                ind_x = np.isin(face.x, faces[i].x)
+                ind_y = np.isin(face.y, faces[i].y)
+                if np.sum(ind_x)==2 and np.sum(ind_y)==2 and face.const_type == faces[i].const_type:
+                    connected_faces.append(faces[i])
+                    match_found = True        
+                else:
+                    if (faces[i] not in non_match) and (faces[i] not in connected_faces):
+                        non_match.append(faces[i])
+        if look_for_linked:
+            faces_to_search = list(set([c for c in connected_faces if c not in faces_to_search]))
+            connected_faces = list(set(connected_faces))
         faces = non_match
     return connected_faces
 
