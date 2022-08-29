@@ -384,7 +384,7 @@ def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]]
         faces2.append(create_face_from_diagonals(blocks[o['block_index']],o['IMIN'],o['JMIN'],o['KMIN'],o['IMAX'],o['JMAX'],o['KMAX']))
         faces2[-1].set_block_index(o['block_index'])
     faces = faces2
-
+    
     faces = [f for f in faces if f!=face]
     connected_faces = list() # F
     faces_to_search = [face]
@@ -420,7 +420,7 @@ def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]]
             connected_faces = list(set(connected_faces))
         faces = non_match
     if len(connected_faces)>0:
-        return [c.to_dict() for c in connected_faces], [f.to_dict() for f in faces_to_search]
+        return [c.to_dict() for c in connected_faces], [f.to_dict() for f in faces]
     else:
         return connected_faces, [f.to_dict() for f in faces] # Returns an empty list and original set of faces to search
 
