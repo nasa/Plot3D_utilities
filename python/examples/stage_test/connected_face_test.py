@@ -2,36 +2,56 @@ import sys, pickle, os
 from venv import create
 sys.path.insert(0,'../../')
 import numpy as np 
-from plot3d import Face, find_connected_face,create_face_from_diagonals,read_plot3D
+from plot3d import Face, find_connected_face,find_face,read_plot3D
 
+# Stator 
 blocks = read_plot3D('stator_split.xyz',binary=True)
-with open('stator_split_connectivity.pickle','rb') as f:
+with open('stator_split_connectivity_periodicity.pickle','rb') as f:
     data = pickle.load(f)
     face_matches = data['face_matches']
     outer_faces = data['outer_faces']
 
-
-def find_face(block_index:int, indices:np.ndarray):
-    outer_face_to_match = None
-    for o in outer_faces:
-        if o['block_index'] == block_index:
-            a = np.array([o['IMIN'], o['JMIN'], o['KMIN'], o['IMAX'], o['JMAX'], o['KMAX']], dtype=int)
-            if np.array_equal(a,indices):
-                outer_face_to_match = create_face_from_diagonals(blocks[o['block_index']], o['IMIN'], o['JMIN'], o['KMIN'], o['IMAX'], o['JMAX'], o['KMAX'])
-                outer_face_to_match.set_block_index(block_index)
-    return outer_face_to_match
-
-# Outerface[53] appears to be a face that is located on the stator surface
+# Stator body
 block_id = 14; indices = np.array([0,0,0,52,148,0], dtype=int) # this is the face we need to find matches for
-outer_face_to_match = find_face(block_id, indices)
+stator_face_to_match = find_face(blocks,block_id, indices,outer_faces)
+stator_faces,outer_faces = find_connected_face(blocks,stator_face_to_match, outer_faces)
+stator_faces.append(stator_face_to_match.to_dict())
 
-block_id = 15; indices = np.array([0,0,0,52,148,0], dtype=int) # this is the face that it should match
-outer_face_should_match = find_face(block_id, indices)
+# Mixing Plane
+block_id = 9; indices = np.array([36, 0,0, 36,148,36], dtype=int)
+mixing_plane_face_to_match = find_face(blocks,block_id, indices,outer_faces)
+stator_mixing_plane_faces, outer_faces = find_connected_face(blocks,stator_face_to_match, outer_faces)
+stator_mixing_plane_faces.append(stator_face_to_match.to_dict())
 
-outer_faces2 = list()
-for o in outer_faces:
-    outer_faces2.append(create_face_from_diagonals(blocks[o['block_index']],o['IMIN'],o['JMIN'],o['KMIN'],o['IMAX'],o['JMAX'],o['KMAX']))
-    outer_faces2[-1].set_block_index(o['block_index'])
+data['outer_faces'] = outer_faces
+data['mixing_plane'] = stator_mixing_plane_faces
+data['stator_body'] = stator_faces
+with open('stator_split_connectivity_final.pickle','wb') as f:
+    pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-connected_faces = find_connected_face(outer_face_to_match, outer_faces2)
+# Rotor
+blocks = read_plot3D('rotor_split.xyz',binary=True)
+with open('rotor_split_connectivity_periodicity.pickle','rb') as f:
+    data = pickle.load(f)
+    face_matches = data['face_matches']
+    outer_faces = data['outer_faces']
+
+# Mixing Plane
+block_id = 0; indices = np.array([0,0,0,0,148,76], dtype=int) # this is the face we need to find matches for
+rotor_mixing_plane_face_to_match = find_face(blocks,block_id, indices,outer_faces)
+rotor_mixing_plane_faces, outer_faces = find_connected_face(blocks,rotor_mixing_plane_face_to_match, outer_faces)# Should match with block 10 [0,0,0,0,148,52]
+rotor_mixing_plane_faces.append(rotor_mixing_plane_face_to_match.to_dict())  
+
+# Rotor body
+block_id = 15; indices = np.array([0,0,0,52,148,0],dtype=int)
+rotor_face_to_match = find_face(blocks,block_id, indices,outer_faces)
+rotor_faces, outer_faces = find_connected_face(blocks,rotor_mixing_plane_face_to_match, outer_faces)
+rotor_faces.append(rotor_face_to_match.to_dict())
+
+data['outer_faces'] = outer_faces
+data['mixing_plane'] = rotor_mixing_plane_faces
+data['rotor_body'] = rotor_faces
+with open('rotor_split_connectivity_final.pickle','wb') as f:
+    pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+
 print('check')
