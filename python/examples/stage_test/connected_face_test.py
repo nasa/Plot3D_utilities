@@ -17,6 +17,19 @@ stator_face_to_match = find_face(blocks,block_id, indices,outer_faces)
 stator_faces,outer_faces = find_connected_face(blocks,stator_face_to_match, outer_faces)
 stator_faces.append(stator_face_to_match.to_dict())
 
+# Stator Hub
+block_id = 0; indices = np.array([0,0,0,32,0,76],dtype=int)
+stator_hub_to_match = find_face(blocks,block_id, indices,outer_faces)
+stator_hub, outer_faces = find_connected_face(blocks,stator_hub_to_match, outer_faces)
+stator_hub.append(stator_hub_to_match.to_dict())
+
+
+# Stator Shroud
+block_id = 0; indices = np.array([0,148,0,32,148,76],dtype=int)
+stator_shroud_to_match = find_face(blocks,block_id, indices,outer_faces)
+stator_shroud, outer_faces = find_connected_face(blocks,stator_shroud_to_match, outer_faces)
+stator_shroud.append(stator_shroud_to_match.to_dict())
+
 # Mixing Plane
 block_id = 9; indices = np.array([36, 0,0, 36,148,36], dtype=int)
 mixing_plane_face_to_match = find_face(blocks,block_id, indices,outer_faces)
@@ -26,6 +39,9 @@ stator_mixing_plane_faces.append(stator_face_to_match.to_dict())
 data['outer_faces'] = outer_faces
 data['mixing_plane'] = stator_mixing_plane_faces
 data['stator_body'] = stator_faces
+data['stator_shroud'] = stator_shroud
+data['stator_hub'] = stator_hub
+
 with open('stator_split_connectivity_final.pickle','wb') as f:
     pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -48,10 +64,24 @@ rotor_face_to_match = find_face(blocks,block_id, indices,outer_faces)
 rotor_faces, outer_faces = find_connected_face(blocks,rotor_mixing_plane_face_to_match, outer_faces)
 rotor_faces.append(rotor_face_to_match.to_dict())
 
+# Rotor Hub
+block_id = 0; indices = np.array([0,148,0,32,148,76],dtype=int)
+rotor_hub_to_match = find_face(blocks,block_id, indices,outer_faces)
+rotor_hub, outer_faces = find_connected_face(blocks,rotor_hub_to_match, outer_faces)
+rotor_hub.append(rotor_hub_to_match.to_dict())
+
+# Rotor Shroud
+block_id = 0; indices = np.array([0,0,0,32,0,76],dtype=int)
+rotor_shroud_to_match = find_face(blocks,block_id, indices,outer_faces)
+rotor_shroud, outer_faces = find_connected_face(blocks,rotor_hub_to_match, outer_faces)
+rotor_shroud.append(rotor_shroud_to_match.to_dict())
+
 data['outer_faces'] = outer_faces
 data['mixing_plane'] = rotor_mixing_plane_faces
 data['rotor_body'] = rotor_faces
+data['rotor_hub'] = rotor_hub
+data['rotor_shroud'] = rotor_shroud
+
 with open('rotor_split_connectivity_final.pickle','wb') as f:
     pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-print('check')
