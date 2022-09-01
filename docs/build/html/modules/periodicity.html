@@ -142,31 +142,6 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="plot3d.periodicity.create_face">
-<span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">create_face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">imin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a></span></span><a class="reference internal" href="../_modules/plot3d/periodicity.html#create_face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.create_face" title="Permalink to this definition"></a></dt>
-<dd><p>Creates a face/surface from IJK bounds. Face = either i is constant or j constant or k constant.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>block</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block object containing X,Y,Z as 3 dimensional arrays</p></li>
-<li><p><strong>imin</strong> (<em>int</em>) – Minimum I-index</p></li>
-<li><p><strong>imax</strong> (<em>int</em>) – Maximum I-index</p></li>
-<li><p><strong>jmin</strong> (<em>int</em>) – Minimum J-index</p></li>
-<li><p><strong>jmax</strong> (<em>int</em>) – Maximum J-index</p></li>
-<li><p><strong>kmin</strong> (<em>int</em>) – Minimum K-index</p></li>
-<li><p><strong>kmax</strong> (<em>int</em>) – Maximum K-index</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Face object with vertices of I,J,K</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face">Face</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="plot3d.periodicity.create_rotation_matrix">
 <span class="sig-prename descclassname"><span class="pre">plot3d.periodicity.</span></span><span class="sig-name descname"><span class="pre">create_rotation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rotation_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/periodicity.html#create_rotation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.periodicity.create_rotation_matrix" title="Permalink to this definition"></a></dt>
 <dd><p>Creates a rotation matrix given an angle and axis</p>

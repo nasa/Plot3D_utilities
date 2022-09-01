@@ -358,13 +358,8 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
 
 def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]], look_for_linked:bool=True):
     """Takes a face and a list of faces. Searches for any connected faces. 
-    Connections will be checked based on shared verticies. 
-    If a face shares at least 2 vertices then it's connected. 
-
-     .___. .______.
-    |     ||      |
-    |Face1||Face2 |
-    |.___.||._____|
+        Connections will be checked based on shared verticies. 
+        If a face shares at least 2 vertices then it's connected. 
 
     Args:
         blocks (List[Block]): 
