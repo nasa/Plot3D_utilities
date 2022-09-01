@@ -1,6 +1,5 @@
 import sys, pickle, os
 from venv import create
-sys.path.insert(0,'../../')
 import numpy as np 
 from plot3d import Face, find_connected_face,find_face,read_plot3D
 

@@ -358,13 +358,8 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
 
 def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]], look_for_linked:bool=True):
     """Takes a face and a list of faces. Searches for any connected faces. 
-    Connections will be checked based on shared verticies. 
-    If a face shares at least 2 vertices then it's connected. 
-
-     .___. .______.
-    |     ||      |
-    |Face1||Face2 |
-    |.___.||._____|
+        Connections will be checked based on shared verticies. 
+        If a face shares at least 2 vertices then it's connected. 
 
     Args:
         blocks (List[Block]): 
@@ -381,7 +376,8 @@ def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]]
     # Converts dictionary to Face object 
     faces2 = list() 
     for o in faces:
-        faces2.append(create_face_from_diagonals(blocks[o['block_index']],o['IMIN'],o['JMIN'],o['KMIN'],o['IMAX'],o['JMAX'],o['KMAX']))
+        faces2.append(create_face_from_diagonals(blocks[o['block_index']],imin=o['IMIN'],jmin=o['JMIN'],kmin=o['KMIN'],
+        imax=o['IMAX'],jmax=o['JMAX'],kmax=o['KMAX']))
         faces2[-1].set_block_index(o['block_index'])
     faces = faces2
     
@@ -548,6 +544,6 @@ def find_face(blocks:List[Block],block_index:int, indices:np.ndarray, outer_face
         if o['block_index'] == block_index:
             a = np.array([o['IMIN'], o['JMIN'], o['KMIN'], o['IMAX'], o['JMAX'], o['KMAX']], dtype=int)
             if np.array_equal(a,indices):
-                outer_face_to_match = create_face_from_diagonals(blocks[o['block_index']], o['IMIN'], o['JMIN'], o['KMIN'], o['IMAX'], o['JMAX'], o['KMAX'])
+                outer_face_to_match = create_face_from_diagonals(blocks[o['block_index']], imin=o['IMIN'], jmin=o['JMIN'], kmin=o['KMIN'], imax=o['IMAX'], jmax=o['JMAX'], kmax=o['KMAX'])
                 outer_face_to_match.set_block_index(block_index)
     return outer_face_to_match

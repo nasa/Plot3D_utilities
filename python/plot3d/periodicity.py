@@ -171,14 +171,24 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list() 
     for o in outer_faces:
-        face = create_face_from_diagonals(blocks[o['block_index']], o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'], o['KMIN'], o['KMAX'])
+        face = create_face_from_diagonals(blocks[o['block_index']], 
+            imin=o['IMIN'], imax=o['IMAX'], 
+            jmin=o['JMIN'], jmax=o['JMAX'], 
+            kmin=o['KMIN'], kmax=o['KMAX'])
         face.set_block_index(o['block_index'])
         outer_faces_all.append(face)
     for match_face_index,m in enumerate(matched_faces):
         if (match_face_index == 14):
             print("check")
-        face1 = create_face_from_diagonals(blocks[m['block1']['block_index']], m['block1']['IMIN'], m['block1']['IMAX'], m['block1']['JMIN'], m['block1']['JMAX'], m['block1']['KMIN'], m['block1']['KMAX'])
-        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], m['block2']['IMIN'], m['block2']['IMAX'], m['block2']['JMIN'], m['block2']['JMAX'], m['block2']['KMIN'], m['block2']['KMAX'])
+        face1 = create_face_from_diagonals(blocks[m['block1']['block_index']],
+            imin=int(m['block1']['IMIN']), imax=int(m['block1']['IMAX']), 
+            min=int(m['block1']['JMIN']), jmax=int(m['block1']['JMAX']),
+            kmin=int(m['block1']['KMIN']), kmax=int(m['block1']['KMAX']))
+        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], 
+            imin=int(m['block2']['IMIN']), imax=int(m['block2']['IMAX']), 
+            jmin=int(m['block2']['JMIN']), jmax=int(m['block2']['JMAX']), 
+            kmin=int(m['block2']['KMIN']), kmax=int(m['block2']['KMAX']))
+
         face1.set_block_index(m['block1']['block_index'])
         face2.set_block_index(m['block2']['block_index'])
         matched_faces_all.append(face1)
@@ -399,18 +409,18 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list() 
     for o in outer_faces:
-        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), 
-            int(o['JMIN']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMIN']/gcd_to_use), int(o['KMAX']/gcd_to_use))
+        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['JMIN']/gcd_to_use), 
+            int(o['KMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMAX']/gcd_to_use))
         face.set_block_index(o['block_index'])
         outer_faces_all.append(face)
 
     for _,m in enumerate(matched_faces):
-        face1 = create_face_from_diagonals(blocks_rotated[m['block1']['block_index']], int(m['block1']['IMIN']/gcd_to_use), int(m['block1']['IMAX']/gcd_to_use), 
-                            int(m['block1']['JMIN']/gcd_to_use), int(m['block1']['JMAX']/gcd_to_use), 
-                            int(m['block1']['KMIN']/gcd_to_use), int(m['block1']['KMAX']/gcd_to_use))
-        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], int(m['block2']['IMIN']/gcd_to_use), int(m['block2']['IMAX']/gcd_to_use), 
-                            int(m['block2']['JMIN']/gcd_to_use), int(m['block2']['JMAX']/gcd_to_use), 
-                            int(m['block2']['KMIN']/gcd_to_use), int(m['block2']['KMAX']/gcd_to_use))
+        face1 = create_face_from_diagonals(blocks_rotated[m['block1']['block_index']], int(m['block1']['IMIN']/gcd_to_use), int(m['block1']['JMIN']/gcd_to_use), 
+                            int(m['block1']['KMIN']/gcd_to_use), int(m['block1']['IMAX']/gcd_to_use), 
+                            int(m['block1']['JMAX']/gcd_to_use), int(m['block1']['KMAX']/gcd_to_use))
+        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], int(m['block2']['IMIN']/gcd_to_use), int(m['block2']['JMIN']/gcd_to_use), 
+                            int(m['block2']['KMIN']/gcd_to_use), int(m['block2']['IMAX']/gcd_to_use), 
+                            int(m['block2']['JMAX']/gcd_to_use), int(m['block2']['KMAX']/gcd_to_use))
         face1.set_block_index(m['block1']['block_index'])
         face2.set_block_index(m['block2']['block_index'])
         matched_faces_all.append(face1)
