@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>plot3d.periodicity &mdash; Plot3D 1.5.2 documentation</title>
+  <title>plot3d.periodicity &mdash; Plot3D 1.5.5 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -31,7 +31,7 @@
             <a href="../../index.html" class="icon icon-home"> Plot3D
           </a>
               <div class="version">
-                1.5.2
+                1.5.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -454,7 +454,7 @@
     <span class="k">return</span> <span class="n">periodic_faces_export</span><span class="p">,</span> <span class="n">outer_faces_export</span><span class="p">,</span> <span class="n">periodic_faces</span><span class="p">,</span> <span class="n">outer_faces_all</span></div>
 
 
-<div class="viewcode-block" id="rotated_periodicity"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.rotated_periodicity">[docs]</a><span class="k">def</span> <span class="nf">rotated_periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">rotation_angle</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="rotated_periodicity"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.rotated_periodicity">[docs]</a><span class="k">def</span> <span class="nf">rotated_periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">rotation_angle</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ReduceMesh</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Finds the peridocity/connectivity by rotating a block. This is a bit different from &quot;periodicity&quot; where you specify the periodic direction. </span>
 <span class="sd">        This method doesn&#39;t care about the direction as long as the angle you specify results in a match between the Left Face and the Right Face         </span>
 
@@ -470,7 +470,7 @@
 <span class="sd">        outer_faces (List[Dict[str,int]]): List of outer faces in dictionary form</span>
 <span class="sd">        rotation_angle (float): rotation angle in between blades in degrees. factor in an additional blade </span>
 <span class="sd">        rotation_axis (str, Optional): &quot;x&quot;, &quot;y&quot;, or &quot;z&quot; </span>
-
+<span class="sd">        ReduceMesh (bool, Optional): True, reduces the mesh for faster matching</span>
 <span class="sd">    </span>
 <span class="sd">    periodic_faces, outer_faces_export, _, _ = rotated_periodicity(blocks,face_matches, outer_faces, rotation_angle=rotation_angle, rotation_axis = &quot;x&quot;)</span>
 <span class="sd">    </span>
@@ -492,11 +492,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">gcd_array</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="c1"># Find the gcd of all the blocks </span>
-    <span class="k">for</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
-        <span class="n">block</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">block_indx</span><span class="p">]</span>
-        <span class="n">gcd_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
-    <span class="n">gcd_to_use</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">gcd_array</span><span class="p">)</span> <span class="c1"># You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.</span>
-    <span class="n">blocks</span> <span class="o">=</span> <span class="n">reduce_blocks</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span><span class="n">gcd_to_use</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ReduceMesh</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">block_indx</span><span class="p">]</span>
+            <span class="n">gcd_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="n">gcd_to_use</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">gcd_array</span><span class="p">)</span> <span class="c1"># You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.</span>
+        <span class="n">blocks</span> <span class="o">=</span> <span class="n">reduce_blocks</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span><span class="n">gcd_to_use</span><span class="p">)</span>
 
     <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">create_rotation_matrix</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">),</span><span class="n">rotation_axis</span><span class="p">)</span>
     
