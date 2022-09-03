@@ -25,7 +25,7 @@ if __name__=="__main__":
     '''
     plot3d_filename = 'stator_split.xyz'
 
-    with open('stator_split_connectivity.pickle','rb') as f:
+    with open('stator_split_connectivity_periodicity.pickle','rb') as f:
         data = pickle.load(f)
         face_matches = data['face_matches']
         stator_shroud = CheckDictionary(data,'stator_shroud')

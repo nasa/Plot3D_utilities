@@ -1,11 +1,8 @@
 import itertools
-from operator import truediv
 from typing import Dict, List, Tuple
 import numpy as np
 from numpy.lib import math
 from .block import Block
-from scipy.optimize import curve_fit
-from tqdm import trange
 
 class Face:
     """Defines a Face of a block for example IMIN,JMIN,JMIN to IMAX,JMIN,JMIN
@@ -37,9 +34,6 @@ class Face:
                     'id':0, 'block_index':self.blockIndex}
 
     @property
-    def centroid(self):
-        return np.array([self.cx,self.cy,self.cx],dtype=np.float64)
-    @property
     def IMIN(self):
         return self.I.min()
     
@@ -67,16 +61,6 @@ class Face:
     def BlockIndex(self):
         return self.blockIndex
     
-    @property
-    def const_type(self):
-        if (self.IMIN == self.IMAX):
-            return 0
-        elif (self.JMIN == self.JMAX):
-            return 1
-        elif (self.KMIN == self.KMAX):
-            return 2
-        return -1
-        
     @property
     def isEdge(self):
         """check if the face is actually an edge. This is an edge if two indicies IMIN == IMAX or JMIN=JMAX or KMIN=KMAX
@@ -359,71 +343,6 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
     return newFace
 
 
-def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]], look_for_linked:bool=True):
-    """Takes a face and a list of faces. Searches for any connected faces. 
-        Connections will be checked based on shared verticies. 
-        If a face shares at least 2 vertices then it's connected. 
-
-    Args:
-        blocks (List[Block]): 
-        face (Face): This is the face that you want to find something that matches with it. 
-        faces (List[Dict[str,int]]): List of faces not including the face you want to match
-        look_for_linked (bool, optional): This takes Face 2 which is connected to face 1 and finds any shared vertices for that face too. Defaults to True.
-
-    Returns:
-        Tuple containing: 
-
-            *connected_faces* (List[Dict[str,int]]): List of connected faces in dictionary format
-            *faces* (List[Dict[str,int]]): List of faces minus any connected face
-    """
-    # Converts dictionary to Face object 
-    faces2 = list() 
-    for o in faces:
-        faces2.append(create_face_from_diagonals(blocks[o['block_index']],imin=o['IMIN'],jmin=o['JMIN'],kmin=o['KMIN'],
-        imax=o['IMAX'],jmax=o['JMAX'],kmax=o['KMAX']))
-        faces2[-1].set_block_index(o['block_index'])
-    faces = faces2
-    
-    faces = [f for f in faces if f!=face]
-    connected_faces = list() # F
-    faces_to_search = [face]
-    match_found = True
-    while (match_found):
-        match_found = False
-        non_match = list()  
-        for face in faces_to_search:
-            t = trange(len(faces))
-            for i in t:
-                t.set_description(f"Matches found {len(connected_faces)}")
-                # Look for verticies 2 that match
-                ind_x = np.isin(face.x, faces[i].x)
-                ind_y = np.isin(face.y, faces[i].y)
-                ind_z = np.isin(face.z, faces[i].z)
-                if np.sum(ind_x)==2 and np.sum(ind_y)==2 and np.sum(ind_z) == 2 and face.const_type == faces[i].const_type:
-                    connected_faces.append(faces[i])
-                    match_found = True
-                elif np.sum(ind_x)>2 and np.sum(ind_y)==2 and np.sum(ind_z) == 2 and face.const_type == faces[i].const_type:
-                    connected_faces.append(faces[i])
-                    match_found = True
-                elif np.sum(ind_x)==2 and np.sum(ind_y)>2 and np.sum(ind_z) == 2 and face.const_type == faces[i].const_type:
-                    connected_faces.append(faces[i])
-                    match_found = True
-                elif np.sum(ind_x)==2 and np.sum(ind_y)==2 and np.sum(ind_z) > 2 and face.const_type == faces[i].const_type:
-                    connected_faces.append(faces[i])
-                    match_found = True
-                else:
-                    if (faces[i] not in non_match) and (faces[i] not in connected_faces):
-                        non_match.append(faces[i])
-        if look_for_linked:
-            faces_to_search = list(set([c for c in connected_faces if c not in faces_to_search]))
-            connected_faces = list(set(connected_faces))
-        faces = non_match
-    if len(connected_faces)>0:
-        return [c.to_dict() for c in connected_faces], [f.to_dict() for f in faces]
-    else:
-        return connected_faces, [f.to_dict() for f in faces] # Returns an empty list and original set of faces to search
-
-
 def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int):
     """Splits a face with another face within the same block 
         picture the split as a two rectangles inside each other
@@ -526,27 +445,3 @@ def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:i
     faces = [f for f in faces if not f.isEdge and not f.index_equals(center_face)] # Remove edges
     [f.set_block_index(face_to_split.blockIndex) for f in faces] 
     return faces 
-
-def find_face(blocks:List[Block],block_index:int, indices:np.ndarray, outer_faces:List[Face]):
-    """Finds a particular face inside a list of outer_faces. This assumes you know the indicies and the block ID. 
-    This is important because if you accidentally type in the wrong indicies, it doesn't create a random face. 
-    You'll know that this face does not exist. 
-    Use this function after you've looked at the geometry in paraview to verify the block id and the indicies of the face. 
-
-    Args:
-        blocks (List[Block]): List of blocks
-        block_index (int): block index the face belongs to
-        indices (np.ndarray): List of integers for [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]
-        outer_faces (List[Face]): _description_
-
-    Returns:
-        (Face | None): Either retuns the matching face or None object.
-    """
-    outer_face_to_match = None
-    for o in outer_faces:
-        if o['block_index'] == block_index:
-            a = np.array([o['IMIN'], o['JMIN'], o['KMIN'], o['IMAX'], o['JMAX'], o['KMAX']], dtype=int)
-            if np.array_equal(a,indices):
-                outer_face_to_match = create_face_from_diagonals(blocks[o['block_index']], imin=o['IMIN'], jmin=o['JMIN'], kmin=o['KMIN'], imax=o['IMAX'], jmax=o['JMAX'], kmax=o['KMAX'])
-                outer_face_to_match.set_block_index(block_index)
-    return outer_face_to_match

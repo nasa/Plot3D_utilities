@@ -8,13 +8,6 @@ from paraview.simple import *
 import random
 
 
-def CheckDictionary(data,name):
-    if name in data:
-        print(f'{name} found')
-        return data[name]
-    else:
-        return list() 
-
 '''
 Main Code
 '''
@@ -23,17 +16,17 @@ if __name__=="__main__":
     '''
     Read the connectivity file
     '''
-    plot3d_filename = 'stator_split.xyz'
+    plot3d_filename = 'rotor_split.xyz'
 
-    with open('stator_split_connectivity.pickle','rb') as f:
+    with open('rotor_split_connectivity_periodicity.pickle','rb') as f:
         data = pickle.load(f)
         face_matches = data['face_matches']
-        stator_shroud = CheckDictionary(data,'stator_shroud')
-        stator_hub = CheckDictionary(data,'stator_hub')
-        stator_body = CheckDictionary(data,'stator_body')
-        outer_faces = CheckDictionary(data,'outer_faces')
-        periodic_faces = CheckDictionary(data,'periodic_faces')
-
+        outer_faces = data['outer_faces']
+        if 'periodic_faces' in data:
+            print('Periodic faces found')
+            periodic_faces = data['periodic_faces']
+        else:
+            periodic_faces = []
     blocks_to_extract = [f['block1']['block_index'] for f in face_matches]
     blocks_to_extract.extend([f['block2']['block_index'] for f in face_matches])
     blocks_to_extract = list(set(blocks_to_extract))
@@ -88,29 +81,11 @@ if __name__=="__main__":
                 CreateSubset(block_source, voi, name='match '+str(match_indx))
         
         # Plot the outer faces  
-        for surface_indx, o in enumerate(stator_body):
-            # Add Plots for Outer Faces
-            if o['block_index'] == b:
-                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
-                CreateSubset(block_source, voi, name='stator_body '+str(surface_indx),opacity=0.2) 
-        
-        for surface_indx, o in enumerate(stator_hub):
-            # Add Plots for Outer Faces
-            if o['block_index'] == b:
-                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
-                CreateSubset(block_source, voi, name='stator_hub '+str(surface_indx),opacity=0.2) 
-        
-        for surface_indx, o in enumerate(stator_shroud):
-            # Add Plots for Outer Faces
-            if o['block_index'] == b:
-                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
-                CreateSubset(block_source, voi, name='stator_shroud '+str(surface_indx),opacity=0.2) 
-
         for surface_indx, o in enumerate(outer_faces):
             # Add Plots for Outer Faces
             if o['block_index'] == b:
                 voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
-                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
+                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2) 
         
         # Plot the periodic faces  
         for periodic_indx, p in enumerate(periodic_faces):
