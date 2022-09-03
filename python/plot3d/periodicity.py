@@ -352,7 +352,7 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
 
-def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]], rotation_angle:float, rotation_axis:str = "x"):
+def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]], rotation_angle:float, rotation_axis:str = "x", ReduceMesh:bool=True):
     """Finds the peridocity/connectivity by rotating a block. This is a bit different from "periodicity" where you specify the periodic direction. 
         This method doesn't care about the direction as long as the angle you specify results in a match between the Left Face and the Right Face         
 
@@ -368,7 +368,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         outer_faces (List[Dict[str,int]]): List of outer faces in dictionary form
         rotation_angle (float): rotation angle in between blades in degrees. factor in an additional blade 
         rotation_axis (str, Optional): "x", "y", or "z" 
-
+        ReduceMesh (bool, Optional): True, reduces the mesh for faster matching
     
     periodic_faces, outer_faces_export, _, _ = rotated_periodicity(blocks,face_matches, outer_faces, rotation_angle=rotation_angle, rotation_axis = "x")
     
@@ -390,11 +390,12 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
     """
     gcd_array = list()
     # Find the gcd of all the blocks 
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
-    blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
+    if ReduceMesh==True:
+        for block_indx in range(len(blocks)):
+            block = blocks[block_indx]
+            gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
+        gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+        blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
     rotation_matrix = create_rotation_matrix(radians(rotation_angle),rotation_axis)
     

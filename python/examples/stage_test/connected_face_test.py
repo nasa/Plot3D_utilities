@@ -1,8 +1,6 @@
-import sys, pickle, os
-from venv import create
-import numpy as np 
 from plot3d import Face, find_connected_face,find_face,read_plot3D
-
+import pickle
+import numpy as np 
 # Stator 
 blocks = read_plot3D('stator_split.xyz',binary=True)
 with open('stator_split_connectivity_periodicity.pickle','rb') as f:
@@ -22,12 +20,35 @@ stator_hub_to_match = find_face(blocks,block_id, indices,outer_faces)
 stator_hub, outer_faces = find_connected_face(blocks,stator_hub_to_match, outer_faces)
 stator_hub.append(stator_hub_to_match.to_dict())
 
+block_id = 8; indices = np.array([0,0,0,60,0,36],dtype=int) 
+stator_hub_to_match = find_face(blocks,block_id, indices,outer_faces)
+stator_hub2, outer_faces = find_connected_face(blocks,stator_hub_to_match, outer_faces)
+stator_hub2.append(stator_hub_to_match.to_dict())
+stator_hub.extend(stator_hub2)
+
+block_id = 10; indices = np.array([0,0,0,52,0,48],dtype=int) 
+stator_hub_to_match = find_face(blocks,block_id, indices,outer_faces)
+stator_hub3, outer_faces = find_connected_face(blocks,stator_hub_to_match, outer_faces)
+stator_hub3.append(stator_hub_to_match.to_dict())
+stator_hub.extend(stator_hub3)
 
 # Stator Shroud
 block_id = 0; indices = np.array([0,148,0,32,148,76],dtype=int)
 stator_shroud_to_match = find_face(blocks,block_id, indices,outer_faces)
 stator_shroud, outer_faces = find_connected_face(blocks,stator_shroud_to_match, outer_faces)
 stator_shroud.append(stator_shroud_to_match.to_dict())
+
+block_id = 8; indices = np.array([0,148,0,60,148,36],dtype=int) 
+stator_shroud_to_match = find_face(blocks,block_id, indices,outer_faces)
+stator_shroud2, outer_faces = find_connected_face(blocks,stator_shroud_to_match, outer_faces)
+stator_shroud2.append(stator_shroud_to_match.to_dict())
+stator_shroud.extend(stator_shroud2)
+
+block_id = 10; indices = np.array([0,148,0,52,148,48],dtype=int) 
+stator_shroud_to_match = find_face(blocks,block_id, indices,outer_faces)
+stator_shroud3, outer_faces = find_connected_face(blocks,stator_shroud_to_match, outer_faces)
+stator_shroud3.append(stator_shroud_to_match.to_dict())
+stator_shroud.extend(stator_shroud3)
 
 # Mixing Plane
 block_id = 9; indices = np.array([36, 0,0, 36,148,36], dtype=int)
@@ -43,6 +64,8 @@ data['stator_hub'] = stator_hub
 
 with open('stator_split_connectivity_final.pickle','wb') as f:
     pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+    print("done")
+
 
 # Rotor
 blocks = read_plot3D('rotor_split.xyz',binary=True)
