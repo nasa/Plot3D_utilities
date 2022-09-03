@@ -123,15 +123,17 @@ def find_matching_blocks(block1:Block,block2:Block,tol:float=1E-6):
 
     block1_outer,_ = get_outer_faces(block1)
     block2_outer,_ = get_outer_faces(block2)
-    
+
+    block1_split_faces = list()
+    block2_split_faces = list() 
+    block1MatchingFace = -1
+    block2MatchingFace = -1
     # Create a dataframe for block1 and block 2 inner matches, add to df later
     # df,split_faces1,split_faces2 = get_face_intersection(block1_outer[3],block2_outer[4],block1,block2,tol=1E-6)
 
     # Checks the nodes of the outer faces to see if any of them match 
     match = True
     while match:
-        block1MatchingFace = -1
-        block2MatchingFace = -1
         match = False
         for p in range(len(block1_outer)):
             block1_face = block1_outer[p]
@@ -141,23 +143,24 @@ def find_matching_blocks(block1:Block,block2:Block,tol:float=1E-6):
                 if len(df)>0:   # the number of intersection points has to be more than 4
                     # if not block1_face in block1MatchingFace and not block2_face in block2MatchingFace:
                     block_match_indices.append(df)
-                    block1MatchingFace = p
-                    block2MatchingFace = q
+                    block1_split_faces.extend(split_faces1)
+                    block2_split_faces.extend(split_faces2)
                     match = True
                     break
             if match:
                 break
-        if (block1MatchingFace >0) and (block2MatchingFace>0):
-            block1_outer = [block1_outer[i] for i in range(len(block1_outer)) if i != block1MatchingFace]
-            block2_outer = [block2_outer[i] for i in range(len(block2_outer)) if i != block2MatchingFace]
-            block1_outer.extend(split_faces1)
-            block2_outer.extend(split_faces2)
-        
+        if match:
+            block1_outer.pop(p)
+            block2_outer.pop(q)
+            block1_outer.extend(block1_split_faces)
+            block2_outer.extend(block2_split_faces)
+            block1_split_faces.clear()
+            block2_split_faces.clear()
 
     return block_match_indices, block1_outer, block2_outer # Remove duplicates using set and list 
                     
         
-        
+
 
 
 def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
