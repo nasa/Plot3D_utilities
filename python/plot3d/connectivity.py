@@ -110,8 +110,12 @@ def find_matching_blocks(block1:Block,block2:Block,block1_outer:List[Face], bloc
     Args:
         block1 (Block): Any plot3d Block that is not the same as block2
         block2 (Block): Any plot3d Block that is not the same as block1
-        full_face_match (bool): (Depreciated) use full face matching (Much faster) Full face match can be deceiving. There could be some cases where the face is a wrap and 4 corners match but the insides do not. This kind of connection shouldn't be considered
-
+        block1_outer (List[Face]): outer faces for block 1. 
+        block2_outer (List[Face]): Outer faces for block 2
+        tol (float, Optional): tolerance to use. Defaults to 1E-6
+    
+    Note:
+        This function was changed to be given an input of outer faces for block 1 and block 2. Outer faces can change and we should use the updated value
     Returns:
         (tuple): containing
             - **df** (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])
