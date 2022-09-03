@@ -183,6 +183,7 @@ def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
     
     return T[dim1[0]:dim1[1], dim2[0]:dim2[1], dim3[0]:dim3[1]]
 
+
 def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:float=1E-6):
     """Get the index of the intersection between two faces located on two different blocks 
         Face1 needs to be the smaller face. 
@@ -226,8 +227,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
 
     # General Search
     if I1[0] == I1[1]: # I is constant in Face 1
-        i = I1[0]
-        combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
+        combo = product(range(X1.shape[0]), range(X1.shape[1]))
         for c in combo:
             p, q = c
             x = X1[p,q]
@@ -267,7 +267,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
             df = pd.concat([df, pd.DataFrame(match_location)], ignore_index=True)
 
     elif K1[0] == K1[1]: # K is constant in face 1 
-        combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
+        combo = product(range(X1.shape[0]), range(X1.shape[1]))
         for c in combo:
             p, q = c
             x = X1[p,q]
@@ -416,17 +416,19 @@ def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
         min_dist = 10000
         for i_o in block_i_outerfaces:
             for j_o in block_j_outerfaces:
-                d = np.linalg.norm(i_o.centroid-j_o.centroid)
-                if d<min_dist:
-                    min_dist = d
-        distances_to_block_i[i,j] = d # This is the minium distance from one block to another 
+                if i_o.const_type == j_o.const_type:
+                    d = np.linalg.norm(i_o.centroid-j_o.centroid)
+                    if d<min_dist:
+                        min_dist = d
+        distances_to_block_i[i,j] = min_dist # This is the minium distance from one block to another 
     
     # Now that we have this matrix, we sort the distances by rows and pick the closest 8 blocks, can use 4 but 8 might be safer
     new_combos = list()
     for i in range(len(blocks)): # For block i
         indices = np.argsort(distances_to_block_i[i,:])
         for j in indices[:nearest_nblocks]:
-            new_combos.append((i,j))
+            if distances_to_block_i[i,j] < 10000:
+                new_combos.append((i,j))
     return new_combos
     
 
