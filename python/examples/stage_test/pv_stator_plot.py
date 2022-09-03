@@ -8,6 +8,13 @@ from paraview.simple import *
 import random
 
 
+def CheckDictionary(data,name):
+    if name in data:
+        print(f'{name} found')
+        return data[name]
+    else:
+        return list() 
+
 '''
 Main Code
 '''
@@ -18,19 +25,15 @@ if __name__=="__main__":
     '''
     plot3d_filename = 'stator_split.xyz'
 
-    with open('stator_split_connectivity_final.pickle','rb') as f:
+    with open('stator_split_connectivity.pickle','rb') as f:
         data = pickle.load(f)
         face_matches = data['face_matches']
-        stator_shroud = data['stator_shroud']
-        stator_hub = data['stator_hub']
-        stator_body = data['stator_body']
-        outer_faces = data['outer_faces']
+        stator_shroud = CheckDictionary(data,'stator_shroud')
+        stator_hub = CheckDictionary(data,'stator_hub')
+        stator_body = CheckDictionary(data,'stator_body')
+        outer_faces = CheckDictionary(data,'outer_faces')
+        periodic_faces = CheckDictionary(data,'periodic_faces')
 
-        if 'periodic_faces' in data:
-            print('Periodic faces found')
-            periodic_faces = data['periodic_faces']
-        else:
-            periodic_faces = []
     blocks_to_extract = [f['block1']['block_index'] for f in face_matches]
     blocks_to_extract.extend([f['block2']['block_index'] for f in face_matches])
     blocks_to_extract = list(set(blocks_to_extract))

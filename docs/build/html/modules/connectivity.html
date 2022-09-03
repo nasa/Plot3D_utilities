@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Connectivity &mdash; Plot3D 1.5.2 documentation</title>
+  <title>Connectivity &mdash; Plot3D 1.5.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -34,7 +34,7 @@
             <a href="../index.html" class="icon icon-home"> Plot3D
           </a>
               <div class="version">
-                1.5.2
+                1.5.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -106,7 +106,7 @@
 <span id="connectivity"></span><h1>Connectivity<a class="headerlink" href="#module-plot3d.connectivity" title="Permalink to this headline"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.connectivity.combinations_of_nearest_blocks">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">combinations_of_nearest_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nearest_nblocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#combinations_of_nearest_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.combinations_of_nearest_blocks" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">combinations_of_nearest_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nearest_nblocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#combinations_of_nearest_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.combinations_of_nearest_blocks" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the indices of the nearest 6 blocks based on their centroid</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -116,10 +116,10 @@
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>[description]</p>
+<dd class="field-even"><p>combinations of nearest blocks</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>[type]</p>
+<dd class="field-odd"><p>List[Tuple[int,int]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -207,18 +207,26 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.connectivity.find_matching_blocks">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">find_matching_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#find_matching_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.find_matching_blocks" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">find_matching_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">plot3d.face.Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#find_matching_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.find_matching_blocks" title="Permalink to this definition"></a></dt>
 <dd><p>Takes two blocks and finds all matching pairs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>block1</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Any plot3d Block that is not the same as block2</p></li>
 <li><p><strong>block2</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Any plot3d Block that is not the same as block1</p></li>
-<li><p><strong>full_face_match</strong> (<em>bool</em>) – (Depreciated) use full face matching (Much faster) Full face match can be deceiving. There could be some cases where the face is a wrap and 4 corners match but the insides do not. This kind of connection shouldn’t be considered</p></li>
+<li><p><strong>block1_outer</strong> (<em>List</em><em>[</em><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a><em>]</em>) – outer faces for block 1.</p></li>
+<li><p><strong>block2_outer</strong> (<em>List</em><em>[</em><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a><em>]</em>) – Outer faces for block 2</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>Optional</em>) – tolerance to use. Defaults to 1E-6</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function was changed to be given an input of outer faces for block 1 and block 2. Outer faces can change and we should use the updated value</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
 <dt>containing</dt><dd><ul class="simple">
 <li><p><strong>df</strong> (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])</p></li>
 <li><p><strong>block1_outer</strong> (List[Face]):</p></li>
@@ -228,8 +236,8 @@
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(tuple)</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(tuple)</p>
 </dd>
 </dl>
 </dd></dl>

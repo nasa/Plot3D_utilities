@@ -37,6 +37,9 @@ class Face:
                     'id':0, 'block_index':self.blockIndex}
 
     @property
+    def centroid(self):
+        return np.array([self.cx,self.cy,self.cx],dtype=np.float64)
+    @property
     def IMIN(self):
         return self.I.min()
     

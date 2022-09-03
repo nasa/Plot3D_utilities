@@ -104,14 +104,18 @@ def unique_pairs(listOfItems:list):
             yield x,y
 
 
-def find_matching_blocks(block1:Block,block2:Block,tol:float=1E-6):  
+def find_matching_blocks(block1:Block,block2:Block,block1_outer:List[Face], block2_outer:List[Face],tol:float=1E-6):  
     """Takes two blocks and finds all matching pairs
 
     Args:
         block1 (Block): Any plot3d Block that is not the same as block2
         block2 (Block): Any plot3d Block that is not the same as block1
-        full_face_match (bool): (Depreciated) use full face matching (Much faster) Full face match can be deceiving. There could be some cases where the face is a wrap and 4 corners match but the insides do not. This kind of connection shouldn't be considered
-
+        block1_outer (List[Face]): outer faces for block 1. 
+        block2_outer (List[Face]): Outer faces for block 2
+        tol (float, Optional): tolerance to use. Defaults to 1E-6
+    
+    Note:
+        This function was changed to be given an input of outer faces for block 1 and block 2. Outer faces can change and we should use the updated value
     Returns:
         (tuple): containing
             - **df** (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])
@@ -121,21 +125,14 @@ def find_matching_blocks(block1:Block,block2:Block,tol:float=1E-6):
     # Check to see if outer face of block 1 matches any of the outer faces of block 2
     block_match_indices = list()
 
-    block1_outer,_ = get_outer_faces(block1)
-    block2_outer,_ = get_outer_faces(block2)
-
     block1_split_faces = list()
     block2_split_faces = list() 
-    block1MatchingFace = list()
-    block2MatchingFace = list()
     # Create a dataframe for block1 and block 2 inner matches, add to df later
     # df,split_faces1,split_faces2 = get_face_intersection(block1_outer[3],block2_outer[4],block1,block2,tol=1E-6)
 
     # Checks the nodes of the outer faces to see if any of them match 
     match = True
     while match:
-        block1MatchingFace.clear()
-        block2MatchingFace.clear()
         match = False
         for p in range(len(block1_outer)):
             block1_face = block1_outer[p]
@@ -145,28 +142,24 @@ def find_matching_blocks(block1:Block,block2:Block,tol:float=1E-6):
                 if len(df)>0:   # the number of intersection points has to be more than 4
                     # if not block1_face in block1MatchingFace and not block2_face in block2MatchingFace:
                     block_match_indices.append(df)
-                    block1MatchingFace.append(block1_face)
-                    block2MatchingFace.append(block2_face)
                     block1_split_faces.extend(split_faces1)
                     block2_split_faces.extend(split_faces2)
                     match = True
                     break
             if match:
                 break
-
-        [block1_outer.remove(b) for b in block1MatchingFace if b in block1_outer]
-        [block2_outer.remove(b) for b in block2MatchingFace if b in block2_outer]
-        if len(block1_split_faces)>0:
+        if match:
+            block1_outer.pop(p)
+            block2_outer.pop(q)
             block1_outer.extend(block1_split_faces)
-            block1_split_faces.clear()
-        if len(block2_split_faces)>0:
             block2_outer.extend(block2_split_faces)
+            block1_split_faces.clear()
             block2_split_faces.clear()
 
     return block_match_indices, block1_outer, block2_outer # Remove duplicates using set and list 
                     
         
-        
+
 
 
 def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
@@ -191,6 +184,7 @@ def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
         return T[ dim1[0]:dim1[1]+1, dim2[0]:dim2[1]+1, dim3[0] ]
     
     return T[dim1[0]:dim1[1], dim2[0]:dim2[1], dim3[0]:dim3[1]]
+
 
 def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:float=1E-6):
     """Get the index of the intersection between two faces located on two different blocks 
@@ -235,8 +229,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
 
     # General Search
     if I1[0] == I1[1]: # I is constant in Face 1
-        i = I1[0]
-        combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
+        combo = product(range(X1.shape[0]), range(X1.shape[1]))
         for c in combo:
             p, q = c
             x = X1[p,q]
@@ -276,7 +269,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
             df = pd.concat([df, pd.DataFrame(match_location)], ignore_index=True)
 
     elif K1[0] == K1[1]: # K is constant in face 1 
-        combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
+        combo = product(range(X1.shape[0]), range(X1.shape[1]))
         for c in combo:
             p, q = c
             x = X1[p,q]
@@ -405,7 +398,7 @@ def __check_edge(df:pd.DataFrame):
     return c<4 #  If "c" is less than 4 then it's an edge 
     
 
-def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=12):
+def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
     """Returns the indices of the nearest 6 blocks based on their centroid
 
     Args:
@@ -413,35 +406,32 @@ def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=12):
         blocks (List[Block]): list of all your blocks
 
     Returns:
-        [type]: [description]
+        List[Tuple[int,int]]: combinations of nearest blocks 
     """
+
+    # Pick a block get centroid of all outer faces        
     combos = list(combinations(range(len(blocks)),2))
-    if (len(blocks))<=48:
-        return combos
+    distances_to_block_i = np.zeros((len(blocks),len(blocks))) + 10000 # rows for block i, columns for i distance to block j
+    for i,j in combos:
+        block_i_outerfaces,_ = get_outer_faces(blocks[i])
+        block_j_outerfaces,_ = get_outer_faces(blocks[j])
+        min_dist = 10000
+        for i_o in block_i_outerfaces:
+            for j_o in block_j_outerfaces:
+                if i_o.const_type == j_o.const_type:
+                    d = np.linalg.norm(i_o.centroid-j_o.centroid)
+                    if d<min_dist:
+                        min_dist = d
+        distances_to_block_i[i,j] = min_dist # This is the minium distance from one block to another 
     
-    distances = [None] * len(combos)
-    for indx,(i,j) in enumerate(combos):
-        dx = blocks[i].cx - blocks[j].cx
-        dy = blocks[i].cy - blocks[j].cy
-        dz = blocks[i].cz - blocks[j].cz
-        distances[indx] = math.sqrt(dx*dx + dy*dy + dz*dz)
-
-    df = pd.DataFrame(combos, columns =['block_i', 'block_j'])
-    df['distance'] = distances 
-
-    block_i = list(df.block_i.unique())        
-    main_df = df.copy(deep=True)
-    block_df = list()
-    for i in block_i:
-        df2 = main_df[main_df['block_i']==i].sort_values('distance')
-        if len(df2)>nearest_nblocks:
-            d = df2.iloc[nearest_nblocks-1].distance
-            block_df.append(main_df[(main_df['block_i']==i) & (main_df['distance'] <= d)])
-        else:
-            block_df.append(main_df[(main_df['block_i']==i)])
-    df = pd.concat(block_df)
-    subset = df[['block_i', 'block_j']]
-    return [tuple(x) for x in subset.to_numpy()] 
+    # Now that we have this matrix, we sort the distances by rows and pick the closest 8 blocks, can use 4 but 8 might be safer
+    new_combos = list()
+    for i in range(len(blocks)): # For block i
+        indices = np.argsort(distances_to_block_i[i,:])
+        for j in indices[:nearest_nblocks]:
+            if distances_to_block_i[i,j] < 10000:
+                new_combos.append((i,j))
+    return new_combos
     
 
 def find_block_index_in_outer_faces(outer_faces:List[Face], block_indx:int):
@@ -522,16 +512,20 @@ def connectivity(blocks:List[Block]):
     face_matches = list()
     matches_to_remove = list()
     # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[4],blocks[7],1E-12)    # This function finds partial matches between blocks
-
-    combos = combinations_of_nearest_blocks(blocks) # Find the 6 nearest Blocks and search through all that. 
-    t = trange(len(combos))
+    temp = [get_outer_faces(b) for b in blocks]
+    block_outer_faces = [t[0] for t in temp]
+    combos = combinations_of_nearest_blocks(blocks,6) # Find the 6 nearest Blocks and search through all that. 
+    # combos = [[3,12]]
+    t = trange(len(combos))    
     for indx in t:     # block i        
         i,j = combos[indx]
         t.set_description(f"Checking connections block {i} with {j}")
         # Takes 2 blocks, gets the matching faces exterior faces of both blocks 
-        df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j])    # This function finds partial matches between blocks
+        df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j],block_outer_faces[i],block_outer_faces[j])    # This function finds partial matches between blocks
         [o.set_block_index(i) for o in blocki_outerfaces]
         [o.set_block_index(j) for o in blockj_outerfaces]
+        block_outer_faces[i] = blocki_outerfaces
+        block_outer_faces[j] = blockj_outerfaces
         # Update connectivity for blocks with matching faces 
         if (len(df_matches)>0):
             for df in df_matches:
@@ -550,10 +544,9 @@ def connectivity(blocks:List[Block]):
                 temp['match'] = df
                 face_matches.append(temp)
 
-        # Update Outer Faces 
-        outer_faces.extend(blocki_outerfaces)
-        outer_faces.extend(blockj_outerfaces)
-        outer_faces = list(set(outer_faces))    # Get most unique
+    # Update Outer Faces 
+    [outer_faces.extend(o) for o in block_outer_faces] # all the outer faces 
+    outer_faces = list(set(outer_faces))    # Get most unique
         
     outer_faces = [o for o in outer_faces if o not in matches_to_remove]
     # Remove any outer faces that may have been found by mistake

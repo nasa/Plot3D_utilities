@@ -1,5 +1,6 @@
 import numpy as np 
 
+
 def point_match(x:float, y:float, z:float, X2:np.ndarray, Y2:np.ndarray, Z2:np.ndarray, tol:float=1E-6):
     """Checks to see if x,y,z is present in a Face
         x,y,z are the point that you want to match in Face defined using X2,Y2,Z2

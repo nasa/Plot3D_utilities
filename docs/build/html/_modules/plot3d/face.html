@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>plot3d.face &mdash; Plot3D 1.5.2 documentation</title>
+  <title>plot3d.face &mdash; Plot3D 1.5.5 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -31,7 +31,7 @@
             <a href="../../index.html" class="icon icon-home"> Plot3D
           </a>
               <div class="version">
-                1.5.2
+                1.5.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -138,6 +138,9 @@
                     <span class="s1">&#39;IMAX&#39;</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="p">),</span> <span class="s1">&#39;JMAX&#39;</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">),</span> <span class="s1">&#39;KMAX&#39;</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">),</span>
                     <span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;block_index&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">}</span></div>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">cx</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">cy</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">cx</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">IMIN</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
