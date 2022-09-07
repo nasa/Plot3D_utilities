@@ -22,7 +22,7 @@ copyright = '2021, Paht Juangphanich'
 author = 'Paht Juangphanich <paht.juangphanich@nasa.gov>'
 
 # The full version, including alpha/beta/rc tags
-version = '1.5.2' # plot3d.__version__
+version = '1.5.5' # plot3d.__version__
 release = version # plot3d.__version__
 
 

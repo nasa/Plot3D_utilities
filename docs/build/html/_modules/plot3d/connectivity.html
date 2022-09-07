@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>plot3d.connectivity &mdash; Plot3D 1.5.2 documentation</title>
+  <title>plot3d.connectivity &mdash; Plot3D 1.5.5 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -31,7 +31,7 @@
             <a href="../../index.html" class="icon icon-home"> Plot3D
           </a>
               <div class="version">
-                1.5.2
+                1.5.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -206,14 +206,18 @@
             <span class="k">yield</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
 
 
-<div class="viewcode-block" id="find_matching_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks">[docs]</a><span class="k">def</span> <span class="nf">find_matching_blocks</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>  
+<div class="viewcode-block" id="find_matching_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks">[docs]</a><span class="k">def</span> <span class="nf">find_matching_blocks</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block1_outer</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">block2_outer</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>  
     <span class="sd">&quot;&quot;&quot;Takes two blocks and finds all matching pairs</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        block1 (Block): Any plot3d Block that is not the same as block2</span>
 <span class="sd">        block2 (Block): Any plot3d Block that is not the same as block1</span>
-<span class="sd">        full_face_match (bool): (Depreciated) use full face matching (Much faster) Full face match can be deceiving. There could be some cases where the face is a wrap and 4 corners match but the insides do not. This kind of connection shouldn&#39;t be considered</span>
-
+<span class="sd">        block1_outer (List[Face]): outer faces for block 1. </span>
+<span class="sd">        block2_outer (List[Face]): Outer faces for block 2</span>
+<span class="sd">        tol (float, Optional): tolerance to use. Defaults to 1E-6</span>
+<span class="sd">    </span>
+<span class="sd">    Note:</span>
+<span class="sd">        This function was changed to be given an input of outer faces for block 1 and block 2. Outer faces can change and we should use the updated value</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        (tuple): containing</span>
 <span class="sd">            - **df** (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])</span>
@@ -223,21 +227,14 @@
     <span class="c1"># Check to see if outer face of block 1 matches any of the outer faces of block 2</span>
     <span class="n">block_match_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-    <span class="n">block1_outer</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">block1</span><span class="p">)</span>
-    <span class="n">block2_outer</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">block2</span><span class="p">)</span>
-
     <span class="n">block1_split_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">block2_split_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
-    <span class="n">block1MatchingFace</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="n">block2MatchingFace</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="c1"># Create a dataframe for block1 and block 2 inner matches, add to df later</span>
     <span class="c1"># df,split_faces1,split_faces2 = get_face_intersection(block1_outer[3],block2_outer[4],block1,block2,tol=1E-6)</span>
 
     <span class="c1"># Checks the nodes of the outer faces to see if any of them match </span>
     <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">while</span> <span class="n">match</span><span class="p">:</span>
-        <span class="n">block1MatchingFace</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="n">block2MatchingFace</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="n">match</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">block1_outer</span><span class="p">)):</span>
             <span class="n">block1_face</span> <span class="o">=</span> <span class="n">block1_outer</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
@@ -247,28 +244,24 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>   <span class="c1"># the number of intersection points has to be more than 4</span>
                     <span class="c1"># if not block1_face in block1MatchingFace and not block2_face in block2MatchingFace:</span>
                     <span class="n">block_match_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-                    <span class="n">block1MatchingFace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block1_face</span><span class="p">)</span>
-                    <span class="n">block2MatchingFace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block2_face</span><span class="p">)</span>
                     <span class="n">block1_split_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_faces1</span><span class="p">)</span>
                     <span class="n">block2_split_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_faces2</span><span class="p">)</span>
                     <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">break</span>
             <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
                 <span class="k">break</span>
-
-        <span class="p">[</span><span class="n">block1_outer</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block1MatchingFace</span> <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block1_outer</span><span class="p">]</span>
-        <span class="p">[</span><span class="n">block2_outer</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block2MatchingFace</span> <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block2_outer</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">block1_split_faces</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">block1_outer</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="n">block2_outer</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
             <span class="n">block1_outer</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">block1_split_faces</span><span class="p">)</span>
-            <span class="n">block1_split_faces</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">block2_split_faces</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
             <span class="n">block2_outer</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">block2_split_faces</span><span class="p">)</span>
+            <span class="n">block1_split_faces</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
             <span class="n">block2_split_faces</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">block_match_indices</span><span class="p">,</span> <span class="n">block1_outer</span><span class="p">,</span> <span class="n">block2_outer</span> <span class="c1"># Remove duplicates using set and list </span></div>
                     
         
-        
+
 
 
 <div class="viewcode-block" id="select_multi_dimensional"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.select_multi_dimensional">[docs]</a><span class="k">def</span> <span class="nf">select_multi_dimensional</span><span class="p">(</span><span class="n">T</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">dim1</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span><span class="n">dim2</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">dim3</span><span class="p">:</span><span class="nb">tuple</span><span class="p">):</span>
@@ -293,6 +286,7 @@
         <span class="k">return</span> <span class="n">T</span><span class="p">[</span> <span class="n">dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim2</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span>
     
     <span class="k">return</span> <span class="n">T</span><span class="p">[</span><span class="n">dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim2</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim3</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim3</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span></div>
+
 
 <div class="viewcode-block" id="get_face_intersection"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.get_face_intersection">[docs]</a><span class="k">def</span> <span class="nf">get_face_intersection</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get the index of the intersection between two faces located on two different blocks </span>
@@ -337,8 +331,7 @@
 
     <span class="c1"># General Search</span>
     <span class="k">if</span> <span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">I1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># I is constant in Face 1</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="n">I1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">combo</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">combo</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">range</span><span class="p">(</span><span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">:</span>
             <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">c</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">X1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
@@ -378,7 +371,7 @@
             <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">match_location</span><span class="p">)],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">elif</span> <span class="n">K1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">K1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># K is constant in face 1 </span>
-        <span class="n">combo</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">combo</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">range</span><span class="p">(</span><span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">:</span>
             <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">c</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">X1</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
@@ -507,7 +500,7 @@
     <span class="k">return</span> <span class="n">c</span><span class="o">&lt;</span><span class="mi">4</span> <span class="c1">#  If &quot;c&quot; is less than 4 then it&#39;s an edge </span>
     
 
-<div class="viewcode-block" id="combinations_of_nearest_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks">[docs]</a><span class="k">def</span> <span class="nf">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">nearest_nblocks</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+<div class="viewcode-block" id="combinations_of_nearest_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks">[docs]</a><span class="k">def</span> <span class="nf">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">nearest_nblocks</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns the indices of the nearest 6 blocks based on their centroid</span>
 
 <span class="sd">    Args:</span>
@@ -515,35 +508,32 @@
 <span class="sd">        blocks (List[Block]): list of all your blocks</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        [type]: [description]</span>
+<span class="sd">        List[Tuple[int,int]]: combinations of nearest blocks </span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Pick a block get centroid of all outer faces        </span>
     <span class="n">combos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)),</span><span class="mi">2</span><span class="p">))</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">))</span><span class="o">&lt;=</span><span class="mi">48</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">combos</span>
+    <span class="n">distances_to_block_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">10000</span> <span class="c1"># rows for block i, columns for i distance to block j</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">combos</span><span class="p">:</span>
+        <span class="n">block_i_outerfaces</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">block_j_outerfaces</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="n">min_dist</span> <span class="o">=</span> <span class="mi">10000</span>
+        <span class="k">for</span> <span class="n">i_o</span> <span class="ow">in</span> <span class="n">block_i_outerfaces</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">j_o</span> <span class="ow">in</span> <span class="n">block_j_outerfaces</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i_o</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="n">j_o</span><span class="o">.</span><span class="n">const_type</span><span class="p">:</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">i_o</span><span class="o">.</span><span class="n">centroid</span><span class="o">-</span><span class="n">j_o</span><span class="o">.</span><span class="n">centroid</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">d</span><span class="o">&lt;</span><span class="n">min_dist</span><span class="p">:</span>
+                        <span class="n">min_dist</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="n">distances_to_block_i</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_dist</span> <span class="c1"># This is the minium distance from one block to another </span>
     
-    <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">combos</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">indx</span><span class="p">,(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">combos</span><span class="p">):</span>
-        <span class="n">dx</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cx</span> <span class="o">-</span> <span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">cx</span>
-        <span class="n">dy</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cy</span> <span class="o">-</span> <span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">cy</span>
-        <span class="n">dz</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cz</span> <span class="o">-</span> <span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">cz</span>
-        <span class="n">distances</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">*</span><span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span><span class="o">*</span><span class="n">dy</span> <span class="o">+</span> <span class="n">dz</span><span class="o">*</span><span class="n">dz</span><span class="p">)</span>
-
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">combos</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span><span class="p">[</span><span class="s1">&#39;block_i&#39;</span><span class="p">,</span> <span class="s1">&#39;block_j&#39;</span><span class="p">])</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">distances</span> 
-
-    <span class="n">block_i</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">block_i</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>        
-    <span class="n">main_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">block_df</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">block_i</span><span class="p">:</span>
-        <span class="n">df2</span> <span class="o">=</span> <span class="n">main_df</span><span class="p">[</span><span class="n">main_df</span><span class="p">[</span><span class="s1">&#39;block_i&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;distance&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df2</span><span class="p">)</span><span class="o">&gt;</span><span class="n">nearest_nblocks</span><span class="p">:</span>
-            <span class="n">d</span> <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">nearest_nblocks</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">distance</span>
-            <span class="n">block_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">main_df</span><span class="p">[(</span><span class="n">main_df</span><span class="p">[</span><span class="s1">&#39;block_i&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">main_df</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">)])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">block_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">main_df</span><span class="p">[(</span><span class="n">main_df</span><span class="p">[</span><span class="s1">&#39;block_i&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">i</span><span class="p">)])</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">block_df</span><span class="p">)</span>
-    <span class="n">subset</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;block_i&#39;</span><span class="p">,</span> <span class="s1">&#39;block_j&#39;</span><span class="p">]]</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subset</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()]</span> </div>
+    <span class="c1"># Now that we have this matrix, we sort the distances by rows and pick the closest 8 blocks, can use 4 but 8 might be safer</span>
+    <span class="n">new_combos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span> <span class="c1"># For block i</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">distances_to_block_i</span><span class="p">[</span><span class="n">i</span><span class="p">,:])</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">[:</span><span class="n">nearest_nblocks</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">distances_to_block_i</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">10000</span><span class="p">:</span>
+                <span class="n">new_combos</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">new_combos</span></div>
     
 
 <div class="viewcode-block" id="find_block_index_in_outer_faces"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.find_block_index_in_outer_faces">[docs]</a><span class="k">def</span> <span class="nf">find_block_index_in_outer_faces</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">block_indx</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
@@ -624,16 +614,20 @@
     <span class="n">face_matches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">matches_to_remove</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="c1"># df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[4],blocks[7],1E-12)    # This function finds partial matches between blocks</span>
-
-    <span class="n">combos</span> <span class="o">=</span> <span class="n">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span> <span class="c1"># Find the 6 nearest Blocks and search through all that. </span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combos</span><span class="p">))</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_outer_faces</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
+    <span class="n">block_outer_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">temp</span><span class="p">]</span>
+    <span class="n">combos</span> <span class="o">=</span> <span class="n">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span> <span class="c1"># Find the 6 nearest Blocks and search through all that. </span>
+    <span class="c1"># combos = [[3,12]]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combos</span><span class="p">))</span>    
     <span class="k">for</span> <span class="n">indx</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>     <span class="c1"># block i        </span>
         <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="o">=</span> <span class="n">combos</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
         <span class="n">t</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Checking connections block </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># Takes 2 blocks, gets the matching faces exterior faces of both blocks </span>
-        <span class="n">df_matches</span><span class="p">,</span> <span class="n">blocki_outerfaces</span><span class="p">,</span> <span class="n">blockj_outerfaces</span> <span class="o">=</span> <span class="n">find_matching_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>    <span class="c1"># This function finds partial matches between blocks</span>
+        <span class="n">df_matches</span><span class="p">,</span> <span class="n">blocki_outerfaces</span><span class="p">,</span> <span class="n">blockj_outerfaces</span> <span class="o">=</span> <span class="n">find_matching_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">block_outer_faces</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">block_outer_faces</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>    <span class="c1"># This function finds partial matches between blocks</span>
         <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">blocki_outerfaces</span><span class="p">]</span>
         <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">blockj_outerfaces</span><span class="p">]</span>
+        <span class="n">block_outer_faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocki_outerfaces</span>
+        <span class="n">block_outer_faces</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">blockj_outerfaces</span>
         <span class="c1"># Update connectivity for blocks with matching faces </span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df_matches</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">df_matches</span><span class="p">:</span>
@@ -652,10 +646,9 @@
                 <span class="n">temp</span><span class="p">[</span><span class="s1">&#39;match&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
                 <span class="n">face_matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
 
-        <span class="c1"># Update Outer Faces </span>
-        <span class="n">outer_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">blocki_outerfaces</span><span class="p">)</span>
-        <span class="n">outer_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">blockj_outerfaces</span><span class="p">)</span>
-        <span class="n">outer_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">))</span>    <span class="c1"># Get most unique</span>
+    <span class="c1"># Update Outer Faces </span>
+    <span class="p">[</span><span class="n">outer_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">block_outer_faces</span><span class="p">]</span> <span class="c1"># all the outer faces </span>
+    <span class="n">outer_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">))</span>    <span class="c1"># Get most unique</span>
         
     <span class="n">outer_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span> <span class="k">if</span> <span class="n">o</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">matches_to_remove</span><span class="p">]</span>
     <span class="c1"># Remove any outer faces that may have been found by mistake</span>
