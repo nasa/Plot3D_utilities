@@ -25,7 +25,7 @@ if __name__=="__main__":
     '''
     plot3d_filename = 'rotor_split.xyz'
 
-    with open('rotor_split_connectivity_final.pickle','rb') as f:
+    with open('rotor_split_connectivity_periodicity.pickle','rb') as f:
         data = pickle.load(f)
         face_matches = data['face_matches']
         rotor_shroud = CheckDictionary(data,'rotor_shroud')
@@ -119,7 +119,7 @@ if __name__=="__main__":
             if o['block_index'] == b:
                 voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
                 CreateSubset(block_source, voi, name='mixing_plane '+str(surface_indx),opacity=0.2)
-                
+
         # Plot the periodic faces  
         for periodic_indx, p in enumerate(periodic_faces):
             # Add Plots for Outer Faces
