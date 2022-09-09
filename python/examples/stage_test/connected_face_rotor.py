@@ -120,13 +120,13 @@ data['face_matches'].append({'block1':face_match_1.to_dict(),
                             'block2':face_match_2.to_dict()})
 
 # Random surface near TE that needs to match
-# face_match_1,indx = find_face(blocks,8, np.array([0,0,0,0,148,40], dtype=int),outer_faces)
-# outer_faces.pop(indx)
-# face_match_2,indx = find_face(blocks,13, np.array([8,0,0,8,148,40], dtype=int),outer_faces)
-# outer_faces.pop(indx)
+face_match_1,indx = find_face(blocks,8, np.array([0,0,0,0,148,40], dtype=int),outer_faces)
+outer_faces.pop(indx)
+face_match_2,indx = find_face(blocks,13, np.array([8,0,0,8,148,40], dtype=int),outer_faces)
+outer_faces.pop(indx)
 
-# data['face_matches'].append({'block1':face_match_1.to_dict(),
-#                              'block2':face_match_2.to_dict()})
+data['face_matches'].append({'block1':face_match_1.to_dict(),
+                             'block2':face_match_2.to_dict()})
 
 
 with open('rotor_split_connectivity_final.pickle','wb') as f:
