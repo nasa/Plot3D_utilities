@@ -136,10 +136,6 @@ stator_matches.extend(rotor_matches)
 stator_matches.extend(stator_periodic)
 stator_matches.extend(rotor_periodic)
 
-stator_shroud.extend(rotor_shroud)  
-stator_hub.extend(rotor_hub)
-stator_body.extend(rotor_body)
-
 faces_and_types = {
                     0:{
                         "faces":stator_inlet,
@@ -162,16 +158,28 @@ faces_and_types = {
                         "type":"wall"
                     },
                     5:{
+                        "faces":rotor_shroud,
+                        "type":"wall"
+                    },
+                    6:{
+                        "faces":rotor_hub,
+                        "type":"wall"
+                    },
+                    7:{
+                        "faces":rotor_body,
+                        "type":"wall"
+                    },
+                    8:{
                         "faces":stator_mixing_plane,
                         "type":"gif"
                     },
-                    6:{
+                    9:{
                         "faces":rotor_mixing_plane,
                         "type":"gif"
                     }
                 }
 gifs = [{
-    'surface_pairs': [5,6],
+    'surface_pairs': [8,9],
     'gif_type': -2
 }]
 zones = {'fluid':[], 'solid':[]} # which block indicies are fluid or solid 
