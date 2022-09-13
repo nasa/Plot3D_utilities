@@ -76,15 +76,6 @@ with open('stator_split_connectivity_final.pickle','wb') as f:
     pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
     print("done")
 
-# Additional Faces that weren't matched by plot3d code. Plot3D gets most things but some are missing
-# Part of blade o-mesh
-face_match_1,indx = find_face(blocks,8, np.array([0,0,0,0,148,48], dtype=int),outer_faces)
-outer_faces.pop(indx)
-face_match_2,indx = find_face(blocks,13, np.array([52,0,0,52,148,48], dtype=int),outer_faces)
-outer_faces.pop(indx)
-
-data['face_matches'].append({'block1':{'block_index':8,'IMIN':0,'JMIN':0,'KMIN':0,'IMAX':0,'JMAX':148,'KMAX':48},
-                            'block2':{'block_index':13,'IMIN':52,'JMIN':0,'KMIN':0,'IMAX':52,'JMAX':148,'KMAX':48}})
 
 # Part of blade TE (Periodic)
 face_match_1,indx = find_face(blocks,7, np.array([0,0,0,0,148,36], dtype=int),outer_faces)
@@ -94,7 +85,7 @@ outer_faces.pop(indx)
 
 data['face_matches'].append({'block1':face_match_1.to_dict(),
                             'block2':face_match_2.to_dict()})
-
+data['outer_faces'] = outer_faces
 
 with open('stator_split_connectivity_final.pickle','wb') as f:
     pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)

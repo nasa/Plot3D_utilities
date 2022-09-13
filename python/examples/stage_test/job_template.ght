@@ -1,0 +1,120 @@
+ &Title
+ TheTitle="TurbineStage"
+ &end
+
+ &JobFiles 
+ DcmpFILE="{ddcmp}",
+ ConnFILE="{connectivity}",
+ BCSpecFILE="boundary_conditions.bcs",
+ GridFile="{mesh_file}", GridFileFormat="formatted", Plot3DFileFormat="unformatted",
+ SolnInFile={SolnInFile},        SolnInFileFormat="unformatted",                     
+ SolnOutFile="Out.soln", SolnOutFileFormat="unformatted",                       
+            residFILE="his.subs",                                                       
+            residFILE2="his.nosubs"
+!,fvProbeDefinitionFile="fvProbes.input"
+ &end
+ 
+
+ &JobControl
+ mRunLevel={mRunLevel}, LUNout=6, RestartSoln=.{RestartSoln}., SaveSoln=.TRUE. ,SaveTransientSoln=.FALSE., VerboseScreenOutput=.TRUE.
+ &end
+ 
+ &TurbModelInput
+ TbModelType=1
+ &end
+ 
+ &Plot3DParameters Plot3DParameterSet='Standard' &end                                   ! Dimensionless?
+ 
+ &InitialCond
+ !T0=0.0
+ P0={initP0}, T0={initT0}, Minit={initMach}, alfa={initAlpha}, beta=0.0, Tu={initTu}, Ts={initTs}
+ &end
+ 
+ &TimeStpControl                                         ! for steady simulations how is that defined?
+ UnsteadyFlow=.FALSE., FullyImplicitDiscr=.F.,
+ EULERBACKWARD   = F,
+ CRANCKNICHOLSON = F,
+ BLENDEDTIME     = T,
+ IMPLICITNESS    = 1.
+ have_previous_step = .F.
+    DT_UNST = 0.00000001
+ CFLn= {CFLn}, CFLr= {CFLr}, cst=3.5, cst_solid=7.
+ nTimeSteps= {nTimeSteps}, maxPseudoSteps={maxPseudoSteps},
+ convergTolerance=5.e-10
+    ,nTransBegin = 0,
+     TransientPlot3dFiles=.FALSE.,
+     nfiles = 5,
+     ninterval =1,
+     nHL=1,
+    ReinitializeTime = .FALSE., ResetTimeTo = 0.,
+ &end
+ 
+ 
+ &SPDSchemeControl                                                                      
+ NS_Central=4*T, TB2_Upwind1=4*T, NS_Upwind2=4*F,                     ! what is 4*F, 4*T?
+ ScalrCoeff_ArtDiss=.TRUE., useSecDiffArtDiss=.TRUE., useFrthDiffArtDiss=.TRUE., 
+  rk2=4*0.12500, rk4=4*0.032
+&end
+ 
+ &RKSchemeControl
+ nStages=4, 
+ RKCoeff=0.25,0.3333333,0.5,1.,6*0, 
+ compute_pdiff_in_stage=T,T,T,T,6*F 
+ compute_adiss_in_stage=T,T,T,T,6*F 
+ export_import_after_stage=T,T,T,T,6*F 
+ use_implicit_residual_smoothing=.T.,
+ &end
+ 
+ &MGSchemeControl
+ FinestLevel=0, 
+ CoarsestLevel={grid_coarsest}, 	
+ pre_mg_sweeps={pre_mg_sweeps}, 
+ mg_sweeps={mg_sweeps}, 
+ post_mg_sweeps=0, 
+ &end
+ 
+  $GasPropertiesInput
+   UseDryAir=.TRUE., Use_const_Cp=.TRUE., Use_const_trProp=.TRUE.,
+  &end
+
+  &ReferenceCond
+   refLen={refLen}, refP0={refP0}, refT0={refT0}, refVisc={refVisc},
+   RgasUnv=8314.4126, MolW=28.964, Pr={refPr}, gamma={refGamma},
+!   ReScalingFactor=1.0 , rho_solid=2707.  ,cond_solid=220.0
+   ReScalingFactor=1.0 , rho_solid=2707.  ,cond_solid=3.16
+   , csp_solid=896.
+  &end
+ 
+
+  &ReferenceCondFull
+    reflen      =    {refLen},
+    refP0       =    {refP0},
+    refT0       =    {refT0},
+    refrho0     =    {refRho},
+    refVel      =    {refVel},
+    refvisc     =    {refVisc},
+    refcond     =    {refCond},
+    refCp       =    {refCp},
+    MolW        =    28.964,
+    RgasUnv     =    8314.4126,
+    Rgas        =    287.06023,
+    gamma       =    {refGamma},
+    Re          =    {refReynolds}.
+    Pr          =    {refPrandtl},
+    ndVisc      = 1.0,
+    ndCond      = 1.0,
+    Omegab      = 0.0,
+    ReScalingFactor = 1.0,
+    rho_solid=2707,
+    cond_solid= 20.0,
+    cond_solid= 220.0,
+    csp_solid=896.
+  &end
+
+
+ 
+ execFILE="GlennHT.serial"
+ execFILE="GlennHT.mpi"
+ do_the_runFILE="do_the_run"
+ returned.filesFILE="returned.files"
+ this_fileFILE="job.SixBlock"

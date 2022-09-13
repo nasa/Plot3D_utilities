@@ -34,7 +34,7 @@ if __name__=="__main__":
         outer_faces = CheckDictionary(data,'outer_faces')
         periodic_faces = CheckDictionary(data,'periodic_faces')
         mixing_plane = CheckDictionary(data,'mixing_plane')
-
+        inlet = CheckDictionary(data,'inlet')
 
     blocks_to_extract = [f['block1']['block_index'] for f in face_matches]
     blocks_to_extract.extend([f['block2']['block_index'] for f in face_matches])
@@ -119,6 +119,12 @@ if __name__=="__main__":
             if o['block_index'] == b:
                 voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
                 CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
+        
+        for surface_indx, o in enumerate(inlet):
+            # Add Plots for Outer Faces
+            if o['block_index'] == b:
+                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
+                CreateSubset(block_source, voi, name='inlet '+str(surface_indx),opacity=0.2)
         
         # Plot the periodic faces  
         for periodic_indx, p in enumerate(periodic_faces):
