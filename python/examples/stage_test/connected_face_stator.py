@@ -1,5 +1,4 @@
 import sys
-sys.path.insert(0,'C:\GitHub\Plot3D_utilities\python')
 from plot3d import Face, find_connected_face,find_face,read_plot3D
 import pickle
 import numpy as np 

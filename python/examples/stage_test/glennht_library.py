@@ -282,70 +282,9 @@ if __name__ == "__main__":
     write_inlet_profile(rspan,P0/bcs['P0_Inlet'],T0/bcs['T0_Inlet'],alpin,beta)
 
 
-      
-
-def export_to_glennht_conn(matches:Dict[str,Dict[str,int]],block_surfaces:List[Dict[str,int]],filename:str):
-    """Exports the connectivity to GlennHT format 
-
-    Args:
-        matches (Dict[str,Dict[str,int]]): Any matching faces between blocks 
-        block_surfaces (List[Dict[str,int]]): Dictionary containing key (int) for surface id followed by a dictionary containing the name of the face `stator_body` and the IMIN,JMIN,KMIN, IMAX, JMAX, KMAX
-        filename (str): name of connection file
-
-    Example of block_surfaces::
-    
-        [
-            {
-                'id': 1,
-                "name": "stator_body",
-                "type": "wall",
-                "surfaces": [("IMIN":IMIN, "JMIN":JMIN, "KMIN":KMIN, "IMAX":IMAX, "JMAX":JMAX, "KMAX":KMAX),
-                            ("IMIN":IMIN, "JMIN":JMIN, "KMIN":KMIN, "IMAX":IMAX, "JMAX":JMAX, "KMAX":KMAX)]
-            },
-            {
-                'id': 2,
-                "name": "inlet",
-                "type": inlet
-                "surfaces": [("IMIN":IMIN, "JMIN":JMIN, "KMIN":KMIN, "IMAX":IMAX, "JMAX":JMAX, "KMAX":KMAX),
-                            ("IMIN":IMIN, "JMIN":JMIN, "KMIN":KMIN, "IMAX":IMAX, "JMAX":JMAX, "KMAX":KMAX)]
-            }
-        ]
-    
-    """
-
-    blocks = ['block1','block2'] # block1 and block2 are arbitrary names, the key is the block index 
-    with open(filename + '.ght_conn','w') as fp:
-        # Print matches
-        nMatches = len(matches)
-        fp.write(f'{nMatches}\n') # Print number of matches 
-        for match in matches:                        
-            for block in blocks:
-                block_indx = match[block]['block_index']+1 
-                block_IMIN = match[block]['IMIN']+1
-                block_JMIN = match[block]['JMIN']+1
-                block_KMIN = match[block]['KMIN']+1
-
-                block_IMAX = match[block]['IMAX']+1
-                block_JMAX = match[block]['JMAX']+1
-                block_KMAX = match[block]['KMAX']+1
-
-                fp.write(f"{block_indx:3d}\t{block_IMIN:5d} {block_JMIN:5d} {block_KMIN:5d}\t{block_IMAX:5d} {block_JMAX:5d} {block_KMAX:5d}\n")
-        # Print Surfaces 
-        # Get total number of surfaces 
-        lines = list()
-        for surface in block_surfaces:
-            id = surface["id"]
-            for s in surface['surfaces']: 
-                IMIN = s['IMIN']+1
-                JMIN = s['JMIN']+1
-                KMIN = s['KMIN']+1
-                
-                IMAX = s['IMAX']+1
-                JMAX = s['JMAX']+1
-                KMAX = s['KMAX']+1
-                lines.append(f"{block_indx:3d}\t{IMIN:5d} {JMIN:5d} {KMIN:5d}\t{IMAX:5d} {JMAX:5d} {KMAX:5d}\t{id:4d}\n")
-             
-        fp.write(f'{len(lines)}\n')
-        [fp.write(line) for line in lines]
-    
-    # Lets print the volumes and types of each volume
+def CheckDictionary(data,name):
+    if name in data:
+        print(f'{name} found')
+        return data[name]
+    else:
+        return list() 
