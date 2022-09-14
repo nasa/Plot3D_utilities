@@ -51,7 +51,7 @@ inlet_subtype=1,
 have_inlet_prof=.FALSE., inlet_ref_Mach_Nr={Mach_Inlet},
 filen_inlet_profile='no_file',
 T0_const={T0_Inlet}, P0_const={P0_inlet},
- annular_inlet=.TRUE., mult_for_full_ring={NBlades},
+ annular_inlet=.TRUE., mult_for_full_ring={NBlades_inlet},
  twall_hub=1, twall_case=1, deltah={bl_height}, deltat={bl_height},
   ang1_const={initAlpha}, bet1_const=0., have_ang1_prof=.FALSE., filen_ang1_profile='inlet_profile.dat'
   Tu_const={Tu_const},  have_Tu_prof=.FALSE., filen_Tu_profile='no_file',

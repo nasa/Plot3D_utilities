@@ -24,6 +24,17 @@ class Block:
         self.cy = np.mean(Y)
         self.cz = np.mean(Z)
     
+    def scale(self,factor:float):
+        """Scales a mesh by a certain factor 
+
+        Args:
+            factor (float): _description_
+        """
+        
+        self.X *= factor
+        self.Y *= factor
+        self.Z *= factor
+
     def cylindrical(self):
         """Converts the block to cylindrical coordinate system. The rotation axis is assumed to be "x" direction
         """

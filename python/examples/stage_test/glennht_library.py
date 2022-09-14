@@ -162,11 +162,11 @@ def modify_bc_template_file(filename:str,bcs:dict):
         # Boundary condition related
         text = text.replace('{Mach_Inlet}','{0:.4f}'.format(bcs['Mach_Inlet']))
         text = text.replace('{bl_height}','{0:.4f}'.format(bcs['bl_height'])) # ! Check to see if this is 0.1336
-        text = text.replace('{NBlades}','{0:d}'.format(bcs['NBlades']))
+        text = text.replace('{NBlades_inlet}','{0:d}'.format(bcs['NBlades'][0]))
         text = text.replace('{T0_Inlet}','{0:.4f}'.format(bcs['T0_Inlet']))
         text = text.replace('{P0_inlet}','{0:.4f}'.format(bcs['P0_Inlet']))
         text = text.replace('{Ps_outlet}','{0:.4f}'.format(bcs['Ps_outlet']))
-        text = text.replace('{NBlades_outlet}','{0:d}'.format(bcs['NBlades']))
+        text = text.replace('{NBlades_outlet}','{0:d}'.format(bcs['NBlades'][-1]))
         text = text.replace('{Tu_const}','{0:.4f}'.format(bcs['Tu_intensity_init']))
         text = text.replace('{Tu_length_scale_init}','{0:.4f}'.format(bcs['Tu_length_scale_init']))
         text = text.replace('{initAlpha}','{0:.4f}'.format(bcs['alpha']))
@@ -209,15 +209,15 @@ def print_inlet_profile(P0:np.ndarray,T0:np.ndarray,alpin:np.ndarray,pspan:np.nd
     fig.tight_layout(pad=1.0)
     plt.savefig('boundary conditions.png',dpi=150)
 
-if __name__ == "__main__":
-    parser =get_args_parser()
-    args = parser.parse_args()
+
+def modify_boundary_conditions_file(settings_file:str,geom_file:str):
     print(args)
     
-    with open(args.input_file,'r') as json_file:
+    with open(settings_file,'r') as json_file:
         settings = json.load(json_file)
         bcs = settings['boundary_conditions']
-    with open(args.geom_file,'r') as geom_file:
+
+    with open(geom_file,'r') as geom_file:
         geom = json.load(geom_file)
         xhub = geom['channel']['hub']['x']
         rhub = geom['channel']['hub']['r']
@@ -282,9 +282,92 @@ if __name__ == "__main__":
     write_inlet_profile(rspan,P0/bcs['P0_Inlet'],T0/bcs['T0_Inlet'],alpin,beta)
 
 
-def CheckDictionary(data,name):
+def CheckDictionary(data:Dict[str,List],name:str):
+    """Checks for key in dictionary and returns empty list if key is not found 
+
+    Args:
+        data (Dict[str,List]): _description_
+        name (str): name of key in dictionary 
+
+    Returns:
+        _type_: _description_
+    """
     if name in data:
         print(f'{name} found')
         return data[name]
     else:
         return list() 
+
+
+def print_connectivity(filename:str,matches:List[Dict[str,int]],faces_and_types:Dict[int,List[Dict[str,int]]],gifs:Dict[str,int],zones:Dict[str,List[int]]):
+    """Writes the Connectivity File
+
+    Args:
+        filename (str): Name of connectivity file
+        matches (List[Dict[str,int]]): _description_
+        faces_and_types (Dict[int,List[Dict[str,int]]]): _description_
+
+    Returns:
+        None: outputs a connectivity file
+    """
+    filename=filename.split('.')[0]
+    def print_matches(matches):
+        lines = list() 
+        match_keys = ['block1','block2'] # block1 and block2 are arbitrary names, the key is the block index 
+        nMatches = len(matches)
+        lines.append(f'{nMatches}\n') # Print number of matches 
+        for match in matches:                        
+            for block in match_keys:
+                block_indx = match[block]['block_index']+1 
+                block_IMIN = match[block]['IMIN']+1
+                block_JMIN = match[block]['JMIN']+1
+                block_KMIN = match[block]['KMIN']+1
+
+                block_IMAX = match[block]['IMAX']+1
+                block_JMAX = match[block]['JMAX']+1
+                block_KMAX = match[block]['KMAX']+1
+
+                lines.append(f"{block_indx:3d}\t{block_IMIN:5d} {block_JMIN:5d} {block_KMIN:5d}\t{block_IMAX:5d} {block_JMAX:5d} {block_KMAX:5d}\n")
+        return lines
+
+    def print_face_group(id:int,faces_and_types:List[Dict[str,int]]):
+        lines = list()
+        for f in faces_and_types['faces']:
+            block_index = f["block_index"]
+            IMIN = f['IMIN']+1
+            JMIN = f['JMIN']+1
+            KMIN = f['KMIN']+1
+            
+            IMAX = f['IMAX']+1
+            JMAX = f['JMAX']+1
+            KMAX = f['KMAX']+1
+            lines.append(f"{block_index:3d}\t{IMIN:5d} {JMIN:5d} {KMIN:5d}\t{IMAX:5d} {JMAX:5d} {KMAX:5d}\t{id:4d} \n")
+        return lines 
+
+    matches = print_matches(matches)
+    surfaces = list()
+    for k,v in faces_and_types.items():
+        surfaces.extend(print_face_group(k,v))
+        
+    
+    with open(f'{filename}.ght_conn','w') as fp:
+        # Print matches
+        fp.writelines(matches)
+        # Print number of surfaces
+        fp.write(f'{len(surfaces)}\n')
+        fp.writelines(surfaces)
+
+        # Lets write the number of gifs (mixing planes, solid|fluid)
+        fp.write(f'{len(gifs)}\n')
+        for gif in gifs:
+            surface_pairs = gif['surface_pairs']
+            gif_type = gif['gif_type']
+            fp.write(f'{surface_pairs[0]} {surface_pairs[1]} {gif_type} 1\n') # 2 = mixing plane, -2 = use polar coordinates, 1 is for linear interpolation
+        
+        # Write the zones
+        num_zones = len(zones['fluid'])>0 + len(zones['solid'])>0
+        fp.write(f'{num_zones}\n')
+        for f in zones['fluid']: # loop through list
+            fp.write(f'{f}')
+        fp.write('\n')
+        
