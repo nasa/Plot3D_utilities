@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plot3d.split_block &mdash; Plot3D 1.5.5 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Plot3D
+          </a>
+              <div class="version">
+                1.5.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../notes/installation.html#installation-via-pip">Installation via Pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notes/installation.html#installation-from-source">Installation from Source</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/connectivity.html">Block to Block Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../notes/connectivity.html#plotting-connectivity-using-paraview">Plotting Connectivity using Paraview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/split-blocks.html">Split Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../notes/split-blocks.html#multi-grid-concept">Multi-grid concept</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notes/split-blocks.html#splitting-blocks-example">Splitting Blocks Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notes/split-blocks.html#plotting-split-blocks-with-paraview">Plotting Split Blocks with Paraview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Periodicity</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>plot3d.split_block</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plot3d.split_block</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Split blocks is combination of help from Dave Rigby and Tim Beach </span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">.face</span> <span class="kn">import</span> <span class="n">Face</span>
+<span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">sqrt</span> 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+
+<div class="viewcode-block" id="Direction"><a class="viewcode-back" href="../../modules/split_block.html#plot3d.split_block.Direction">[docs]</a><span class="k">class</span> <span class="nc">Direction</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+<div class="viewcode-block" id="max_aspect_ratio"><a class="viewcode-back" href="../../modules/split_block.html#plot3d.split_block.max_aspect_ratio">[docs]</a><span class="k">def</span> <span class="nf">max_aspect_ratio</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">ix</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jx</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kx</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the maximum cell aspect ratio</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (np.ndarray): 3 dimensional Array containing X values. X[i,j,k]</span>
+<span class="sd">        Y (np.ndarray): 3 dimensional Array containing X values. X[i,j,k]</span>
+<span class="sd">        Z (np.ndarray): 3 dimensional Array containing X values. X[i,j,k]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Maximum value of aspect ratio </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="p">[</span><span class="n">ix</span><span class="p">,</span><span class="n">jx</span><span class="p">,</span><span class="n">kx</span><span class="p">]</span>  <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span> <span class="c1"># ix, jx, kx are the max values like IMAX, JMAX, KMAX</span>
+    <span class="n">ix</span><span class="o">-=</span><span class="mi">1</span><span class="p">;</span> <span class="n">jx</span><span class="o">-=</span><span class="mi">1</span><span class="p">;</span> <span class="n">kx</span><span class="o">-=</span><span class="mi">1</span> <span class="c1"># Python is 0 index so need to subtract 1 from ix, iy, kx to reference the last value </span>
+
+    <span class="c1"># Each column is a corner </span>
+    <span class="c1"># [corner 1, corner 2, corner 3, corner 4]</span>
+    <span class="n">i1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ix</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> 
+    <span class="n">j1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">jx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">k1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">kx</span><span class="p">]</span>
+
+    <span class="c1"># Appending more corners []</span>
+    <span class="n">i1</span> <span class="o">=</span> <span class="n">i1</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ix</span><span class="p">,</span><span class="n">ix</span><span class="p">,</span><span class="n">ix</span><span class="p">]</span>
+    <span class="n">j1</span> <span class="o">=</span> <span class="n">j1</span> <span class="o">+</span> <span class="p">[</span><span class="n">jx</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">jx</span><span class="p">,</span><span class="n">jx</span><span class="p">]</span>
+    <span class="n">k1</span> <span class="o">=</span> <span class="n">k1</span> <span class="o">+</span> <span class="p">[</span><span class="n">kx</span><span class="p">,</span><span class="n">kx</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kx</span><span class="p">]</span>
+
+    <span class="c1"># i2, j2, k2 are the first nodes diagonally from the block corners </span>
+    <span class="n">i2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">ix</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">j2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">jx</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">k2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">kx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">i2</span> <span class="o">=</span> <span class="n">i2</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">ix</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ix</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ix</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">j2</span> <span class="o">=</span> <span class="n">j2</span> <span class="o">+</span> <span class="p">[</span><span class="n">jx</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">jx</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">jx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">k2</span> <span class="o">=</span> <span class="n">k2</span> <span class="o">+</span> <span class="p">[</span><span class="n">kx</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">kx</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">kx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="n">ds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">)):</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sqrt</span><span class="p">((</span><span class="n">X</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">X</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
+                    <span class="p">(</span><span class="n">Y</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Y</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>  
+                    <span class="p">(</span><span class="n">Z</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Z</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sqrt</span><span class="p">((</span><span class="n">X</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">X</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>  
+                    <span class="p">(</span><span class="n">Y</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Y</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>  
+                    <span class="p">(</span><span class="n">Z</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Z</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sqrt</span><span class="p">((</span><span class="n">X</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k2</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">X</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> 
+                    <span class="p">(</span><span class="n">Y</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k2</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Y</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> 
+                    <span class="p">(</span><span class="n">Z</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k2</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Z</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="p">)</span>
+    <span class="n">aspect</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">aspect</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">ds</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">aspect</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">ds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">aspect</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">ds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">ds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">aspect</span><span class="p">)</span> </div>
+
+
+<span class="k">def</span> <span class="nf">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">denominator</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Searches for the right step size that leads to block splits with the same greatest common divisor. Same greatest common denominator means you will always have the same multi-grid when you solve. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        total_cells (int): [description]</span>
+<span class="sd">        greatest_common_divisor (int): [description]</span>
+<span class="sd">        ncells_per_block (int): [description]</span>
+<span class="sd">        denominator (float): If the direction is &quot;i&quot; then denominator is JMAX*KMAX</span>
+<span class="sd">        direction (str, optional): &#39;forward&#39; or &#39;backward&#39; This chooses to increment step direction by +1 or -1. Defaults to &#39;forward&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        [type]: [description]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">step_size</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">ncells_per_block</span><span class="o">/</span><span class="n">denominator</span><span class="p">)</span>     <span class="c1"># initial Guess</span>
+    <span class="n">initial_guess</span> <span class="o">=</span> <span class="n">step_size</span>
+    <span class="n">Number_of_Cells_Remaining</span> <span class="o">=</span> <span class="n">total_cells</span> <span class="o">%</span> <span class="p">(</span><span class="n">step_size</span><span class="o">*</span><span class="n">denominator</span><span class="p">)</span>
+    <span class="n">IJK_MAX_Remainder</span> <span class="o">=</span> <span class="n">Number_of_Cells_Remaining</span><span class="o">/</span><span class="n">denominator</span>
+    <span class="n">increment</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">if</span> <span class="n">direction</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
+        <span class="n">increment</span><span class="o">=</span><span class="mi">1</span> 
+    <span class="k">while</span> <span class="p">(</span> <span class="p">(</span><span class="n">step_size</span> <span class="o">%</span><span class="n">greatest_common_divisor</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> 
+            <span class="p">((</span><span class="n">IJK_MAX_Remainder</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="n">greatest_common_divisor</span> <span class="o">!=</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> 
+            <span class="n">step_size</span><span class="o">&gt;</span><span class="n">initial_guess</span><span class="o">/</span><span class="mi">2</span> <span class="ow">and</span> 
+            <span class="n">step_size</span><span class="o">&lt;</span><span class="n">initial_guess</span><span class="o">*</span><span class="mf">1.5</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">step_size</span> <span class="o">%</span><span class="n">greatest_common_divisor</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">IJK_MAX_Remainder</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="n">greatest_common_divisor</span> <span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">step_size</span><span class="o">+=</span><span class="n">increment</span> 
+        <span class="n">Number_of_Cells_Remaining</span> <span class="o">=</span> <span class="n">total_cells</span> <span class="o">%</span> <span class="p">((</span><span class="n">step_size</span><span class="p">)</span><span class="o">*</span><span class="n">denominator</span><span class="p">)</span>
+        <span class="n">IJK_MAX_Remainder</span> <span class="o">=</span> <span class="n">Number_of_Cells_Remaining</span><span class="o">/</span><span class="n">denominator</span>
+    
+    <span class="k">if</span> <span class="n">step_size</span> <span class="o">%</span><span class="n">greatest_common_divisor</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>             <span class="c1"># This checks if each of the split blocks is divisible by gcd</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">IJK_MAX_Remainder</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="n">greatest_common_divisor</span> <span class="o">!=</span><span class="mi">0</span><span class="p">:</span>   <span class="c1">#  This checks the remaining/final block to see if it is divisible by gcd</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">return</span> <span class="n">step_size</span>
+
+<div class="viewcode-block" id="split_blocks"><a class="viewcode-back" href="../../modules/split_block.html#plot3d.split_block.split_blocks">[docs]</a><span class="k">def</span> <span class="nf">split_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">ncells_per_block</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="n">Direction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Split blocks is used to divide an array of blocks based on number of cells per block. This code maintains the greatest common denominator of the parent block. Number of cells per block is simply an estimate of how many you want. The actual number will change to meet the greatest common denominator (GCD). GCD of 4 means multigrid of 3 e.g. grid/4 (coarse), 2 (fine), and 1 (finest). If a direction is not specified then for each block the longest index either i,j, or k is used. </span>
+<span class="sd">    </span>
+
+<span class="sd">        Wisdom from Dave Rigby:</span>
+<span class="sd">            For example, for radial equilibrium we must integrate across the span.  Some codes (GlennHT used to) would want a single block across the entire span.  In that case you would want some additional control.</span>
+<span class="sd"> </span>
+<span class="sd">            Another example might be if you would like a block to include the entire boundary layer.  In that case you might introduce an aspect ratio control.</span>
+<span class="sd">            </span>
+<span class="sd">    Args:</span>
+<span class="sd">        blocks (List[Block]): List of blocks</span>
+<span class="sd">        ncells_per_block (int): number of cells desired per block </span>
+<span class="sd">        direction (Direction): direction to split the blocks in. Direction.(i,j,k). Defaults to None. None means it will pick the direction for you based on which is greater IMAX, JMAX, or KMAX</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Blocks (List[Block]): list of blocks split in the specified direction </span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+    
+    <span class="n">direction_to_use</span> <span class="o">=</span> <span class="n">direction</span> <span class="c1"># store the user input variable </span>
+    
+    <span class="n">new_blocks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">block_indx</span><span class="p">]</span>
+        <span class="n">total_cells</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">*</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">*</span><span class="n">block</span><span class="o">.</span><span class="n">KMAX</span>
+
+        <span class="k">if</span> <span class="n">direction</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span> 
+            <span class="n">indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">indx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">direction_to_use</span><span class="o">=</span><span class="n">Direction</span><span class="o">.</span><span class="n">i</span>
+            <span class="k">elif</span> <span class="n">indx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">direction_to_use</span><span class="o">=</span><span class="n">Direction</span><span class="o">.</span><span class="n">j</span>
+            <span class="k">elif</span> <span class="n">indx</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">direction_to_use</span><span class="o">=</span><span class="n">Direction</span><span class="o">.</span><span class="n">k</span>
+
+        <span class="k">if</span> <span class="n">total_cells</span><span class="o">&gt;</span><span class="n">ncells_per_block</span><span class="p">:</span>
+            <span class="c1"># Use greatest common divsor to maintain multi-grid so say the entire block is divisible by 4 then we want to maintain than for all the splits! </span>
+            <span class="n">greatest_common_divisor</span> <span class="o">=</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="c1"># Gets the maximum number of partitions that we can make for this given block</span>
+            <span class="k">if</span> <span class="n">direction_to_use</span> <span class="o">==</span> <span class="n">Direction</span><span class="o">.</span><span class="n">i</span><span class="p">:</span> 
+                
+                <span class="c1"># In order to get close to the number of cells per block, we need to control how many steps of the greatest_common_divisor to advance so for example if you have a multigrid mesh that has gcd of 16 (fine) =&gt; 8 (coarse) =&gt; 4 (coarser) =&gt; 2 (coarsest) and you want 400K cells per block then JMAX*KMAX*gcd*some_factor has to be close to 400K cells</span>
+                <span class="n">denominator</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">*</span><span class="n">block</span><span class="o">.</span><span class="n">KMAX</span>
+                <span class="n">step_size</span> <span class="o">=</span> <span class="n">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">,</span><span class="n">denominator</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;backward&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">step_size</span> <span class="o">=</span> <span class="n">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">,</span><span class="n">denominator</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;no valid step size found, do you have multi-block? gcd &gt; 1&#39;</span><span class="p">)</span>
+                <span class="c1"># step_size-1 is the IMAX of the sub_blocks e.g. 0 to 92 this shows IMAX=93, (93-1) % 4 = 0 (good)</span>
+                
+                <span class="n">iprev</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">step_size</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span><span class="n">step_size</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">iprev</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,:,:]</span>      <span class="c1"># New X, Y, Z splits </span>
+                    <span class="n">Y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">iprev</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,:,:]</span>      <span class="c1"># This indexes to iprev:i so if iprev=2 and i = 10 it will go from 2 to 9</span>
+                    <span class="n">Z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">iprev</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,:,:]</span>
+                    <span class="n">iprev</span><span class="o">=</span><span class="n">i</span>                     <span class="c1"># Blocks have to share the same face, Pick the previous face</span>
+                    <span class="n">new_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">))</span>
+
+                <span class="c1"># Check for remainder</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;</span> <span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="p">:</span>
+                    <span class="c1"># Add remainder to last block</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">:,:,:]</span> <span class="c1"># New X, Y, Z splits </span>
+                    <span class="n">Y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">:,:,:]</span>
+                    <span class="n">Z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">:,:,:]</span>
+                    <span class="n">new_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">))</span>
+                
+            <span class="k">elif</span> <span class="n">direction_to_use</span> <span class="o">==</span> <span class="n">Direction</span><span class="o">.</span><span class="n">j</span><span class="p">:</span>                
+                <span class="n">denominator</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">*</span><span class="n">block</span><span class="o">.</span><span class="n">KMAX</span>
+                <span class="n">step_size</span> <span class="o">=</span> <span class="n">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">,</span><span class="n">denominator</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;backward&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">step_size</span> <span class="o">=</span> <span class="n">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">,</span><span class="n">denominator</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;no valid step size found, do you have multi-block? gcd &gt; 1&#39;</span><span class="p">)</span>
+                <span class="n">jprev</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">step_size</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span><span class="n">step_size</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span><span class="n">jprev</span><span class="p">:</span><span class="n">j</span><span class="p">,:]</span>      <span class="c1"># New X, Y, Z splits </span>
+                    <span class="n">Y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="p">[:,</span><span class="n">jprev</span><span class="p">:</span><span class="n">j</span><span class="p">,:]</span>
+                    <span class="n">Z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span><span class="p">[:,</span><span class="n">jprev</span><span class="p">:</span><span class="n">j</span><span class="p">,:]</span>
+                    <span class="n">jprev</span><span class="o">=</span><span class="n">j</span>
+                    <span class="n">new_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">))</span>
+
+                <span class="c1"># Check for remainder</span>
+                <span class="k">if</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;</span> <span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="p">:</span>
+                    <span class="c1"># Add remainder to last block</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span><span class="n">j</span><span class="p">:,:]</span> <span class="c1"># New X, Y, Z splits </span>
+                    <span class="n">Y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="p">[:,</span><span class="n">j</span><span class="p">:,:]</span>
+                    <span class="n">Z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span><span class="p">[:,</span><span class="n">j</span><span class="p">:,:]</span>
+                    <span class="n">new_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">denominator</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">*</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span>
+                <span class="n">step_size</span> <span class="o">=</span> <span class="n">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">,</span><span class="n">denominator</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;backward&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">step_size</span> <span class="o">=</span> <span class="n">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">,</span><span class="n">denominator</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;no valid step size found, do you have multi-block? gcd &gt; 1&#39;</span><span class="p">)</span>
+                <span class="n">kprev</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">step_size</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="p">,</span><span class="n">step_size</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="p">[:,:,</span><span class="n">kprev</span><span class="p">:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>     <span class="c1"># New X, Y, Z splits </span>
+                    <span class="n">Y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="p">[:,:,</span><span class="n">kprev</span><span class="p">:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">Z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span><span class="p">[:,:,</span><span class="n">kprev</span><span class="p">:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">kprev</span><span class="o">=</span><span class="n">k</span>
+                    <span class="n">new_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">))</span>
+
+                <span class="c1"># Check for remainder</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="p">:</span>
+                   <span class="c1"># Add remainder to last block</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="p">[:,:,</span><span class="n">k</span><span class="p">:]</span> <span class="c1"># New X, Y, Z splits </span>
+                    <span class="n">Y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="p">[:,:,</span><span class="n">k</span><span class="p">:]</span>
+                    <span class="n">Z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span><span class="p">[:,:,</span><span class="n">k</span><span class="p">:]</span>                    
+                    <span class="n">new_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">))</span> <span class="c1"># replace it </span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_blocks</span></div>
+
+        
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

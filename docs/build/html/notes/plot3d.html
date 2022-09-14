@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plot3D Data Format &mdash; Plot3D 1.5.5 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reading and Writing Plot3D Files" href="reading_writing.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Plot3D
+          </a>
+              <div class="version">
+                1.5.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-via-pip">Installation via Pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-from-source">Installation from Source</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Block to Block Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html#plotting-connectivity-using-paraview">Plotting Connectivity using Paraview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split-blocks.html">Split Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="split-blocks.html#multi-grid-concept">Multi-grid concept</a></li>
+<li class="toctree-l2"><a class="reference internal" href="split-blocks.html#splitting-blocks-example">Splitting Blocks Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="split-blocks.html#plotting-split-blocks-with-paraview">Plotting Split Blocks with Paraview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/write.html">Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/periodicity.html">Periodicity</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Plot3D Data Format</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/nasa/plot3d_utilities/blob/main/docs/notes/plot3d.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="plot3d-data-format">
+<h1>Plot3D Data Format<a class="headerlink" href="#plot3d-data-format" title="Permalink to this heading"></a></h1>
+<p>Data format for plot3D comes from this 1990s manual  <a class="reference download internal" download="" href="../_downloads/c8e92d9597217c734f36a5b14065ed0c/plot3d_manual.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a> Plot3D is a simple way to construct a structured grid using 4 points to define a cell in 2D and 8 points for 3D.</p>
+<p>Plot3D files are organized as follows</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span> 8                                   # Number of blocks
+<span class="linenos"> 2</span>    5       5       5                # Block 1 is shaped 5x5x5 in i,j,k this is 125 nodes
+<span class="linenos"> 3</span>    5       5       5                # Block 2 shape
+<span class="linenos"> 4</span>    5       5       5
+<span class="linenos"> 5</span>    5       5       5
+<span class="linenos"> 6</span>    5       5       5
+<span class="linenos"> 7</span>    5       5       5
+<span class="linenos"> 8</span>    5       5       5
+<span class="linenos"> 9</span>    5       5       5
+<span class="linenos">10</span> 1.08569236018e-07  2.89960779720e-07  2.99150448968e-07  2.55513369907e-07          # First 125 values describe are X, next 25 are Y, last 25 are Z
+<span class="linenos">11</span> 2.12244548714e-07  1.01483086157e-07  2.67218012828e-07  2.71062573276e-07
+<span class="linenos">12</span> 2.24420893535e-07  1.78210401103e-07  7.47886754748e-08  1.93926065872e-07
+<span class="linenos">13</span> 1.84719158858e-07  1.38925249638e-07  1.00523800506e-07  1.71518139691e-08
+<span class="linenos">14</span> 9.37154616132e-08  9.36074304736e-08  5.80944219397e-08  2.00380892990e-08
+<span class="linenos">15</span> -5.46866818496e-08 -1.24404013757e-08  1.15859071226e-08 -4.76059469623e-09
+</pre></div>
+</div>
+<p>Knowing this, reading the files is fairly simple to do in python. The following code blocks demonstrate how to read a simple ASCII or binary file. Calling the function <code class="docutils literal notranslate"><span class="pre">read_plot3D(filename:str,</span> <span class="pre">binary:bool=True,big_endian:bool=False)</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos">  2</span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
+<span class="linenos">  3</span><span class="kn">import</span> <span class="nn">struct</span>
+<span class="linenos">  4</span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="linenos">  5</span><span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
+<span class="linenos">  6</span>
+<span class="linenos">  7</span><span class="k">def</span> <span class="nf">__read_plot3D_chunk_binary</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="linenos">  8</span>    <span class="sd">&quot;&quot;&quot;Reads and formats a binary chunk of data into a plot3D block</span>
+<span class="linenos">  9</span>
+<span class="linenos"> 10</span><span class="sd">    Args:</span>
+<span class="linenos"> 11</span><span class="sd">        f (io): file handle</span>
+<span class="linenos"> 12</span><span class="sd">        IMAX (int): maximum I index</span>
+<span class="linenos"> 13</span><span class="sd">        JMAX (int): maximum J index</span>
+<span class="linenos"> 14</span><span class="sd">        KMAX (int): maximum K index</span>
+<span class="linenos"> 15</span><span class="sd">        big_endian (bool, Optional): Use big endian format for reading binary files. Defaults False.</span>
+<span class="linenos"> 16</span>
+<span class="linenos"> 17</span><span class="sd">    Returns:</span>
+<span class="linenos"> 18</span><span class="sd">        numpy.ndarray: Plot3D variable either X,Y, or Z</span>
+<span class="linenos"> 19</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos"> 20</span>    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">IMAX</span><span class="p">,</span> <span class="n">JMAX</span><span class="p">,</span> <span class="n">KMAX</span><span class="p">))</span>
+<span class="linenos"> 21</span>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KMAX</span><span class="p">):</span>
+<span class="linenos"> 22</span>        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">JMAX</span><span class="p">):</span>
+<span class="linenos"> 23</span>            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">IMAX</span><span class="p">):</span>
+<span class="linenos"> 24</span>                <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;f&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">big_endian</span> <span class="k">else</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos"> 25</span>    <span class="k">return</span> <span class="n">A</span>
+<span class="linenos"> 26</span>
+<span class="linenos"> 27</span><span class="k">def</span> <span class="nf">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span><span class="n">offset</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<span class="linenos"> 28</span>    <span class="sd">&quot;&quot;&quot;Reads an ascii chunk of plot3D data into a block</span>
+<span class="linenos"> 29</span>
+<span class="linenos"> 30</span><span class="sd">    Args:</span>
+<span class="linenos"> 31</span><span class="sd">        tokenArray (List[str]): this is a list of strings separated by a space, new line character removed [&quot;12&quot;,&quot;22&quot;, ... etc]</span>
+<span class="linenos"> 32</span><span class="sd">        offset (int): how many entries to skip in the array based on block size (IMAX*JMAX*KMAX) of the previous block</span>
+<span class="linenos"> 33</span><span class="sd">        IMAX (int): maximum I index</span>
+<span class="linenos"> 34</span><span class="sd">        JMAX (int): maximum J index</span>
+<span class="linenos"> 35</span><span class="sd">        KMAX (int): maximum K index</span>
+<span class="linenos"> 36</span>
+<span class="linenos"> 37</span><span class="sd">    Returns:</span>
+<span class="linenos"> 38</span><span class="sd">        numpy.ndarray: Plot3D variable either X,Y, or Z</span>
+<span class="linenos"> 39</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos"> 40</span>    <span class="sd">&#39;&#39;&#39;Works for ASCII files</span>
+<span class="linenos"> 41</span><span class="sd">    &#39;&#39;&#39;</span>
+<span class="linenos"> 42</span>    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">IMAX</span><span class="p">,</span> <span class="n">JMAX</span><span class="p">,</span> <span class="n">KMAX</span><span class="p">))</span>
+<span class="linenos"> 43</span>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KMAX</span><span class="p">):</span>
+<span class="linenos"> 44</span>        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">JMAX</span><span class="p">):</span>
+<span class="linenos"> 45</span>            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">IMAX</span><span class="p">):</span>
+<span class="linenos"> 46</span>                <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokenArray</span><span class="p">[</span><span class="n">offset</span><span class="p">]</span>
+<span class="linenos"> 47</span>                <span class="n">offset</span><span class="o">+=</span><span class="mi">1</span>
+<span class="linenos"> 48</span>
+<span class="linenos"> 49</span>    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">offset</span>
+<span class="linenos"> 50</span>
+<span class="linenos"> 51</span><span class="k">def</span> <span class="nf">read_plot3D</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">binary</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="linenos"> 52</span>    <span class="sd">&quot;&quot;&quot;Reads a plot3d file and returns Blocks</span>
+<span class="linenos"> 53</span>
+<span class="linenos"> 54</span><span class="sd">    Args:</span>
+<span class="linenos"> 55</span><span class="sd">        filename (str): name of the file to read, .p3d, .xyz, .pdc, .plot3d?</span>
+<span class="linenos"> 56</span><span class="sd">        binary (bool, optional): indicates if the file is binary. Defaults to True.</span>
+<span class="linenos"> 57</span><span class="sd">        big_endian (bool, optional): use big endian format for reading binary files</span>
+<span class="linenos"> 58</span>
+<span class="linenos"> 59</span><span class="sd">    Returns:</span>
+<span class="linenos"> 60</span><span class="sd">        List[Block]: List of blocks insdie the plot3d file</span>
+<span class="linenos"> 61</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos"> 62</span>
+<span class="linenos"> 63</span>    <span class="n">blocks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="linenos"> 64</span>    <span class="k">if</span> <span class="n">osp</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="linenos"> 65</span>        <span class="k">if</span> <span class="n">binary</span><span class="p">:</span>
+<span class="linenos"> 66</span>            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="linenos"> 67</span>                <span class="n">nblocks</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;I&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">big_endian</span> <span class="k">else</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Read bytes</span>
+<span class="linenos"> 68</span>                <span class="n">IMAX</span> <span class="o">=</span> <span class="nb">list</span><span class="p">();</span> <span class="n">JMAX</span> <span class="o">=</span> <span class="nb">list</span><span class="p">();</span> <span class="n">KMAX</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="linenos"> 69</span>                <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nblocks</span><span class="p">):</span>
+<span class="linenos"> 70</span>                    <span class="k">if</span> <span class="n">big_endian</span><span class="p">:</span>
+<span class="linenos"> 71</span>                        <span class="n">IMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;I&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># Read bytes</span>
+<span class="linenos"> 72</span>                        <span class="n">JMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;I&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># Read bytes</span>
+<span class="linenos"> 73</span>                        <span class="n">KMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;I&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># Read bytes</span>
+<span class="linenos"> 74</span>                    <span class="k">else</span><span class="p">:</span>
+<span class="linenos"> 75</span>                        <span class="n">IMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># Read bytes</span>
+<span class="linenos"> 76</span>                        <span class="n">JMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># Read bytes</span>
+<span class="linenos"> 77</span>                        <span class="n">KMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># Read bytes</span>
+<span class="linenos"> 78</span>
+<span class="linenos"> 79</span>                <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nblocks</span><span class="p">):</span>
+<span class="linenos"> 80</span>                    <span class="n">X</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_binary</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">big_endian</span><span class="p">)</span>
+<span class="linenos"> 81</span>                    <span class="n">Y</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_binary</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">big_endian</span><span class="p">)</span>
+<span class="linenos"> 82</span>                    <span class="n">Z</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_binary</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">big_endian</span><span class="p">)</span>
+<span class="linenos"> 83</span>                    <span class="n">b_temp</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">)</span>
+<span class="linenos"> 84</span>                    <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b_temp</span><span class="p">)</span>
+<span class="linenos"> 85</span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos"> 86</span>            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="linenos"> 87</span>                <span class="n">nblocks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">())</span>
+<span class="linenos"> 88</span>                <span class="n">IMAX</span> <span class="o">=</span> <span class="nb">list</span><span class="p">();</span> <span class="n">JMAX</span> <span class="o">=</span> <span class="nb">list</span><span class="p">();</span> <span class="n">KMAX</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="linenos"> 89</span>
+<span class="linenos"> 90</span>                <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nblocks</span><span class="p">):</span>
+<span class="linenos"> 91</span>                    <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">w</span><span class="p">]</span>
+<span class="linenos"> 92</span>                    <span class="n">IMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="linenos"> 93</span>                    <span class="n">JMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="linenos"> 94</span>                    <span class="n">KMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="linenos"> 95</span>
+<span class="linenos"> 96</span>                <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span> <span class="c1"># Basically an array of strings representing numbers</span>
+<span class="linenos"> 97</span>                <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>         <span class="c1"># Flatten list of lists https://stackabuse.com/python-how-to-flatten-list-of-lists/</span>
+<span class="linenos"> 98</span>
+<span class="linenos"> 99</span>                <span class="n">tokenArray</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="n">entry</span><span class="p">]</span> <span class="c1"># Convert everything to float</span>
+<span class="linenos">100</span>                <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos">101</span>                <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nblocks</span><span class="p">):</span>
+<span class="linenos">102</span>                    <span class="n">X</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">,</span><span class="n">offset</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+<span class="linenos">103</span>                    <span class="n">Y</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">,</span><span class="n">offset</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+<span class="linenos">104</span>                    <span class="n">Z</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">,</span><span class="n">offset</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+<span class="linenos">105</span>                    <span class="n">b_temp</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">)</span>
+<span class="linenos">106</span>                    <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b_temp</span><span class="p">)</span>
+<span class="linenos">107</span>    <span class="k">return</span> <span class="n">blocks</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reading_writing.html" class="btn btn-neutral float-right" title="Reading and Writing Plot3D Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

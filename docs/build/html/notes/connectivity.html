@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Block to Block Connectivity &mdash; Plot3D 1.5.5 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Periodicity" href="periodicity.html" />
+    <link rel="prev" title="Reading and Writing Plot3D Files" href="reading_writing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Plot3D
+          </a>
+              <div class="version">
+                1.5.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-via-pip">Installation via Pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-from-source">Installation from Source</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Block to Block Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plotting-connectivity-using-paraview">Plotting Connectivity using Paraview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split-blocks.html">Split Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="split-blocks.html#multi-grid-concept">Multi-grid concept</a></li>
+<li class="toctree-l2"><a class="reference internal" href="split-blocks.html#splitting-blocks-example">Splitting Blocks Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="split-blocks.html#plotting-split-blocks-with-paraview">Plotting Split Blocks with Paraview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/write.html">Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/periodicity.html">Periodicity</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Block to Block Connectivity</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/nasa/plot3d_utilities/blob/main/docs/notes/connectivity.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="block-to-block-connectivity">
+<h1>Block to Block Connectivity<a class="headerlink" href="#block-to-block-connectivity" title="Permalink to this heading"></a></h1>
+<p>Computational Grids are often divided into blocks for easier gridding. It is important to know how these blocks connect with each other in order to model the transfer of information. Computational Fluid Dynamics (CFD) requires the solver to know the “connectivity” of these blocks.</p>
+<p>The plot3D python library has a function for determining the connectivity. This is found by taking the combination of each block with another block and scanning the nodes on the exterior faces of block 1 with the exterior face of block 2. If there is a match then the two faces are connected. The code can search for <em>full face matches</em> or <em>partial matching</em>. <em>Full face matching</em> is much faster and should be used if your grid has a definite match.</p>
+<p>Below is an example of a turbine domain with two blocks: HGrid in (red) and ogrid in (white). The two share a connected face with partial matching. There’s also the o-mesh which within itself has a connected face.</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/turbine_domain-blocking.png"><img alt="Two blocks, one in red for h mesh and white for omesh" src="../_images/turbine_domain-blocking.png" style="width: 800px;" /></a>
+</figure>
+<p>To find connectivity simply call the function <em>connectivity</em> and pass in the blocks. This will return two things: face_matches and outer faces. Face matches are faces that are connected between the blocks. Outer faces are the remaining outer faces that aren’t connected to anything. This can take a long time to run for larger meshes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;PahtCascade.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">big_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">2</span><span class="c1"># Block 1 is the blade O-Mesh k=0</span>
+<span class="linenos">3</span><span class="c1"># outer_faces, _ = get_outer_faces(blocks[0]) # lets check</span>
+<span class="linenos">4</span><span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is an example of the output. The figure below shows the block 1 and 2 matching faces found in the variable <em>face_matches</em>.</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/turbine_domain-matching1-2.png"><img alt="matching block 1 and block 2 faces" src="../_images/turbine_domain-matching1-2.png" style="width: 800px;" /></a>
+</figure>
+<p>This is the matching face within the omesh</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/turbine_domain-matching1-1.png"><img alt="matching block 1 and block 2 faces" src="../_images/turbine_domain-matching1-1.png" style="width: 800px;" /></a>
+</figure>
+<section id="plotting-connectivity-using-paraview">
+<h2>Plotting Connectivity using Paraview<a class="headerlink" href="#plotting-connectivity-using-paraview" title="Permalink to this heading"></a></h2>
+<p>This example shows how you can take a mesh created Numeca Autogrid and plot the connecitivity using paraview. With this information, anyone should be able to comprehend the format and export it to whatever solver.
+This code has been tested using paraview 5.9. Modifications may need to be added for Paraview 5.10</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Important Note: This is a 2 step process because: Paraview has it’s own python environment called pvpython which it uses to automate plotting.
+You do not have full access to this library, so pip installs won’t work. This means you cannot directly call the plot3d library from paraview.</p>
+<p>We need to split this into 2 codes.</p>
+<p><strong>Part 1</strong> One code runs on python from your own environment.</p>
+<p><strong>Part 2</strong> the other code runs from paraview’s python environment.</p>
+</div>
+<section id="part-1-processing-the-data-locally-for-paraview-import">
+<h3>Part 1 - Processing the data locally for paraview import<a class="headerlink" href="#part-1-processing-the-data-locally-for-paraview-import" title="Permalink to this heading"></a></h3>
+<p>The goal if this code is to create a pickle file that is read in part 2. This pickle file contains the matching faces and outer faces.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;../../&#39;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;../Cascade&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">find_periodicity</span>
+<span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">find_matching_blocks</span><span class="p">,</span> <span class="n">get_outer_faces</span><span class="p">,</span> <span class="n">connectivity</span>
+<span class="kn">from</span> <span class="nn">glennht_con</span> <span class="kn">import</span> <span class="n">export_to_glennht_conn</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="c1"># Convert to binary because of size </span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;connectivity.pickle&#39;</span><span class="p">):</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;[Path to your Plot3D File]&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="c1"># Paraview has issues with ASCII </span>
+    <span class="n">write_plot3D</span><span class="p">(</span><span class="s1">&#39;[Path to your Plot3D File]&#39;</span><span class="p">,</span><span class="n">blocks</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>   <span class="c1"># Converted to binary for easy reading </span>
+
+    <span class="c1"># Block 1 is the blade O-Mesh k=0</span>
+    <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;connectivity.pickle&#39;</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s2">&quot;face_matches&quot;</span><span class="p">:</span><span class="n">face_matches</span><span class="p">,</span> <span class="s2">&quot;outer_faces&quot;</span><span class="p">:</span><span class="n">outer_faces_formatted</span><span class="p">},</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="part-2-calling-paraview-in-script-mode">
+<h3>Part 2 - Calling Paraview in script mode<a class="headerlink" href="#part-2-calling-paraview-in-script-mode" title="Permalink to this heading"></a></h3>
+<p>This part of the code shows how you can read the pickle file in part 1 from within paraview to display all your plots.</p>
+<p>This code was tested with Paraview version 5.9 <a class="reference external" href="https://www.paraview.org/download/">https://www.paraview.org/download/</a></p>
+<p>Paraview executable can be called with the script option to have it automatically create the plots for you.</p>
+<p>For windows this looks like this. You have the <cite>[working folder]&gt;”[path to paraview executable]” –script=[your_python_script.py]</cite></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Has been tested on Paraview 5.10. Not backwards compatible with older paraview versions</p>
+<p>C:\Github\Plot3D_utilities\python\test\paraview_plot &gt; “C:\Program Files\ParaView 5.10.0-Windows-Python3.9-msvc2017-AMD64\bin\paraview.exe” –script=compressor_plot_test.py</p>
+</div>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/paraview_launch_command.png"><img alt="screenshot of command prompt to launch paraview in script mode" src="../_images/paraview_launch_command.png" style="width: 800px;" /></a>
+</figure>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span> <span class="c1"># This allows you to select files locally</span>
+<span class="kn">from</span> <span class="nn">pv_library</span> <span class="kn">import</span> <span class="n">Load</span><span class="p">,</span> <span class="n">ExtractBlocks</span><span class="p">,</span> <span class="n">ExtractSurface</span>
+<span class="kn">from</span> <span class="nn">paraview.simple</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+
+<span class="k">def</span> <span class="nf">CreateSubset</span><span class="p">(</span><span class="n">block_source</span><span class="p">,</span><span class="n">voi</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span><span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">opacity</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a subset within paraview to display the mesh </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        block_source ([type]): [description]</span>
+<span class="sd">        voi (List[int]): This is the volume of interest. When (I,J,K)MIN=(I,J,K)MAX it is a surface/face. When two quantities is the same e.g. IMIN=IMAX and JMIN=JMAX you have an edge. If none of them are equal then you have a volume </span>
+<span class="sd">        name (str): Name you want paraview to display in the left </span>
+<span class="sd">        opacity (float, optional): [description]. Defaults to 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (tuple): tuple containing:</span>
+
+<span class="sd">            - **extractSubset1** (paraview source): source object representing the subset.</span>
+<span class="sd">            - **extractSubset1Display** (paraview display): display settings for the source.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Plot the Face </span>
+    <span class="n">Hide</span><span class="p">(</span><span class="n">block_source</span><span class="p">,</span> <span class="n">View</span><span class="p">)</span>
+    <span class="n">extractSubset1</span> <span class="o">=</span> <span class="n">ExtractSubset</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">Input</span><span class="o">=</span><span class="n">block_source</span><span class="p">)</span>
+    <span class="n">extractSubset1</span><span class="o">.</span><span class="n">VOI</span> <span class="o">=</span> <span class="n">voi</span>
+
+    <span class="n">renderView1</span> <span class="o">=</span> <span class="n">GetActiveViewOrCreate</span><span class="p">(</span><span class="s1">&#39;RenderView&#39;</span><span class="p">)</span>
+    <span class="n">extractSubset1Display</span> <span class="o">=</span> <span class="n">Show</span><span class="p">(</span><span class="n">extractSubset1</span><span class="p">,</span> <span class="n">renderView1</span><span class="p">,</span> <span class="s1">&#39;StructuredGridRepresentation&#39;</span><span class="p">)</span>
+    <span class="c1"># trace defaults for the display properties.</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">Representation</span> <span class="o">=</span> <span class="s1">&#39;Surface&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">ColorArrayName</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SelectTCoordArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SelectNormalArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SelectTangentArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">OSPRayScaleFunction</span> <span class="o">=</span> <span class="s1">&#39;PiecewiseFunction&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SelectOrientationVectors</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">ScaleFactor</span> <span class="o">=</span> <span class="mf">7.410221099853516</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SelectScaleArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">GlyphType</span> <span class="o">=</span> <span class="s1">&#39;Arrow&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">GlyphTableIndexArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">GaussianRadius</span> <span class="o">=</span> <span class="mf">0.3705110549926758</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SetScaleArray</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">ScaleTransferFunction</span> <span class="o">=</span> <span class="s1">&#39;PiecewiseFunction&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">OpacityArray</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">OpacityTransferFunction</span> <span class="o">=</span> <span class="s1">&#39;PiecewiseFunction&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">DataAxesGrid</span> <span class="o">=</span> <span class="s1">&#39;GridAxesRepresentation&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">PolarAxes</span> <span class="o">=</span> <span class="s1">&#39;PolarAxesRepresentation&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">ScalarOpacityUnitDistance</span> <span class="o">=</span> <span class="mf">6.758095838007181</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SetRepresentationType</span><span class="p">(</span><span class="s1">&#39;Surface&#39;</span><span class="p">)</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">Opacity</span> <span class="o">=</span> <span class="n">opacity</span>
+    <span class="c1"># Add in the face color and update </span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">AmbientColor</span> <span class="o">=</span> <span class="n">rgb_face_matches</span><span class="p">[</span><span class="n">match_indx</span><span class="p">]</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">DiffuseColor</span> <span class="o">=</span> <span class="n">rgb_face_matches</span><span class="p">[</span><span class="n">match_indx</span><span class="p">]</span>
+    <span class="n">renderView1</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">extractSubset1</span><span class="p">,</span> <span class="n">extractSubset1Display</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Main Code</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Read the connectivity file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;connectivity.pickle&#39;</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">face_matches</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;face_matches&#39;</span><span class="p">]</span>
+        <span class="n">outer_faces</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;outer_faces&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;periodic_surfaces&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">periodic_faces</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;periodic_surfaces&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">periodic_faces</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">blocks_to_extract</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">face_matches</span><span class="p">]</span>
+    <span class="n">blocks_to_extract</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">face_matches</span><span class="p">])</span>
+    <span class="n">blocks_to_extract</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">blocks_to_extract</span><span class="p">))</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generate Random Colors </span>
+<span class="sd">    </span>
+<span class="sd">    This part generates random colors so that each color is associated with a face match. </span>
+<span class="sd">    Doesn&#39;t matter what the block is a single match is assigned the same color. </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">rgb_face_matches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">face_matches</span><span class="p">)):</span>
+        <span class="n">rgb_face_matches</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span><span class="o">/</span><span class="mi">255</span><span class="p">])</span>
+
+    <span class="n">rgb_outer_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">)):</span>
+        <span class="n">rgb_outer_faces</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span><span class="o">/</span><span class="mi">255</span><span class="p">])</span>
+
+    <span class="c1"># Load mesh</span>
+    <span class="n">plot3d_binary_filename</span> <span class="o">=</span> <span class="s1">&#39;R4_testfile_binary.xyz&#39;</span>
+    <span class="n">plot3D_source</span><span class="p">,</span><span class="n">plot3D_Display</span><span class="p">,</span><span class="n">View</span><span class="p">,</span><span class="n">LUT</span> <span class="o">=</span> <span class="n">Load</span><span class="p">(</span><span class="n">plot3d_binary_filename</span><span class="p">)</span>
+    <span class="n">surface_indx</span> <span class="o">=</span> <span class="mi">1</span> 
+    
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Loop through all the blocks and create within each block the match and the outer surfaces</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks_to_extract</span><span class="p">:</span> <span class="c1"># Block indicies </span>
+        <span class="n">block_source</span><span class="p">,</span><span class="n">block_display</span><span class="p">,</span><span class="n">LUT</span> <span class="o">=</span> <span class="n">ExtractBlocks</span><span class="p">(</span><span class="n">plot3D_source</span><span class="p">,</span><span class="n">View</span><span class="p">,[</span><span class="n">b</span><span class="p">])</span>
+        <span class="n">RenameSource</span><span class="p">(</span><span class="s1">&#39;Block &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">block_source</span><span class="p">)</span>
+        <span class="n">block_source</span> <span class="o">=</span> <span class="n">FindSource</span><span class="p">(</span><span class="s1">&#39;Block &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+        
+        <span class="c1"># Plot the face matches </span>
+        <span class="k">for</span> <span class="n">match_indx</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">face_matches</span><span class="p">):</span>
+            <span class="c1"># Add Plots for Matched Faces </span>
+            <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span> <span class="ow">or</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span> <span class="p">:</span> 
+                <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+                    <span class="n">voi</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">],</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">voi</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">],</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]]</span>
+                <span class="n">CreateSubset</span><span class="p">(</span><span class="n">block_source</span><span class="p">,</span> <span class="n">voi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;match &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">match_indx</span><span class="p">))</span>
+        
+        <span class="c1"># Plot the outer faces  </span>
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span><span class="p">:</span>
+            <span class="c1"># Add Plots for Outer Faces</span>
+            <span class="k">if</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+                    <span class="n">voi</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;IMAX&#39;</span><span class="p">],</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;JMAX&#39;</span><span class="p">],</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]]</span>
+                    <span class="n">CreateSubset</span><span class="p">(</span><span class="n">block_source</span><span class="p">,</span> <span class="n">voi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;outer_face &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">surface_indx</span><span class="p">),</span><span class="n">opacity</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+                    <span class="n">surface_indx</span> <span class="o">+=</span><span class="mi">1</span> 
+               
+        <span class="k">for</span> <span class="n">periodic_indx</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">periodic_faces</span><span class="p">):</span>
+            <span class="c1"># Add Plots for Outer Faces</span>
+            <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span> <span class="ow">and</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span> <span class="c1"># Periodicity within the block </span>
+                <span class="n">voi</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]]</span>
+                <span class="n">CreateSubset</span><span class="p">(</span><span class="n">block_source</span><span class="p">,</span> <span class="n">voi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;periodic &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">periodic_indx</span><span class="p">))</span>
+                <span class="n">voi</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]]</span>
+                <span class="n">CreateSubset</span><span class="p">(</span><span class="n">block_source</span><span class="p">,</span> <span class="n">voi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;periodic &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">periodic_indx</span><span class="p">))</span>
+
+            <span class="k">elif</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span> <span class="ow">or</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span> <span class="c1"># Periodicity from block to block </span>
+                <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+                    <span class="n">voi</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">voi</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]]</span>
+                <span class="n">CreateSubset</span><span class="p">(</span><span class="n">block_source</span><span class="p">,</span> <span class="n">voi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;periodic &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">periodic_indx</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This is the contents of pv_library.py</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">paraview.simple</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="c1">#pylint: skip-file</span>
+<span class="n">paraview</span><span class="o">.</span><span class="n">simple</span><span class="o">.</span><span class="n">_DisableFirstRenderCameraReset</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">Load</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calls pvpython and displays the file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): [description]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (tuple): tuple containing:</span>
+
+<span class="sd">            - **Plot3D** (paraview.source): source object for plot3d </span>
+<span class="sd">            - **plot3D_Display** (paraview display): this is the display object for the source. Colors and things </span>
+<span class="sd">            - **View** (paraview.source): source object for plot3d </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">plot3D</span> <span class="o">=</span> <span class="n">PLOT3DReader</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
+            <span class="n">QFileName</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">FileName</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
+            <span class="n">FunctionFileName</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c1"># set active source</span>
+    <span class="n">SetActiveSource</span><span class="p">(</span><span class="n">plot3D</span><span class="p">)</span>
+    <span class="c1"># get active view</span>
+    <span class="n">View</span> <span class="o">=</span> <span class="n">GetActiveViewOrCreate</span><span class="p">(</span><span class="s1">&#39;RenderView&#39;</span><span class="p">)</span>    
+    <span class="c1"># show data in view</span>
+    <span class="n">plot3D_Display</span> <span class="o">=</span> <span class="n">Show</span><span class="p">(</span><span class="n">plot3D</span><span class="p">,</span> <span class="n">View</span><span class="p">)</span>
+    <span class="c1"># trace defaults for the display properties.</span>
+    <span class="n">plot3D_Display</span><span class="o">.</span><span class="n">Representation</span> <span class="o">=</span> <span class="s1">&#39;Outline&#39;</span>
+    <span class="n">plot3D_Display</span><span class="o">.</span><span class="n">ColorArrayName</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;POINTS&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="n">plot3D_Display</span><span class="o">.</span><span class="n">OSPRayScaleFunction</span> <span class="o">=</span> <span class="s1">&#39;PiecewiseFunction&#39;</span>
+    <span class="n">plot3D_Display</span><span class="o">.</span><span class="n">SelectOrientationVectors</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">plot3D_Display</span><span class="o">.</span><span class="n">ScaleFactor</span> <span class="o">=</span> <span class="mf">0.5376288175582886</span>
+    <span class="n">plot3D_Display</span><span class="o">.</span><span class="n">SelectScaleArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">plot3D_Display</span><span class="o">.</span><span class="n">GlyphType</span> <span class="o">=</span> <span class="s1">&#39;Arrow&#39;</span>
+    <span class="n">plot3D_Display</span><span class="o">.</span><span class="n">PolarAxes</span> <span class="o">=</span> <span class="s1">&#39;PolarAxesRepresentation&#39;</span>
+    <span class="n">plot3D_Display</span><span class="o">.</span><span class="n">ScalarOpacityUnitDistance</span> <span class="o">=</span> <span class="mf">0.11673090489063437</span>
+
+    <span class="c1"># reset view to fit data</span>
+    <span class="n">View</span><span class="o">.</span><span class="n">ResetCamera</span><span class="p">()</span>
+    
+    <span class="c1"># show color bar/color legend</span>
+    <span class="n">plot3D_Display</span><span class="o">.</span><span class="n">SetRepresentationType</span><span class="p">(</span><span class="s1">&#39;Outline&#39;</span><span class="p">)</span>
+    <span class="n">ColorBy</span><span class="p">(</span><span class="n">plot3D_Display</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;FIELD&#39;</span><span class="p">,</span> <span class="s1">&#39;vtkBlockColors&#39;</span><span class="p">))</span>
+    <span class="n">LUT</span> <span class="o">=</span> <span class="n">GetColorTransferFunction</span><span class="p">(</span><span class="s1">&#39;SolidColor&#39;</span><span class="p">)</span>
+    <span class="n">HideScalarBarIfNotNeeded</span><span class="p">(</span><span class="n">LUT</span><span class="p">,</span> <span class="n">View</span><span class="p">)</span> <span class="c1"># Change to solid color</span>
+    <span class="k">return</span> <span class="n">plot3D</span><span class="p">,</span><span class="n">plot3D_Display</span><span class="p">,</span><span class="n">View</span><span class="p">,</span><span class="n">LUT</span>
+
+<span class="k">def</span> <span class="nf">SetCamera</span><span class="p">(</span><span class="n">View</span><span class="p">,</span><span class="n">position</span><span class="p">,</span><span class="n">focalPoint</span><span class="p">,</span><span class="n">ViewUp</span><span class="p">):</span>  
+    <span class="c1"># current camera placement for renderView1</span>
+    <span class="n">View</span><span class="o">.</span><span class="n">CameraPosition</span> <span class="o">=</span> <span class="n">position</span>
+    <span class="n">View</span><span class="o">.</span><span class="n">CameraFocalPoint</span> <span class="o">=</span> <span class="n">focalPoint</span>
+    <span class="n">View</span><span class="o">.</span><span class="n">CameraViewUp</span> <span class="o">=</span> <span class="n">ViewUp</span>
+    <span class="n">View</span><span class="o">.</span><span class="n">CameraParallelScale</span> <span class="o">=</span> <span class="mf">3.242501630387953</span>
+
+<span class="c1"># Extracts the mesh block</span>
+<span class="c1"># Block indicies should be an array format</span>
+<span class="k">def</span> <span class="nf">ExtractBlocks</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="n">View</span><span class="p">,</span><span class="n">BlockIndicies</span><span class="p">):</span>
+    <span class="n">extractBlock1</span> <span class="o">=</span> <span class="n">ExtractBlock</span><span class="p">(</span><span class="n">Input</span><span class="o">=</span><span class="n">source</span><span class="p">)</span>
+    <span class="n">extractBlock1</span><span class="o">.</span><span class="n">Selectors</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;/Root/Block</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">BlockIndicies</span><span class="p">]</span>
+    <span class="n">extractBlock1Display</span> <span class="o">=</span> <span class="n">Show</span><span class="p">(</span><span class="n">extractBlock1</span><span class="p">,</span> <span class="n">View</span><span class="p">)</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">Representation</span> <span class="o">=</span> <span class="s1">&#39;Outline&#39;</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">ColorArrayName</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;POINTS&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">OSPRayScaleFunction</span> <span class="o">=</span> <span class="s1">&#39;PiecewiseFunction&#39;</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">SelectOrientationVectors</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">ScaleFactor</span> <span class="o">=</span> <span class="mf">0.2489664673805237</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">SelectScaleArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">GlyphType</span> <span class="o">=</span> <span class="s1">&#39;Arrow&#39;</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">PolarAxes</span> <span class="o">=</span> <span class="s1">&#39;PolarAxesRepresentation&#39;</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">ScalarOpacityUnitDistance</span> <span class="o">=</span> <span class="mf">0.07851226208722488</span>
+    <span class="n">Hide</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">View</span><span class="p">)</span>
+    <span class="n">SetActiveSource</span><span class="p">(</span><span class="n">extractBlock1</span><span class="p">)</span>
+    <span class="c1"># set scalar coloring</span>
+    <span class="n">ColorBy</span><span class="p">(</span><span class="n">extractBlock1Display</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;FIELD&#39;</span><span class="p">,</span> <span class="s1">&#39;vtkBlockColors&#39;</span><span class="p">))</span>
+
+    <span class="c1"># show color bar/color legend</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">SetScalarBarVisibility</span><span class="p">(</span><span class="n">View</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># show color bar/color legend</span>
+    <span class="n">ColorBy</span><span class="p">(</span><span class="n">extractBlock1Display</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;FIELD&#39;</span><span class="p">,</span> <span class="s1">&#39;vtkBlockColors&#39;</span><span class="p">))</span>
+    <span class="n">LUT</span> <span class="o">=</span> <span class="n">GetColorTransferFunction</span><span class="p">(</span><span class="s1">&#39;vtkBlockColors&#39;</span><span class="p">)</span>
+    <span class="n">extractBlock1Display</span><span class="o">.</span><span class="n">SetRepresentationType</span><span class="p">(</span><span class="s1">&#39;Surface With Edges&#39;</span><span class="p">)</span>
+    <span class="n">ColorBy</span><span class="p">(</span><span class="n">extractBlock1Display</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;FIELD&#39;</span><span class="p">,</span> <span class="s1">&#39;Solid Color&#39;</span><span class="p">))</span>
+    <span class="n">HideScalarBarIfNotNeeded</span><span class="p">(</span><span class="n">LUT</span><span class="p">,</span> <span class="n">View</span><span class="p">)</span> <span class="c1"># Change to solid color</span>
+    <span class="k">return</span> <span class="n">extractBlock1</span><span class="p">,</span><span class="n">extractBlock1Display</span><span class="p">,</span><span class="n">LUT</span>
+
+<span class="k">def</span> <span class="nf">ExtractSurface</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">VOI</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;[summary]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        source ([type]): [description]</span>
+<span class="sd">        name (string): name of surface </span>
+<span class="sd">        VOI (List[int]): Volume of interest [imin,imax,jmin,jmax,kmin,kmax]</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        [type]: [description]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">renderView1</span> <span class="o">=</span> <span class="n">GetActiveViewOrCreate</span><span class="p">(</span><span class="s1">&#39;RenderView&#39;</span><span class="p">)</span>
+
+    <span class="n">Hide</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">renderView1</span><span class="p">)</span>
+    <span class="n">extractSubset1</span> <span class="o">=</span> <span class="n">ExtractSubset</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">Input</span><span class="o">=</span><span class="n">source</span><span class="p">)</span>
+    <span class="n">extractSubset1</span><span class="o">.</span><span class="n">VOI</span> <span class="o">=</span> <span class="n">voi</span>
+
+    <span class="n">renderView1</span> <span class="o">=</span> <span class="n">GetActiveViewOrCreate</span><span class="p">(</span><span class="s1">&#39;RenderView&#39;</span><span class="p">)</span>
+    <span class="n">extractSubset1Display</span> <span class="o">=</span> <span class="n">Show</span><span class="p">(</span><span class="n">extractSubset1</span><span class="p">,</span> <span class="n">renderView1</span><span class="p">,</span> <span class="s1">&#39;StructuredGridRepresentation&#39;</span><span class="p">)</span>
+    <span class="c1"># trace defaults for the display properties.</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">Representation</span> <span class="o">=</span> <span class="s1">&#39;Outline&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">ColorArrayName</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SelectTCoordArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SelectNormalArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SelectTangentArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">OSPRayScaleFunction</span> <span class="o">=</span> <span class="s1">&#39;PiecewiseFunction&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SelectOrientationVectors</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">ScaleFactor</span> <span class="o">=</span> <span class="mf">7.410221099853516</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SelectScaleArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">GlyphType</span> <span class="o">=</span> <span class="s1">&#39;Arrow&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">GlyphTableIndexArray</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">GaussianRadius</span> <span class="o">=</span> <span class="mf">0.3705110549926758</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SetScaleArray</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">ScaleTransferFunction</span> <span class="o">=</span> <span class="s1">&#39;PiecewiseFunction&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">OpacityArray</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">OpacityTransferFunction</span> <span class="o">=</span> <span class="s1">&#39;PiecewiseFunction&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">DataAxesGrid</span> <span class="o">=</span> <span class="s1">&#39;GridAxesRepresentation&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">PolarAxes</span> <span class="o">=</span> <span class="s1">&#39;PolarAxesRepresentation&#39;</span>
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">ScalarOpacityUnitDistance</span> <span class="o">=</span> <span class="mf">6.758095838007181</span>
+
+    <span class="c1"># update the view to ensure updated data information</span>
+    <span class="n">renderView1</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+
+    <span class="n">extractSubset1Display</span><span class="o">.</span><span class="n">SetRepresentationType</span><span class="p">(</span><span class="s1">&#39;Outline&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">extractSubset1</span><span class="p">,</span><span class="n">extractSubset1Display</span>
+
+<span class="k">def</span> <span class="nf">ChangeRepresentationMesh</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="n">sourceDisplay</span><span class="p">,</span><span class="n">View</span><span class="p">,</span><span class="n">LUT</span><span class="p">):</span>
+    <span class="n">SetActiveSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="c1"># set active source</span>
+    <span class="n">HideScalarBarIfNotNeeded</span><span class="p">(</span><span class="n">LUT</span><span class="p">,</span> <span class="n">View</span><span class="p">)</span> <span class="c1"># Hide the scalar bar for this color map if no visible data is colored by it.    </span>
+    <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">SetRepresentationType</span><span class="p">(</span><span class="s1">&#39;Surface With Edges&#39;</span><span class="p">)</span> <span class="c1"># set active source</span>
+    <span class="n">ColorBy</span><span class="p">(</span><span class="n">sourceDisplay</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;FIELD&#39;</span><span class="p">,</span> <span class="s1">&#39;Solid Color&#39;</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">Periodicity</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="n">nBlades</span><span class="p">,</span><span class="n">BlockIndices</span><span class="p">,</span><span class="n">View</span><span class="p">):</span>  
+    <span class="c1"># hide data in view</span>
+    <span class="n">Hide</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">View</span><span class="p">)</span>
+    <span class="n">angularPeriodicFilter1</span> <span class="o">=</span> <span class="n">AngularPeriodicFilter</span><span class="p">(</span><span class="n">Input</span><span class="o">=</span><span class="n">source</span><span class="p">)</span>
+
+    <span class="c1"># Properties modified on angularPeriodicFilter1</span>
+    <span class="n">angularPeriodicFilter1</span><span class="o">.</span><span class="n">BlockIndices</span> <span class="o">=</span> <span class="n">BlockIndices</span>
+    <span class="n">angularPeriodicFilter1</span><span class="o">.</span><span class="n">IterationMode</span> <span class="o">=</span> <span class="s1">&#39;Manual&#39;</span>
+    <span class="n">angularPeriodicFilter1</span><span class="o">.</span><span class="n">NumberOfPeriods</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">angularPeriodicFilter1</span><span class="o">.</span><span class="n">RotationAngle</span> <span class="o">=</span> <span class="mf">360.0</span><span class="o">/</span><span class="n">nBlades</span>
+
+    <span class="n">SetActiveSource</span><span class="p">(</span><span class="n">angularPeriodicFilter1</span><span class="p">)</span>
+    <span class="c1"># get color transfer function/color map for &#39;Density&#39;</span>
+    <span class="n">LUT</span> <span class="o">=</span> <span class="n">GetColorTransferFunction</span><span class="p">(</span><span class="s1">&#39;Density&#39;</span><span class="p">)</span>
+
+    <span class="c1"># show data in view</span>
+    <span class="n">angularPeriodicFilter1Display</span> <span class="o">=</span> <span class="n">Show</span><span class="p">(</span><span class="n">angularPeriodicFilter1</span><span class="p">,</span> <span class="n">View</span><span class="p">)</span>
+    <span class="c1"># trace defaults for the display properties.</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">Representation</span> <span class="o">=</span> <span class="s1">&#39;Outline&#39;</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">ColorArrayName</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;POINTS&#39;</span><span class="p">,</span> <span class="s1">&#39;Density&#39;</span><span class="p">]</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">LookupTable</span> <span class="o">=</span> <span class="n">LUT</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">OSPRayScaleArray</span> <span class="o">=</span> <span class="s1">&#39;Density&#39;</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">OSPRayScaleFunction</span> <span class="o">=</span> <span class="s1">&#39;PiecewiseFunction&#39;</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">SelectOrientationVectors</span> <span class="o">=</span> <span class="s1">&#39;Momentum&#39;</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">ScaleFactor</span> <span class="o">=</span> <span class="mf">0.6140377521514893</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">SelectScaleArray</span> <span class="o">=</span> <span class="s1">&#39;Density&#39;</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">GlyphType</span> <span class="o">=</span> <span class="s1">&#39;Arrow&#39;</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">PolarAxes</span> <span class="o">=</span> <span class="s1">&#39;PolarAxesRepresentation&#39;</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">ScalarOpacityUnitDistance</span> <span class="o">=</span> <span class="mf">0.35345957752629076</span>
+    <span class="c1"># show color bar/color legend</span>
+    <span class="n">angularPeriodicFilter1Display</span><span class="o">.</span><span class="n">SetScalarBarVisibility</span><span class="p">(</span><span class="n">View</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">angularPeriodicFilter1</span><span class="p">,</span><span class="n">angularPeriodicFilter1Display</span><span class="p">,</span><span class="n">LUT</span>
+
+
+<span class="k">def</span> <span class="nf">CreateNewLayout</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="n">layoutName</span><span class="p">):</span>
+    <span class="n">CreateLayout</span><span class="p">(</span><span class="n">layoutName</span><span class="p">)</span>
+
+    <span class="c1"># Create a new &#39;Render View&#39;</span>
+    <span class="n">renderView2</span> <span class="o">=</span> <span class="n">CreateView</span><span class="p">(</span><span class="s1">&#39;RenderView&#39;</span><span class="p">)</span>
+    <span class="c1">#renderView2.ViewSize = [1233, 814]</span>
+    <span class="n">renderView2</span><span class="o">.</span><span class="n">AxesGrid</span> <span class="o">=</span> <span class="s1">&#39;GridAxes3DActor&#39;</span>
+    <span class="n">renderView2</span><span class="o">.</span><span class="n">StereoType</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">renderView2</span><span class="o">.</span><span class="n">Background</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.32</span><span class="p">,</span> <span class="mf">0.34</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">]</span>
+    <span class="n">layout</span> <span class="o">=</span> <span class="n">GetLayout</span><span class="p">()</span>
+    
+    <span class="c1"># set active source</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">source</span><span class="p">):</span>
+        <span class="n">SetActiveSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="c1"># show data in view</span>
+        <span class="n">sourceDisplay</span> <span class="o">=</span> <span class="n">Show</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">renderView2</span><span class="p">)</span>
+        <span class="c1"># trace defaults for the display properties.</span>
+        <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">Representation</span> <span class="o">=</span> <span class="s1">&#39;Outline&#39;</span>
+        <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">ColorArrayName</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;POINTS&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+        <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">OSPRayScaleArray</span> <span class="o">=</span> <span class="s1">&#39;Density&#39;</span>
+        <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">OSPRayScaleFunction</span> <span class="o">=</span> <span class="s1">&#39;PiecewiseFunction&#39;</span>
+        <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">SelectOrientationVectors</span> <span class="o">=</span> <span class="s1">&#39;Momentum&#39;</span>
+        <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">ScaleFactor</span> <span class="o">=</span> <span class="mf">0.5376288175582886</span>
+        <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">SelectScaleArray</span> <span class="o">=</span> <span class="s1">&#39;Density&#39;</span>
+        <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">GlyphType</span> <span class="o">=</span> <span class="s1">&#39;Arrow&#39;</span>
+        <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">PolarAxes</span> <span class="o">=</span> <span class="s1">&#39;PolarAxesRepresentation&#39;</span>
+        <span class="n">sourceDisplay</span><span class="o">.</span><span class="n">ScalarOpacityUnitDistance</span> <span class="o">=</span> <span class="mf">0.11673090489063437</span>
+        <span class="c1"># reset view to fit data</span>
+        <span class="n">renderView2</span><span class="o">.</span><span class="n">ResetCamera</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">layout</span><span class="p">,</span><span class="n">sourceDisplay</span><span class="p">,</span><span class="n">renderView2</span>
+    
+    <span class="k">return</span> <span class="n">layout</span><span class="p">,</span><span class="n">renderView2</span>
+</pre></div>
+</div>
+<p>The output should look like the following</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/connectivity_paraview.png"><img alt="screenshot of a mesh with connected faces in paraview" src="../_images/connectivity_paraview.png" style="width: 800px;" /></a>
+</figure>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="reading_writing.html" class="btn btn-neutral float-left" title="Reading and Writing Plot3D Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="periodicity.html" class="btn btn-neutral float-right" title="Periodicity" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

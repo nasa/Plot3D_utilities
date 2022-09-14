@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exporting to GlennHT Connectivity Files &mdash; Plot3D 1.5.5 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Split Blocks" href="split-blocks.html" />
+    <link rel="prev" title="Periodicity" href="periodicity.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Plot3D
+          </a>
+              <div class="version">
+                1.5.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Python Notes</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-via-pip">Installation via Pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-from-source">Installation from Source</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Block to Block Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html#plotting-connectivity-using-paraview">Plotting Connectivity using Paraview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split-blocks.html">Split Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="split-blocks.html#multi-grid-concept">Multi-grid concept</a></li>
+<li class="toctree-l2"><a class="reference internal" href="split-blocks.html#splitting-blocks-example">Splitting Blocks Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="split-blocks.html#plotting-split-blocks-with-paraview">Plotting Split Blocks with Paraview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/write.html">Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/periodicity.html">Periodicity</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Exporting to GlennHT Connectivity Files</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/nasa/plot3d_utilities/blob/main/docs/notes/exporting.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="exporting-to-glennht-connectivity-files">
+<h1>Exporting to GlennHT Connectivity Files<a class="headerlink" href="#exporting-to-glennht-connectivity-files" title="Permalink to this heading"></a></h1>
+<p>This is an example of how I read a mesh, convert it to ascii, save it, find connectivity, find periodicty and export to glennht format.
+In this example we will use the file <a class="reference external" href="https://nasa-public-data.s3.amazonaws.com/plot3d_utilities/PahtCascade-ASCII.xyz">PahtCascade-ASCII</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
+<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="linenos"> 3</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;../../&#39;</span><span class="p">)</span>
+<span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">find_periodicity</span>
+<span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">find_matching_blocks</span><span class="p">,</span> <span class="n">get_outer_faces</span><span class="p">,</span> <span class="n">connectivity</span>
+<span class="linenos"> 6</span><span class="kn">from</span> <span class="nn">glennht_con</span> <span class="kn">import</span> <span class="n">export_to_glennht_conn</span>
+<span class="linenos"> 7</span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="c1"># Convert to binary because of size</span>
+<span class="linenos">10</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;PahtCascade-ASCII.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="linenos">11</span><span class="n">write_plot3D</span><span class="p">(</span><span class="s1">&#39;PahtCascade.xyz&#39;</span><span class="p">,</span><span class="n">blocks</span><span class="p">,</span><span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;PahtCascade.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">big_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span><span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;connectivity.pickle&#39;</span><span class="p">):</span>
+<span class="linenos">16</span>    <span class="n">blocks</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;PahtCascade.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">big_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">17</span>    <span class="c1"># Block 1 is the blade O-Mesh k=0</span>
+<span class="linenos">18</span>    <span class="c1"># outer_faces, _ = get_outer_faces(blocks[0]) # lets check</span>
+<span class="linenos">19</span>    <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+<span class="linenos">20</span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;connectivity.pickle&#39;</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="linenos">21</span>        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s2">&quot;face_matches&quot;</span><span class="p">:</span><span class="n">face_matches</span><span class="p">,</span> <span class="s2">&quot;outer_faces&quot;</span><span class="p">:</span><span class="n">outer_faces_formatted</span><span class="p">},</span><span class="n">f</span><span class="p">)</span>
+<span class="linenos">22</span>
+<span class="linenos">23</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;connectivity.pickle&#39;</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="linenos">24</span>    <span class="n">data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="linenos">25</span>    <span class="n">face_matches</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;face_matches&#39;</span><span class="p">]</span>
+<span class="linenos">26</span>    <span class="n">outer_faces</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;outer_faces&#39;</span><span class="p">]</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;PahtCascade.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">big_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">29</span><span class="n">periodic_surfaces</span><span class="p">,</span> <span class="n">outer_faces_to_keep</span> <span class="o">=</span> <span class="n">find_periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">,</span><span class="n">periodic_direction</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="linenos">30</span><span class="c1"># Append periodic surfaces to face_matches</span>
+<span class="linenos">31</span><span class="n">face_matches</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">periodic_surfaces</span><span class="p">)</span>
+<span class="linenos">32</span>
+<span class="linenos">33</span><span class="n">export_to_glennht_conn</span><span class="p">(</span><span class="n">face_matches</span><span class="p">,</span><span class="n">outer_faces_to_keep</span><span class="p">,</span><span class="s1">&#39;finalmesh&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="linenos">  2</span><span class="k">def</span> <span class="nf">export_to_glennht_conn</span><span class="p">(</span><span class="n">nblocks</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">matches</span><span class="p">:</span><span class="n">List</span><span class="p">,</span><span class="n">block_surfaces</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">other_settings</span><span class="p">:</span><span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="linenos">  3</span>    <span class="sd">&quot;&quot;&quot;Exports the connectivity to GlennHT format</span>
+<span class="linenos">  4</span>
+<span class="linenos">  5</span><span class="sd">    Args:</span>
+<span class="linenos">  6</span><span class="sd">        matches (dict): Any matching faces between blocks</span>
+<span class="linenos">  7</span><span class="sd">        block_surfaces (dict): Non matching faces of all blocks or surfaces to consider</span>
+<span class="linenos">  8</span><span class="sd">        filename (str): filename to write to</span>
+<span class="linenos">  9</span><span class="sd">        other_settings (dict, optional): contains general interfaces, zones, blocks that are in the zone. Defaults to None.</span>
+<span class="linenos"> 10</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos"> 11</span>
+<span class="linenos"> 12</span>    <span class="n">blocks</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">,</span><span class="s1">&#39;block2&#39;</span><span class="p">]</span> <span class="c1"># Block 1 and Block 2 are arbitrary names. Their index matters</span>
+<span class="linenos"> 13</span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s1">&#39;.ght_conn&#39;</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+<span class="linenos"> 14</span>        <span class="c1"># Print matches</span>
+<span class="linenos"> 15</span>        <span class="n">nMatches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span>
+<span class="linenos"> 16</span>        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nMatches</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="c1"># Print number of matches</span>
+<span class="linenos"> 17</span>        <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+<span class="linenos"> 18</span>            <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">:</span>
+<span class="linenos"> 19</span>                <span class="n">block_indx</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># block1 and block2 are arbitrary names, the key is the block index</span>
+<span class="linenos"> 20</span>                <span class="n">block_IMIN</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 21</span>                <span class="n">block_JMIN</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 22</span>                <span class="n">block_KMIN</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span>                <span class="n">block_IMAX</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 25</span>                <span class="n">block_JMAX</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 26</span>                <span class="n">block_KMAX</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 27</span>
+<span class="linenos"> 28</span>                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">block_indx</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">block_IMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">block_JMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">block_KMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">block_IMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">block_JMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">block_KMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 29</span>        <span class="c1"># Print Surfaces</span>
+<span class="linenos"> 30</span>        <span class="c1"># Get total number of surfaces</span>
+<span class="linenos"> 31</span>        <span class="nb">id</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos"> 32</span>        <span class="n">lines</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="linenos"> 33</span>        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">block_surfaces</span><span class="p">:</span>
+<span class="linenos"> 34</span>            <span class="n">block_indx</span> <span class="o">=</span> <span class="n">block</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 35</span>            <span class="k">for</span> <span class="n">surface</span> <span class="ow">in</span> <span class="n">block</span><span class="p">[</span><span class="s1">&#39;surfaces&#39;</span><span class="p">]:</span>
+<span class="linenos"> 36</span>                <span class="n">IMIN</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 37</span>                <span class="n">JMIN</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 38</span>                <span class="n">KMIN</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 39</span>
+<span class="linenos"> 40</span>                <span class="n">IMAX</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 41</span>                <span class="n">JMAX</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 42</span>                <span class="n">KMAX</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+<span class="linenos"> 43</span>                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">block_indx</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">IMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">JMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">KMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">IMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">JMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">KMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="nb">id</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 44</span>                <span class="nb">id</span><span class="o">+=</span><span class="mi">1</span>
+<span class="linenos"> 45</span>
+<span class="linenos"> 46</span>        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos"> 47</span>        <span class="p">[</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+<span class="linenos"> 48</span>
+<span class="linenos"> 49</span>        <span class="c1"># Write general interfaces</span>
+<span class="linenos"> 50</span>        <span class="n">n_gif</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_settings</span><span class="p">[</span><span class="s1">&#39;general_interfaces&#39;</span><span class="p">])</span>
+<span class="linenos"> 51</span>        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">n_gif</span><span class="si">:</span><span class="s1">d</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos"> 52</span>        <span class="k">for</span> <span class="n">gif</span> <span class="ow">in</span> <span class="n">other_settings</span><span class="p">[</span><span class="s1">&#39;general_interfaces&#39;</span><span class="p">]:</span>
+<span class="linenos"> 53</span>            <span class="n">surf1</span> <span class="o">=</span> <span class="n">gif</span><span class="p">[</span><span class="s1">&#39;surface_pairs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos"> 54</span>            <span class="n">surf2</span> <span class="o">=</span> <span class="n">gif</span><span class="p">[</span><span class="s1">&#39;surface_pairs&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="linenos"> 55</span>            <span class="k">if</span> <span class="n">gif</span><span class="p">[</span><span class="s1">&#39;gif_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;mixing_plane&#39;</span><span class="p">:</span>
+<span class="linenos"> 56</span>                <span class="n">gif_kind</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="linenos"> 57</span>            <span class="k">else</span><span class="p">:</span>
+<span class="linenos"> 58</span>                <span class="n">gif_kind</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># for conjugate</span>
+<span class="linenos"> 59</span>            <span class="k">if</span> <span class="n">gif</span><span class="p">[</span><span class="s1">&#39;is_polar&#39;</span><span class="p">]:</span>
+<span class="linenos"> 60</span>                <span class="n">gif_kind</span><span class="o">*=-</span><span class="mi">1</span>
+<span class="linenos"> 61</span>            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">surf1</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">surf2</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">gif_kind</span><span class="si">}</span><span class="s1"> 1 &#39;</span><span class="p">)</span> <span class="c1"># Assume no new lines and just write on a single line.</span>
+<span class="linenos"> 62</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_settings</span><span class="p">[</span><span class="s1">&#39;general_interfaces&#39;</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+<span class="linenos"> 63</span>            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos"> 64</span>
+<span class="linenos"> 65</span>        <span class="k">def</span> <span class="nf">zonetype_to_glennht</span><span class="p">(</span><span class="nb">type</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="linenos"> 66</span>            <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;fluid&#39;</span><span class="p">:</span>
+<span class="linenos"> 67</span>                <span class="k">return</span> <span class="s1">&#39;1&#39;</span>
+<span class="linenos"> 68</span>            <span class="k">else</span><span class="p">:</span>                   <span class="c1"># Second zone is solid</span>
+<span class="linenos"> 69</span>                <span class="k">return</span> <span class="s1">&#39;2&#39;</span>
+<span class="linenos"> 70</span>
+<span class="linenos"> 71</span>        <span class="k">def</span> <span class="nf">lookup_zone_index</span><span class="p">(</span><span class="n">block_indx</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="linenos"> 72</span>            <span class="sd">&quot;&quot;&quot;Searches through all the zones for the block_index</span>
+<span class="linenos"> 73</span>
+<span class="linenos"> 74</span><span class="sd">            Args:</span>
+<span class="linenos"> 75</span><span class="sd">                block_indx (int): index of block</span>
+<span class="linenos"> 76</span>
+<span class="linenos"> 77</span><span class="sd">            Returns:</span>
+<span class="linenos"> 78</span><span class="sd">                int: the zone index</span>
+<span class="linenos"> 79</span><span class="sd">            &quot;&quot;&quot;</span>
+<span class="linenos"> 80</span>            <span class="n">zone_indx</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos"> 81</span>            <span class="k">for</span> <span class="n">zone</span> <span class="ow">in</span> <span class="n">other_settings</span><span class="p">[</span><span class="s1">&#39;zones&#39;</span><span class="p">]:</span>
+<span class="linenos"> 82</span>                <span class="k">if</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="n">zone</span><span class="p">[</span><span class="s1">&#39;blocks&#39;</span><span class="p">]:</span>
+<span class="linenos"> 83</span>                    <span class="k">return</span> <span class="n">zone_indx</span>
+<span class="linenos"> 84</span>                <span class="n">zone_index</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="linenos"> 85</span>
+<span class="linenos"> 86</span>        <span class="c1"># Write the Zones</span>
+<span class="linenos"> 87</span>        <span class="n">n_zones</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_settings</span><span class="p">[</span><span class="s1">&#39;zones&#39;</span><span class="p">])</span>
+<span class="linenos"> 88</span>        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">n_zones</span><span class="si">:</span><span class="s1">d</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos"> 89</span>        <span class="k">for</span> <span class="n">zone</span> <span class="ow">in</span> <span class="n">other_settings</span><span class="p">[</span><span class="s1">&#39;zones&#39;</span><span class="p">]:</span>    <span class="c1"># Write which zone is fluid and which is solid</span>
+<span class="linenos"> 90</span>            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">zonetype_to_glennht</span><span class="p">(</span><span class="n">zone</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+<span class="linenos"> 91</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_settings</span><span class="p">[</span><span class="s1">&#39;zones&#39;</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+<span class="linenos"> 92</span>            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos"> 93</span>
+<span class="linenos"> 94</span>        <span class="c1"># Write out which block belongs to what zone index</span>
+<span class="linenos"> 95</span>        <span class="k">for</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nblocks</span><span class="p">):</span>
+<span class="linenos"> 96</span>            <span class="n">zone_index</span> <span class="o">=</span> <span class="n">lookup_zone_index</span><span class="p">(</span><span class="n">block_indx</span><span class="p">)</span>
+<span class="linenos"> 97</span>            <span class="k">if</span> <span class="p">(</span><span class="n">block_indx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">6</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="linenos"> 98</span>                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">zone_index</span><span class="si">:</span><span class="s1">d</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos"> 99</span>                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">100</span>            <span class="k">else</span><span class="p">:</span>
+<span class="linenos">101</span>                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">zone_index</span><span class="si">:</span><span class="s1">d</span><span class="si">}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="periodicity.html" class="btn btn-neutral float-left" title="Periodicity" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="split-blocks.html" class="btn btn-neutral float-right" title="Split Blocks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
