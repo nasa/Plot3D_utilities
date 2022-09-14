@@ -1,4 +1,4 @@
-{   
+{
     "boundary_conditions":{
         "P0_Inlet": 5,
         "T0_Inlet": 700,
@@ -6,7 +6,7 @@
         "bl_height": 0.001,
         "Mach_Inlet":0.10,
         "alpha":0,
-        "refLen":0.0254,
+        "refLen":1,
         "Tu_intensity_init": 0.03,
         "Tu_length_scale_init": 0.03,
         "NBlades":[55,60],

@@ -35,6 +35,20 @@ class Block:
         self.Y *= factor
         self.Z *= factor
 
+    def shift(self,shift_amount:float,direction:str="z"):
+        """shifts the blocks by a certain amount
+
+        Args:
+            shift_amount (float): _description_
+            direction (str, optional): _description_. Defaults to "z".
+        """
+        if direction.lower() == 'z':
+            self.Z +=shift_amount
+        elif direction.lower() == 'y':
+            self.Y +=shift_amount
+        elif direction.lower() == 'x':
+            self.X +=shift_amount
+
     def cylindrical(self):
         """Converts the block to cylindrical coordinate system. The rotation axis is assumed to be "x" direction
         """

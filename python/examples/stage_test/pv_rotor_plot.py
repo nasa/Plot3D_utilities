@@ -1,7 +1,7 @@
 import sys
 import os
 import pickle
-from typing import List
+from typing import List, Dict
 sys.path.insert(0,os.getcwd()) # This allows you to select files locally
 from pv_library import Load, ExtractBlocks, CreateSubset
 from paraview.simple import *
@@ -11,6 +11,22 @@ from glennht_library import CheckDictionary
 '''
 Main Code
 '''
+
+def CheckDictionary(data:Dict[str,List],name:str):
+    """Checks for key in dictionary and returns empty list if key is not found 
+
+    Args:
+        data (Dict[str,List]): _description_
+        name (str): name of key in dictionary 
+
+    Returns:
+        _type_: _description_
+    """
+    if name in data:
+        print(f'{name} found')
+        return data[name]
+    else:
+        return list() 
 
 if __name__=="__main__":
     '''
