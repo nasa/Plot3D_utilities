@@ -9,18 +9,18 @@ import json
 
 mesh_filename = 'StageMesh.xyz'
 print("Reading mesh")
-blocks = read_plot3D(mesh_filename,binary=True,big_endian=False)
+# blocks = read_plot3D(mesh_filename,binary=True,big_endian=False)
 
-stator_blocks = [blocks[i] for i in range(0,4)]
-rotor_blocks = [blocks[i] for i in range(4,len(blocks))]
+# stator_blocks = [blocks[i] for i in range(0,4)]
+# rotor_blocks = [blocks[i] for i in range(4,len(blocks))]
 
-write_plot3D('stator.xyz',stator_blocks,binary=True)
-stator_blocks_split = split_blocks(stator_blocks,500000, direction=Direction.i) # Splits the blocks while keeping the gcd. 380,000 is a rough number that it tries to match
-write_plot3D('stator_split.xyz',stator_blocks_split,binary=True)
+# write_plot3D('stator.xyz',stator_blocks,binary=True)
+# stator_blocks_split = split_blocks(stator_blocks,500000, direction=Direction.i) # Splits the blocks while keeping the gcd. 380,000 is a rough number that it tries to match
+# write_plot3D('stator_split.xyz',stator_blocks_split,binary=True)
 
-write_plot3D('rotor.xyz',rotor_blocks,binary=True)
-rotor_blocks_split = split_blocks(rotor_blocks,700000, direction=Direction.i)
-write_plot3D('rotor_split.xyz',rotor_blocks_split,binary=True)
+# write_plot3D('rotor.xyz',rotor_blocks,binary=True)
+# rotor_blocks_split = split_blocks(rotor_blocks,700000, direction=Direction.i)
+# write_plot3D('rotor_split.xyz',rotor_blocks_split,binary=True)
 
 
 def find_connectivity(filename:str,nblades:int):
@@ -53,5 +53,5 @@ def find_connectivity(filename:str,nblades:int):
             "outer_faces":outer_faces_to_keep       
             },f)
 
-# find_connectivity(filename="stator_split",nblades=55)
+find_connectivity(filename="stator_split",nblades=55)
 find_connectivity(filename="rotor_split",nblades=60)

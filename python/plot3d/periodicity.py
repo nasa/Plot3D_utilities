@@ -429,10 +429,12 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         matched_faces_all.append(face2)
 
     split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
+    non_matching = list()
     while periodic_found:
         periodic_found = False        
         outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
         outer_face_combos = list(permutations(range(len(outer_faces_all)),2))
+        outer_face_combos = list(set(outer_face_combos) - set(non_matching)) # removes face combinations already checked
         t = trange(len(outer_face_combos))
         for i in t: 
             # Check if surfaces are periodic with each other
@@ -463,14 +465,16 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
                     split_faces.extend(split_faces_temp)
                     periodic_found = True
                     break
+            else: 
+                non_matching.append((face1_indx,face2_indx))
 
         if (periodic_found):
             outer_faces_to_remove = list(set(outer_faces_to_remove))
             outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]
             if len(split_faces)>0:
                 outer_faces_all.extend(split_faces)
-                split_faces.clear()
-
+                split_faces.clear()        
+            
     # This is an added check to make sure all periodic faces are in the outer_faces_to_remove
     for p in periodic_faces:
         outer_faces_to_remove.append(p[0])
@@ -611,10 +615,12 @@ def translational_periodicity(blocks:List[Block],matched_faces:List[Dict[str,int
         matched_faces_all.append(face2)
 
     split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
+    non_matching = list()
     while periodic_found:
         periodic_found = False        
         outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
         outer_face_combos = list(permutations(range(len(outer_faces_all)),2))
+        outer_face_combos = list(set(outer_face_combos) - set(non_matching)) # removes face combinations already checked
         t = trange(len(outer_face_combos))
         for i in t: 
             # Check if surfaces are periodic with each other
@@ -645,6 +651,9 @@ def translational_periodicity(blocks:List[Block],matched_faces:List[Dict[str,int
                     split_faces.extend(split_faces_temp)
                     periodic_found = True
                     break
+            else: 
+                non_matching.append((face1_indx,face2_indx))
+            
 
         if (periodic_found):
             outer_faces_to_remove = list(set(outer_faces_to_remove))

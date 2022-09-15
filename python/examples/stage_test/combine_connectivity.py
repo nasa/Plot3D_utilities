@@ -125,7 +125,7 @@ for i in range(len(stator_blocks)):
 print_connectivity('stage_connectivity.ght_conn',stator_matches,faces_and_types, gifs, zones)
 
 # Scale mesh in inches to meters
-[b.scale(0.0254) for b in stator_blocks] # convert to meters 
+[b.scale(0.0254) for b in stator_blocks] # convert to meters
 write_plot3D('StageMesh_metric.xyz',stator_blocks,binary=True)
 # Normalize the boundary conditions
 with open('settings.json','r') as f:
@@ -152,6 +152,6 @@ with open('settings.json','r') as f:
     bcs_non_dim['gamma'] = gamma
     bcs_non_dim['Cp'] = air.Cp
     bcs_non_dim['V_rel'] = V_rel
-    bcs_non_dim['Re'] = air.rho * V_rel * bcs_non_dim['refLen'] / mu 
+    bcs_non_dim['Re'] = air.rho * V_rel * bcs_non_dim['refLen'] / mu
     
     modify_bc_template_file('boundary_conditions_template.bcs', bcs_non_dim)
