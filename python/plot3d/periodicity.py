@@ -2,8 +2,8 @@ from operator import truediv
 from typing import List, Dict, Tuple
 from itertools import combinations_with_replacement, permutations
 import numpy as np
-from .block import Block, rotate_block, reduce_blocks
-from .face import Face, create_face_from_diagonals, split_face
+from .block import Block, rotate_block, reduce_blocks, get_outer_bounds
+from .face import Face, create_face_from_diagonals, split_face, find_face_near_plane, convert_dictionary_faces_to_face
 from .connectivity import connectivity_fast, get_face_intersection, face_matches_to_dict
 from .write import write_plot3D
 from math import cos, radians, sin, sqrt, acos, radians
@@ -595,12 +595,23 @@ def translational_periodicity(blocks:List[Block],matched_faces:List[Dict[str,int
     matched_faces_all = list()
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list() 
+    
+    # Speed up calculations: To make things faster we found the outer bounds of the blocks and filter the outerfaces so that, for example, if you translate in the x direction, we only use outer faces that are in the xmin and xmax of the block
+    xbounds,ybounds,zbounds = get_outer_bounds(blocks)
+    outer_faces_all = convert_dictionary_faces_to_face(blocks,outer_faces,gcd_to_use)
+    if (shift_direction == 'x'):
+        nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,xbounds[0]-0.1)
+        nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,xbounds[1]+0.1)
+    if (shift_direction == 'y'):
+        nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,ybounds[0]-0.1)
+        nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,ybounds[1]+0.1)
+    if (shift_direction == 'z'):
+        nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,zbounds[0]-0.1)
+        nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,zbounds[1]+0.1)
+    outer_faces_all = nearest_faces1
+    outer_faces_all.extend(nearest_faces2)
 
-    for o in outer_faces:
-        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['JMIN']/gcd_to_use), 
-            int(o['KMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMAX']/gcd_to_use))
-        face.set_block_index(o['block_index'])
-        outer_faces_all.append(face)
+    
 
     for _,m in enumerate(matched_faces):
         face1 = create_face_from_diagonals(blocks_shifted[m['block1']['block_index']], 

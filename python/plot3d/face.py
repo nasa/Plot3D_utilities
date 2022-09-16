@@ -358,7 +358,16 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
                 newFace.add_vertex(x,y,z,i,j,k)
     return newFace
 
+def convert_dictionary_faces_to_face(blocks:List[Block],faces:List[Dict[str,int]],gcd_to_use:int=1):
+    # Converts dictionary to Face object 
+    faces2 = list() 
+    for o in faces:
+        faces2.append(create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['JMIN']/gcd_to_use), 
+            int(o['KMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMAX']/gcd_to_use)))
+        faces2[-1].set_block_index(o['block_index'])
+    return faces2
 
+    
 def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]], look_for_linked:bool=True):
     """Takes a face and a list of faces. Searches for any connected faces. 
         Connections will be checked based on shared verticies. 
@@ -376,13 +385,8 @@ def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]]
             *connected_faces* (List[Dict[str,int]]): List of connected faces in dictionary format
             *faces* (List[Dict[str,int]]): List of faces minus any connected face
     """
-    # Converts dictionary to Face object 
-    faces2 = list() 
-    for o in faces:
-        faces2.append(create_face_from_diagonals(blocks[o['block_index']],imin=o['IMIN'],jmin=o['JMIN'],kmin=o['KMIN'],
-        imax=o['IMAX'],jmax=o['JMAX'],kmax=o['KMAX']))
-        faces2[-1].set_block_index(o['block_index'])
-    faces = faces2
+    if isinstance(faces[0],dict):
+        faces = convert_dictionary_faces_to_face(blocks,faces)
     
     faces = [f for f in faces if f!=face]
     connected_faces = list() # F
@@ -399,16 +403,16 @@ def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]]
                 ind_x = np.isin(face.x, faces[i].x)
                 ind_y = np.isin(face.y, faces[i].y)
                 ind_z = np.isin(face.z, faces[i].z)
-                if np.sum(ind_x)==2 and np.sum(ind_y)==2 and np.sum(ind_z) == 2 and face.const_type == faces[i].const_type:
+                if np.sum(ind_x)==2 and np.sum(ind_y)==2 and np.sum(ind_z) == 2 and faces_to_search[0].const_type == faces[i].const_type:
                     connected_faces.append(faces[i])
                     match_found = True
-                elif np.sum(ind_x)>2 and np.sum(ind_y)==2 and np.sum(ind_z) == 2 and face.const_type == faces[i].const_type:
+                elif np.sum(ind_x)>2 and np.sum(ind_y)==2 and np.sum(ind_z) == 2 and faces_to_search[0].const_type == faces[i].const_type:
                     connected_faces.append(faces[i])
                     match_found = True
-                elif np.sum(ind_x)==2 and np.sum(ind_y)>2 and np.sum(ind_z) == 2 and face.const_type == faces[i].const_type:
+                elif np.sum(ind_x)==2 and np.sum(ind_y)>2 and np.sum(ind_z) == 2 and faces_to_search[0].const_type == faces[i].const_type:
                     connected_faces.append(faces[i])
                     match_found = True
-                elif np.sum(ind_x)==2 and np.sum(ind_y)==2 and np.sum(ind_z) > 2 and face.const_type == faces[i].const_type:
+                elif np.sum(ind_x)==2 and np.sum(ind_y)==2 and np.sum(ind_z) > 2 and faces_to_search[0].const_type == faces[i].const_type:
                     connected_faces.append(faces[i])
                     match_found = True
                 else:
@@ -418,6 +422,7 @@ def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]]
             faces_to_search = list(set([c for c in connected_faces if c not in faces_to_search]))
             connected_faces = list(set(connected_faces))
         faces = non_match
+        
     if len(connected_faces)>0:
         return [c.to_dict() for c in connected_faces], [f.to_dict() for f in faces]
     else:
