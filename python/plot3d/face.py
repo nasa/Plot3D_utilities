@@ -1,10 +1,8 @@
 import itertools
-from operator import truediv
 from typing import Dict, List, Tuple
 import numpy as np
 from numpy.lib import math
 from .block import Block
-from scipy.optimize import curve_fit
 from tqdm import trange
 
 class Face:
