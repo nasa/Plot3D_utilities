@@ -597,21 +597,20 @@ def translational_periodicity(blocks:List[Block],matched_faces:List[Dict[str,int
     periodic_faces_export = list() 
     
     # Speed up calculations: To make things faster we found the outer bounds of the blocks and filter the outerfaces so that, for example, if you translate in the x direction, we only use outer faces that are in the xmin and xmax of the block
-    xbounds,ybounds,zbounds = get_outer_bounds(blocks)
     outer_faces_all = convert_dictionary_faces_to_face(blocks,outer_faces,gcd_to_use)
-    if (shift_direction == 'x'):
-        nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,xbounds[0]-0.1)
-        nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,xbounds[1]+0.1)
-    if (shift_direction == 'y'):
-        nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,ybounds[0]-0.1)
-        nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,ybounds[1]+0.1)
-    if (shift_direction == 'z'):
-        nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,zbounds[0]-0.1)
-        nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,zbounds[1]+0.1)
-    outer_faces_all = nearest_faces1
-    outer_faces_all.extend(nearest_faces2)
 
-    
+    # xbounds,ybounds,zbounds = get_outer_bounds(blocks)    
+    # if (shift_direction == 'x'):
+    #     nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,xbounds[0]-0.1)
+    #     nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,xbounds[1]+0.1)
+    # if (shift_direction == 'y'):
+    #     nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,ybounds[0]-0.1)
+    #     nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,ybounds[1]+0.1)
+    # if (shift_direction == 'z'):
+    #     nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,zbounds[0]-0.1)
+    #     nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,zbounds[1]+0.1)
+    # outer_faces_all = nearest_faces1
+    # outer_faces_all.extend(nearest_faces2)
 
     for _,m in enumerate(matched_faces):
         face1 = create_face_from_diagonals(blocks_shifted[m['block1']['block_index']], 
