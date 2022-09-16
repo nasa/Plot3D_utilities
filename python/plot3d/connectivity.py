@@ -4,14 +4,11 @@ import math
 from itertools import product, combinations
 from tqdm import trange
 import numpy as np 
-from .differencing import find_face_edges
 import pandas as pd
-from operator import eq 
 from typing import List, NamedTuple
 import math
 from .point_match import point_match
 from copy import deepcopy
-from numba import njit, prange
 
 
 def get_outer_faces(block1:Block):

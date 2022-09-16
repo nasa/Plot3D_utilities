@@ -138,6 +138,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">*=</span> <span class="n">factor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">*=</span> <span class="n">factor</span></div>
 
+<div class="viewcode-block" id="Block.shift"><a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block.shift">[docs]</a>    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">shift_amount</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;shifts the blocks by a certain amount</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            shift_amount (float): _description_</span>
+<span class="sd">            direction (str, optional): _description_. Defaults to &quot;z&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">direction</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">+=</span><span class="n">shift_amount</span>
+        <span class="k">elif</span> <span class="n">direction</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">+=</span><span class="n">shift_amount</span>
+        <span class="k">elif</span> <span class="n">direction</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">+=</span><span class="n">shift_amount</span></div>
+
 <div class="viewcode-block" id="Block.cylindrical"><a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block.cylindrical">[docs]</a>    <span class="k">def</span> <span class="nf">cylindrical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Converts the block to cylindrical coordinate system. The rotation axis is assumed to be &quot;x&quot; direction</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -305,6 +319,49 @@
         <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">KMAX</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span>
     <span class="k">return</span> <span class="n">blocks</span></div>
 
+<div class="viewcode-block" id="get_outer_bounds"><a class="viewcode-back" href="../../modules/block.html#plot3d.block.get_outer_bounds">[docs]</a><span class="k">def</span> <span class="nf">get_outer_bounds</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Get outer bounds for a set of blocks</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blocks (List[Block]): Blocks defining your shape</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (Tuple) containing: </span>
+
+<span class="sd">            **xbounds** (Tuple[float,float]): xmin,xmax</span>
+<span class="sd">            **ybounds** (Tuple[float,float]): ymin,ymax</span>
+<span class="sd">            **zbounds** (Tuple[float,float]): zmin,zmax</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xbounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
+    <span class="n">ybounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
+    <span class="n">zbounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="n">ymin</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="n">zmin</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">zmax</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">xmin</span><span class="o">&lt;</span><span class="n">xbounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">xbounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmin</span>
+        <span class="k">elif</span> <span class="n">xmax</span><span class="o">&gt;</span><span class="n">xbounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">xbounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmax</span>
+        
+        <span class="k">if</span> <span class="n">ymin</span><span class="o">&lt;</span><span class="n">ybounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">ybounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ymin</span>
+        <span class="k">elif</span> <span class="n">ymax</span><span class="o">&gt;</span><span class="n">ybounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">ybounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ymax</span>
+
+        <span class="k">if</span> <span class="n">zmin</span><span class="o">&lt;</span><span class="n">zbounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">zbounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">zmin</span>
+        <span class="k">elif</span> <span class="n">zmax</span><span class="o">&gt;</span><span class="n">zbounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">zbounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">zmax</span>
+    
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">xbounds</span><span class="p">),</span><span class="nb">tuple</span><span class="p">(</span><span class="n">ybounds</span><span class="p">),</span><span class="nb">tuple</span><span class="p">(</span><span class="n">zbounds</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

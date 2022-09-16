@@ -412,6 +412,45 @@ Use this function after you’ve looked at the geometry in paraview to verify th
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="plot3d.face.find_face_near_plane">
+<span class="sig-prename descclassname"><span class="pre">plot3d.face.</span></span><span class="sig-name descname"><span class="pre">find_face_near_plane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">faces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#find_face_near_plane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.find_face_near_plane" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of faces near a given plane. So if your plane is in constant y direction, you specify a value of y that the plane is located at</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – List of blocks</p></li>
+<li><p><strong>faces</strong> (<em>List</em><em>[</em><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a><em>]</em>) – List of faces</p></li>
+<li><p><strong>axis</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_. Defaults to ‘y’.</p></li>
+<li><p><strong>plane_value</strong> (<em>float</em><em>, </em><em>optional</em>) – value x,y,z where plane is located at. Defaults to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>All faces connected to at located nearest to the plane value.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(List[<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face">Face</a>])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.face.find_face_nearest_point">
+<span class="sig-prename descclassname"><span class="pre">plot3d.face.</span></span><span class="sig-name descname"><span class="pre">find_face_nearest_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">faces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#find_face_nearest_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.find_face_nearest_point" title="Permalink to this definition"></a></dt>
+<dd><p>Find a face nearest to a given point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – List of blocks</p></li>
+<li><p><strong>faces</strong> (<em>List</em><em>[</em><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a><em>]</em>) – List of faces</p></li>
+<li><p><strong>x</strong> (<em>float</em>) – x coordinate of a reference point</p></li>
+<li><p><strong>y</strong> (<em>float</em>) – y coordinate of a reference point</p></li>
+<li><p><strong>z</strong> (<em>float</em>) – z coordinate of a reference point</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="plot3d.face.split_face">
 <span class="sig-prename descclassname"><span class="pre">plot3d.face.</span></span><span class="sig-name descname"><span class="pre">split_face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_to_split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">imin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#split_face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.split_face" title="Permalink to this definition"></a></dt>
 <dd><dl class="simple">
