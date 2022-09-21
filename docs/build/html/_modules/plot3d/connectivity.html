@@ -15,6 +15,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -106,9 +107,7 @@
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span><span class="p">,</span> <span class="n">combinations</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
-<span class="kn">from</span> <span class="nn">.differencing</span> <span class="kn">import</span> <span class="n">find_face_edges</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">eq</span> 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">.point_match</span> <span class="kn">import</span> <span class="n">point_match</span>
@@ -499,7 +498,6 @@
 
     <span class="k">return</span> <span class="n">c</span><span class="o">&lt;</span><span class="mi">4</span> <span class="c1">#  If &quot;c&quot; is less than 4 then it&#39;s an edge </span>
     
-
 <div class="viewcode-block" id="combinations_of_nearest_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks">[docs]</a><span class="k">def</span> <span class="nf">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">nearest_nblocks</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns the indices of the nearest 6 blocks based on their centroid</span>
 
@@ -514,7 +512,10 @@
     <span class="c1"># Pick a block get centroid of all outer faces        </span>
     <span class="n">combos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)),</span><span class="mi">2</span><span class="p">))</span>
     <span class="n">distances_to_block_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">10000</span> <span class="c1"># rows for block i, columns for i distance to block j</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">combos</span><span class="p">:</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combos</span><span class="p">))</span>    
+    <span class="k">for</span> <span class="n">indx</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>     <span class="c1"># block i        </span>
+        <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="o">=</span> <span class="n">combos</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finding nearest blocks comparing </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">block_i_outerfaces</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="n">block_j_outerfaces</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
         <span class="n">min_dist</span> <span class="o">=</span> <span class="mi">10000</span>
@@ -617,7 +618,7 @@
     <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_outer_faces</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
     <span class="n">block_outer_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">temp</span><span class="p">]</span>
     <span class="n">combos</span> <span class="o">=</span> <span class="n">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span> <span class="c1"># Find the 6 nearest Blocks and search through all that. </span>
-    <span class="c1"># combos = [[3,12]]</span>
+
     <span class="n">t</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combos</span><span class="p">))</span>    
     <span class="k">for</span> <span class="n">indx</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>     <span class="c1"># block i        </span>
         <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="o">=</span> <span class="n">combos</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>

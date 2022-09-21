@@ -1,10 +1,8 @@
 import itertools
-from operator import truediv
 from typing import Dict, List, Tuple
 import numpy as np
 from numpy.lib import math
 from .block import Block
-from scipy.optimize import curve_fit
 from tqdm import trange
 
 class Face:
@@ -358,7 +356,16 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
                 newFace.add_vertex(x,y,z,i,j,k)
     return newFace
 
+def convert_dictionary_faces_to_face(blocks:List[Block],faces:List[Dict[str,int]],gcd_to_use:int=1):
+    # Converts dictionary to Face object 
+    faces2 = list() 
+    for o in faces:
+        faces2.append(create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['JMIN']/gcd_to_use), 
+            int(o['KMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMAX']/gcd_to_use)))
+        faces2[-1].set_block_index(o['block_index'])
+    return faces2
 
+    
 def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]], look_for_linked:bool=True):
     """Takes a face and a list of faces. Searches for any connected faces. 
         Connections will be checked based on shared verticies. 
@@ -376,13 +383,8 @@ def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]]
             *connected_faces* (List[Dict[str,int]]): List of connected faces in dictionary format
             *faces* (List[Dict[str,int]]): List of faces minus any connected face
     """
-    # Converts dictionary to Face object 
-    faces2 = list() 
-    for o in faces:
-        faces2.append(create_face_from_diagonals(blocks[o['block_index']],imin=o['IMIN'],jmin=o['JMIN'],kmin=o['KMIN'],
-        imax=o['IMAX'],jmax=o['JMAX'],kmax=o['KMAX']))
-        faces2[-1].set_block_index(o['block_index'])
-    faces = faces2
+    if isinstance(faces[0],dict):
+        faces = convert_dictionary_faces_to_face(blocks,faces)
     
     faces = [f for f in faces if f!=face]
     connected_faces = list() # F
@@ -399,16 +401,16 @@ def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]]
                 ind_x = np.isin(face.x, faces[i].x)
                 ind_y = np.isin(face.y, faces[i].y)
                 ind_z = np.isin(face.z, faces[i].z)
-                if np.sum(ind_x)==2 and np.sum(ind_y)==2 and np.sum(ind_z) == 2 and face.const_type == faces[i].const_type:
+                if np.sum(ind_x)==2 and np.sum(ind_y)==2 and np.sum(ind_z) == 2 and faces_to_search[0].const_type == faces[i].const_type:
                     connected_faces.append(faces[i])
                     match_found = True
-                elif np.sum(ind_x)>2 and np.sum(ind_y)==2 and np.sum(ind_z) == 2 and face.const_type == faces[i].const_type:
+                elif np.sum(ind_x)>2 and np.sum(ind_y)==2 and np.sum(ind_z) == 2 and faces_to_search[0].const_type == faces[i].const_type:
                     connected_faces.append(faces[i])
                     match_found = True
-                elif np.sum(ind_x)==2 and np.sum(ind_y)>2 and np.sum(ind_z) == 2 and face.const_type == faces[i].const_type:
+                elif np.sum(ind_x)==2 and np.sum(ind_y)>2 and np.sum(ind_z) == 2 and faces_to_search[0].const_type == faces[i].const_type:
                     connected_faces.append(faces[i])
                     match_found = True
-                elif np.sum(ind_x)==2 and np.sum(ind_y)==2 and np.sum(ind_z) > 2 and face.const_type == faces[i].const_type:
+                elif np.sum(ind_x)==2 and np.sum(ind_y)==2 and np.sum(ind_z) > 2 and faces_to_search[0].const_type == faces[i].const_type:
                     connected_faces.append(faces[i])
                     match_found = True
                 else:
@@ -418,6 +420,7 @@ def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]]
             faces_to_search = list(set([c for c in connected_faces if c not in faces_to_search]))
             connected_faces = list(set(connected_faces))
         faces = non_match
+        
     if len(connected_faces)>0:
         return [c.to_dict() for c in connected_faces], [f.to_dict() for f in faces]
     else:
@@ -527,6 +530,7 @@ def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:i
     [f.set_block_index(face_to_split.blockIndex) for f in faces] 
     return faces 
 
+
 def find_face(blocks:List[Block],block_index:int, indices:np.ndarray, outer_faces:List[Face]):
     """Finds a particular face inside a list of outer_faces. This assumes you know the indicies and the block ID. 
     This is important because if you accidentally type in the wrong indicies, it doesn't create a random face. 
@@ -540,13 +544,63 @@ def find_face(blocks:List[Block],block_index:int, indices:np.ndarray, outer_face
         outer_faces (List[Face]): _description_
 
     Returns:
-        (Face | None): Either retuns the matching face or None object.
+        (Tuple): containing
+            *face* (Face | None): Either retuns the matching face or None object.
+            *outer_face_index* (int): index of outer face to remove
     """
     outer_face_to_match = None
-    for o in outer_faces:
+    for index,o in enumerate(outer_faces):
         if o['block_index'] == block_index:
             a = np.array([o['IMIN'], o['JMIN'], o['KMIN'], o['IMAX'], o['JMAX'], o['KMAX']], dtype=int)
             if np.array_equal(a,indices):
                 outer_face_to_match = create_face_from_diagonals(blocks[o['block_index']], imin=o['IMIN'], jmin=o['JMIN'], kmin=o['KMIN'], imax=o['IMAX'], jmax=o['JMAX'], kmax=o['KMAX'])
                 outer_face_to_match.set_block_index(block_index)
-    return outer_face_to_match
+                break
+    return outer_face_to_match, index
+
+def find_face_nearest_point(blocks:List[Block], faces:List[Face], x:float,y:float,z:float):
+    """Find a face nearest to a given point
+
+    Args:
+        blocks (List[Block]): List of blocks
+        faces (List[Face]): List of faces
+        x (float): x coordinate of a reference point
+        y (float): y coordinate of a reference point
+        z (float): z coordinate of a reference point
+    """
+    n = list(range(len(faces)))
+    dv = list()
+    for i in n:
+        dx = x-faces[i].cx
+        dy = y-faces[i].cy
+        dz = z-faces[i].cz
+        dv.append(math.sqrt(dx*dx + dy*dy + dz*dz))
+    face_index = np.argmin(np.array(dv))
+    return face_index
+
+
+def find_face_near_plane(blocks:List[Block],faces:List[Face],axis:str='y',plane_value:float=0):
+    """Returns a list of faces near a given plane. So if your plane is in constant y direction, you specify a value of y that the plane is located at
+        
+    Args:
+        blocks (List[Block]): List of blocks
+        faces (List[Face]): List of faces
+        axis (str, optional): _description_. Defaults to 'y'.
+        plane_value (float, optional): value x,y,z where plane is located at. Defaults to 0.
+
+    Returns:
+        (List[Face]): All faces connected to at located nearest to the plane value.
+    """
+    n = list(range(len(faces)))
+    dv = list()
+    for i in n:
+        if axis=="x":
+            dv.append(plane_value-faces[i].cx)
+        elif axis=="y":
+            dv.append(plane_value-faces[i].cy)
+        else: 
+            dv.append(plane_value-faces[i].cz)
+    face_index = np.argmin(np.array(dv))
+    faces_near_plane = find_connected_face(blocks,faces[face_index],faces)
+    return faces_near_plane
+    

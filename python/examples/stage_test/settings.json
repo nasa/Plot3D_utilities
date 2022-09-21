@@ -1,0 +1,71 @@
+{
+    "boundary_conditions":{
+        "P0_Inlet": 5,
+        "T0_Inlet": 700,
+        "Ps_outlet": 1,
+        "bl_height": 0.001,
+        "Mach_Inlet":0.10,
+        "alpha":0,
+        "refLen":1,
+        "Tu_intensity_init": 0.03,
+        "Tu_length_scale_init": 0.03,
+        "NBlades":[55,60],
+        "RotorRPM":7500
+    },
+    "job_settings": [
+        {
+            "name": "solve_0",
+            "mesh_file": "../mesh/finalmesh-ASCII-split.xyz",
+            "connectivity": "../mesh/finalmesh-split.ght_conn",
+            "mRunLevel" : 0,
+            "RestartSoln" : false,
+            "SolnInFile" : "../solve_1/Out.soln",
+            "SolnOutFile" : "Out.soln",
+            "CFLn" : 3,
+            "CFLr" : 1.5,
+            "nTimeSteps": 20,
+            "maxPseudoSteps": 1000,
+            "UnsteadyFlow": false,
+            "ddcmp":"ddcmp_ncpu7.dat",
+            "grid_coarsest":0,
+            "pre_mg_sweeps":1,
+            "mg_sweeps":1
+        },
+        {
+            "name": "solve_0+1000",
+            "mesh_file": "../mesh/finalmesh-ASCII-split.xyz",
+            "connectivity": "../mesh/finalmesh-split.ght_conn",
+            "mRunLevel" : 0,
+            "RestartSoln" : true,
+            "SolnInFile" : "../solve_0/Out.soln",
+            "SolnOutFile" : "Out.soln",
+            "CFLn" : 3,
+            "CFLr" : 1.5,
+            "nTimeSteps": 1,
+            "maxPseudoSteps": 1000,
+            "UnsteadyFlow": false,
+            "ddcmp":"ddcmp_ncpu7.dat",
+            "grid_coarsest":0,
+            "pre_mg_sweeps":1,
+            "mg_sweeps":1
+        },
+        {
+            "name": "solve_0+2000",
+            "mesh_file": "../mesh/finalmesh-ASCII-split.xyz",
+            "connectivity": "../mesh/finalmesh-split.ght_conn",
+            "mRunLevel" : 0,
+            "RestartSoln" : true,
+            "SolnInFile" : "../solve_0+1000/Out.soln",
+            "SolnOutFile" : "Out.soln",
+            "CFLn" : 3,
+            "CFLr" : 1.5,
+            "nTimeSteps": 1,
+            "maxPseudoSteps": 1000,
+            "UnsteadyFlow": false,
+            "ddcmp":"ddcmp_ncpu7.dat",
+            "grid_coarsest":0,
+            "pre_mg_sweeps":1,
+            "mg_sweeps":1
+        }
+    ]
+}

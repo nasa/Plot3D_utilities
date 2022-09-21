@@ -4,9 +4,7 @@ import math
 from itertools import product, combinations
 from tqdm import trange
 import numpy as np 
-from .differencing import find_face_edges
 import pandas as pd
-from operator import eq 
 from typing import List, NamedTuple
 import math
 from .point_match import point_match
@@ -397,7 +395,6 @@ def __check_edge(df:pd.DataFrame):
 
     return c<4 #  If "c" is less than 4 then it's an edge 
     
-
 def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
     """Returns the indices of the nearest 6 blocks based on their centroid
 
@@ -412,7 +409,10 @@ def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
     # Pick a block get centroid of all outer faces        
     combos = list(combinations(range(len(blocks)),2))
     distances_to_block_i = np.zeros((len(blocks),len(blocks))) + 10000 # rows for block i, columns for i distance to block j
-    for i,j in combos:
+    t = trange(len(combos))    
+    for indx in t:     # block i        
+        i,j = combos[indx]
+        t.set_description(f"Finding nearest blocks comparing {i} with {j}")
         block_i_outerfaces,_ = get_outer_faces(blocks[i])
         block_j_outerfaces,_ = get_outer_faces(blocks[j])
         min_dist = 10000
@@ -515,7 +515,7 @@ def connectivity(blocks:List[Block]):
     temp = [get_outer_faces(b) for b in blocks]
     block_outer_faces = [t[0] for t in temp]
     combos = combinations_of_nearest_blocks(blocks,6) # Find the 6 nearest Blocks and search through all that. 
-    # combos = [[3,12]]
+
     t = trange(len(combos))    
     for indx in t:     # block i        
         i,j = combos[indx]

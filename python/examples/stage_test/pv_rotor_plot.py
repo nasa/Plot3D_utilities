@@ -1,16 +1,31 @@
 import sys
 import os
 import pickle
-from typing import List
+from typing import List, Dict
 sys.path.insert(0,os.getcwd()) # This allows you to select files locally
 from pv_library import Load, ExtractBlocks, CreateSubset
 from paraview.simple import *
 import random
 
-
 '''
 Main Code
 '''
+
+def CheckDictionary(data:Dict[str,List],name:str):
+    """Checks for key in dictionary and returns empty list if key is not found 
+
+    Args:
+        data (Dict[str,List]): _description_
+        name (str): name of key in dictionary 
+
+    Returns:
+        _type_: _description_
+    """
+    if name in data:
+        print(f'{name} found')
+        return data[name]
+    else:
+        return list() 
 
 if __name__=="__main__":
     '''
@@ -21,12 +36,16 @@ if __name__=="__main__":
     with open('rotor_split_connectivity_periodicity.pickle','rb') as f:
         data = pickle.load(f)
         face_matches = data['face_matches']
-        outer_faces = data['outer_faces']
-        if 'periodic_faces' in data:
-            print('Periodic faces found')
-            periodic_faces = data['periodic_faces']
-        else:
-            periodic_faces = []
+        rotor_shroud = CheckDictionary(data,'rotor_shroud')
+        rotor_hub = CheckDictionary(data,'rotor_hub')
+        rotor_body = CheckDictionary(data,'rotor_body')
+        outer_faces = CheckDictionary(data,'outer_faces')
+        periodic_faces = CheckDictionary(data,'periodic_faces')
+        mixing_plane = CheckDictionary(data,'mixing_plane')
+        outlet = CheckDictionary(data,'outlet')
+
+
+
     blocks_to_extract = [f['block1']['block_index'] for f in face_matches]
     blocks_to_extract.extend([f['block2']['block_index'] for f in face_matches])
     blocks_to_extract = list(set(blocks_to_extract))
@@ -81,12 +100,42 @@ if __name__=="__main__":
                 CreateSubset(block_source, voi, name='match '+str(match_indx))
         
         # Plot the outer faces  
+        for surface_indx, o in enumerate(rotor_body):
+            # Add Plots for Outer Faces
+            if o['block_index'] == b:
+                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
+                CreateSubset(block_source, voi, name='rotor_body '+str(surface_indx),opacity=0.2) 
+        
+        for surface_indx, o in enumerate(rotor_hub):
+            # Add Plots for Outer Faces
+            if o['block_index'] == b:
+                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
+                CreateSubset(block_source, voi, name='rotor_hub '+str(surface_indx),opacity=0.2) 
+        
+        for surface_indx, o in enumerate(rotor_shroud):
+            # Add Plots for Outer Faces
+            if o['block_index'] == b:
+                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
+                CreateSubset(block_source, voi, name='rotor_shroud '+str(surface_indx),opacity=0.2) 
+
         for surface_indx, o in enumerate(outer_faces):
             # Add Plots for Outer Faces
             if o['block_index'] == b:
                 voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
-                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2) 
+                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
         
+        for surface_indx, o in enumerate(mixing_plane):
+            # Add Plots for Outer Faces
+            if o['block_index'] == b:
+                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
+                CreateSubset(block_source, voi, name='mixing_plane '+str(surface_indx),opacity=0.2)
+        
+        for surface_indx, o in enumerate(outlet):
+            # Add Plots for Outer Faces
+            if o['block_index'] == b:
+                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
+                CreateSubset(block_source, voi, name='outlet '+str(surface_indx),opacity=0.2)
+
         # Plot the periodic faces  
         for periodic_indx, p in enumerate(periodic_faces):
             # Add Plots for Outer Faces

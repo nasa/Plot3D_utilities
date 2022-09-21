@@ -1,0 +1,129 @@
+&BSurf_Spec
+BSurfID=0, BCType=1,  BCalc=F,  BSurfName='Inlet'
+&END
+
+&BSurf_Spec
+BSurfID=1, BCType=2,  BCalc=F,  BSurfName='Outlet'
+&END
+
+&BSurf_Spec
+BSurfID=2, BCType=4,  BCalc=F,  BSurfName='stator-shroud'
+&END
+
+&BSurf_Spec
+BSurfID=3, BCType=4,  BCalc=F,  BSurfName='stator-hub'
+&END
+
+&BSurf_Spec
+BSurfID=4, BCType=4,  BCalc=F,  BSurfName='stator-body'
+&END
+
+&BSurf_Spec
+BSurfID=5, BCType=4,  BCalc=F,  BSurfName='rotor-shroud'
+&END
+
+&BSurf_Spec
+BSurfID=6, BCType=4,  BCalc=F,  BSurfName='rotor-hub'
+&END
+
+&BSurf_Spec
+BSurfID=7, BCType=4,  BCalc=F,  BSurfName='rotor-body'
+&END
+
+&BSurf_Spec
+BSurfID=8, BCType=1000,  BCalc=F,  BSurfName='mixing-plane'
+&END
+
+&BSurf_Spec
+BSurfID=9, BCType=1000,  BCalc=F,  BSurfName='mixing-plane'
+&END
+
+
+&VZConditions
+VZid=1, VZtype=1, OmegaVZ=0., VZMaterialName=Air,
+Fluid_Tref_prop=0.0, Fluid_k_Tref={Tref_fluid}, Fluid_amu_Tref={Tref_fluid}, Fluid_expnt=.7, 
+!Fluid_cp=1002., Fluid_Pr={Prref_fluid}, Fluid_MW=28.964
+&END
+
+
+&INLET_BC
+inlet_subtype=1,
+have_inlet_prof=.FALSE., inlet_ref_Mach_Nr={Mach_Inlet},
+filen_inlet_profile='no_file',
+T0_const={T0_Inlet}, P0_const={P0_inlet},
+ annular_inlet=.TRUE., mult_for_full_ring={NBlades_inlet},
+ twall_hub=1, twall_case=1, deltah={bl_height}, deltat={bl_height},
+  ang1_const={initAlpha}, bet1_const=0., have_ang1_prof=.FALSE., filen_ang1_profile='inlet_profile.dat'
+  Tu_const={Tu_const},  have_Tu_prof=.FALSE., filen_Tu_profile='no_file',
+  Ts_const={Tu_length_scale_init},  have_Ts_prof=.FALSE., filen_Ts_profile='no_file',
+surfID_inlet=0
+&END
+
+&OUTLET_BC
+outlet_subType=1, 
+EXTRAPOLATION_ORDER = 0,
+Pback_extrapolate_profile=.FALSE.,
+Pback_const={Ps_outlet}, have_Pback_prof=.FALSE.,
+annular_outlet=.FALSE.,
+mult_for_full_ring={NBlades_outlet},
+filen_Pback_prof='no_file',
+surfID_outlet=1
+&END
+
+&WALL_BC
+wall_subtype=0,
+Qwall_const=0, have_Twall_prof=.FALSE., filen_Twall_prof='no_file',
+have_Qwall_prof=.FALSE., filen_Qwall_prof='no_file',
+BEM_coupled_surf=.FALSE.,
+Nr_wall_segments=1., segment_Omega=0., segment_xMin=-100.,
+surfID_wall=2
+&END
+
+&WALL_BC
+wall_subtype=0,
+Qwall_const=0, have_Twall_prof=.FALSE., filen_Twall_prof='no_file',
+have_Qwall_prof=.FALSE., filen_Qwall_prof='no_file',
+BEM_coupled_surf=.FALSE.,
+Nr_wall_segments=1., segment_Omega=0., segment_xMin=-100.,
+surfID_wall=3
+&END
+
+&WALL_BC
+wall_subtype=0,
+Qwall_const=0, have_Twall_prof=.FALSE., filen_Twall_prof='no_file',
+have_Qwall_prof=.FALSE., filen_Qwall_prof='no_file',
+BEM_coupled_surf=.FALSE.,
+Nr_wall_segments=1., segment_Omega=0., segment_xMin=-100.,
+surfID_wall=4
+&END
+
+&WALL_BC
+wall_subtype=0,
+Qwall_const=0, have_Twall_prof=.FALSE., filen_Twall_prof='no_file',
+have_Qwall_prof=.FALSE., filen_Qwall_prof='no_file',
+BEM_coupled_surf=.FALSE.,
+Nr_wall_segments=1., segment_Omega={rotation_rad_per_sec}, segment_xMin=-100.,
+surfID_wall=5
+&END
+
+&WALL_BC
+wall_subtype=0,
+Qwall_const=0, have_Twall_prof=.FALSE., filen_Twall_prof='no_file',
+have_Qwall_prof=.FALSE., filen_Qwall_prof='no_file',
+BEM_coupled_surf=.FALSE.,
+Nr_wall_segments=1., segment_Omega=rotation_rad_per_sec}, segment_xMin=-100.,
+surfID_wall=6
+&END
+
+&WALL_BC
+wall_subtype=0,
+Qwall_const=0, have_Twall_prof=.FALSE., filen_Twall_prof='no_file',
+have_Qwall_prof=.FALSE., filen_Qwall_prof='no_file',
+BEM_coupled_surf=.FALSE.,
+Nr_wall_segments=1., segment_Omega=0., segment_xMin=-100.,
+surfID_wall=7
+&END
+
+&GIF_Spec
+SurfID_1=8, SurfID_2=9,
+&END

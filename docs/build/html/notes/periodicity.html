@@ -16,6 +16,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -103,7 +104,7 @@
            <div itemprop="articleBody">
              
   <section id="periodicity">
-<h1>Periodicity<a class="headerlink" href="#periodicity" title="Permalink to this headline"></a></h1>
+<h1>Periodicity<a class="headerlink" href="#periodicity" title="Permalink to this heading"></a></h1>
 <p>The domain above has a periodicity on the side walls and from block 1 to block 2 on the suction side. Plot3D library can find periodic surfaces. Periodic surfaces can only be found by rotation about the x-axis. The user also needs to specify which direction is periodic either <em>i</em>, <em>j</em>, or <em>k</em>. Combinations of outer faces are searched to find the ones that are periodic when rotated about the x-axis and in the “k” direction (default option). Below is an example on how to find periodic surfaces.</p>
 <p>In this example we will use the file  <a class="reference external" href="https://nasa-public-data.s3.amazonaws.com/plot3d_utilities/PahtCascade-ASCII.xyz">PahtCascade-ASCII</a></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">periodicity</span><span class="p">,</span> <span class="n">connectivity</span>

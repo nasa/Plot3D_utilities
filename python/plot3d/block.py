@@ -24,6 +24,31 @@ class Block:
         self.cy = np.mean(Y)
         self.cz = np.mean(Z)
     
+    def scale(self,factor:float):
+        """Scales a mesh by a certain factor 
+
+        Args:
+            factor (float): _description_
+        """
+        
+        self.X *= factor
+        self.Y *= factor
+        self.Z *= factor
+
+    def shift(self,shift_amount:float,direction:str="z"):
+        """shifts the blocks by a certain amount
+
+        Args:
+            shift_amount (float): _description_
+            direction (str, optional): _description_. Defaults to "z".
+        """
+        if direction.lower() == 'z':
+            self.Z +=shift_amount
+        elif direction.lower() == 'y':
+            self.Y +=shift_amount
+        elif direction.lower() == 'x':
+            self.X +=shift_amount
+
     def cylindrical(self):
         """Converts the block to cylindrical coordinate system. The rotation axis is assumed to be "x" direction
         """
@@ -191,3 +216,46 @@ def reduce_blocks(blocks:List[Block],factor:int):
         blocks[i].IMAX,blocks[i].JMAX,blocks[i].KMAX = blocks[i].X.shape
     return blocks
 
+def get_outer_bounds(blocks:List[Block]):
+    """Get outer bounds for a set of blocks
+
+    Args:
+        blocks (List[Block]): Blocks defining your shape
+
+    Returns:
+        (Tuple) containing: 
+
+            **xbounds** (Tuple[float,float]): xmin,xmax
+            **ybounds** (Tuple[float,float]): ymin,ymax
+            **zbounds** (Tuple[float,float]): zmin,zmax
+    """
+    xbounds = [blocks[0].X.min(),blocks[0].X.max()]
+    ybounds = [blocks[0].Y.min(),blocks[0].Y.max()]
+    zbounds = [blocks[0].Z.min(),blocks[0].Z.max()]
+    
+    for i in range(1,len(blocks)):
+        xmin = blocks[i].X.min()
+        xmax = blocks[i].X.max()
+
+        ymin = blocks[i].Y.min()
+        ymax = blocks[i].Y.max()
+
+        zmin = blocks[i].Z.min()
+        zmax = blocks[i].Z.max()
+
+        if xmin<xbounds[0]:
+            xbounds[0] = xmin
+        elif xmax>xbounds[1]:
+            xbounds[1] = xmax
+        
+        if ymin<ybounds[0]:
+            ybounds[0] = ymin
+        elif ymax>ybounds[1]:
+            ybounds[1] = ymax
+
+        if zmin<zbounds[0]:
+            zbounds[0] = zmin
+        elif zmax>zbounds[1]:
+            zbounds[1] = zmax
+    
+    return tuple(xbounds),tuple(ybounds),tuple(zbounds)

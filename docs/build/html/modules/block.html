@@ -16,6 +16,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -103,10 +104,10 @@
            <div itemprop="articleBody">
              
   <section id="module-plot3d.block">
-<span id="block"></span><h1>Block<a class="headerlink" href="#module-plot3d.block" title="Permalink to this headline"></a></h1>
+<span id="block"></span><h1>Block<a class="headerlink" href="#module-plot3d.block" title="Permalink to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="plot3d.block.Block">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block" title="Permalink to this definition"></a></dt>
 <dd><p>Plot3D Block definition</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.block.Block.cell_volumes">
@@ -132,11 +133,55 @@
 <dd><p>Converts the block to cylindrical coordinate system. The rotation axis is assumed to be “x” direction</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.block.Block.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.scale" title="Permalink to this definition"></a></dt>
+<dd><p>Scales a mesh by a certain factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>factor</strong> (<em>float</em>) – _description_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.block.Block.shift">
+<span class="sig-name descname"><span class="pre">shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'z'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.shift" title="Permalink to this definition"></a></dt>
+<dd><p>shifts the blocks by a certain amount</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shift_amount</strong> (<em>float</em>) – _description_</p></li>
+<li><p><strong>direction</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_. Defaults to “z”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.block.get_outer_bounds">
+<span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">get_outer_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#get_outer_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.get_outer_bounds" title="Permalink to this definition"></a></dt>
+<dd><p>Get outer bounds for a set of blocks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – Blocks defining your shape</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>xbounds</strong> (Tuple[float,float]): xmin,xmax
+<strong>ybounds</strong> (Tuple[float,float]): ymin,ymax
+<strong>zbounds</strong> (Tuple[float,float]): zmin,zmax</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(Tuple) containing</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.block.reduce_blocks">
-<span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">reduce_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#reduce_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.reduce_blocks" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">reduce_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#reduce_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.reduce_blocks" title="Permalink to this definition"></a></dt>
 <dd><p>reduce the blocks by a factor of (factor)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -156,7 +201,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.block.rotate_block">
-<span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">rotate_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">plot3d.block.Block</span></a></span></span><a class="reference internal" href="../_modules/plot3d/block.html#rotate_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.rotate_block" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">rotate_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></span><a class="reference internal" href="../_modules/plot3d/block.html#rotate_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.rotate_block" title="Permalink to this definition"></a></dt>
 <dd><p>Rotates a block by a rotation matrix</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
