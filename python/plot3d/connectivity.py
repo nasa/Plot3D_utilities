@@ -10,7 +10,7 @@ import math
 from .point_match import point_match
 from copy import deepcopy
 
-def my_function()
+def my_function() :
     print('hello')
     return
 
