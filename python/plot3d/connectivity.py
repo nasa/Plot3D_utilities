@@ -156,7 +156,9 @@ def find_matching_blocks(block1:Block,block2:Block,block1_outer:List[Face], bloc
 
     return block_match_indices, block1_outer, block2_outer # Remove duplicates using set and list 
                     
-        
+def my_function() :
+    print('hello')
+    return       
 
 
 
