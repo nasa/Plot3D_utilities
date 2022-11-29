@@ -10,6 +10,9 @@ import math
 from .point_match import point_match
 from copy import deepcopy
 
+def my_function()
+    print('hello')
+    return
 
 def get_outer_faces(block1:Block):
     """Get the outer faces of a block
