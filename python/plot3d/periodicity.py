@@ -182,7 +182,7 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
             print("check")
         face1 = create_face_from_diagonals(blocks[m['block1']['block_index']],
             imin=int(m['block1']['IMIN']), imax=int(m['block1']['IMAX']), 
-            min=int(m['block1']['JMIN']), jmax=int(m['block1']['JMAX']),
+            jmin=int(m['block1']['JMIN']), jmax=int(m['block1']['JMAX']),
             kmin=int(m['block1']['KMIN']), kmax=int(m['block1']['KMAX']))
         face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], 
             imin=int(m['block2']['IMIN']), imax=int(m['block2']['IMAX']), 
