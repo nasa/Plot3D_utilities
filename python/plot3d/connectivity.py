@@ -10,9 +10,7 @@ import math
 from .point_match import point_match
 from copy import deepcopy
 
-def my_function() :
-    print('hello')
-    return
+
 
 def get_outer_faces(block1:Block):
     """Get the outer faces of a block
@@ -157,11 +155,7 @@ def find_matching_blocks(block1:Block,block2:Block,block1_outer:List[Face], bloc
             block1_split_faces.clear()
             block2_split_faces.clear()
 
-    return block_match_indices, block1_outer, block2_outer # Remove duplicates using set and list 
-                    
-def my_function() :
-    print('hello')
-    return       
+    return block_match_indices, block1_outer, block2_outer # Remove duplicates using set and list      
 
 
 
