@@ -365,7 +365,9 @@ def convert_dictionary_faces_to_face(blocks:List[Block],faces:List[Dict[str,int]
         faces2[-1].set_block_index(o['block_index'])
     return faces2
 
+
     
+
 def find_connected_face(blocks:List[Block], face:Face, faces:List[Dict[str,int]], look_for_linked:bool=True):
     """Takes a face and a list of faces. Searches for any connected faces. 
         Connections will be checked based on shared verticies. 

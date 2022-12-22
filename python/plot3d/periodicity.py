@@ -153,38 +153,13 @@ def are_adjacent(face1: Face, face2: Face) -> bool:
 
     return False
 
-def connected_components(graph: List[List[int]]) -> List[List[int]]:
-    def dfs(v, visited, component):
-        visited.add(v)
-        component.append(v)
-        for neighbor in graph[v]:
-            if neighbor not in visited:
-                dfs(neighbor, visited, component)
-    
-    components = []
-    visited = set()
-    for v in range(len(graph)):
-        if v not in visited:
-            component = []
-            dfs(v, visited, component)
-            components.append(component)
-    return components
- 
-def is_component_periodic(component: List[Face]) -> bool:
-    #Assumes that the component contains only faces with a constant value or I J or K. Wont work with faces that contain only two edges 
-    for i, face1 in enumerate(component):
-        for j, face2 in enumerate(component[i+1:]):
-            if face1.const_type == face2.const_type:
-                if face1.const_type == 0:
-                    if face1.IMIN == face2.IMIN:
-                        return True
-                elif face1.const_type == 1:
-                    if face1.JMIN == face2.JMIN:
-                        return True
-                elif face1.const_type == 2:
-                    if face1.KMIN == face2.KMIN:
-                        return True
-    return False
+def is_connected(face1:Face, face2:Face, periodic_direction:str='k') -> bool :
+    face1 = face1[1]
+    face2 = face2[1]
+    same_i = face1['IMIN'] == face2['IMIN'] and face1['IMAX'] == face2['IMAX']
+    same_j = face1['JMIN'] == face2['JMIN']and face1['JMAX'] == face2['JMAX']
+    same_k = face1['KMIN'] == face2['KMIN'] and face1['KMAX'] == face2['KMAX']
+    return same_i and same_j and same_k
 
 def get_outer_faces(outer_faces:List[Dict[str,int]], blocks:List[Block]) -> list :
     
@@ -200,6 +175,28 @@ def get_outer_faces(outer_faces:List[Dict[str,int]], blocks:List[Block]) -> list
         outer_faces_all.append(face)
     
     return outer_faces_all
+
+def get_matched_faces(matched_faces:List[Dict[str,int]], blocks:List[Block]) -> list() :
+    #Find what faces are connected/equal to eachother 
+    matched_faces_all = list()
+    for match_face_index,m in enumerate(matched_faces):
+        if (match_face_index == 14):
+            print("check")
+        face1 = create_face_from_diagonals(blocks[m['block1']['block_index']],
+            imin=int(m['block1']['IMIN']), imax=int(m['block1']['IMAX']), 
+            jmin=int(m['block1']['JMIN']), jmax=int(m['block1']['JMAX']),
+            kmin=int(m['block1']['KMIN']), kmax=int(m['block1']['KMAX']))
+        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], 
+            imin=int(m['block2']['IMIN']), imax=int(m['block2']['IMAX']), 
+            jmin=int(m['block2']['JMIN']), jmax=int(m['block2']['JMAX']), 
+            kmin=int(m['block2']['KMIN']), kmax=int(m['block2']['KMAX']))
+
+        face1.set_block_index(m['block1']['block_index'])
+        face2.set_block_index(m['block2']['block_index'])
+        matched_faces_all.append(face1)
+        matched_faces_all.append(face2)
+    
+    return matched_faces_all
 
 
 
@@ -226,51 +223,9 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
 
     """
     
-    """
     
     
-     # Create the adjacency matrix
-    adj_matrix = np.zeros((len(outer_faces), len(outer_faces)))
-
-    # Iterate over all pairs of faces
-    for i, face1 in enumerate(outer_faces):
-        for j, face2 in enumerate(outer_faces):
-            # Check if the faces are adjacent
-            if get_face_intersection(face1, face2, ):
-                adj_matrix[i][j] = 1
-
-    # Find the connected components in the adjacency matrix
-    num_components, labels = connected_components(adj_matrix, directed=False)
-
-    # Initialize lists to store the periodic and non-periodic faces
-    periodic_faces_export = []
-    outer_faces_export = []
-
-    # Iterate over the connected components
-    for component in range(num_components):
-        # Get the indices of the faces in this component
-        face_indices = np.where(labels == component)[0]
-
-        # Get the list of faces in this component
-        component_faces = [outer_faces[i] for i in face_indices]
-
-        # Check if this component is periodic
-        if is_component_periodic(component_faces, blocks, periodic_direction, rotation_axis, nblades):
-            # Add the faces to the list of periodic faces
-            periodic_faces_export.extend(component_faces)
-        else:
-            # Add the faces to the list of non-periodic faces
-            outer_faces_export.extend(component_faces)
-
-    # Convert the periodic and non-periodic faces to Face objects
-    periodic_faces = convert_dictionary_faces_to_face(blocks, periodic_faces_export)
-    outer_faces_all = convert_dictionary_faces_to_face(blocks, outer_faces_export)
-
-    return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
-    
-
-    """
-
+        
 
     rotation_angle = radians(360.0/nblades)
     rotation_matrix1 = create_rotation_matrix(rotation_angle,rotation_axis)
@@ -282,36 +237,41 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
     # Here we make a list of all the outer faces containing their corosponding blocks 
     outer_faces_all = get_outer_faces(outer_faces, blocks)
 
-
-    matched_faces_all = list()
+    #faces that are shared between blocks
+    matched_faces_all = get_matched_faces(matched_faces, blocks)
 
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list() 
 
+    #Create an adjacency matrix with row/column length of each face
+    num_faces = len(outer_faces_all) 
+
+    adjacency_matrix = np.zeros((num_faces, num_faces), dtype = bool)
+
+    #Add which pairs of faces are connected
+    for face1 in enumerate(outer_faces):
+        #Loop all the faces again 
+        for face2 in enumerate(outer_faces):    
+            #if these two faces are connected          
+            if(is_connected(face1,face2)) :
+                
+                adjacency_matrix[face1.index, face2.index] = True
+            else:
+                adjacency_matrix[face1.index, face2.index] = False
+                
+
+    print(adjacency_matrix)
+        
+        
+
+
     
-
-
-    for match_face_index,m in enumerate(matched_faces):
-        if (match_face_index == 14):
-            print("check")
-        face1 = create_face_from_diagonals(blocks[m['block1']['block_index']],
-            imin=int(m['block1']['IMIN']), imax=int(m['block1']['IMAX']), 
-            jmin=int(m['block1']['JMIN']), jmax=int(m['block1']['JMAX']),
-            kmin=int(m['block1']['KMIN']), kmax=int(m['block1']['KMAX']))
-        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], 
-            imin=int(m['block2']['IMIN']), imax=int(m['block2']['IMAX']), 
-            jmin=int(m['block2']['JMIN']), jmax=int(m['block2']['JMAX']), 
-            kmin=int(m['block2']['KMIN']), kmax=int(m['block2']['KMAX']))
-
-        face1.set_block_index(m['block1']['block_index'])
-        face2.set_block_index(m['block2']['block_index'])
-        matched_faces_all.append(face1)
-        matched_faces_all.append(face2)
-
-    split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
+    split_faces = list()     # List of split but free surfaces, this will be appended to outer_faces_to_remove list
     while periodic_found:
         periodic_found = False        
-        outer_faces_to_remove = list()  # Integer list of which outher surfaces to remove
+        outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
+        
+        #Every combination of faces 
         outer_face_combos = list(combinations_with_replacement(range(len(outer_faces_all)),2))
         t = trange(len(outer_face_combos))
         for i in t: 
