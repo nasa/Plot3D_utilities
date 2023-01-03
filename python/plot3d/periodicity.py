@@ -136,30 +136,34 @@ def create_rotation_matrix(rotation_angle:float, rotation_axis:str="x"):
 
     return rotation_matrix 
 
-def are_adjacent(face1: Face, face2: Face) -> bool:
-    #check if face1 and face 2 share a common edge
-    if (face1["IMIN"] == face2["IMIN"] and face1["JMIN"] == face2["JMIN"]) or \
-        (face1["IMAX"] == face2["IMAX"] and face1["JMIN"] == face2["JMIN"]) or \
-        (face1["IMIN"] == face2["IMIN"] and face1["JMIN"] == face2["JMIN"]) or \
-        (face1["IMAX"] ==face2["IMAX"] and face1["JMIN"] == face2["JMIN"]):
-        return True
+def is_connected_direction(blocks:List[Block], face1:Face, face2:Face, periodic_direction:str='k', ) -> bool :
+    
+    #Compare two faces and find if they are connected in a periodic direction 
 
-    #Check if face 1 and face 2 share a common vertex
-    if (face1["IMIN"] == face2["IMIN"] and face1["JMIN"] == face2["JMIN"]) or \
-        (face1["IMAX"] == face2["IMAX"] and face1["JMIN"] == face2["JMIN"]) or \
-        (face1["IMIN"] == face2["IMIN"] and face1["JMAX"] == face2["JMAX"]) or \
-        (face1["IMAX"] == face2["IMAX"] and face1["JMAX"] == face2["JMAX"]):
-        return True
+    #(look into just checking if both faces points are connected to equal to each other)
+    #Check if  the faces are both zero points starting points 
+    match periodic_direction:
+        case 'k':
+            #Check if both points are equal  
+            if (face1['KMIN'] == face1['KMAX']) and (face2['KMIN'] == face2['KMAX']): 
+                #Check if faces periodict same method orignal form did
+                
+                print('hi')
+
+
+                return True 
+
+                
+            
+            
+        case 'i':
+            print('i')
+            
+        case 'j':
+            
+            print('j')
 
     return False
-
-def is_connected(face1:Face, face2:Face, periodic_direction:str='k') -> bool :
-    face1 = face1[1]
-    face2 = face2[1]
-    same_i = face1['IMIN'] == face2['IMIN'] and face1['IMAX'] == face2['IMAX']
-    same_j = face1['JMIN'] == face2['JMIN']and face1['JMAX'] == face2['JMAX']
-    same_k = face1['KMIN'] == face2['KMIN'] and face1['KMAX'] == face2['KMAX']
-    return same_i and same_j and same_k
 
 def get_outer_faces(outer_faces:List[Dict[str,int]], blocks:List[Block]) -> list :
     
@@ -198,8 +202,108 @@ def get_matched_faces(matched_faces:List[Dict[str,int]], blocks:List[Block]) -> 
     
     return matched_faces_all
 
+def periodicty2 (blocks:List[Block],outer_faces:List[Dict[str,int]], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
+    """This function is used to check for periodicity of the other faces rotated about an axis 
+        The way it works is to find faces of a constant i,j, or k value
+
+    Args:
+        blocks (List[Block]): List of blocks that will be scanned for perodicity
+        outer_faces (List[Dict[str,int]]): List of outer faces for each block as a dictionary format. You can get this from connectivity
+        matched_faces (ListList[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces 
+        periodic_direction (str): either i,j,k to look for
+        rotation_axis (str): either x,y,z
+        nblades (int): Number of blades to consider, this affects the rotation angle. 
+
+    Returns:
+        (Tuple): containing
+            
+            - **periodic_faces_export** (List[Dict[str,int]]):  This is list of all the surfaces/faces that match when rotated by an angle formatted as a dictionary.
+            - **outer_faces_export** (List[Dict[str,int]]): These are the list of outer faces that are not periodic formatted as a dictionary.
+            - **periodic_faces** (List[Tuple[Face,Face]]): - This is a list of Face objects that are connected to each other organized as a list of tuples: [Face1, Face2] where Face 1 will contain the block number and the diagonals [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]. Example: blk: 1 [168,0,0,268,100,0].
+            - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
+
+    """
+
+    rotation_angle = radians(360.0/nblades)
+    rotation_matrix1 = create_rotation_matrix(rotation_angle,rotation_axis)
+    rotation_matrix2 = create_rotation_matrix(-rotation_angle,rotation_axis)
+    
+    
+    #Create an adjacency matrix with row/column length of each faces
+    adjacency_matrix = np.zeros((len(outer_faces), len(outer_faces)),  dtype = bool)
+
+    #List of every combonation of faces
+    outer_faces_combo = list(combinations_with_replacement(range(len(outer_faces)),2))
+    
+    #loop through every combination of faces
+    for faces in outer_faces_combo:
+        #Check if these two faces are connected to each other
+        if(is_connected_direction(blocks, outer_faces[faces[0]], outer_faces[faces[1]], periodic_direction)) :
+            #Add this connection 
+            adjacency_matrix[faces[0], faces[1]] = True
+                
+
+    periodic_faces = list()      # This is the output of the code 
+    
+    #iterate over the rows of the adjacency matrix
+    for i, row in enumerate(adjacency_matrix):
+        o = outer_faces[i]
+        #Extract the current face from the outer face and create a face object
+        face = create_face_from_diagonals(blocks[o['block_index']],
+            imin=o['IMIN'], imax=o['IMAX'], 
+            jmin=o['JMIN'], jmax=o['JMAX'], 
+            kmin=o['KMIN'], kmax=o['KMAX']) 
+        face.set_block_index(o['block_index'])
 
 
+        #Check if the current face is connected to any other face
+        if np.any(row) :
+            #Find the indices of the connected faces
+            connected_face_indices = np.where(row)[0]
+            #Extract the connected faces from the outer_faces list 
+
+            connected_faces = [create_face_from_diagonals(blocks[outer_faces[index]['block_index']],
+                imin=outer_faces[index]['IMIN'], imax=outer_faces[index]['IMAX'],
+                jmin=outer_faces[index]['JMIN'], jmax=outer_faces[index]['JMAX'],
+                kmin=outer_faces[index]['KMIN'], kmax=outer_faces[index]['KMAX'])
+                for index in connected_face_indices]
+
+            # Add the current face and the connected faces to the periodic_faces list
+            periodic_faces.extend([(face, connected_face) for connected_face in connected_faces])
+        
+    #Initialize an empty list to store the outer faces 
+    outer_faces_all = [create_face_from_diagonals(blocks[o['block_index']],
+        imin=o['IMIN'], imax=o['IMAX'],
+        jmin=o['JMIN'], jmax=o['JMAX'],
+        kmin=o['KMIN'], kmax=o['KMAX'])
+        for o in outer_faces]
+
+
+    
+    
+   
+
+    # Convert the periodic faces to a format that can be exported
+    #Most likely a fucntion already does this
+    periodic_faces_export = [{'block1': {'block_index': face1.BlockIndex,
+        'IMIN': face1.IMIN, 'IMAX': face1.IMAX, 'JMIN': face1.JMIN,
+        'JMAX': face1.JMAX,'KMIN': face1.KMIN, 'KMAX': face1.KMAX},
+        'block2': {'block_index': face2.BlockIndex, 'IMIN': face2.IMIN, 
+        'IMAX': face2.IMAX,'JMIN': face2.JMIN, 'JMAX': face2.JMAX,
+        'KMIN': face2.KMAX, 'KMAX': face2.KMAX}}
+        for face1, face2 in periodic_faces]
+
+
+    #Outer faces formated to export
+    outer_faces_export = [{'block_index': face.BlockIndex,
+                       'IMIN': face.IMIN, 'IMAX': face.IMAX,
+                       'JMIN': face.JMIN, 'JMAX': face.JMAX,
+                       'KMIN': face.KMIN, 'KMAX': face.KMAX}
+                      for face in outer_faces_all]
+
+
+    # Return the periodic and outer faces
+    return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
 def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """This function is used to check for periodicity of the other faces rotated about an axis 
@@ -224,7 +328,7 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
     """
     
     
-    
+    return periodicty2(blocks,outer_faces, matched_faces, periodic_direction, rotation_axis,nblades)
         
 
     rotation_angle = radians(360.0/nblades)
@@ -234,44 +338,31 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
     # Check periodic within a block 
     periodic_found = True
     
+    
+
+    
+
+    periodic_faces_export = list() 
+
+ 
+    
+    
+
+    #Initialize an empty list to store faces in proper format
+    periodic_faces_export = []
+
+    periodic_faces = list()   
+
     # Here we make a list of all the outer faces containing their corosponding blocks 
     outer_faces_all = get_outer_faces(outer_faces, blocks)
 
     #faces that are shared between blocks
     matched_faces_all = get_matched_faces(matched_faces, blocks)
-
-    periodic_faces = list()      # This is the output of the code 
-    periodic_faces_export = list() 
-
-    #Create an adjacency matrix with row/column length of each face
-    num_faces = len(outer_faces_all) 
-
-    adjacency_matrix = np.zeros((num_faces, num_faces), dtype = bool)
-
-    #Add which pairs of faces are connected
-    for face1 in enumerate(outer_faces):
-        #Loop all the faces again 
-        for face2 in enumerate(outer_faces):    
-            #if these two faces are connected          
-            if(is_connected(face1,face2)) :
-                
-                adjacency_matrix[face1.index, face2.index] = True
-            else:
-                adjacency_matrix[face1.index, face2.index] = False
-                
-
-    print(adjacency_matrix)
-        
-        
-
-
     
     split_faces = list()     # List of split but free surfaces, this will be appended to outer_faces_to_remove list
     while periodic_found:
         periodic_found = False        
-        outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
-        
-        #Every combination of faces 
+        outer_faces_to_remove = list()  # Integer list of which outher surfaces to remove
         outer_face_combos = list(combinations_with_replacement(range(len(outer_faces_all)),2))
         t = trange(len(outer_face_combos))
         for i in t: 
@@ -360,7 +451,7 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
                     block2 = blocks[face2.blockIndex]
                     #   Check periodicity
                     df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
-
+                    
                     if len(periodic_faces_temp) == 0:
                         block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix2)
                         block2 = blocks[face2.blockIndex]
@@ -383,10 +474,12 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
                         periodic_faces.append(periodic_faces_temp)
                         periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1_rotated,block2))
                         split_faces.extend(split_faces_temp)
+                        i
                         periodic_found = True
                         break
 
         if (periodic_found):
+            print(x)
             outer_faces_to_remove = list(set(outer_faces_to_remove))
             outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]
             if len(split_faces)>0:
