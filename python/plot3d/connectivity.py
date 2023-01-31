@@ -696,6 +696,13 @@ def block_connection_matrix(blocks:List[Block]):
             - (List[Face]): any split faces from block 2 
 
     """
+    gcd_array = list()
+    # Find the gcd of all the blocks 
+    for block_indx in range(len(blocks)):
+        block = blocks[block_indx]
+        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
+    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+    blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
     n = len(blocks)
     i_connectivity = np.eye(n,dtype=np.int8)

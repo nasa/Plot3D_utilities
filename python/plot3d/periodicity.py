@@ -14,8 +14,8 @@ import math
 
 
 def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
-    """This function is used to match a non-rotated set of blocks. 
-        Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity 
+    """Finds the connectivity of blocks when they are rotated by an angle defined by the number of blades. Only use this if your mesh is of an annulus. 
+        This function reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity 
 
     Args:
         blocks (List[Block]): List of blocks that will be scanned for perodicity
@@ -137,7 +137,7 @@ def create_rotation_matrix(rotation_angle:float, rotation_axis:str="x"):
     return rotation_matrix 
 
 def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
-    """This function is used to check for periodicity of the other faces rotated about an axis 
+    """This function is used to check for periodicity of the other faces rotated about an axis. Use periodicity_fast instead. Periodicity_fast calls this function after reducing the size of the mesh.
         The way it works is to find faces of a constant i,j, or k value
 
     Args:
@@ -353,8 +353,7 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
 
 
 def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]], rotation_angle:float, rotation_axis:str = "x", ReduceMesh:bool=True):
-    """Finds the peridocity/connectivity by rotating a block. This is a bit different from "periodicity" where you specify the periodic direction. 
-        This method doesn't care about the direction as long as the angle you specify results in a match between the Left Face and the Right Face         
+    """Finds the peridocity/connectivity by rotating a block. This is a bit different from "periodicity_fast" where you specify the periodic direction. This method doesn't care about the direction as long as the angle you specify results in a match between the Left Face and the Right Face. I would use this instead.
 
     Example 1:              
         L      RL           R
@@ -548,7 +547,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
 
 
 
-def translational_periodicity(blocks:List[Block],matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]], shift_distance:float, shift_direction:str = "x", ReduceMesh:bool=True):
+def translational_periodicity(blocks:List[Block], connectivity_matrix:np.ndarray, translational_index:str="j", translational_direction:str = "z"):
     """Find periodicity using translated blocks. Simple example: if you have a rectangle and the top and bottom surfaces are periodic, this will copy the rectangle and shift it up to find which surfaces match. 
 
     Args:
@@ -577,18 +576,46 @@ def translational_periodicity(blocks:List[Block],matched_faces:List[Dict[str,int
             - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
     """
     gcd_array = list()
-    # Find the gcd of all the blocks 
-    if ReduceMesh==True:
-        for block_indx in range(len(blocks)):
-            block = blocks[block_indx]
-            gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-        gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
-        blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
+    # Find the gcd of all the blocks
+    for block_indx in range(len(blocks)):
+        block = blocks[block_indx]
+        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
+    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+    blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)    
 
+    xc_array = np.array([b.xc for b in blocks]); xc = np.mean(xc_array)
+    yc_array = np.array([b.yc for b in blocks]); yc = np.mean(yc_array)
+    zc_array = np.array([b.zc for b in blocks]); zc = np.mean(zc_array)
 
     blocks_shifted = deepcopy(blocks)
-    [b.shift(shift_distance, shift_direction) for b in blocks_shifted]
-   
+    if translational_direction=="x":
+        xmins = [b.X.min() for b in blocks]
+        xmaxes = [b.X.max() for b in blocks]
+        xmin = min(xmins)
+        xmax = max(xmaxes)
+        x_shift_distance = xmax-xmin
+        [b.shift(x_shift_distance, translational_direction) for b in blocks_shifted]
+        
+        b.xc-xc
+        
+
+    elif translational_direction=="y":
+        ymins = [b.Y.min() for b in blocks]
+        ymaxes = [b.Y.max() for b in blocks]
+        ymin = min(ymins)
+        ymax = max(ymaxes)
+        y_shift_distance = ymax-ymin
+        [b.shift(y_shift_distance, translational_direction) for b in blocks_shifted]
+
+    elif translational_direction=="z":
+        zmins = [b.Z.min() for b in blocks]
+        zmaxes = [b.Z.max() for b in blocks]
+        zmin = min(zmins)
+        zmax = max(zmaxes)
+        z_shift_distance = zmax-zmin
+        [b.shift(z_shift_distance, translational_direction) for b in blocks_shifted]
+    
+    # Now that the blocks are shifted and we have the connection matrix, lets find a block closest to the 
     # Check periodic within a block 
     periodic_found = True
     

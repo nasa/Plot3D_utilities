@@ -28,22 +28,7 @@ with open('CMC009_connectivity.pickle','rb') as f:
     connection_matrix_j = data['connection_matrix_j']
     connection_matrix_k = data['connection_matrix_k']
 
-zmins = [b.Z.min() for b in blocks]
-zmin = min(zmins)
-
-zmaxes = [b.Z.max() for b in blocks]
-zmax = max(zmaxes)
-
-ymins = [b.Y.min() for b in blocks]
-ymin = min(ymins)
-
-ymaxes = [b.Y.max() for b in blocks]
-ymax = max(ymaxes)
-
-z_shift_distance = zmax-zmin 
-y_shift_distance = ymax-ymin 
-
-
+# We need faces connected in I and J at KMIN
 periodic_faces, outer_faces, _, _ = translational_periodicity(blocks,face_matches,outer_faces,shift_distance=z_shift_distance, shift_direction='z')
 face_matches.extend(periodic_faces)
 
