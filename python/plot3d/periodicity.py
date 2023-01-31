@@ -546,6 +546,8 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         outer_faces_all[j].K *= gcd_to_use
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
+
+
 def translational_periodicity(blocks:List[Block],matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]], shift_distance:float, shift_direction:str = "x", ReduceMesh:bool=True):
     """Find periodicity using translated blocks. Simple example: if you have a rectangle and the top and bottom surfaces are periodic, this will copy the rectangle and shift it up to find which surfaces match. 
 
@@ -583,7 +585,7 @@ def translational_periodicity(blocks:List[Block],matched_faces:List[Dict[str,int
         gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
         blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
-    
+
     blocks_shifted = deepcopy(blocks)
     [b.shift(shift_distance, shift_direction) for b in blocks_shifted]
    

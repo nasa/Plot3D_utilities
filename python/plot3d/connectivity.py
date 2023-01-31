@@ -680,3 +680,49 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
     match['block2']['JMAX'] = int(df.iloc[0]['J'])
     match['block2']['KMAX'] = int(df.iloc[0]['K'])
     return match
+
+def block_connection_matrix(blocks:List[Block]):
+    """Used to find how block are organized.  
+        
+
+    Args:
+        blocks (List[Block]): List of blocks defined in any order
+
+    Returns:
+        (Tuple): containing
+
+            - (pandas.DataFrame): dataframe with matches. Columns = I1, J1, K1, I2, J2, K2
+            - (List[Face]): any split faces from block 1
+            - (List[Face]): any split faces from block 2 
+
+    """
+
+    n = len(blocks)
+    i_connectivity = np.eye(n,dtype=np.int8)
+    j_connectivity = np.eye(n,dtype=np.int8)
+    k_connectivity = np.eye(n,dtype=np.int8)
+    connectivity = np.eye(n,dtype=np.int8)
+    for i in range(n):
+        b1 = blocks[i]
+        b1_outer_faces,_ = get_outer_faces(b1)        
+        if np.sum(connectivity[i,:]==1)<6:
+            for j in range(0,n):
+                if i != j and connectivity[i,j]!=-1:
+                    b2 = blocks[j]
+                    b2_outer_faces,_ = get_outer_faces(b2)
+                    # Check to see if any of the outer faces match                 
+                    for f1 in b1_outer_faces:
+                        for f2 in b2_outer_faces:
+                            if (f1.const_type == f2.const_type and f1.vertices_equals(f2)): # Check corner matches
+                                if (f1.const_type == 0):
+                                    i_connectivity[i,j] = 1 # Connection in the i direction only 
+                                elif (f1.const_type == 1):
+                                    j_connectivity[i,j] = 1 # Connection in the j direction only 
+                                else:
+                                    k_connectivity[i,j] = 1 # Connection in the k direction only 
+                                connectivity[i,j] = 1       # Default block to block connection matrix 
+                                connectivity[j,i] = 1
+                            else:
+                                connectivity[i,j] = -1
+                                connectivity[j,i] = -1
+    return connectivity, i_connectivity, j_connectivity, k_connectivity, 
