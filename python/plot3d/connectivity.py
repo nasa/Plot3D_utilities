@@ -702,27 +702,37 @@ def block_connection_matrix(blocks:List[Block]):
     j_connectivity = np.eye(n,dtype=np.int8)
     k_connectivity = np.eye(n,dtype=np.int8)
     connectivity = np.eye(n,dtype=np.int8)
-    for i in range(n):
+    combos = list(combinations(range(n),2))
+    for indx in (pbar:=trange(len(combos))):
+        i,j = combos[indx]
+        pbar.set_description(f"Building block to block connectivity matrix: checking {i}")
         b1 = blocks[i]
         b1_outer_faces,_ = get_outer_faces(b1)        
-        if np.sum(connectivity[i,:]==1)<6:
-            for j in range(0,n):
-                if i != j and connectivity[i,j]!=-1:
-                    b2 = blocks[j]
-                    b2_outer_faces,_ = get_outer_faces(b2)
-                    # Check to see if any of the outer faces match                 
-                    for f1 in b1_outer_faces:
-                        for f2 in b2_outer_faces:
-                            if (f1.const_type == f2.const_type and f1.vertices_equals(f2)): # Check corner matches
-                                if (f1.const_type == 0):
-                                    i_connectivity[i,j] = 1 # Connection in the i direction only 
-                                elif (f1.const_type == 1):
-                                    j_connectivity[i,j] = 1 # Connection in the j direction only 
-                                else:
-                                    k_connectivity[i,j] = 1 # Connection in the k direction only 
-                                connectivity[i,j] = 1       # Default block to block connection matrix 
-                                connectivity[j,i] = 1
+        if i != j and connectivity[i,j]!=-1:
+            b2 = blocks[j]
+            b2_outer_faces,_ = get_outer_faces(b2)
+            # Check to see if any of the outer faces match    
+            connection_found=False             
+            for f1 in b1_outer_faces:
+                for f2 in b2_outer_faces:
+                    if (f1.const_type == f2.const_type): # Check corner matches
+                        if f1.vertices_equals(f2):
+                            if (f1.const_type == 0):
+                                i_connectivity[i,j] = 1 # Connection in the i direction only 
+                            elif (f1.const_type == 1):
+                                j_connectivity[i,j] = 1 # Connection in the j direction only 
                             else:
-                                connectivity[i,j] = -1
-                                connectivity[j,i] = -1
+                                k_connectivity[i,j] = 1 # Connection in the k direction only 
+                            connectivity[i,j] = 1       # Default block to block connection matrix 
+                            connectivity[j,i] = 1
+                            connection_found=True
+                    if np.sum(connectivity[i,:]==1)==6:
+                        break
+                if np.sum(connectivity[i,:]==1)==6:
+                        break
+            if not connection_found:
+                connectivity[i,j] = -1
+                connectivity[j,i] = -1
+        # c = np.sum(connectivity[i,:]==1)
+        # print(f"block {i} connections {c}")
     return connectivity, i_connectivity, j_connectivity, k_connectivity, 
