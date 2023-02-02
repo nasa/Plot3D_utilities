@@ -28,12 +28,12 @@ with open('CMC009_connectivity.pickle','rb') as f:
     connection_matrix_j = data['connection_matrix_j']
     connection_matrix_k = data['connection_matrix_k']
 
-# We need faces connected in I and J at KMIN
-periodic_faces, outer_faces, _, _ = translational_periodicity(blocks,face_matches,outer_faces,shift_distance=z_shift_distance, shift_direction='z')
-face_matches.extend(periodic_faces)
+# # We need faces connected in I and J at KMIN
+# periodic_faces, outer_faces, _, _ = translational_periodicity(blocks,connection_matrix, outer_faces,translational_direction='z')
+# face_matches.extend(periodic_faces)
 
-periodic_faces, outer_faces, _, _ = translational_periodicity(blocks,face_matches,outer_faces,shift_distance=y_shift_distance,shift_direction='y')
-face_matches.extend(periodic_faces)
+# periodic_faces, outer_faces, _, _ = translational_periodicity(blocks,face_matches,outer_faces,shift_distance=y_shift_distance,shift_direction='y')
+# face_matches.extend(periodic_faces)
 
 
 

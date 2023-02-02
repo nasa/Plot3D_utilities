@@ -4,7 +4,7 @@ from itertools import combinations_with_replacement, permutations
 import numpy as np
 from .block import Block, rotate_block, reduce_blocks, get_outer_bounds
 from .face import Face, create_face_from_diagonals, split_face, find_face_near_plane, convert_dictionary_faces_to_face
-from .connectivity import connectivity_fast, get_face_intersection, face_matches_to_dict
+from .connectivity import connectivity_fast, get_face_intersection, face_matches_to_dict, get_outer_faces
 from .write import write_plot3D
 from math import cos, radians, sin, sqrt, acos, radians
 from copy import deepcopy
@@ -546,8 +546,91 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
 
+def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray,centroid:np.ndarray,translational_direction:str="x",minvalue:bool=True):
+        """Find the closest block to an extreme in the x,y, or z direction and returns the targetting point. 
+        Target point is the reference point where we want the closest block and the closest face 
 
-def translational_periodicity(blocks:List[Block], connectivity_matrix:np.ndarray, translational_index:str="j", translational_direction:str = "z"):
+        Args:
+            x (np.ndarray): x coordinate of all the blocks' centroid
+            y (np.ndarray): y coordinate of all the blocks' centroid
+            z (np.ndarray): z coordinate of all the blocks' centroid
+            centroid (np.ndarray): centroid (cx,cy,cz)
+            translational_direction (str, optional): _description_. Defaults to "x".
+            minvalue (bool, optional): _description_. Defaults to True.
+
+        Returns:
+            (tuple): containing
+
+                *selected block index* (int): index of closest block
+                *target_x* (float): this is the x value where selected block is closest to
+                *target_y* (float): this is the y value where selected block is closest to
+                *target_z* (float): this is the z value where selected block is closest to
+        """
+        cx = centroid[0]; cy = centroid[1]; cz = centroid[2]
+        target_x = cx; target_y = cy; target_z = cz
+        if translational_direction=="x":
+            xmins = [b.X.min() for b in blocks]
+            xmaxes = [b.X.max() for b in blocks]
+            xmin = min(xmins)
+            xmax = max(xmaxes)
+            if minvalue:
+                selected_block_indx = np.argmin(np.sqrt((xmin-x)**2 + (cy-y)**2 + (cz-z)**2))
+                target_x = xmin
+            else:
+                selected_block_indx = np.argmin(np.sqrt((xmax-x)**2 + (cy-y)**2 + (cz-z)**2))
+                target_x = xmax
+        elif translational_direction=="y":
+            ymins = [b.Y.min() for b in blocks]
+            ymaxes = [b.Y.max() for b in blocks]
+            ymin = min(ymins)
+            ymax = max(ymaxes)
+            if minvalue:
+                selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (ymin-y)**2 + (cz-z)**2))
+                target_y = ymin
+            else:
+                selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (ymax-y)**2 + (cz-z)**2))
+                target_y = ymax
+        else: #  translational_direction=="z":
+            zmins = [b.Z.min() for b in blocks]
+            zmaxes = [b.Z.max() for b in blocks]
+            zmin = min(zmins)
+            zmax = max(zmaxes)
+            if minvalue:
+                selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (zmin-z)**2))
+                target_z = zmin
+            else:
+                selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (zmax-z)**2))
+                target_z = zmax
+        return selected_block_indx,target_x,target_y,target_z 
+
+def matching_face_search(face_to_search,outer_faces:List[Face],connectivity_matrix:np.ndarray):
+    """Recursive program to return all the matching faces. Note faces must have the same I,J,K definition so faces will be matching if for example: Face1 IMIN=IMAX and Face2 IMIN=IMAX and they share a common edge (2 vertices)
+
+    Args:
+        face_to_search (_type_): _description_
+        outer_faces (List[Face]): _description_
+        connectivity_matrix (np.ndarray): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    matching_faces = list() 
+    selected_block_indx = face_to_search.BlockIndex
+    connected_block_indices = np.where(connectivity_matrix[selected_block_indx,:]==1)[0]
+    faces_to_check = [o for o in outer_faces if o.BlockIndex in connected_block_indices.tolist()]
+    # faces_to_check = list(filter(lambda : o.BlockIndex in connected_block_indices.tolist(),outer_faces))
+    for f in faces_to_check:
+        if (face_to_search.is_coplanar(f)):
+            connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
+            connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
+            outer_faces.remove(f)
+            matching_faces.append(f)
+    for f in matching_faces:
+        matching_faces.extend(matching_face_search(f,outer_faces,connectivity_matrix))
+    return matching_faces
+            
+            
+def translational_periodicity(blocks:List[Block], connectivity_matrix:np.ndarray, outer_faces:List[Face], translational_direction:str = "z"):
     """Find periodicity using translated blocks. Simple example: if you have a rectangle and the top and bottom surfaces are periodic, this will copy the rectangle and shift it up to find which surfaces match. 
 
     Args:
@@ -583,194 +666,46 @@ def translational_periodicity(blocks:List[Block], connectivity_matrix:np.ndarray
     gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
     blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)    
 
-    xc_array = np.array([b.xc for b in blocks]); xc = np.mean(xc_array)
-    yc_array = np.array([b.yc for b in blocks]); yc = np.mean(yc_array)
-    zc_array = np.array([b.zc for b in blocks]); zc = np.mean(zc_array)
-
-    blocks_shifted = deepcopy(blocks)
-    if translational_direction=="x":
-        xmins = [b.X.min() for b in blocks]
-        xmaxes = [b.X.max() for b in blocks]
-        xmin = min(xmins)
-        xmax = max(xmaxes)
-        x_shift_distance = xmax-xmin
-        [b.shift(x_shift_distance, translational_direction) for b in blocks_shifted]
-        
-        b.xc-xc
-        
-
-    elif translational_direction=="y":
-        ymins = [b.Y.min() for b in blocks]
-        ymaxes = [b.Y.max() for b in blocks]
-        ymin = min(ymins)
-        ymax = max(ymaxes)
-        y_shift_distance = ymax-ymin
-        [b.shift(y_shift_distance, translational_direction) for b in blocks_shifted]
-
-    elif translational_direction=="z":
-        zmins = [b.Z.min() for b in blocks]
-        zmaxes = [b.Z.max() for b in blocks]
-        zmin = min(zmins)
-        zmax = max(zmaxes)
-        z_shift_distance = zmax-zmin
-        [b.shift(z_shift_distance, translational_direction) for b in blocks_shifted]
+    xyz_array = np.array([(b.cx, b.cy, b.cz) for b in blocks]); 
     
-    # Now that the blocks are shifted and we have the connection matrix, lets find a block closest to the 
-    # Check periodic within a block 
-    periodic_found = True
+    cx = np.mean(xyz_array[:,0]) # Centroid 
+    cy = np.mean(xyz_array[:,1])
+    cz = np.mean(xyz_array[:,2])
+    x = xyz_array[:,0]; y = xyz_array[:,1]; z = xyz_array[:,2]
+
     
-    # Here we make a list of all the outer faces
-    outer_faces_all = list() 
-    matched_faces_all = list()
-    periodic_faces = list()      # This is the output of the code 
-    periodic_faces_export = list() 
     
-    # Speed up calculations: To make things faster we found the outer bounds of the blocks and filter the outerfaces so that, for example, if you translate in the x direction, we only use outer faces that are in the xmin and xmax of the block
-    outer_faces_all = convert_dictionary_faces_to_face(blocks,outer_faces,gcd_to_use)
+    # Takes the dictionary of outer faces and converts it to a list of objects 
+    outer_faces_all = list()
+    for o in outer_faces:
+        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['JMIN']/gcd_to_use), 
+            int(o['KMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMAX']/gcd_to_use))
+        face.set_block_index(o['block_index'])
+        outer_faces_all.append(face)
 
-    # xbounds,ybounds,zbounds = get_outer_bounds(blocks)    
-    # if (shift_direction == 'x'):
-    #     nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,xbounds[0]-0.1)
-    #     nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,xbounds[1]+0.1)
-    # if (shift_direction == 'y'):
-    #     nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,ybounds[0]-0.1)
-    #     nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,ybounds[1]+0.1)
-    # if (shift_direction == 'z'):
-    #     nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,zbounds[0]-0.1)
-    #     nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,zbounds[1]+0.1)
-    # outer_faces_all = nearest_faces1
-    # outer_faces_all.extend(nearest_faces2)
+    # Find closest face to the min value 
+    selected_block_index,tx,ty,tz = find_closest_block(blocks,x,y,z,np.array([cx,cy,cz]),translational_direction,minvalue=True)
+    faces = [f for f in outer_faces_all if f.BlockIndex == selected_block_index]    # Pick all the faces for the selected block 
+    min_face_indx = np.argmin(np.array([np.sqrt((f.cx-cx)**2+(f.cy-cy)**2+(f.cz-cz)**2) for f in faces]))
+    min_face = faces[min_face_indx]     # Just need this
+    
+    selected_block_index,tx,ty,tz = find_closest_block(blocks,x,y,z,np.array([cx,cy,cz]),translational_direction,minvalue=False)
+    faces = [f for f in outer_faces_all if f.BlockIndex == selected_block_index]    # Pick all the faces for the selected block 
+    max_face_indx = np.argmin(np.array([np.sqrt((f.cx-cx)**2+(f.cy-cy)**2+(f.cz-cz)**2) for f in faces]))
+    max_face = faces[max_face_indx]     # Also need this
 
-    for _,m in enumerate(matched_faces):
-        face1 = create_face_from_diagonals(blocks_shifted[m['block1']['block_index']], 
-                            int(m['block1']['IMIN']/gcd_to_use), int(m['block1']['JMIN']/gcd_to_use), int(m['block1']['KMIN']/gcd_to_use), 
-                            int(m['block1']['IMAX']/gcd_to_use), int(m['block1']['JMAX']/gcd_to_use), int(m['block1']['KMAX']/gcd_to_use))
-        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], 
-                            int(m['block2']['IMIN']/gcd_to_use), int(m['block2']['JMIN']/gcd_to_use), int(m['block2']['KMIN']/gcd_to_use), 
-                            int(m['block2']['IMAX']/gcd_to_use), int(m['block2']['JMAX']/gcd_to_use), int(m['block2']['KMAX']/gcd_to_use))
-        face1.set_block_index(m['block1']['block_index'])
-        face2.set_block_index(m['block2']['block_index'])
-        matched_faces_all.append(face1)
-        matched_faces_all.append(face2)
+    
+    # Search face connectivity in block connectivity matrix 
+    connectivity_matrix = connectivity_matrix - np.eye(connectivity_matrix.shape[0],dtype=np.int8) # turn off connections with itself 
 
-    split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
-    non_matching = list()
-    while periodic_found:
-        periodic_found = False        
-        outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
-        outer_face_combos = list(permutations(range(len(outer_faces_all)),2))
-        outer_face_combos = list(set(outer_face_combos) - set(non_matching)) # removes face combinations already checked
-        t = trange(len(outer_face_combos))
-        for i in t: 
-            # Check if surfaces are periodic with each other
-            face1_indx = outer_face_combos[i][0]
-            face2_indx = outer_face_combos[i][1]
-            face1 = outer_faces_all[face1_indx]
-            face2 = outer_faces_all[face2_indx]
-            t.set_description(f"Checking connections block {face1.blockIndex} with {face2.blockIndex}")
-
-            if (face1.IMIN == face1.IMAX) and (face2.IMIN == face2.IMAX) or \
-                (face1.JMIN == face1.JMAX) and (face2.JMIN == face2.JMAX) or \
-                (face1.KMIN == face1.KMAX) and (face2.KMIN == face2.KMAX):
-                    
-                # Rotate Block 1 -> Check periodicity -> if not periodic -> Rotate Block 1 opposite direction -> Check periodicity
-                #   Rotate Block 1
-                block1_rotated = blocks_shifted[face1.blockIndex]
-                block2 = blocks[face2.blockIndex]
-                #   Check periodicity
-                df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
+    lower_connected_faces = matching_face_search(min_face,outer_faces_all,connectivity_matrix)
+    upper_connected_faces = matching_face_search(max_face,outer_faces_all,connectivity_matrix)
                 
-                if len(periodic_faces_temp) > 0:
-                    outer_faces_to_remove.append(face1)
-                    outer_faces_to_remove.append(face2)
-                    outer_faces_to_remove.append(periodic_faces_temp[0])
-                    outer_faces_to_remove.append(periodic_faces_temp[1])
-                    periodic_faces.append(periodic_faces_temp)
-                    periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1_rotated,block2))
-                    split_faces.extend(split_faces_temp)
-                    periodic_found = True
-                    break
-            else: 
-                non_matching.append((face1_indx,face2_indx))
-            
+        
 
-        if (periodic_found):
-            outer_faces_to_remove = list(set(outer_faces_to_remove))
-            outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]
-            if len(split_faces)>0:
-                outer_faces_all.extend(split_faces)
-                split_faces.clear()
-
-    # This is an added check to make sure all periodic faces are in the outer_faces_to_remove
-    for p in periodic_faces:
-        outer_faces_to_remove.append(p[0])
-        outer_faces_to_remove.append(p[1])
-
-    for m in matched_faces_all:
-        outer_faces_to_remove.append(m)
-
-    outer_faces_to_remove = list(set(outer_faces_to_remove))    # Use only unique values
-    outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]    # remove from outer faces 
-    # remove any duplicate periodic face pairs 
-    indx_to_remove = list()
-    for i in range(len(periodic_faces)):
-        for j in range(i+1,len(periodic_faces)):
-            if periodic_faces[i][0] == periodic_faces[j][0]:
-                if periodic_faces[i][1] == periodic_faces[j][1]:
-                    indx_to_remove.append(j)
-            if periodic_faces[i][1] == periodic_faces[j][0]:
-                if periodic_faces[i][0] == periodic_faces[j][1]:
-                    indx_to_remove.append(j)
+        
     
-
-    periodic_faces_export = [periodic_faces_export[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
-    periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
-    # Export periodic faces and outer faces
-    outer_faces_export = list() 
-
-    for o in outer_faces_all:
-        outer_faces_export.append(o.to_dict())
-
-    # scale it up
-    for i in range(len(periodic_faces_export)):
-        periodic_faces_export[i]['block1']['IMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['JMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['KMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['IMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['JMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['KMAX'] *= gcd_to_use
-
-        if (periodic_faces_export[i]['block2']['IMIN'] == 168):
-            print("check")
-        periodic_faces_export[i]['block2']['IMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['JMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['KMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['IMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['JMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['KMAX'] *= gcd_to_use
-    
-    for i in range(len(periodic_faces)):
-        periodic_faces[i][0].I *= gcd_to_use
-        periodic_faces[i][0].J *= gcd_to_use
-        periodic_faces[i][0].K *= gcd_to_use
-
-        periodic_faces[i][1].I *= gcd_to_use
-        periodic_faces[i][1].J *= gcd_to_use
-        periodic_faces[i][1].K *= gcd_to_use
-
-    for j in range(len(outer_faces_export)):
-        outer_faces_export[j]['IMIN'] *= gcd_to_use
-        outer_faces_export[j]['JMIN'] *= gcd_to_use
-        outer_faces_export[j]['KMIN'] *= gcd_to_use
-        outer_faces_export[j]['IMAX'] *= gcd_to_use
-        outer_faces_export[j]['JMAX'] *= gcd_to_use
-        outer_faces_export[j]['KMAX'] *= gcd_to_use
-    
-    for j in range(len(outer_faces_all)):
-        outer_faces_all[j].I *= gcd_to_use
-        outer_faces_all[j].J *= gcd_to_use
-        outer_faces_all[j].K *= gcd_to_use
-    return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
+    print('check')
 
 def linear_real_transform(face1:Face,face2:Face) -> Tuple:
     """Computes the rotation angle from Face1 to Face2. This can be used to check if the faces are periodic 

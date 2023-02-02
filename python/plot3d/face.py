@@ -311,7 +311,18 @@ class Face:
             if self.I[indx] == self.IMAX and self.J[indx] == self.JMAX and self.K[indx] == self.KMAX:
                 maxIndx = indx
         return (self.x[minIndx],self.y[minIndx], self.z[minIndx]),(self.x[maxIndx],self.y[maxIndx], self.z[maxIndx])
-        
+    
+    def is_coplanar(self,f):
+        """Determines if face is connected and coplanar think of this as tiles next to each other. It will detect tiles that are next to each other but not any vertical running tiles. 
+
+        Args:
+            f (Face): another face object 
+        """
+        matchedIndices = self.match_indices(f)
+        if len(matchedIndices) == 2 and f.const_type == self.const_type:
+            return True
+        return False
+
 
 
 def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int):
