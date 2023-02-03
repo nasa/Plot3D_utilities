@@ -1,5 +1,6 @@
 from typing import Dict, List, Tuple
 import numpy as np
+import math
 
 class Face:
     """Defines a Face of a block for example IMIN,JMIN,JMIN to IMAX,JMIN,JMIN
