@@ -539,6 +539,7 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
             else:
                 selected_block_indx = np.argmin(np.sqrt((xmax-x)**2 + (cy-y)**2 + (cz-z)**2))
                 target_x = xmax
+            target_y=blocks[selected_block_indx].cy; target_z = blocks[selected_block_indx].cz
         elif translational_direction=="y":
             ymins = [b.Y.min() for b in blocks]
             ymaxes = [b.Y.max() for b in blocks]
@@ -549,7 +550,8 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
                 target_y = ymin
             else:
                 selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (ymax-y)**2 + (cz-z)**2))
-                target_y = ymax
+                target_y = ymax; 
+            target_x = blocks[selected_block_indx].cx; target_z = blocks[selected_block_indx].cz
         else: #  translational_direction=="z":
             zmins = [b.Z.min() for b in blocks]
             zmaxes = [b.Z.max() for b in blocks]
@@ -557,10 +559,11 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
             zmax = max(zmaxes)
             if minvalue:
                 selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (zmin-z)**2))
-                target_z = zmin
+                target_z = zmin;
             else:
                 selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (zmax-z)**2))
-                target_z = zmax
+                target_z = zmax; 
+            target_x = blocks[selected_block_indx].cx; target_y = blocks[selected_block_indx].cy
         return selected_block_indx,target_x,target_y,target_z 
 
 def matching_face_search(face_to_search,outer_faces:List[Face],connectivity_matrix:np.ndarray):
@@ -580,15 +583,13 @@ def matching_face_search(face_to_search,outer_faces:List[Face],connectivity_matr
     faces_to_check = [o for o in outer_faces if o.BlockIndex in connected_block_indices.tolist()]
     # faces_to_check = list(filter(lambda : o.BlockIndex in connected_block_indices.tolist(),outer_faces))
     for f in faces_to_check:
-        if face_to_search.BlockIndex==45 and f.BlockIndex==44:
-            print('check')
-        elif face_to_search.BlockIndex==44 and f.BlockIndex==45:
-            print('check')
-            
-        if (face_to_search.is_coplanar(f)):
+        # if f.BlockIndex == 45 and face_to_search.BlockIndex == 46:
+        #     print('check')
+        # elif f.BlockIndex == 46 and face_to_search.BlockIndex == 45:
+        #     print('check')
+        if (len(face_to_search.match_indices(f))==2 and face_to_search.const_type==f.const_type):
             connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
             connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
-            outer_faces.remove(f)
             matching_faces.append(f)
     for f in matching_faces:
         matching_faces.extend(matching_face_search(f,outer_faces,connectivity_matrix))

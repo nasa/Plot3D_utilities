@@ -718,9 +718,6 @@ def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[
     outer_faces = outer_faces_all
 
     n = len(blocks)
-    i_connectivity = np.eye(n,dtype=np.int8)
-    j_connectivity = np.eye(n,dtype=np.int8)
-    k_connectivity = np.eye(n,dtype=np.int8)
     connectivity = np.eye(n,dtype=np.int8)
     combos = list(combinations(range(n),2))    
     for indx in (pbar:=trange(len(combos))):
@@ -741,28 +738,20 @@ def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[
             else:
                 b2_outer_faces = [o for o in outer_faces if o.BlockIndex == j]                
 
-            # Check to see if any of the outer faces match    
+            # Check to see if any of the outer faces of the blocks match   
             connection_found=False             
             for f1 in b1_outer_faces:
                 for f2 in b2_outer_faces:
-                    if (f1.const_type == f2.const_type): # Check corner matches
-                        if len(f1.match_indices(f2))==2:
-                            if (f1.const_type == 0):
-                                i_connectivity[i,j] = 1 # Connection where IMIN=IMAX
-                            elif (f1.const_type == 1):
-                                j_connectivity[i,j] = 1 # Connection where JMIN=JMAX
-                            else:
-                                k_connectivity[i,j] = 1 # Connection where KMIN=KMAX
-                            connectivity[i,j] = 1       # Default block to block connection matrix 
-                            connectivity[j,i] = 1
-                            connection_found=True
-                #     if np.sum(connectivity[i,:]==1)==6:
-                #         break
-                # if np.sum(connectivity[i,:]==1)==6:
-                #         break
+                    if (f1.is_connected(f2)): # Check if face centroid is the same
+                        connectivity[i,j] = 1       # Default block to block connection matrix 
+                        connectivity[j,i] = 1
+                        connection_found=True
+                        break
+                if connection_found:
+                    break
             if not connection_found:
                 connectivity[i,j] = -1
                 connectivity[j,i] = -1
         # c = np.sum(connectivity[i,:]==1)
         # print(f"block {i} connections {c}")
-    return connectivity, i_connectivity, j_connectivity, k_connectivity
+    return connectivity

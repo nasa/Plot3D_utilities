@@ -1,9 +1,5 @@
-import itertools
 from typing import Dict, List, Tuple
 import numpy as np
-from numpy.lib import math
-from .block import Block
-from tqdm import trange
 
 class Face:
     """Defines a Face of a block for example IMIN,JMIN,JMIN to IMAX,JMIN,JMIN
@@ -273,6 +269,7 @@ class Face:
     def __repr__(self):
         return str(self)
     
+
     @property
     def diagonal_length(self) -> float:
         """Returns the diagonal length of the face 
@@ -312,16 +309,18 @@ class Face:
                 maxIndx = indx
         return (self.x[minIndx],self.y[minIndx], self.z[minIndx]),(self.x[maxIndx],self.y[maxIndx], self.z[maxIndx])
     
-    def is_coplanar(self,f):
-        """Determines if face is connected and coplanar think of this as tiles next to each other. It will detect tiles that are next to each other but not any vertical running tiles. 
+    def is_connected(self,f):
+        """Determines if face is connected by looking at the face centroid
 
         Args:
             f (Face): another face object 
         """
-        matchedIndices = self.match_indices(f)
-        if len(matchedIndices) == 2 and f.const_type == self.const_type:
+        val = np.sqrt((self.cx-f.cx)**2 + (self.cy-f.cy)**2 + (self.cz-f.cz)**2)
+        if val <1E-8:
             return True
-        return False
+        else:
+            return False
+
 
     def shift(self,dx:float,dy:float,dz:float):
         """Shifts the faces 

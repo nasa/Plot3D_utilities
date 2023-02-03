@@ -1,4 +1,5 @@
-import sys, os, pickle 
+import sys, os, pickle
+import numpy as np
 sys.path.insert(0,'../../')
 from plot3d import read_plot3D, connectivity_fast,translational_periodicity, translational_periodicity2, write_plot3D, Direction, split_blocks, block_connection_matrix, outer_face_dict_to_list, match_faces_dict_to_list
 
@@ -27,21 +28,14 @@ if not os.path.exists(f'VSPT_connectivity.pickle'):
             }
     dump_data(data)
     print('Creating block connection matrix')
-    c,ic,jc,kc = block_connection_matrix(blocks,matched_faces)
+    c = block_connection_matrix(blocks,matched_faces)
     data["connection_matrix"]=c
-    data["connection_matrix_i"]=ic
-    data["connection_matrix_j"]=jc
-    data["connection_matrix_k"]=kc
     dump_data(data)
 
 data = read_data()    
 face_matches = data['face_matches']
 outer_faces = data['outer_faces']
 connection_matrix = data['connection_matrix']
-connection_matrix_i = data['connection_matrix_i']
-connection_matrix_j = data['connection_matrix_j']
-connection_matrix_k = data['connection_matrix_k']
-
 
 # We need faces connected in I and J at KMIN
 lower_connected_faces, upper_connected_faces = translational_periodicity(blocks,connection_matrix,translational_direction='z')
