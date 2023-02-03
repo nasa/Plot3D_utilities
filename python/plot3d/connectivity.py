@@ -1,11 +1,13 @@
-from .block import Block, reduce_blocks
-from .face import Face, create_face_from_diagonals, split_face
+from .block import Block
+from .blockfunctions import reduce_blocks
+from .face import Face
+from .facefunctions import create_face_from_diagonals, split_face
 import math 
 from itertools import product, combinations
 from tqdm import trange
 import numpy as np 
 import pandas as pd
-from typing import List, NamedTuple
+from typing import Dict, List, NamedTuple
 import math
 from .point_match import point_match
 from copy import deepcopy
@@ -681,28 +683,39 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
     match['block2']['KMAX'] = int(df.iloc[0]['K'])
     return match
 
-def block_connection_matrix(blocks:List[Block]):
-    """Used to find how block are organized.  
-        
+def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[]):
+    """Creates a matrix representing how block edges are connected to each other 
 
     Args:
-        blocks (List[Block]): List of blocks defined in any order
+        blocks (List[Block]): _description_
+        outer_faces (List[Dict[str,int]], optional): List of outer faces remaining from connectivity. Useful if you are interested in finding faces that are exterior to the block. Also useful if you combine outerfaces with match faces, this will help identify connections by looking at split faces. Defaults to [].
 
     Returns:
         (Tuple): containing
 
-            - (pandas.DataFrame): dataframe with matches. Columns = I1, J1, K1, I2, J2, K2
-            - (List[Face]): any split faces from block 1
-            - (List[Face]): any split faces from block 2 
-
+            *connectivity* (np.ndarray): integer matrix defining how the blocks are connected to each other
+            *connectivity_i* (np.ndarray): integer matrix defining connectivity of all blocks where IMAX=IMIN
+            *connectivity_j* (np.ndarray): integer matrix defining connectivity of all blocks where JMAX=JMIN
+            *connectivity_k* (np.ndarray): integer matrix defining connectivity of all blocks where KMAX=KMIN
+            
     """
-    gcd_array = list()
-    # Find the gcd of all the blocks 
+    # Reduce the size of the blocks by the GCD 
+    gcd_array = list()    
     for block_indx in range(len(blocks)):
         block = blocks[block_indx]
         gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
     gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
     blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
+
+    # Face to List 
+    outer_faces_all = list()
+    for o in outer_faces:
+        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['JMIN']/gcd_to_use), 
+            int(o['KMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMAX']/gcd_to_use))
+        face.set_block_index(o['block_index'])
+        outer_faces_all.append(face)
+
+    outer_faces = outer_faces_all
 
     n = len(blocks)
     i_connectivity = np.eye(n,dtype=np.int8)
@@ -714,10 +727,20 @@ def block_connection_matrix(blocks:List[Block]):
         i,j = combos[indx]
         pbar.set_description(f"Building block to block connectivity matrix: checking {i}")
         b1 = blocks[i]
-        b1_outer_faces,_ = get_outer_faces(b1)        
+
+        if len(outer_faces)==0:                     # Get the outerfaces to search
+            b1_outer_faces,_ = get_outer_faces(b1)
+        else:
+            b1_outer_faces = [o for o in outer_faces if o.BlockIndex == i]
+        
         if i != j and connectivity[i,j]!=-1:
             b2 = blocks[j]
-            b2_outer_faces,_ = get_outer_faces(b2)
+
+            if len(outer_faces)==0:                 # Get the outerfaces to search
+                b2_outer_faces,_ = get_outer_faces(b2)
+            else:
+                b2_outer_faces = [o for o in outer_faces if o.BlockIndex == j]                
+
             # Check to see if any of the outer faces match    
             connection_found=False             
             for f1 in b1_outer_faces:
