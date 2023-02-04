@@ -5,9 +5,7 @@ from plot3d import read_plot3D, connectivity_fast,translational_periodicity, tra
 
 def dump_data(data):
     with open('VSPT_connectivity.pickle','wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
-        pickle.dump(data
-            ,f)
+        pickle.dump(data,f)
 
 def read_data():
     with open('VSPT_connectivity.pickle','rb') as f:
@@ -18,6 +16,7 @@ blocks = read_plot3D('3DVSPT_inAtmp4OutAT2.xyz',True)
 if not os.path.exists(f'VSPT_connectivity.pickle'):    
     print('Finding connectivity')
     face_matches, outer_faces = connectivity_fast(blocks)
+    [m.pop('match',None) for m in face_matches] # Remove the dataframe
     print('Organizing split and outerfaces')
     all_faces = match_faces_dict_to_list(blocks,face_matches)
     all_faces.extend(outer_face_dict_to_list(blocks,outer_faces))
@@ -45,8 +44,8 @@ data['upper_connected_faces'] = upper_connected_faces
 dump_data(data)
 
 data = read_data()
-lower_connected_faces = list(set(data['lower_connected_faces']))
-upper_connected_faces = list(set(data['upper_connected_faces']))
+lower_connected_faces = data['lower_connected_faces']
+upper_connected_faces = data['upper_connected_faces']
 
 # Shift lower connected face by the delta z and check for connectivity
 # translational_periodicity2(blocks,lower_connected_faces,upper_connected_faces,direction="z")

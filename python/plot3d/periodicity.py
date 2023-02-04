@@ -550,7 +550,7 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
                 target_y = ymin
             else:
                 selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (ymax-y)**2 + (cz-z)**2))
-                target_y = ymax; 
+                target_y = ymax
             target_x = blocks[selected_block_indx].cx; target_z = blocks[selected_block_indx].cz
         else: #  translational_direction=="z":
             zmins = [b.Z.min() for b in blocks]
@@ -559,10 +559,10 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
             zmax = max(zmaxes)
             if minvalue:
                 selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (zmin-z)**2))
-                target_z = zmin;
+                target_z = zmin
             else:
                 selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (zmax-z)**2))
-                target_z = zmax; 
+                target_z = zmax 
             target_x = blocks[selected_block_indx].cx; target_y = blocks[selected_block_indx].cy
         return selected_block_indx,target_x,target_y,target_z 
 
@@ -664,8 +664,8 @@ def translational_periodicity(blocks:List[Block], connectivity_matrix:np.ndarray
     connectivity_matrix = connectivity_matrix - np.eye(connectivity_matrix.shape[0],dtype=np.int8) # turn off connections with itself 
 
     print("Recursively searching for connected faces")
-    upper_connected_faces = list(set(matching_face_search(max_face,outer_faces_all,connectivity_matrix)))
-    lower_connected_faces = list(set(matching_face_search(min_face,outer_faces_all,connectivity_matrix)))
+    lower_connected_faces = matching_face_search(min_face,outer_faces_all,connectivity_matrix)
+    upper_connected_faces = matching_face_search(max_face,outer_faces_all,connectivity_matrix)
     
     return lower_connected_faces, upper_connected_faces
 
@@ -697,7 +697,8 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
         [b.shift(dz,direction) for b in blocks_shifted]
 
     face_combos = list(product(lower_connected_faces,upper_connected_faces))
-
+    upper_face = [u for u in upper_connected_faces if u.BlockIndex == 45][0]
+    lower_face = [l for l in lower_connected_faces if l.BlockIndex == 205][0]
     split_faces = list()
     # Check periodic within a block 
     periodic_found = True
@@ -721,6 +722,8 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
             block1_shifted = blocks_shifted[face1.blockIndex]
             block2 = blocks[face2.blockIndex]
             #   Check periodicity
+            if face1.BlockIndex==45 and face2.BlockIndex==46:
+                print('check')
             df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_shifted, block2)
             
             if len(periodic_faces_temp) > 0:
