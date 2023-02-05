@@ -36,12 +36,12 @@ data = read_data()
 all_faces = data['all_faces']
 connection_matrix = data['connection_matrix']
 
-# We need faces connected in I and J at KMIN
-left_connected_faces, right_connected_faces = translational_periodicity(blocks,connection_matrix,all_faces,translational_direction='y')
+# # We need faces connected in I and J at KMIN
+# left_connected_faces, right_connected_faces = translational_periodicity(blocks,connection_matrix,all_faces,translational_direction='y')
 
-data['left_connected_faces'] = left_connected_faces
-data['right_connected_faces'] = right_connected_faces
-dump_data(data)
+# data['left_connected_faces'] = left_connected_faces
+# data['right_connected_faces'] = right_connected_faces
+# dump_data(data)
 
 data = read_data()
 left_connected_faces = data['left_connected_faces']
@@ -49,7 +49,7 @@ right_connected_faces = data['right_connected_faces']
 connection_matrix = data['connection_matrix']
 
 # Shift lower connected face by the delta z and check for connectivity
-# translational_periodicity2(blocks,left_connected_faces,right_connected_faces,direction="y")
+translational_periodicity2(blocks,right_connected_faces,left_connected_faces,direction="y")
 # periodic_faces, outer_faces, _, _ = translational_periodicity(blocks,face_matches,outer_faces,shift_distance=y_shift_distance,shift_direction='y')
 # face_matches.extend(periodic_faces)
 

@@ -1,17 +1,15 @@
-from operator import truediv
 from typing import List, Dict, Tuple
 from itertools import combinations_with_replacement, permutations, product
 import numpy as np
 from .block import Block
-from .blockfunctions import rotate_block, reduce_blocks, get_outer_bounds
+from .blockfunctions import rotate_block, reduce_blocks
 from .face import Face
-from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals, split_face, find_face_near_plane
-from .connectivity import connectivity_fast, get_face_intersection, face_matches_to_dict, get_outer_faces
+from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals
+from .connectivity import get_face_intersection, face_matches_to_dict, get_outer_faces
 from math import cos, radians, sin, sqrt, acos, radians
 from copy import deepcopy
 from tqdm import trange
-import math
-from .split_block import Direction
+import math, tqdm 
 
 def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """Finds the connectivity of blocks when they are rotated by an angle defined by the number of blades. Only use this if your mesh is of an annulus. 
@@ -696,10 +694,6 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
         dz = zmax-zmin
         [b.shift(dz,direction) for b in blocks_shifted]
 
-    face_combos = list(product(lower_connected_faces,upper_connected_faces))
-    lower_test_faces = [l for l in lower_connected_faces if l.BlockIndex == 205]
-    upper_test_faces = [u for u in upper_connected_faces if u.BlockIndex == 45]
-    face_combos = list(product(lower_test_faces,upper_test_faces))
 
     split_faces = list()
     # Check periodic within a block 
@@ -708,54 +702,40 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
     # Here we make a list of all the outer faces
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list()
-    lower_faces_to_remove = list()
-    upper_faces_to_remove = list()
+
+    face_combos = list(product(lower_connected_faces,upper_connected_faces))
+    pbar = tqdm(total = len(lower_connected_faces))
     while periodic_found:
         periodic_found = False
-        outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
         
-        for indx in (pbar := trange(len(face_combos))):
+        for indx in range(len(face_combos)):
             # Check if surfaces are periodic with each other
             face1, face2= face_combos[indx] # Lower Connected faces, upper connected faces 
             pbar.set_description(f"Checking connections block {face1.blockIndex} with {face2.blockIndex}")
-
             # Shift block 1 -> Check periodicity -> if not periodic -> shift Block 1 opposite direction -> Check periodicity
             #   Rotate Block 1
             block1_shifted = blocks_shifted[face1.blockIndex]
             block2 = blocks[face2.blockIndex]
             #   Check periodicity
-            df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_shifted, block2)
+            _, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_shifted, block2)
             
             if len(periodic_faces_temp) > 0:
-                lower_faces_to_remove.append(face1)
-                upper_faces_to_remove.append(face2)
-                lower_faces_to_remove.append(periodic_faces_temp[0])
-                upper_faces_to_remove.append(periodic_faces_temp[1])
+                lower_connected_faces.remove(face1)
+                upper_connected_faces.remove(face2)
                 periodic_faces.append(periodic_faces_temp)
                 periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1_shifted,block2))
                 split_faces.extend(split_faces_temp)
                 periodic_found = True
+                pbar.update(1)
                 break
-            # else: 
-            #     non_matching.append((face1_indx,face2_indx))
-
-        if (periodic_found):
-            lower_faces_to_remove = list(set(lower_faces_to_remove))
-            upper_faces_to_remove = list(set(upper_faces_to_remove))
-            lower_connected_faces = [p for p in lower_connected_faces if p not in lower_faces_to_remove]
-            upper_connected_faces = [p for p in upper_connected_faces if p not in upper_faces_to_remove]
-
-            if len(split_faces)>0:
-                outer_faces_all.extend(split_faces)
-                split_faces.clear()        
+            
+        face_combos = list(product(lower_connected_faces,upper_connected_faces))
+        if len(split_faces)>0:
+            face_combos.extend(list(permutations(split_faces))) # Loop until all faces match 
+            split_faces.clear() 
             
     # This is an added check to make sure all periodic faces are in the outer_faces_to_remove
-    for p in periodic_faces:
-        outer_faces_to_remove.append(p[0])
-        outer_faces_to_remove.append(p[1])
 
-    outer_faces_to_remove = list(set(outer_faces_to_remove))    # Use only unique values
-    outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]    # remove from outer faces 
     # remove any duplicate periodic face pairs 
     indx_to_remove = list()
     for i in range(len(periodic_faces)):
@@ -770,11 +750,6 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
 
     periodic_faces_export = [periodic_faces_export[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
     periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
-    # Export periodic faces and outer faces
-    outer_faces_export = list() 
-
-    for o in outer_faces_all:
-        outer_faces_export.append(o.to_dict())
 
     # scale it up
     for i in range(len(periodic_faces_export)):
@@ -803,20 +778,7 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
         periodic_faces[i][1].J *= gcd_to_use
         periodic_faces[i][1].K *= gcd_to_use
 
-    for j in range(len(outer_faces_export)):
-        outer_faces_export[j]['IMIN'] *= gcd_to_use
-        outer_faces_export[j]['JMIN'] *= gcd_to_use
-        outer_faces_export[j]['KMIN'] *= gcd_to_use
-        outer_faces_export[j]['IMAX'] *= gcd_to_use
-        outer_faces_export[j]['JMAX'] *= gcd_to_use
-        outer_faces_export[j]['KMAX'] *= gcd_to_use
-    
-    for j in range(len(outer_faces_all)):
-        outer_faces_all[j].I *= gcd_to_use
-        outer_faces_all[j].J *= gcd_to_use
-        outer_faces_all[j].K *= gcd_to_use
-
-    return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
+    return periodic_faces_export, periodic_faces
 
 def linear_real_transform(face1:Face,face2:Face) -> Tuple:
     """Computes the rotation angle from Face1 to Face2. This can be used to check if the faces are periodic 
