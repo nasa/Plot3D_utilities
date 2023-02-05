@@ -1,107 +1,16 @@
 from .block import Block
 from .blockfunctions import reduce_blocks
 from .face import Face
-from .facefunctions import create_face_from_diagonals, split_face
+from .facefunctions import create_face_from_diagonals, split_face, get_outer_faces
 import math 
 from itertools import product, combinations
 from tqdm import trange
 import numpy as np 
 import pandas as pd
-from typing import Dict, List, NamedTuple
+from typing import List
 import math
 from .point_match import point_match
 from copy import deepcopy
-
-
-def get_outer_faces(block1:Block):
-    """Get the outer faces of a block
-
-    Args:
-        block1 (Block): A plot3D block
-
-    Returns:
-        List[Face]: Non matching faces of the block 
-        List[(Face,Face)]: Matching faces inside the block 
-    """
-    I = [0,block1.IMAX-1]               # Python index starts at 0, need to subtract 1 for it to get the i,j,k
-    J = [0,block1.JMAX-1]
-    K = [0,block1.KMAX-1]
-    # Create the outer faces        
-    faces = list()
-    face = Face(4)
-    i=I[0]
-    for j in J:
-        for k in K:
-            face.add_vertex(block1.X[i,j,k], block1.Y[i,j,k], block1.Z[i,j,k],i,j,k)
-    
-    faces.append(face)
-    face = Face(4)
-    i=I[1]
-    for j in J:
-        for k in K:
-            face.add_vertex(block1.X[i,j,k], block1.Y[i,j,k], block1.Z[i,j,k],i,j,k)
-    
-    faces.append(face)
-    face = Face(4)
-    j=J[0]
-    for i in I:
-        for k in K:
-            face.add_vertex(block1.X[i,j,k], block1.Y[i,j,k], block1.Z[i,j,k],i,j,k)
-    
-    faces.append(face)
-    face = Face(4)
-    j=J[1]
-    for i in I:
-        for k in K:
-            face.add_vertex(block1.X[i,j,k], block1.Y[i,j,k], block1.Z[i,j,k],i,j,k)
-
-    faces.append(face)
-    face = Face(4)
-    k=K[0]
-    for i in I:
-        for j in J:
-            face.add_vertex(block1.X[i,j,k], block1.Y[i,j,k], block1.Z[i,j,k],i,j,k)
-    
-    faces.append(face)
-    face = Face(4)
-    k=K[1]
-    for i in I:
-        for j in J:
-            face.add_vertex(block1.X[i,j,k], block1.Y[i,j,k], block1.Z[i,j,k],i,j,k)
-    faces.append(face)
-
-    # Check if faces match each other
-    matching = list()
-    non_matching = list()
-    for i in range(len(faces)):
-        matchFound = False
-        for j in range(len(faces)):
-            if (i!=j and faces[i].vertices_equals(faces[j])):
-                matching.append((i,j))
-                matchFound = True
-        if not matchFound:
-            non_matching.append(faces[i]) # these are guaranteed to be exterior 
-    matching = list(unique_pairs(matching))
-    matching = [(faces[i],faces[j]) for i,j in matching]
-    
-    # Make sure normals do not intersect 
-    # block_center_to_face_center =  block1.cx
-    return non_matching, matching # these should be the outer faces
-
-def unique_pairs(listOfItems:list):
-    """Checks if an item is not already in the list 
-    
-    Args:
-        listOfItems (list): list of combinations e.g. (1,2),(3,4),(2,1)
-
-    Yields:
-        unique pair: [description]
-    """
-    seen = set()  #use set to keep track of already seen items, sets provide O(1) lookup  
-    for x,y in listOfItems:
-        if x!=y and (y,x) not in seen:
-            seen.add((x,y)) 
-            yield x,y
 
 
 def find_matching_blocks(block1:Block,block2:Block,block1_outer:List[Face], block2_outer:List[Face],tol:float=1E-6):  
@@ -157,10 +66,6 @@ def find_matching_blocks(block1:Block,block2:Block,block1_outer:List[Face], bloc
             block2_split_faces.clear()
 
     return block_match_indices, block1_outer, block2_outer # Remove duplicates using set and list 
-                    
-        
-
-
 
 def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
     """Takes a block (T) and selects X,Y,Z from the block given a face's dimensions
@@ -184,7 +89,6 @@ def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
         return T[ dim1[0]:dim1[1]+1, dim2[0]:dim2[1]+1, dim3[0] ]
     
     return T[dim1[0]:dim1[1], dim2[0]:dim2[1], dim3[0]:dim3[1]]
-
 
 def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:float=1E-6):
     """Get the index of the intersection between two faces located on two different blocks 
@@ -337,8 +241,6 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
         df = pd.DataFrame() # set df to empty dataframe
     return df, split_faces1, split_faces2
 
-
-
 def __filter_block_increasing(df:pd.DataFrame,key1:str):
     """Filters dataframe results of get_face_intersection to make sure both key1 is increasing. 
         When searching through a plot3D we check based on the planes e.g. const i, j, or k 
@@ -435,23 +337,6 @@ def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
                 new_combos.append((i,j))
     return new_combos
     
-
-def find_block_index_in_outer_faces(outer_faces:List[Face], block_indx:int):
-    """Looks through an array of faces (outer_faces). Outer faces can include multiple blocks
-        This function finds the face of corresponding block index
-
-    Args:
-        outer_faces (List[Face]): List of all outer faces for all blocks
-        block_indx (int): block index
-
-    Returns:
-        int: block index within outer_faces array that corresponds to all outer faces of that single block
-    """
-    for i in range(len(outer_faces)):
-        if outer_faces[i]['block'] == block_indx:
-            return i
-    return -1 
-
 def connectivity_fast(blocks:List[Block]):
     """Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity 
 
@@ -601,7 +486,6 @@ def connectivity(blocks:List[Block]):
 
     return face_matches, outer_faces_formatted  
 
-
 def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
     """Makes sure the diagonal of face 1 match the diagonal of face 2
 
@@ -682,76 +566,3 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
     match['block2']['JMAX'] = int(df.iloc[0]['J'])
     match['block2']['KMAX'] = int(df.iloc[0]['K'])
     return match
-
-def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[]):
-    """Creates a matrix representing how block edges are connected to each other 
-
-    Args:
-        blocks (List[Block]): _description_
-        outer_faces (List[Dict[str,int]], optional): List of outer faces remaining from connectivity. Useful if you are interested in finding faces that are exterior to the block. Also useful if you combine outerfaces with match faces, this will help identify connections by looking at split faces. Defaults to [].
-
-    Returns:
-        (Tuple): containing
-
-            *connectivity* (np.ndarray): integer matrix defining how the blocks are connected to each other
-            *connectivity_i* (np.ndarray): integer matrix defining connectivity of all blocks where IMAX=IMIN
-            *connectivity_j* (np.ndarray): integer matrix defining connectivity of all blocks where JMAX=JMIN
-            *connectivity_k* (np.ndarray): integer matrix defining connectivity of all blocks where KMAX=KMIN
-            
-    """
-    # Reduce the size of the blocks by the GCD 
-    gcd_array = list()    
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
-    blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
-
-    # Face to List 
-    outer_faces_all = list()
-    for o in outer_faces:
-        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['JMIN']/gcd_to_use), 
-            int(o['KMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMAX']/gcd_to_use))
-        face.set_block_index(o['block_index'])
-        outer_faces_all.append(face)
-
-    outer_faces = outer_faces_all
-
-    n = len(blocks)
-    connectivity = np.eye(n,dtype=np.int8)
-    combos = list(combinations(range(n),2))    
-    for indx in (pbar:=trange(len(combos))):
-        i,j = combos[indx]
-        pbar.set_description(f"Building block to block connectivity matrix: checking {i}")
-        b1 = blocks[i]
-
-        if len(outer_faces)==0:                     # Get the outerfaces to search
-            b1_outer_faces,_ = get_outer_faces(b1)
-        else:
-            b1_outer_faces = [o for o in outer_faces if o.BlockIndex == i]
-        
-        if i != j and connectivity[i,j]!=-1:
-            b2 = blocks[j]
-
-            if len(outer_faces)==0:                 # Get the outerfaces to search
-                b2_outer_faces,_ = get_outer_faces(b2)
-            else:
-                b2_outer_faces = [o for o in outer_faces if o.BlockIndex == j]                
-
-            # Check to see if any of the outer faces of the blocks match   
-            connection_found=False             
-            for f1 in b1_outer_faces:
-                for f2 in b2_outer_faces:
-                    if (f1.is_connected(f2)): # Check if face centroid is the same
-                        connectivity[i,j] = 1       # Default block to block connection matrix 
-                        connectivity[j,i] = 1
-                        connection_found=True
-                        break
-                if connection_found:
-                    break
-            if not connection_found:
-                connectivity[i,j] = -1
-                connectivity[j,i] = -1
-        # c = np.sum(connectivity[i,:]==1)
-        # print(f"block {i} connections {c}")
-    return connectivity

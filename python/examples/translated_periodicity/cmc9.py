@@ -1,8 +1,9 @@
 import sys, os, pickle
 import numpy as np
 sys.path.insert(0,'../../')
-from plot3d import read_plot3D, connectivity_fast,translational_periodicity, translational_periodicity2, write_plot3D, Direction, split_blocks, block_connection_matrix, outer_face_dict_to_list, match_faces_dict_to_list
-from plot3d import outer_face_dict_to_list
+from plot3d import read_plot3D, connectivity_fast,translational_periodicity, write_plot3D, Direction, split_blocks, block_connection_matrix, find_bounding_faces
+from plot3d import outer_face_dict_to_list, match_faces_dict_to_list
+
 def dump_data(data):
     with open('cmc9_data.pickle','wb') as f:
         pickle.dump(data,f)
@@ -36,25 +37,19 @@ data = read_data()
 all_faces = data['all_faces']
 connection_matrix = data['connection_matrix']
 
-# We need faces connected in I and J at KMIN
-lower_connected_faces, upper_connected_faces = translational_periodicity(blocks,connection_matrix,all_faces,translational_direction='z')
-left_connected_faces, right_connected_faces = translational_periodicity(blocks,connection_matrix,all_faces,translational_direction='y')
-
-data['lower_connected_faces'] = [l.to_dict() for l in lower_connected_faces]
-data['upper_connected_faces'] = [u.to_dict() for u in upper_connected_faces]
-data['left_connected_faces'] = [l.to_dict() for l in left_connected_faces]
-data['right_connected_faces'] = [r.to_dict() for r in right_connected_faces]
+# Find bounding Faces
+lower_bound, upper_bound,_,_ = find_bounding_faces(blocks,all_faces,"z")
+left_bound, right_bound,_,_ = find_bounding_faces(blocks,all_faces,"y")
+data['lower_bound'] = lower_bound
+data['upper_bound'] = upper_bound
+data['left_bound'] = left_bound
+data['right_bound'] = right_bound
 dump_data(data)
 
-data = read_data()
-lower_connected_faces = outer_face_dict_to_list(data['lower_connected_faces'])
-upper_connected_faces = outer_face_dict_to_list(data['upper_connected_faces'])
-connection_matrix = data['connection_matrix']
+# Use bounding faces to find periodicity
+z_periodic_faces_export, periodic_faces = translational_periodicity(blocks,lower_bound,upper_bound,translational_direction='z')
+y_periodic_faces_export, periodic_faces = translational_periodicity(blocks,left_bound,right_bound,translational_direction='y')
+data['z_periodic'] = z_periodic_faces_export
+data['y_periodic'] = y_periodic_faces_export
 
-# Shift lower connected face by the delta z and check for connectivity
-periodic_faces_export, periodic_faces = translational_periodicity2(blocks,lower_connected_faces,upper_connected_faces,direction="z")
-# periodic_faces, outer_faces, _, _ = translational_periodicity(blocks,face_matches,outer_faces,shift_distance=y_shift_distance,shift_direction='y')
-# face_matches.extend(periodic_faces)
-
-data['periodic_faces'] = periodic_faces_export
 dump_data(data)

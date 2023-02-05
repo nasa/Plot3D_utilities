@@ -162,3 +162,21 @@ class Block:
                                         +cf[4+n,l]*a[6+l][i,j,k-1+n])
                     v[i,j,k]= vol12/12
         return v
+
+
+def reduce_blocks(blocks:List[Block],factor:int):
+    """reduce the blocks by a factor of (factor)
+
+    Args:
+        blocks (List[Block]): list of blocks to reduce in size
+        factor (int, optional): Number of indicies to skip . Defaults to 2.
+
+    Returns:
+        [type]: [description]
+    """
+    for i in range(len(blocks)):
+        blocks[i].X = blocks[i].X[::factor,::factor,::factor]
+        blocks[i].Y = blocks[i].Y[::factor,::factor,::factor]
+        blocks[i].Z = blocks[i].Z[::factor,::factor,::factor]
+        blocks[i].IMAX,blocks[i].JMAX,blocks[i].KMAX = blocks[i].X.shape
+    return blocks

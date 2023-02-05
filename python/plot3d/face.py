@@ -71,7 +71,7 @@ class Face:
         elif (self.KMIN == self.KMAX):
             return 2
         return -1
-        
+    
     @property
     def isEdge(self):
         """check if the face is actually an edge. This is an edge if two indicies IMIN == IMAX or JMIN=JMAX or KMIN=KMAX
@@ -115,6 +115,10 @@ class Face:
         indx = list(set([indx_i]))[0] # Get the common one through a union
         return self.x[indx], self.y[indx], self.z[indx]
 
+    def scale(self,gcd:int):
+        self.I = int(self.I*gcd)
+        self.J = int(self.J*gcd)
+        self.K = int(self.K*gcd)
 
     def add_vertex(self, x:float,y:float,z:float, i:int, j:int, k:int):
         """Add vertex to define a face
