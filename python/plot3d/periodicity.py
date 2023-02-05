@@ -705,13 +705,12 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
     lower_blocks = [l.BlockIndex for l in lower_connected_faces]
     upper_blocks = [u.BlockIndex for u in upper_connected_faces]
     pbar = tqdm(total = len(lower_connected_faces))
-    while periodic_found:
+    no_match_counter = 0 
+    while periodic_found and no_match_counter<10:
         periodic_found = False
-        face_combos = list(product(lower_connected_faces,upper_connected_faces))
-
-        for indx in range(len(face_combos)):
+        face1 = lower_connected_faces[0]
+        for face2 in upper_connected_faces:
             # Check if surfaces are periodic with each other
-            face1, face2= face_combos[indx] # Lower Connected faces, upper connected faces 
             pbar.set_description(f"Checking connections block {face1.blockIndex} with {face2.blockIndex}")
             # Shift block 1 -> Check periodicity -> if not periodic -> shift Block 1 opposite direction -> Check periodicity
             #   Rotate Block 1
@@ -732,6 +731,8 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
                 periodic_found = True
                 pbar.update(1)
                 break
+        if not periodic_found:
+            no_match_counter +=1 
                         
     # This is an added check to make sure all periodic faces are in the outer_faces_to_remove
 
