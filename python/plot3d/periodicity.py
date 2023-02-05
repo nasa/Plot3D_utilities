@@ -697,8 +697,10 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
         [b.shift(dz,direction) for b in blocks_shifted]
 
     face_combos = list(product(lower_connected_faces,upper_connected_faces))
-    upper_face = [u for u in upper_connected_faces if u.BlockIndex == 45][0]
-    lower_face = [l for l in lower_connected_faces if l.BlockIndex == 205][0]
+    lower_test_faces = [l for l in lower_connected_faces if l.BlockIndex == 205]
+    upper_test_faces = [u for u in upper_connected_faces if u.BlockIndex == 45]
+    face_combos = list(product(lower_test_faces,upper_test_faces))
+
     split_faces = list()
     # Check periodic within a block 
     periodic_found = True
@@ -722,8 +724,6 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
             block1_shifted = blocks_shifted[face1.blockIndex]
             block2 = blocks[face2.blockIndex]
             #   Check periodicity
-            if face1.BlockIndex==45 and face2.BlockIndex==46:
-                print('check')
             df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_shifted, block2)
             
             if len(periodic_faces_temp) > 0:

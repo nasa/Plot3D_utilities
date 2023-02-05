@@ -4,16 +4,16 @@ sys.path.insert(0,'../../')
 from plot3d import read_plot3D, connectivity_fast,translational_periodicity, translational_periodicity2, write_plot3D, Direction, split_blocks, block_connection_matrix, outer_face_dict_to_list, match_faces_dict_to_list
 
 def dump_data(data):
-    with open('VSPT_connectivity.pickle','wb') as f:
+    with open('data.pickle','wb') as f:
         pickle.dump(data,f)
 
 def read_data():
-    with open('VSPT_connectivity.pickle','rb') as f:
+    with open('data.pickle','rb') as f:
         return pickle.load(f)
    
-blocks = read_plot3D('3DVSPT_inAtmp4OutAT2.xyz',True)
+blocks = read_plot3D('CMC009_fine_binary.xyz',True)
 
-if not os.path.exists(f'VSPT_connectivity.pickle'):    
+if not os.path.exists(f'data.pickle'):    
     print('Finding connectivity')
     face_matches, outer_faces = connectivity_fast(blocks)
     [m.pop('match',None) for m in face_matches] # Remove the dataframe
@@ -46,6 +46,7 @@ dump_data(data)
 data = read_data()
 lower_connected_faces = data['lower_connected_faces']
 upper_connected_faces = data['upper_connected_faces']
+connection_matrix = data['connection_matrix']
 
 # Shift lower connected face by the delta z and check for connectivity
 # translational_periodicity2(blocks,lower_connected_faces,upper_connected_faces,direction="z")
