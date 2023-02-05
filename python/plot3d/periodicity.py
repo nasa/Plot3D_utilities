@@ -8,8 +8,8 @@ from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, cre
 from .connectivity import get_face_intersection, face_matches_to_dict, get_outer_faces
 from math import cos, radians, sin, sqrt, acos, radians
 from copy import deepcopy
-from tqdm import trange
-import math, tqdm 
+from tqdm import trange, tqdm
+import math 
 
 def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """Finds the connectivity of blocks when they are rotated by an angle defined by the number of blades. Only use this if your mesh is of an annulus. 
@@ -694,20 +694,21 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
         dz = zmax-zmin
         [b.shift(dz,direction) for b in blocks_shifted]
 
-
-    split_faces = list()
     # Check periodic within a block 
     periodic_found = True
     
     # Here we make a list of all the outer faces
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list()
-
-    face_combos = list(product(lower_connected_faces,upper_connected_faces))
+    lower_connected_faces = list(set(lower_connected_faces))
+    upper_connected_faces = list(set(upper_connected_faces))
+    lower_blocks = [l.BlockIndex for l in lower_connected_faces]
+    upper_blocks = [u.BlockIndex for u in upper_connected_faces]
     pbar = tqdm(total = len(lower_connected_faces))
     while periodic_found:
         periodic_found = False
-        
+        face_combos = list(product(lower_connected_faces,upper_connected_faces))
+
         for indx in range(len(face_combos)):
             # Check if surfaces are periodic with each other
             face1, face2= face_combos[indx] # Lower Connected faces, upper connected faces 
@@ -724,16 +725,14 @@ def translational_periodicity2(blocks,lower_connected_faces,upper_connected_face
                 upper_connected_faces.remove(face2)
                 periodic_faces.append(periodic_faces_temp)
                 periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1_shifted,block2))
-                split_faces.extend(split_faces_temp)
+                lower_split_faces = [s for s in split_faces_temp if s.BlockIndex in lower_blocks]
+                upper_split_faces = [s for s in split_faces_temp if s.BlockIndex in upper_blocks]
+                lower_connected_faces.extend(lower_split_faces)
+                upper_connected_faces.extend(upper_split_faces)
                 periodic_found = True
                 pbar.update(1)
                 break
-            
-        face_combos = list(product(lower_connected_faces,upper_connected_faces))
-        if len(split_faces)>0:
-            face_combos.extend(list(permutations(split_faces))) # Loop until all faces match 
-            split_faces.clear() 
-            
+                        
     # This is an added check to make sure all periodic faces are in the outer_faces_to_remove
 
     # remove any duplicate periodic face pairs 

@@ -52,7 +52,7 @@ upper_connected_faces = data['upper_connected_faces']
 connection_matrix = data['connection_matrix']
 
 # Shift lower connected face by the delta z and check for connectivity
-r sotranslational_periodicity2(blocks,lower_connected_faces,upper_connected_faces,direction="z")
+translational_periodicity2(blocks,lower_connected_faces,upper_connected_faces,direction="z")
 # periodic_faces, outer_faces, _, _ = translational_periodicity(blocks,face_matches,outer_faces,shift_distance=y_shift_distance,shift_direction='y')
 # face_matches.extend(periodic_faces)
 
