@@ -563,6 +563,7 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
     periodic_found = True # start of the loop 
     
     # Here we make a list of all the outer faces
+    non_matching = list()
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list()
     lower_connected_faces = list(set(lower_connected_faces))
@@ -570,7 +571,7 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
     lower_blocks = [l.BlockIndex for l in lower_connected_faces]
     upper_blocks = [u.BlockIndex for u in upper_connected_faces]
     pbar = tqdm(total = len(lower_connected_faces))
-    while periodic_found:
+    while len(lower_connected_faces)>0:
         periodic_found = False
         face1 = lower_connected_faces[0]
         for face2 in upper_connected_faces:
@@ -595,6 +596,13 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
                 periodic_found = True
                 pbar.update(1)
                 break
+    
+        if periodic_found == False:
+            non_matching.append(face1)
+            lower_connected_faces.remove(face1)
+            pbar.update(1)
+    print(f"Number of non-matching {len(non_matching)}")
+
                         
     # remove any duplicate periodic face pairs 
     indx_to_remove = list()
