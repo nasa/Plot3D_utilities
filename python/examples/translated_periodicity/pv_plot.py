@@ -47,8 +47,6 @@ if __name__=="__main__":
     blocks_to_extract.sort()
     n = len(blocks_to_extract)
     
-    # blocks_to_extract = blocks_to_extract[200:300]
-
     '''
     Generate Random Colors 
     
@@ -72,7 +70,7 @@ if __name__=="__main__":
     for b in blocks_to_extract: # Block indicies 
         block_source,block_display,LUT = ExtractBlocks(plot3D_source,View,[b])
         RenameSource('Block '+str(b), block_source)
-        # block_source = FindSource('Block '+str(b))
+        block_source = FindSource('Block '+str(b))
         
         # for surface_indx, o in enumerate(outer_faces):
         #     # Add Plots for Outer Faces

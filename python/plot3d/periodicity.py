@@ -541,29 +541,31 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
     upper_connected_faces = outer_face_dict_to_list(blocks,upper_connected_faces,gcd_to_use)
     blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)    
     
-    # Now for the periodicity part 
-    blocks_shifted = deepcopy(blocks)
-    if translational_direction.lower().strip() == "x":
-        xmin = min([b.X.min() for b in blocks])
-        xmax = max([b.X.max() for b in blocks])
-        dx = xmax-xmin
-        [b.shift(dx,translational_direction) for b in blocks_shifted]
+    # Now for the periodicity part
+            
+    def shift_blocks(sign:int=1):
+        blocks_shifted = deepcopy(blocks)
+        if translational_direction.lower().strip() == "x":
+            xmin = min([b.X.min() for b in blocks])
+            xmax = max([b.X.max() for b in blocks])
+            dx = xmax-xmin
+            return [b.shift(sign*dx,translational_direction) for b in blocks_shifted]
 
-    elif translational_direction.lower().strip() == "y":
-        ymin = min([b.Y.min() for b in blocks])
-        ymax = max([b.Y.max() for b in blocks])
-        dy = ymax-ymin
-        [b.shift(dy,translational_direction) for b in blocks_shifted]
-    else: #  direction.lower().strip() == "z"
-        zmin = min([b.Z.min() for b in blocks])
-        zmax = max([b.Z.max() for b in blocks])
-        dz = zmax-zmin
-        [b.shift(dz,translational_direction) for b in blocks_shifted]
-
+        elif translational_direction.lower().strip() == "y":
+            ymin = min([b.Y.min() for b in blocks])
+            ymax = max([b.Y.max() for b in blocks])
+            dy = ymax-ymin
+            return [b.shift(sign*dy,translational_direction) for b in blocks_shifted]
+        else: #  direction.lower().strip() == "z"
+            zmin = min([b.Z.min() for b in blocks])
+            zmax = max([b.Z.max() for b in blocks])
+            dz = zmax-zmin
+            return [b.shift(sign*dz,translational_direction) for b in blocks_shifted]
+    blocks_shifted = shift_blocks()
     periodic_found = True # start of the loop 
     
     # Here we make a list of all the outer faces
-    non_matching = list()
+    times_failed = 0 
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list()
     lower_connected_faces = list(set(lower_connected_faces))
@@ -571,7 +573,8 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
     lower_blocks = [l.BlockIndex for l in lower_connected_faces]
     upper_blocks = [u.BlockIndex for u in upper_connected_faces]
     pbar = tqdm(total = len(lower_connected_faces))
-    while len(lower_connected_faces)>0:
+
+    while len(lower_connected_faces)>0 and times_failed<2:
         periodic_found = False
         face1 = lower_connected_faces[0]
         for face2 in upper_connected_faces:
@@ -598,10 +601,11 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
                 break
     
         if periodic_found == False:
-            non_matching.append(face1)
-            lower_connected_faces.remove(face1)
-            pbar.update(1)
-    print(f"Number of non-matching {len(non_matching)}")
+            # Lets switch the order 
+            times_failed+=1
+            blocks_shifted = shift_blocks(-1)            
+    if times_failed==2:
+        print(f"\nNot periodic")
 
                         
     # remove any duplicate periodic face pairs 
