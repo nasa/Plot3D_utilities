@@ -138,18 +138,19 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
     """
     matching_faces = list()
     selected_block_indx = face_to_search.BlockIndex
-    connected_block_indices = np.where(connectivity_matrix[selected_block_indx,:]==1)[0]
-    faces_to_check = [o for o in outer_faces if o.BlockIndex in connected_block_indices.tolist()]
-    faces_to_check = [f for f in faces_to_check if f not in searched_faces]
-    for f in faces_to_check:
-        if (len(face_to_search.match_indices(f))==2 and face_to_search.const_type==f.const_type):
-            connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
-            connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
-            matching_faces.append(f)
-    searched_faces.append(face_to_search)
-    for m in matching_faces:
-        matching_faces.extend(find_connected_faces(m,outer_faces,connectivity_matrix,searched_faces))
     
+    if face_to_search not in searched_faces:
+        connected_block_indices = np.where(connectivity_matrix[selected_block_indx,:]==1)[0]
+        faces_to_check = [o for o in outer_faces if o.BlockIndex in connected_block_indices.tolist()]
+        for f in faces_to_check:
+            if (len(face_to_search.match_indices(f))==2 and face_to_search.const_type==f.const_type):
+                connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
+                connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
+                matching_faces.append(f)
+            searched_faces.append(face_to_search)
+        for m in matching_faces:
+            matching_faces.extend(find_connected_faces(m,outer_faces,connectivity_matrix,searched_faces))    
+        matching_faces = list(set(matching_faces))
     return matching_faces 
 
 

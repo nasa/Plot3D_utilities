@@ -540,8 +540,6 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
     lower_connected_faces = outer_face_dict_to_list(blocks,lower_connected_faces,gcd_to_use)
     upper_connected_faces = outer_face_dict_to_list(blocks,upper_connected_faces,gcd_to_use)
     blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)    
-
-    
     
     # Now for the periodicity part 
     blocks_shifted = deepcopy(blocks)
