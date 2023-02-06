@@ -139,14 +139,14 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
     selected_block_indx = face_to_search.BlockIndex
     connected_block_indices = np.where(connectivity_matrix[selected_block_indx,:]==1)[0]
     faces_to_check = [o for o in outer_faces if o.BlockIndex in connected_block_indices.tolist()]
-    # faces_to_check = list(filter(lambda : o.BlockIndex in connected_block_indices.tolist(),outer_faces))
+    
     for f in faces_to_check:
         if (len(face_to_search.match_indices(f))==2 and face_to_search.const_type==f.const_type):
             connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
             connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
             matching_faces.append(f)
-    for f in matching_faces:
-        matching_faces.extend(find_connected_faces(f,outer_faces,connectivity_matrix))
+    for m in matching_faces:
+        matching_faces.extend(find_connected_faces(m,outer_faces,connectivity_matrix))
     return matching_faces
 
 
@@ -270,6 +270,8 @@ def find_bounding_faces(blocks:List[Block],connectivity_matrix:np.ndarray,outer_
     upper_connected_faces = find_connected_faces(max_face,outer_faces_all,connectivity_matrix)
 
     # Unscale faces
+    lower_connected_faces = list(set(lower_connected_faces))
+    upper_connected_faces = list(set(upper_connected_faces))
 
     for l in lower_connected_faces:
         l.I*=gcd_to_use

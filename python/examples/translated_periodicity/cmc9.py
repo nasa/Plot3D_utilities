@@ -44,7 +44,7 @@ data['lower_bound'] = lower_bound
 data['upper_bound'] = upper_bound
 data['left_bound'] = left_bound
 data['right_bound'] = right_bound
-# dump_data(data)
+dump_data(data)
 
 # Use bounding faces to find periodicity
 data = read_data()
