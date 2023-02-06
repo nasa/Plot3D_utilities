@@ -214,7 +214,7 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
         target_x = blocks[selected_block_indx].cx; target_y = blocks[selected_block_indx].cy
     return selected_block_indx,target_x,target_y,target_z 
 
-def find_bounding_faces(blocks:List[Block],outer_faces:List[Dict[str,int]], direction:str="z"):
+def find_bounding_faces(blocks:List[Block],connectivity_matrix:np.ndarray,outer_faces:List[Dict[str,int]], direction:str="z"):
     """Finds bounding faces in x,y,z direction so think of this as the xmin and xmax faces of a block.
     This is useful for translational periodicity where you want the bounds to check
 
