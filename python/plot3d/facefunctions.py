@@ -181,36 +181,39 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
         xmaxes = [b.X.max() for b in blocks]
         xmin = min(xmins)
         xmax = max(xmaxes)
+        dx = xmax - xmin
         if minvalue:
-            selected_block_indx = np.argmin(np.sqrt((xmin-x)**2 + (cy-y)**2 + (cz-z)**2))
-            target_x = xmin
+            target_x = xmin - dx*0.5
+            selected_block_indx = np.argmin(np.sqrt((target_x-x)**2 + (cy-y)**2 + (cz-z)**2))            
         else:
-            selected_block_indx = np.argmin(np.sqrt((xmax-x)**2 + (cy-y)**2 + (cz-z)**2))
-            target_x = xmax
+            target_x = xmax + dx*0.5
+            selected_block_indx = np.argmin(np.sqrt((target_x-x)**2 + (cy-y)**2 + (cz-z)**2))            
         target_y=blocks[selected_block_indx].cy; target_z = blocks[selected_block_indx].cz
     elif translational_direction=="y":
         ymins = [b.Y.min() for b in blocks]
         ymaxes = [b.Y.max() for b in blocks]
         ymin = min(ymins)
         ymax = max(ymaxes)
+        dy = ymax-ymin; 
         if minvalue:
-            selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (ymin-y)**2 + (cz-z)**2))
-            target_y = ymin
+            target_y = ymin - dy*0.5
+            selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (target_y-y)**2 + (cz-z)**2))
         else:
-            selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (ymax-y)**2 + (cz-z)**2))
-            target_y = ymax
+            target_y = ymax + dy*0.5
+            selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (target_y-y)**2 + (cz-z)**2))
         target_x = blocks[selected_block_indx].cx; target_z = blocks[selected_block_indx].cz
     else: #  translational_direction=="z":
         zmins = [b.Z.min() for b in blocks]
         zmaxes = [b.Z.max() for b in blocks]
         zmin = min(zmins)
         zmax = max(zmaxes)
+        dz = zmax - zmin
         if minvalue:
-            selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (zmin-z)**2))
-            target_z = zmin
+            target_z = zmin - dz*0.5
+            selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (target_z-z)**2))            
         else:
-            selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (zmax-z)**2))
-            target_z = zmax 
+            target_z = zmax + dz*0.5
+            selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (target_z-z)**2))
         target_x = blocks[selected_block_indx].cx; target_y = blocks[selected_block_indx].cy
     return selected_block_indx,target_x,target_y,target_z 
 

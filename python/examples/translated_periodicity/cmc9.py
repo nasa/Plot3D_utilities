@@ -33,13 +33,13 @@ if not os.path.exists(f'cmc9_data.pickle'):
     data["connectivity_matrix"]=c
     dump_data(data)
 
-# data = read_data()    
-# all_faces = data['all_faces']
-# connectivity_matrix = data['connectivity_matrix']
+data = read_data()    
+all_faces = data['all_faces']
+connectivity_matrix = data['connectivity_matrix']
 
 # # Find bounding Faces
 # lower_bound, upper_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"z")
-# left_bound, right_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"y")
+left_bound, right_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"y")
 # data['lower_bound'] = lower_bound
 # data['upper_bound'] = upper_bound
 # data['left_bound'] = left_bound

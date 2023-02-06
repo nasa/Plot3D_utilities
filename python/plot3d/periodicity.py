@@ -549,18 +549,19 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
             xmin = min([b.X.min() for b in blocks])
             xmax = max([b.X.max() for b in blocks])
             dx = xmax-xmin
-            return [b.shift(sign*dx,translational_direction) for b in blocks_shifted]
-
+            [b.shift(sign*dx,translational_direction) for b in blocks_shifted]
         elif translational_direction.lower().strip() == "y":
             ymin = min([b.Y.min() for b in blocks])
             ymax = max([b.Y.max() for b in blocks])
             dy = ymax-ymin
-            return [b.shift(sign*dy,translational_direction) for b in blocks_shifted]
+            [b.shift(sign*dy,translational_direction) for b in blocks_shifted]
         else: #  direction.lower().strip() == "z"
             zmin = min([b.Z.min() for b in blocks])
             zmax = max([b.Z.max() for b in blocks])
             dz = zmax-zmin
-            return [b.shift(sign*dz,translational_direction) for b in blocks_shifted]
+            [b.shift(sign*dz,translational_direction) for b in blocks_shifted]
+        return blocks_shifted
+        
     blocks_shifted = shift_blocks()
     periodic_found = True # start of the loop 
     
