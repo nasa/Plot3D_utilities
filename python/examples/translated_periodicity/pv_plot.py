@@ -39,7 +39,7 @@ if __name__=="__main__":
         faces_to_plot = data[what_to_plot]
         outer_faces = CheckDictionary(data,what_to_plot)
 
-    blocks_to_extract = [f['block_index'] for o in outer_faces]
+    blocks_to_extract = [o['block_index'] for o in outer_faces]
     blocks_to_extract = list(set(blocks_to_extract))
     blocks_to_extract.sort()
     print(blocks_to_extract)

@@ -11,7 +11,7 @@ def dump_data(data):
 def read_data():
     with open('cmc9_data.pickle','rb') as f:
         return pickle.load(f)
-   
+
 blocks = read_plot3D('CMC009_fine_binary.xyz',True)
 
 if not os.path.exists(f'cmc9_data.pickle'):    
