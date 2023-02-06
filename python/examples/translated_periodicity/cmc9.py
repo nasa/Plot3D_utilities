@@ -54,5 +54,17 @@ z_periodic_faces_export, periodic_faces = translational_periodicity(blocks,lower
 y_periodic_faces_export, periodic_faces = translational_periodicity(blocks,left_bound,right_bound,translational_direction='y')
 data['z_periodic'] = z_periodic_faces_export
 data['y_periodic'] = y_periodic_faces_export
-
 dump_data(data)
+
+# Check to see if each of the upper and lower blocks have a periodic face
+data = read_data()
+lower_bound_blocks_indices = [l['block_index'] for l in data['lower_bound']]
+upper_bound_blocks_indices = [u['block_index'] for u in data['upper_bound']]
+periodic_block1_indices = [f['block1']['block_index'] for f in data['z_periodic']]
+periodic_block2_indices = [f['block2']['block_index'] for f in data['z_periodic']]
+
+lower_bound_blocks_indices.sort()
+upper_bound_blocks_indices.sort()
+periodic_block1_indices.sort()
+periodic_block2_indices.sort()
+print('check')

@@ -288,16 +288,17 @@ def __check_edge(df:pd.DataFrame):
     Returns:
         boolean: True = It is an edge, False = not edge 
     """
-    
-    block = [['i1','j1','k1'],['i2','j2','k2']]
-    # Single edge matching check
-    c=0
-    for b in block:        
-        for k in b: # loop for i,j,k
-            unq = df[k].unique()
-            c += int(len(unq)>1 and len(unq)>2) # example i1 = 1,2,3,4,5
-
-    return c<4 #  If "c" is less than 4 then it's an edge 
+    diagonal = [(df['i1'].min(),df['j1'].min(),df['k1'].min()), (df['i1'].max(),df['j2'].max(),df['k2'].max())]
+    edge1 = diagonal[0]
+    edge2 = diagonal[1]
+    edge_matches = 0 
+    for i in range(3):
+        if edge1[i]==edge2[i]:
+            edge_matches+=1
+    if edge_matches<2:
+        return False
+    else:
+        return True
     
 def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
     """Returns the indices of the nearest 6 blocks based on their centroid

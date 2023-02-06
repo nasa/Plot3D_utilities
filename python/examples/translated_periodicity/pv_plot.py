@@ -36,16 +36,17 @@ if __name__=="__main__":
     what_to_plot = 'upper_bound'
     with open('cmc9_data.pickle','rb') as f:
         data = pickle.load(f)
+        faces_to_plot = data[what_to_plot]
         outer_faces = CheckDictionary(data,what_to_plot)
         periodic_faces = CheckDictionary(data,'z_periodic')
 
-
     blocks_to_extract = [o['block_index'] for o in outer_faces]
     blocks_to_extract.extend([f['block1']['block_index'] for f in periodic_faces])
+    blocks_to_extract.extend([f['block2']['block_index'] for f in periodic_faces])
     blocks_to_extract = list(set(blocks_to_extract))
     blocks_to_extract.sort()
-    print(blocks_to_extract)
-
+    n = len(blocks_to_extract)
+    
     '''
     Generate Random Colors 
     
@@ -58,7 +59,7 @@ if __name__=="__main__":
 
     # Load mesh
     plot3D_source,plot3D_Display,View,LUT = Load(plot3d_filename,True)
-    
+    print(f"Total number of blocks: {n}")
     def check_and_swap(ijkmin, ijkmax):
         if (ijkmin> ijkmax):
             temp = ijkmax
@@ -70,12 +71,12 @@ if __name__=="__main__":
         block_source,block_display,LUT = ExtractBlocks(plot3D_source,View,[b])
         RenameSource('Block '+str(b), block_source)
         block_source = FindSource('Block '+str(b))
-
+        
         # for surface_indx, o in enumerate(outer_faces):
         #     # Add Plots for Outer Faces
         #     if o['block_index'] == b:
         #         voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
-        #         CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
+        #         CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.8)
         
         # Plot the periodic faces  
         for periodic_indx, p in enumerate(periodic_faces):
