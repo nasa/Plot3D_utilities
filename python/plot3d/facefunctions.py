@@ -141,10 +141,6 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
     faces_to_check = [o for o in outer_faces if o.BlockIndex in connected_block_indices.tolist()]
     # faces_to_check = list(filter(lambda : o.BlockIndex in connected_block_indices.tolist(),outer_faces))
     for f in faces_to_check:
-        # if f.BlockIndex == 45 and face_to_search.BlockIndex == 46:
-        #     print('check')
-        # elif f.BlockIndex == 46 and face_to_search.BlockIndex == 45:
-        #     print('check')
         if (len(face_to_search.match_indices(f))==2 and face_to_search.const_type==f.const_type):
             connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
             connectivity_matrix[f.BlockIndex, selected_block_indx] = 0

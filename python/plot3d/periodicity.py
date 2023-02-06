@@ -537,10 +537,11 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
         block = blocks[block_indx]
         gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
     gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+    lower_connected_faces = outer_face_dict_to_list(blocks,lower_connected_faces,gcd_to_use)
+    upper_connected_faces = outer_face_dict_to_list(blocks,upper_connected_faces,gcd_to_use)
     blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)    
 
-    lower_connected_faces = outer_face_dict_to_list(lower_connected_faces,gcd_to_use)
-    upper_connected_faces = outer_face_dict_to_list(upper_connected_faces,gcd_to_use)
+    
     
     # Now for the periodicity part 
     blocks_shifted = deepcopy(blocks)
