@@ -38,10 +38,10 @@ all_faces = data['all_faces']
 connectivity_matrix = data['connectivity_matrix']
 
 # Find bounding Faces
-# lower_bound, upper_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"z")
+lower_bound, upper_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"z")
 left_bound, right_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"y")
-# data['lower_bound'] = lower_bound
-# data['upper_bound'] = upper_bound
+data['lower_bound'] = lower_bound
+data['upper_bound'] = upper_bound
 data['left_bound'] = left_bound
 data['right_bound'] = right_bound
 dump_data(data)
@@ -50,11 +50,11 @@ dump_data(data)
 data = read_data()
 lower_bound = data['lower_bound']; upper_bound = data['upper_bound']
 left_bound = data['left_bound']; right_bound = data['right_bound']
-# # z_periodic_faces_export, periodic_faces = translational_periodicity(blocks,lower_bound,upper_bound,translational_direction='z')
-# y_periodic_faces_export, periodic_faces = translational_periodicity(blocks,left_bound,right_bound,translational_direction='y')
-# # data['z_periodic'] = z_periodic_faces_export
-# data['y_periodic'] = y_periodic_faces_export
-# dump_data(data)
+z_periodic_faces_export, periodic_faces = translational_periodicity(blocks,lower_bound,upper_bound,translational_direction='z')
+y_periodic_faces_export, periodic_faces = translational_periodicity(blocks,left_bound,right_bound,translational_direction='y')
+data['z_periodic'] = z_periodic_faces_export
+data['y_periodic'] = y_periodic_faces_export
+dump_data(data)
 
 # # Check to see if each of the upper and lower blocks have a periodic face
 # data = read_data()
