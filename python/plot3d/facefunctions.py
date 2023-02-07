@@ -137,6 +137,7 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
         List[Face]: list of all faces that connect with face_to_search and it's neighbors. Beware of duplicates.
     """
     matching_faces = list()
+    matching_faces.append(face_to_search)
     selected_block_indx = face_to_search.BlockIndex
     
     if face_to_search not in searched_faces:
