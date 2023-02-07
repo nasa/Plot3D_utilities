@@ -157,29 +157,30 @@ class Face:
     def set_block_index(self,val):
         self.blockIndex = val
         
-    def __normal__(self):
+    def normal(self,block):
         """Computes the normal vector of the face 
             not really used but if anyone wants it. 
         """
-        if (self.I[0]!=self.I[1]) and (self.I[0]!=self.I[2]):
-            indx = np.argsort(self.I)
-        elif (self.J[0]!=self.J[1]) and (self.J[0]!=self.J[2]):
-            indx = np.argsort(self.J)
-        elif (self.K[0]!=self.K[1]) and (self.K[0]!=self.K[2]):
-            indx = np.argsort(self.K)
+        if self.const_type == 0: # CONST J, IMIN==IMAX
+            x = [block.X[self.IMIN,self.JMIN,self.KMIN],block.X[self.IMIN,self.JMAX,self.KMIN],block.X[self.IMIN,self.JMIN,self.KMAX]]
+            y = [block.Y[self.IMIN,self.JMIN,self.KMIN],block.Y[self.IMIN,self.JMAX,self.KMIN],block.Y[self.IMIN,self.JMIN,self.KMAX]]
+            z = [block.Z[self.IMIN,self.JMIN,self.KMIN],block.Z[self.IMIN,self.JMAX,self.KMIN],block.Z[self.IMIN,self.JMIN,self.KMAX]]
+        elif self.const_type == 1: # CONST J, JMIN==JMAX
+            x = [block.X[self.IMIN,self.JMIN,self.KMIN],block.X[self.IMAX,self.JMIN,self.KMIN],block.X[self.IMIN,self.JMIN,self.KMAX]]
+            y = [block.Y[self.IMIN,self.JMIN,self.KMIN],block.Y[self.IMAX,self.JMIN,self.KMIN],block.Y[self.IMIN,self.JMIN,self.KMAX]]
+            z = [block.Z[self.IMIN,self.JMIN,self.KMIN],block.Z[self.IMAX,self.JMIN,self.KMIN],block.Z[self.IMIN,self.JMIN,self.KMAX]]
+        else:   # CONST K, KMIN==KMAX
+            x = [block.X[self.IMIN,self.JMIN,self.KMIN],block.X[self.IMAX,self.JMIN,self.KMIN],block.X[self.IMIN,self.JMAX,self.KMIN]]
+            y = [block.Y[self.IMIN,self.JMIN,self.KMIN],block.Y[self.IMAX,self.JMIN,self.KMIN],block.Y[self.IMIN,self.JMAX,self.KMIN]]
+            z = [block.Z[self.IMIN,self.JMIN,self.KMIN],block.Z[self.IMAX,self.JMIN,self.KMIN],block.Z[self.IMIN,self.JMAX,self.KMIN]]
 
-        self.x = self.x[indx]
-        self.y = self.y[indx]
-        self.z = self.z[indx]
-        self.I = self.I[indx]
-        self.J = self.J[indx]
-        self.K = self.K[indx]
-        x1 = self.x[1]-self.x[0]; y1 = self.y[1]-self.y[0]; z1 = self.z[1]-self.z[0]
-        x2 = self.x[2]-self.x[0]; y2 = self.y[2]-self.y[0]; z2 = self.z[2]-self.z[0]
+        x1 = x[1]-x[0]; y1 = y[1]-self.y[0]; z1 = z[1]-z[0]
+        x2 = x[2]-x[0]; y2 = y[2]-self.y[0]; z2 = z[2]-z[0]
         nx = y1*z2-y2*z1; ny = -1*(x1*z2-x2*z1); nz = x1*y2-x2*y1
         self.nx = nx
         self.ny = ny
-        self.nz = nz 
+        self.nz = nz
+        return np.array([nx,ny,nz])
 
     def match_indices(self,f):
         """Check to see if two faces are the same. Checks to see if any of vertices x,y,z match

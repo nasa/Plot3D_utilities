@@ -124,7 +124,7 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
                 newFace.add_vertex(x,y,z,i,j,k)
     return newFace
 
-def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity_matrix:np.ndarray,searched_faces:List[Face]=[],first_iter:bool=True):
+def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity_matrix:np.ndarray,blocks:List[Block]):
     """Recursive program to return all the matching faces. Note faces must have the same I,J,K definition so faces will be matching if for example: Face1 IMIN=IMAX and Face2 IMIN=IMAX and they share a common edge (2 vertices)
 
     Args:
@@ -136,23 +136,35 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
     Returns:
         List[Face]: list of all faces that connect with face_to_search and it's neighbors. Beware of duplicates.
     """
-    matching_faces = list()
-    selected_block_indx = face_to_search.BlockIndex
-    
-    if face_to_search not in searched_faces:
-        connected_block_indices = np.where(connectivity_matrix[selected_block_indx,:]==1)[0]
-        faces_to_check = [o for o in outer_faces if o.BlockIndex in connected_block_indices.tolist()]
-        for f in faces_to_check:
-            if (len(face_to_search.match_indices(f))==2 and face_to_search.const_type==f.const_type):
-                connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
-                connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
-                matching_faces.append(f)
-            if not first_iter:
-                searched_faces.append(face_to_search)
-        for m in matching_faces:
-            matching_faces.extend(find_connected_faces(m,outer_faces,connectivity_matrix,searched_faces,False))    
-        matching_faces = list(set(matching_faces))
-    return matching_faces 
+    all_matching_faces = [face_to_search]
+    faces_to_search = [face_to_search]
+    faces_searched = []
+    while len(faces_to_search)>0:
+        matching_faces = list()
+        for face_to_search in faces_to_search:
+            n1 = face_to_search.normal(blocks[face_to_search.BlockIndex])
+            selected_block_indx = face_to_search.BlockIndex    
+            connected_block_indices = np.where(connectivity_matrix[selected_block_indx,:]==1)[0]
+            faces_to_check = [o for o in outer_faces if o.BlockIndex in connected_block_indices.tolist()]
+            
+            for f in faces_to_check:
+                if (len(face_to_search.match_indices(f))==2):
+                    n2 = f.normal(blocks[f.BlockIndex])
+                    if f.BlockIndex == 704:
+                        print('check')
+                    angle = abs(math.degrees(math.acos(np.dot(n1,n2)/(np.linalg.norm(n1)*np.linalg.norm(n2)))))
+                    if angle<5:
+                        connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
+                        connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
+                        matching_faces.append(f)        
+              
+        faces_searched.extend(faces_to_search)
+        matching_faces = [m for m in matching_faces if m not in all_matching_faces]
+        faces_to_search.extend(matching_faces)
+        all_matching_faces.extend(matching_faces)
+        # all_matching_faces = list(set(all_matching_faces))  
+        matching_faces.clear()
+    return all_matching_faces
 
 
 def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray,centroid:np.ndarray,translational_direction:str="x",minvalue:bool=True):
@@ -277,10 +289,15 @@ def find_bounding_faces(blocks:List[Block],connectivity_matrix:np.ndarray,outer_
     # Search face connectivity in block connectivity matrix 
     connectivity_matrix = connectivity_matrix - np.eye(connectivity_matrix.shape[0],dtype=np.int8) # turn off connections with itself 
 
-    print("Recursively searching for connected faces")
-    lower_connected_faces = find_connected_faces(min_face,outer_faces_all,connectivity_matrix)
-    upper_connected_faces = find_connected_faces(max_face,outer_faces_all,connectivity_matrix)
-
+    outer_faces_all = [o for o in outer_faces_all if o.BlockIndex != min_face.BlockIndex]
+    outer_faces_all = [o for o in outer_faces_all if o.BlockIndex != max_face.BlockIndex]
+    
+    # !print("Recursively searching for connected faces")
+    lower_connected_faces = find_connected_faces(min_face,outer_faces_all,connectivity_matrix,blocks)
+    upper_connected_faces = find_connected_faces(max_face,outer_faces_all,connectivity_matrix,blocks)
+    
+    lower_connected_faces.append(min_face)
+    upper_connected_faces.append(max_face)
     # Unscale faces
     lower_connected_faces = list(set(lower_connected_faces))
     upper_connected_faces = list(set(upper_connected_faces))
