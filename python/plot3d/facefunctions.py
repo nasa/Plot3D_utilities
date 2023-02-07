@@ -124,7 +124,7 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
                 newFace.add_vertex(x,y,z,i,j,k)
     return newFace
 
-def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity_matrix:np.ndarray,searched_faces:List[Face]=[]):
+def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity_matrix:np.ndarray,searched_faces:List[Face]=[],first_iter:bool=True):
     """Recursive program to return all the matching faces. Note faces must have the same I,J,K definition so faces will be matching if for example: Face1 IMIN=IMAX and Face2 IMIN=IMAX and they share a common edge (2 vertices)
 
     Args:
@@ -137,7 +137,6 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
         List[Face]: list of all faces that connect with face_to_search and it's neighbors. Beware of duplicates.
     """
     matching_faces = list()
-    matching_faces.append(face_to_search)
     selected_block_indx = face_to_search.BlockIndex
     
     if face_to_search not in searched_faces:
@@ -148,9 +147,10 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
                 connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
                 connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
                 matching_faces.append(f)
-            searched_faces.append(face_to_search)
+            if not first_iter:
+                searched_faces.append(face_to_search)
         for m in matching_faces:
-            matching_faces.extend(find_connected_faces(m,outer_faces,connectivity_matrix,searched_faces))    
+            matching_faces.extend(find_connected_faces(m,outer_faces,connectivity_matrix,searched_faces,False))    
         matching_faces = list(set(matching_faces))
     return matching_faces 
 
