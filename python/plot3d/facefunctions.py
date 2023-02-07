@@ -188,20 +188,22 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
         else:
             target_x = xmax + dx*0.5
             selected_block_indx = np.argmin(np.sqrt((target_x-x)**2 + (cy-y)**2 + (cz-z)**2))            
-        target_y=blocks[selected_block_indx].cy; target_z = blocks[selected_block_indx].cz
+        target_y= cy
+        target_z = cz
     elif translational_direction=="y":
         ymins = [b.Y.min() for b in blocks]
         ymaxes = [b.Y.max() for b in blocks]
         ymin = min(ymins)
         ymax = max(ymaxes)
-        dy = ymax-ymin; 
+        dy = ymax-ymin
         if minvalue:
             target_y = ymin - dy*0.5
             selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (target_y-y)**2 + (cz-z)**2))
         else:
             target_y = ymax + dy*0.5
             selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (target_y-y)**2 + (cz-z)**2))
-        target_x = blocks[selected_block_indx].cx; target_z = blocks[selected_block_indx].cz
+        target_x = cx
+        target_z = cz
     else: #  translational_direction=="z":
         zmins = [b.Z.min() for b in blocks]
         zmaxes = [b.Z.max() for b in blocks]
@@ -214,7 +216,9 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
         else:
             target_z = zmax + dz*0.5
             selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (target_z-z)**2))
-        target_x = blocks[selected_block_indx].cx; target_y = blocks[selected_block_indx].cy
+        target_x = cx
+        target_y = cy
+
     return selected_block_indx,target_x,target_y,target_z 
 
 def find_bounding_faces(blocks:List[Block],connectivity_matrix:np.ndarray,outer_faces:List[Dict[str,int]], direction:str="z"):

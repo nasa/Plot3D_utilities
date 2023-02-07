@@ -52,7 +52,7 @@ lower_bound = data['lower_bound']; upper_bound = data['upper_bound']
 left_bound = data['left_bound']; right_bound = data['right_bound']
 z_periodic_faces_export, periodic_faces = translational_periodicity(blocks,lower_bound,upper_bound,translational_direction='z')
 y_periodic_faces_export, periodic_faces = translational_periodicity(blocks,left_bound,right_bound,translational_direction='y')
-data['z_periodic'] = z_periodic_faces_export
+# data['z_periodic'] = z_periodic_faces_export
 data['y_periodic'] = y_periodic_faces_export
 dump_data(data)
 

@@ -561,7 +561,7 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
             dz = zmax-zmin
             [b.shift(sign*dz,translational_direction) for b in blocks_shifted]
         return blocks_shifted
-        
+
     blocks_shifted = shift_blocks()
     periodic_found = True # start of the loop 
     
@@ -606,7 +606,9 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
             times_failed+=1
             blocks_shifted = shift_blocks(-1)            
     if times_failed==2:
-        print(f"\nNot periodic")
+        print(f"\nNot periodic {translational_direction}")
+    else:
+        print(f"\nPeriodic {translational_direction}")
 
                         
     # remove any duplicate periodic face pairs 
