@@ -33,12 +33,12 @@ if __name__=="__main__":
     Read the connectivity file
     '''
     plot3d_filename = 'CMC009_fine_binary.xyz'
-    what_to_plot = 'upper_bound'
+    what_to_plot = 'left_bound'
     with open('cmc9_data.pickle','rb') as f:
         data = pickle.load(f)
         faces_to_plot = data[what_to_plot]
         outer_faces = CheckDictionary(data,what_to_plot)
-        periodic_faces = CheckDictionary(data,'z_periodic')
+        periodic_faces = CheckDictionary(data,'y_periodic')
 
     blocks_to_extract = [o['block_index'] for o in outer_faces]
     blocks_to_extract.extend([f['block1']['block_index'] for f in periodic_faces])
@@ -72,11 +72,11 @@ if __name__=="__main__":
         RenameSource('Block '+str(b), block_source)
         block_source = FindSource('Block '+str(b))
         
-        # for surface_indx, o in enumerate(outer_faces):
-        #     # Add Plots for Outer Faces
-        #     if o['block_index'] == b:
-        #         voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
-        #         CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.8)
+        for surface_indx, o in enumerate(outer_faces):
+            # Add Plots for Outer Faces
+            if o['block_index'] == b:
+                voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
+                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=1)
         
         # Plot the periodic faces  
         for periodic_indx, p in enumerate(periodic_faces):

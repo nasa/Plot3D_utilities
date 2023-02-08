@@ -155,6 +155,7 @@ def CreateSubset(block_source,voi:List[int],name:str,opacity:float=1,rgb_face_ma
     extractSubset1Display.AmbientColor = rgb_face_matches
     extractSubset1Display.DiffuseColor = rgb_face_matches
     # renderView1.Update()
+    ColorBy(extractSubset1Display, ('FIELD', 'Solid Color'))
 
     return extractSubset1, extractSubset1Display
 

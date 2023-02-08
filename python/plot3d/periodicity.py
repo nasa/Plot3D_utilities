@@ -503,25 +503,18 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         outer_faces_all[j].K *= gcd_to_use
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
-def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dict[str,int]], upper_connected_faces:List[Dict[str,int]], translational_direction:str = "z"):
+def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dict[str,int]], upper_connected_faces:List[Dict[str,int]],delta:float=None, translational_direction:str = "z"):
     """Find periodicity using translated blocks. Simple example: if you have a rectangle and the top and bottom surfaces are periodic, this will copy the rectangle and shift it up to find which surfaces match. 
 
     Args:
-        blocks (List[Block]): List of blocks for a particular geometry. Do not duplicate the geometry and pass it in! 
-        outer_faces (List[Dict[str,int]]): List of outer faces in dictionary form
-        shift_distance (float): Distance to shift the block
-        shift_direction (str, Optional): "x", "y", or "z" 
-        ReduceMesh (bool, Optional): True, reduces the mesh for faster matching
+        blocks (List[Block]): List of blocks for a particular geometry. Do not duplicate the geometry and pass it in
+        lower_connected_faces (List[Dict[str,int]]): List of faces in the lower or left bound of the mesh
+        upper_connected_faces (List[Dict[str,int]]): List of faces in the upper or right bound of the mesh
+        delta (float): if specified the delta will be used to shift the blocks. Defaults to None
+        translational_direction (str, Optional): "x", "y", or "z" 
     
-    periodic_faces, outer_faces_export, _, _ = rotated_periodicity(blocks,face_matches, outer_faces, rotation_angle=rotation_angle, rotation_axis = "x")
-    
-    Replaces:
-        Is the same as 
-
-        periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity_fast(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
-        and
-        periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
-
+    Example:
+        y_periodic_faces_export, periodic_faces = translational_periodicity(blocks,left_bound,right_bound,translational_direction='y')
 
     Returns:
         (Tuple): containing
@@ -542,23 +535,23 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
     blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)    
     
     # Now for the periodicity part
-            
+    
     def shift_blocks(sign:int=1):
         blocks_shifted = deepcopy(blocks)
         if translational_direction.lower().strip() == "x":
             xmin = min([b.X.min() for b in blocks])
             xmax = max([b.X.max() for b in blocks])
-            dx = xmax-xmin
+            dx = xmax-xmin if not delta else delta
             [b.shift(sign*dx,translational_direction) for b in blocks_shifted]
         elif translational_direction.lower().strip() == "y":
             ymin = min([b.Y.min() for b in blocks])
             ymax = max([b.Y.max() for b in blocks])
-            dy = ymax-ymin
+            dy = ymax-ymin if not delta else delta
             [b.shift(sign*dy,translational_direction) for b in blocks_shifted]
         else: #  direction.lower().strip() == "z"
             zmin = min([b.Z.min() for b in blocks])
             zmax = max([b.Z.max() for b in blocks])
-            dz = zmax-zmin
+            dz = zmax-zmin if not delta else delta
             [b.shift(sign*dz,translational_direction) for b in blocks_shifted]
         return blocks_shifted
 
@@ -569,13 +562,15 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
     times_failed = 0 
     periodic_faces = list()      # This is the output of the code 
     periodic_faces_export = list()
+    non_matching = list()
     lower_connected_faces = list(set(lower_connected_faces))
     upper_connected_faces = list(set(upper_connected_faces))
     lower_blocks = [l.BlockIndex for l in lower_connected_faces]
     upper_blocks = [u.BlockIndex for u in upper_connected_faces]
     pbar = tqdm(total = len(lower_connected_faces))
-
-    while len(lower_connected_faces)>0 and times_failed<2:
+    
+    periodicity_tol = 1E-6 
+    while len(lower_connected_faces)>0 and times_failed<3:
         periodic_found = False
         face1 = lower_connected_faces[0]
         for face2 in upper_connected_faces:
@@ -586,7 +581,7 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
             block1_shifted = blocks_shifted[face1.blockIndex]
             block2 = blocks[face2.blockIndex]
             #   Check periodicity
-            _, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_shifted, block2)
+            _, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_shifted, block2,periodicity_tol)
             
             if len(periodic_faces_temp) > 0:
                 lower_connected_faces.remove(face1)
@@ -603,9 +598,12 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
     
         if periodic_found == False:
             # Lets switch the order 
+            non_matching.append(face1)
+            lower_connected_faces.remove(face1)
+            periodicity_tol *=10
             times_failed+=1
-            blocks_shifted = shift_blocks(-1)            
-    if times_failed==2:
+
+    if len(non_matching)>0:
         print(f"\nNot periodic {translational_direction}")
     else:
         print(f"\nPeriodic {translational_direction}")
@@ -707,7 +705,7 @@ def linear_real_transform(face1:Face,face2:Face) -> Tuple:
             ang*=-1
     return ang, rotation_matrix
 
-def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block):
+def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:float=1E-6):
     """General function to find periodicity within a given block. 
     
     Steps:
@@ -743,7 +741,7 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block):
         block2 = temp_block        
         swapped = True
     
-    df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2)
+    df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2,tol)
 
     if len(df)>4:
         f1 = create_face_from_diagonals(block1,imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(), imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max())

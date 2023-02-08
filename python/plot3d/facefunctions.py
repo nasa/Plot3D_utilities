@@ -153,17 +153,20 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
                     if f.BlockIndex == 704:
                         print('check')
                     angle = abs(math.degrees(math.acos(np.dot(n1,n2)/(np.linalg.norm(n1)*np.linalg.norm(n2)))))
-                    if angle<5:
+                    if angle>90:
+                        angle = 180-angle
+                    if angle<50:
                         connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
                         connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
                         matching_faces.append(f)        
               
         faces_searched.extend(faces_to_search)
         matching_faces = [m for m in matching_faces if m not in all_matching_faces]
+        faces_to_search.clear()
         faces_to_search.extend(matching_faces)
-        all_matching_faces.extend(matching_faces)
-        # all_matching_faces = list(set(all_matching_faces))  
+        all_matching_faces.extend(matching_faces)        
         matching_faces.clear()
+    all_matching_faces = list(set(all_matching_faces))  
     return all_matching_faces
 
 

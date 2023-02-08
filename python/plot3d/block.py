@@ -15,7 +15,7 @@ class Block:
             Z (np.ndarray): All the Z coordinates (i,j,k)
 
         """
-        imax,jmax,kmax = X.shape; 
+        self.IMAX,self.JMAX,self.KMAX = X.shape; 
         self.X = X
         self.Y = Y
         self.Z = Z
@@ -23,53 +23,7 @@ class Block:
         self.cx = np.mean(X) 
         self.cy = np.mean(Y)
         self.cz = np.mean(Z)
-        # Calculate Normals
         
-        # IMAX - Normal should be out of the page        
-        # Normals I direction: IMIN
-        x = [X[0,0,0],X[0,jmax,0],X[0,0,kmax]] 
-        y = [Y[0,0,0],Y[0,jmax,0],Y[0,0,kmax]]
-        z = [Z[0,0,0],Z[0,jmax,0],Z[0,0,kmax]]
-
-        # Normals I direction: IMAX
-        x = [X[imax,0,0],X[imax,jmax,0],X[imax,0,kmax]] 
-        y = [Y[imax,0,0],Y[imax,jmax,0],Y[imax,0,kmax]]
-        z = [Z[imax,0,0],Z[imax,jmax,0],Z[imax,0,kmax]]
-
-        # Normals J direction: JMIN
-        x = [X[0,0,0],X[imax,0,0],X[0,0,kmax]] 
-        y = [Y[0,0,0],Y[imax,0,0],Y[0,0,kmax]]
-        z = [Z[0,0,0],Z[imax,0,0],Z[0,0,kmax]]
-
-        # Normals J direction: JMAX
-        x = [X[0,jmax,0],X[imax,jmax,0],X[0,jmax,kmax]] 
-        y = [Y[0,jmax,0],Y[imax,jmax,0],Y[0,jmax,kmax]]
-        z = [Z[0,jmax,0],Z[imax,jmax,0],Z[0,jmax,kmax]]
-
-        # Normals K direction: KMIN
-        x = [X[imax,0,0],X[0,jmax,0],X[0,0,0]] 
-        y = [Y[imax,0,0],Y[0,jmax,0],Y[0,0,0]]
-        z = [Z[imax,0,0],Z[0,jmax,0],Z[0,0,0]]
-
-        # Normals K direction: KMAX
-        x = [X[imax,0,kmax],X[0,jmax,kmax],X[0,0,kmax]] 
-        y = [Y[imax,0,kmax],Y[0,jmax,kmax],Y[0,0,kmax]]
-        z = [Z[imax,0,kmax],Z[0,jmax,kmax],Z[0,0,kmax]]
-
-        x1 = x[1]-x[0]; y1 = y[1]-self.y[0]; z1 = z[1]-z[0]
-        x2 = x[2]-x[0]; y2 = y[2]-self.y[0]; z2 = z[2]-z[0]
-        nx = y1*z2-y2*z1; ny = -1*(x1*z2-x2*z1); nz = x1*y2-x2*y1
-        imax_normal = np.array([nx,ny,nz])
-            
-        return np.array([nx,ny,nz]) 
-
-
-        self.n_imax
-        self.n_imin
-        self.n_jmax
-        self.n_jmin
-        self.n_kmax
-        self.n_kmin
     
     def scale(self,factor:float):
         """Scales a mesh by a certain factor 
@@ -210,6 +164,77 @@ class Block:
                     v[i,j,k]= vol12/12
         return v
 
+def checkCollinearity(v1:np.ndarray, v2:np.ndarray):
+    # Calculate their cross product
+    cross_P = np.cross(v1,v2) 
+ 
+    # Check if their cross product
+    # is a NULL Vector or not
+    if (cross_P[0] == 0 and
+        cross_P[1] == 0 and
+        cross_P[2] == 0):
+        return True
+    else:
+        return False
+
+def calculate_outward_normals(block:Block):
+    # Calculate Normals
+        X = block.X
+        Y = block.Y
+        Z = block.Z
+        imax = block.IMAX
+        jmax = block.JMAX
+        kmax = block.KMAX 
+        # IMAX - Normal should be out of the page        
+        # Normals I direction: IMIN https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
+        x = [X[0,0,0],X[0,jmax,0],X[0,0,kmax]] 
+        y = [Y[0,0,0],Y[0,jmax,0],Y[0,0,kmax]]
+        z = [Z[0,0,0],Z[0,jmax,0],Z[0,0,kmax]]
+        u = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]]) 
+        v = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_imin = np.cross(v1,v2)
+        
+        # Normals I direction: IMAX
+        x = [X[imax,0,0],X[imax,jmax,0],X[imax,0,kmax]] 
+        y = [Y[imax,0,0],Y[imax,jmax,0],Y[imax,0,kmax]]
+        z = [Z[imax,0,0],Z[imax,jmax,0],Z[imax,0,kmax]]
+        v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
+        v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_imax = np.cross(v1,v2)
+
+        # Normals J direction: JMIN
+        x = [X[0,0,0],X[imax,0,0],X[0,0,kmax]] 
+        y = [Y[0,0,0],Y[imax,0,0],Y[0,0,kmax]]
+        z = [Z[0,0,0],Z[imax,0,0],Z[0,0,kmax]]
+        v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
+        v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_jmin = np.cross(v1,v2)
+
+        # Normals J direction: JMAX
+        x = [X[0,jmax,0],X[imax,jmax,0],X[0,jmax,kmax]] 
+        y = [Y[0,jmax,0],Y[imax,jmax,0],Y[0,jmax,kmax]]
+        z = [Z[0,jmax,0],Z[imax,jmax,0],Z[0,jmax,kmax]]
+        v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
+        v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_jmax = np.cross(v1,v2)
+
+        # Normals K direction: KMIN
+        x = [X[imax,0,0],X[0,jmax,0],X[0,0,0]] 
+        y = [Y[imax,0,0],Y[0,jmax,0],Y[0,0,0]]
+        z = [Z[imax,0,0],Z[0,jmax,0],Z[0,0,0]]
+        v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
+        v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_kmin = np.cross(v1,v2)
+
+        # Normals K direction: KMAX
+        x = [X[imax,0,kmax],X[0,jmax,kmax],X[0,0,kmax]] 
+        y = [Y[imax,0,kmax],Y[0,jmax,kmax],Y[0,0,kmax]]
+        z = [Z[imax,0,kmax],Z[0,jmax,kmax],Z[0,0,kmax]]
+        v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
+        v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_kmax = np.cross(v1,v2)
+
+        return n_imin,n_jmin,n_kmin,n_imax,n_jmax,n_kmax
 
 def reduce_blocks(blocks:List[Block],factor:int):
     """reduce the blocks by a factor of (factor)
