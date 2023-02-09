@@ -193,7 +193,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
         df = pd.concat([df, pd.DataFrame(match_location)], ignore_index=True)
     
     # Checking for split faces 
-    if len(df)>4:
+    if len(df)>=4:
         if (__check_edge(df)):
             df = pd.DataFrame()     # If it's an edge
         else:                       # not edge 
@@ -219,7 +219,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                 df = __filter_block_increasing(df,'j2')
 
             # Do a final check after doing all these checks
-            if len(df)>4:       # Greater than 4 because match can occur with simply 4 corners but the interior doesn't match. 
+            if len(df)>=4:       # Greater than 4 because match can occur with simply 4 corners but the interior doesn't match. 
                 # Check for Split faces
                 ## Block 1
                 main_face = create_face_from_diagonals(block1,imin=I1[0],imax=I1[1], jmin=J1[0],jmax=J1[1],kmin=K1[0],kmax=K1[1])
