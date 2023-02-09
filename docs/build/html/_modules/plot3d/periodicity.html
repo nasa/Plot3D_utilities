@@ -12,11 +12,10 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -29,14 +28,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> Plot3D
+
+          
+          
+          <a href="../../index.html">
+            
           </a>
               <div class="version">
                 1.5.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -66,14 +69,55 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Connectivity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Block</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Differencing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Face</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Read</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Write</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/split_block.html">Splitting Blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks"><code class="docutils literal notranslate"><span class="pre">combinations_of_nearest_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.connectivity"><code class="docutils literal notranslate"><span class="pre">connectivity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.connectivity_fast"><code class="docutils literal notranslate"><span class="pre">connectivity_fast()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.face_matches_to_dict"><code class="docutils literal notranslate"><span class="pre">face_matches_to_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks"><code class="docutils literal notranslate"><span class="pre">find_matching_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.get_face_intersection"><code class="docutils literal notranslate"><span class="pre">get_face_intersection()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.select_multi_dimensional"><code class="docutils literal notranslate"><span class="pre">select_multi_dimensional()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Block</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/block.html#plot3d.block.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/block.html#plot3d.block.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Differencing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/differencing.html#plot3d.differencing.find_edges"><code class="docutils literal notranslate"><span class="pre">find_edges()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/differencing.html#plot3d.differencing.find_face_edges"><code class="docutils literal notranslate"><span class="pre">find_face_edges()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Face</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/face.html#plot3d.face.Face"><code class="docutils literal notranslate"><span class="pre">Face</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Read</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/read.html#plot3d.read.read_ap_nasa"><code class="docutils literal notranslate"><span class="pre">read_ap_nasa()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/read.html#plot3d.read.read_plot3D"><code class="docutils literal notranslate"><span class="pre">read_plot3D()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Write</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/write.html#plot3d.write.write_plot3D"><code class="docutils literal notranslate"><span class="pre">write_plot3D()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/split_block.html">Splitting Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/split_block.html#plot3d.split_block.Direction"><code class="docutils literal notranslate"><span class="pre">Direction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/split_block.html#plot3d.split_block.max_aspect_ratio"><code class="docutils literal notranslate"><span class="pre">max_aspect_ratio()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/split_block.html#plot3d.split_block.split_blocks"><code class="docutils literal notranslate"><span class="pre">split_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Periodicity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.__periodicity_check__"><code class="docutils literal notranslate"><span class="pre">__periodicity_check__()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.create_rotation_matrix"><code class="docutils literal notranslate"><span class="pre">create_rotation_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.linear_real_transform"><code class="docutils literal notranslate"><span class="pre">linear_real_transform()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.periodicity"><code class="docutils literal notranslate"><span class="pre">periodicity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.periodicity_fast"><code class="docutils literal notranslate"><span class="pre">periodicity_fast()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.rotated_periodicity"><code class="docutils literal notranslate"><span class="pre">rotated_periodicity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.translational_periodicity"><code class="docutils literal notranslate"><span class="pre">translational_periodicity()</span></code></a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -89,9 +133,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>plot3d.periodicity</li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plot3d.periodicity</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -101,24 +145,22 @@
            <div itemprop="articleBody">
              
   <h1>Source code for plot3d.periodicity</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">truediv</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations_with_replacement</span><span class="p">,</span> <span class="n">permutations</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations_with_replacement</span><span class="p">,</span> <span class="n">permutations</span><span class="p">,</span> <span class="n">product</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">rotate_block</span><span class="p">,</span> <span class="n">reduce_blocks</span><span class="p">,</span> <span class="n">get_outer_bounds</span>
-<span class="kn">from</span> <span class="nn">.face</span> <span class="kn">import</span> <span class="n">Face</span><span class="p">,</span> <span class="n">create_face_from_diagonals</span><span class="p">,</span> <span class="n">split_face</span><span class="p">,</span> <span class="n">find_face_near_plane</span><span class="p">,</span> <span class="n">convert_dictionary_faces_to_face</span>
-<span class="kn">from</span> <span class="nn">.connectivity</span> <span class="kn">import</span> <span class="n">connectivity_fast</span><span class="p">,</span> <span class="n">get_face_intersection</span><span class="p">,</span> <span class="n">face_matches_to_dict</span>
-<span class="kn">from</span> <span class="nn">.write</span> <span class="kn">import</span> <span class="n">write_plot3D</span>
+<span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
+<span class="kn">from</span> <span class="nn">.blockfunctions</span> <span class="kn">import</span> <span class="n">rotate_block</span><span class="p">,</span> <span class="n">reduce_blocks</span>
+<span class="kn">from</span> <span class="nn">.face</span> <span class="kn">import</span> <span class="n">Face</span>
+<span class="kn">from</span> <span class="nn">.facefunctions</span> <span class="kn">import</span> <span class="n">outer_face_dict_to_list</span><span class="p">,</span><span class="n">match_faces_dict_to_list</span><span class="p">,</span> <span class="n">create_face_from_diagonals</span><span class="p">,</span> <span class="n">find_bounding_faces</span><span class="p">,</span><span class="n">get_outer_faces</span>
+<span class="kn">from</span> <span class="nn">.connectivity</span> <span class="kn">import</span> <span class="n">get_face_intersection</span><span class="p">,</span> <span class="n">face_matches_to_dict</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">cos</span><span class="p">,</span> <span class="n">radians</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">acos</span><span class="p">,</span> <span class="n">radians</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
-<span class="kn">import</span> <span class="nn">math</span>
-
-
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span><span class="p">,</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">math</span> 
 
 <div class="viewcode-block" id="periodicity_fast"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.periodicity_fast">[docs]</a><span class="k">def</span> <span class="nf">periodicity_fast</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">periodic_direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">nblades</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">55</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;This function is used to match a non-rotated set of blocks. </span>
-<span class="sd">        Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds the connectivity of blocks when they are rotated by an angle defined by the number of blades. Only use this if your mesh is of an annulus. </span>
+<span class="sd">        This function reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity </span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        blocks (List[Block]): List of blocks that will be scanned for perodicity</span>
@@ -213,7 +255,7 @@
     <span class="k">return</span> <span class="n">periodic_faces_export</span><span class="p">,</span> <span class="n">outer_faces_export</span><span class="p">,</span> <span class="n">periodic_faces</span><span class="p">,</span> <span class="n">outer_faces_all</span></div>
 
 <div class="viewcode-block" id="create_rotation_matrix"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.create_rotation_matrix">[docs]</a><span class="k">def</span> <span class="nf">create_rotation_matrix</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Creates a rotation matrix given an angle and axis </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a rotation matrix given an angle and axis </span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        rotation_angle (float): Rotation angle in radians</span>
@@ -240,7 +282,7 @@
     <span class="k">return</span> <span class="n">rotation_matrix</span> </div>
 
 <div class="viewcode-block" id="periodicity"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.periodicity">[docs]</a><span class="k">def</span> <span class="nf">periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">periodic_direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">nblades</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">55</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;This function is used to check for periodicity of the other faces rotated about an axis </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is used to check for periodicity of the other faces rotated about an axis. Use periodicity_fast instead. Periodicity_fast calls this function after reducing the size of the mesh.</span>
 <span class="sd">        The way it works is to find faces of a constant i,j, or k value</span>
 
 <span class="sd">    Args:</span>
@@ -269,33 +311,10 @@
     <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">True</span>
     
     <span class="c1"># Here we make a list of all the outer faces</span>
-    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
-    <span class="n">matched_faces_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">periodic_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>      <span class="c1"># This is the output of the code </span>
     <span class="n">periodic_faces_export</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
-    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span><span class="p">:</span>
-        <span class="n">face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> 
-            <span class="n">imin</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">imax</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;IMAX&#39;</span><span class="p">],</span> 
-            <span class="n">jmin</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">jmax</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;JMAX&#39;</span><span class="p">],</span> 
-            <span class="n">kmin</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">kmax</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;KMAX&#39;</span><span class="p">])</span>
-        <span class="n">face</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
-        <span class="n">outer_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">match_face_index</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">matched_faces</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">match_face_index</span> <span class="o">==</span> <span class="mi">14</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;check&quot;</span><span class="p">)</span>
-        <span class="n">face1</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span>
-            <span class="n">imin</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]),</span> <span class="n">imax</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]),</span> 
-            <span class="nb">min</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]),</span> <span class="n">jmax</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]),</span>
-            <span class="n">kmin</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]),</span> <span class="n">kmax</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]))</span>
-        <span class="n">face2</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> 
-            <span class="n">imin</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]),</span> <span class="n">imax</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]),</span> 
-            <span class="n">jmin</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]),</span> <span class="n">jmax</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]),</span> 
-            <span class="n">kmin</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]),</span> <span class="n">kmax</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]))</span>
-
-        <span class="n">face1</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
-        <span class="n">face2</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
-        <span class="n">matched_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span>
-        <span class="n">matched_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face2</span><span class="p">)</span>
+    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="n">outer_face_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">)</span>
+    <span class="n">matched_faces_all</span> <span class="o">=</span> <span class="n">match_faces_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">matched_faces</span><span class="p">)</span>
 
     <span class="n">split_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>         <span class="c1"># List of split but free surfaces, this will be appended to outer_faces_to_remove list</span>
     <span class="k">while</span> <span class="n">periodic_found</span><span class="p">:</span>
@@ -331,7 +350,7 @@
                             <span class="n">outer_faces_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>    <span class="c1"># Make sure periodic faces are also removed from outer faces during the loop</span>
                             <span class="n">outer_faces_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                             <span class="n">periodic_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">)</span>
-                            <span class="n">periodic_faces_export</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face_matches_to_dict</span><span class="p">(</span><span class="n">face1</span><span class="p">,</span><span class="n">face2</span><span class="p">,</span><span class="n">block1_rotated</span><span class="p">,</span><span class="n">block2</span><span class="p">))</span>
+                            <span class="n">periodic_faces_export</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">face1</span><span class="p">,</span><span class="n">face2</span><span class="p">,</span><span class="n">block1_rotated</span><span class="p">,</span><span class="n">block2</span><span class="p">))</span>
                             <span class="n">split_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_faces_temp</span><span class="p">)</span>
                             <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">True</span>
                             <span class="k">break</span>
@@ -456,8 +475,7 @@
 
 
 <div class="viewcode-block" id="rotated_periodicity"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.rotated_periodicity">[docs]</a><span class="k">def</span> <span class="nf">rotated_periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">rotation_angle</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ReduceMesh</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Finds the peridocity/connectivity by rotating a block. This is a bit different from &quot;periodicity&quot; where you specify the periodic direction. </span>
-<span class="sd">        This method doesn&#39;t care about the direction as long as the angle you specify results in a match between the Left Face and the Right Face         </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds the peridocity/connectivity by rotating a block. This is a bit different from &quot;periodicity_fast&quot; where you specify the periodic direction. This method doesn&#39;t care about the direction as long as the angle you specify results in a match between the Left Face and the Right Face. I would use this instead.</span>
 
 <span class="sd">    Example 1:              </span>
 <span class="sd">        L      RL           R</span>
@@ -508,28 +526,11 @@
     <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">True</span>
     
     <span class="c1"># Here we make a list of all the outer faces</span>
-    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
-    <span class="n">matched_faces_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">periodic_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>      <span class="c1"># This is the output of the code </span>
     <span class="n">periodic_faces_export</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
 
-    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span><span class="p">:</span>
-        <span class="n">face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> 
-            <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">))</span>
-        <span class="n">face</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
-        <span class="n">outer_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">matched_faces</span><span class="p">):</span>
-        <span class="n">face1</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks_rotated</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> 
-                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> 
-                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">))</span>
-        <span class="n">face2</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> 
-                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> 
-                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">))</span>
-        <span class="n">face1</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
-        <span class="n">face2</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
-        <span class="n">matched_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span>
-        <span class="n">matched_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face2</span><span class="p">)</span>
+    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="n">outer_face_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">,</span><span class="n">gcd_to_use</span><span class="p">)</span>
+    <span class="n">matched_faces_all</span> <span class="o">=</span> <span class="n">match_faces_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">matched_faces</span><span class="p">,</span><span class="n">gcd_to_use</span><span class="p">)</span>
 
     <span class="n">split_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>         <span class="c1"># List of split but free surfaces, this will be appended to outer_faces_to_remove list</span>
     <span class="n">non_matching</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -649,25 +650,18 @@
         <span class="n">outer_faces_all</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">K</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
     <span class="k">return</span> <span class="n">periodic_faces_export</span><span class="p">,</span> <span class="n">outer_faces_export</span><span class="p">,</span> <span class="n">periodic_faces</span><span class="p">,</span> <span class="n">outer_faces_all</span></div>
 
-<div class="viewcode-block" id="translational_periodicity"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.translational_periodicity">[docs]</a><span class="k">def</span> <span class="nf">translational_periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">shift_distance</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">shift_direction</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ReduceMesh</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Find periodicity using translated blocks. Simple example: if you have a rectangle and the top and bottom surfaces are periodic, this will copy the rectangle and shift it up to find which surfaces match. </span>
+<div class="viewcode-block" id="translational_periodicity"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.translational_periodicity">[docs]</a><span class="k">def</span> <span class="nf">translational_periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">lower_connected_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">upper_connected_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">delta</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">translational_direction</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find periodicity using translated blocks. Simple example: if you have a rectangle and the top and bottom surfaces are periodic, this will copy the rectangle and shift it up to find which surfaces match. </span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        blocks (List[Block]): List of blocks for a particular geometry. Do not duplicate the geometry and pass it in! </span>
-<span class="sd">        outer_faces (List[Dict[str,int]]): List of outer faces in dictionary form</span>
-<span class="sd">        shift_distance (float): Distance to shift the block</span>
-<span class="sd">        shift_direction (str, Optional): &quot;x&quot;, &quot;y&quot;, or &quot;z&quot; </span>
-<span class="sd">        ReduceMesh (bool, Optional): True, reduces the mesh for faster matching</span>
+<span class="sd">        blocks (List[Block]): List of blocks for a particular geometry. Do not duplicate the geometry and pass it in</span>
+<span class="sd">        lower_connected_faces (List[Dict[str,int]]): List of faces in the lower or left bound of the mesh</span>
+<span class="sd">        upper_connected_faces (List[Dict[str,int]]): List of faces in the upper or right bound of the mesh</span>
+<span class="sd">        delta (float): if specified the delta will be used to shift the blocks. Defaults to None</span>
+<span class="sd">        translational_direction (str, Optional): &quot;x&quot;, &quot;y&quot;, or &quot;z&quot; </span>
 <span class="sd">    </span>
-<span class="sd">    periodic_faces, outer_faces_export, _, _ = rotated_periodicity(blocks,face_matches, outer_faces, rotation_angle=rotation_angle, rotation_axis = &quot;x&quot;)</span>
-<span class="sd">    </span>
-<span class="sd">    Replaces:</span>
-<span class="sd">        Is the same as </span>
-
-<span class="sd">        periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity_fast(blocks,outer_faces,face_matches,periodic_direction=&#39;k&#39;,rotation_axis=&#39;x&#39;,nblades=55)</span>
-<span class="sd">        and</span>
-<span class="sd">        periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity(blocks,outer_faces,face_matches,periodic_direction=&#39;k&#39;,rotation_axis=&#39;x&#39;,nblades=55)</span>
-
+<span class="sd">    Example:</span>
+<span class="sd">        y_periodic_faces_export, periodic_faces = translational_periodicity(blocks,left_bound,right_bound,translational_direction=&#39;y&#39;)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (Tuple): containing</span>
@@ -678,113 +672,90 @@
 <span class="sd">            - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">gcd_array</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="c1"># Find the gcd of all the blocks </span>
-    <span class="k">if</span> <span class="n">ReduceMesh</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
-            <span class="n">block</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">block_indx</span><span class="p">]</span>
-            <span class="n">gcd_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
-        <span class="n">gcd_to_use</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">gcd_array</span><span class="p">)</span> <span class="c1"># You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.</span>
-        <span class="n">blocks</span> <span class="o">=</span> <span class="n">reduce_blocks</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span><span class="n">gcd_to_use</span><span class="p">)</span>
-
+    <span class="c1"># Find the gcd of all the blocks</span>
+    <span class="k">for</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">block_indx</span><span class="p">]</span>
+        <span class="n">gcd_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">gcd_to_use</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">gcd_array</span><span class="p">)</span> <span class="c1"># You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.</span>
+    <span class="n">lower_connected_faces</span> <span class="o">=</span> <span class="n">outer_face_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">lower_connected_faces</span><span class="p">,</span><span class="n">gcd_to_use</span><span class="p">)</span>
+    <span class="n">upper_connected_faces</span> <span class="o">=</span> <span class="n">outer_face_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">upper_connected_faces</span><span class="p">,</span><span class="n">gcd_to_use</span><span class="p">)</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">reduce_blocks</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span><span class="n">gcd_to_use</span><span class="p">)</span>    
     
-    <span class="n">blocks_shifted</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
-    <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">shift_distance</span><span class="p">,</span> <span class="n">shift_direction</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks_shifted</span><span class="p">]</span>
-   
-    <span class="c1"># Check periodic within a block </span>
-    <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># Now for the periodicity part</span>
+    
+    <span class="k">def</span> <span class="nf">shift_blocks</span><span class="p">(</span><span class="n">sign</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">blocks_shifted</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">translational_direction</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
+            <span class="n">xmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="n">xmax</span><span class="o">-</span><span class="n">xmin</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">delta</span> <span class="k">else</span> <span class="n">delta</span>
+            <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">sign</span><span class="o">*</span><span class="n">dx</span><span class="p">,</span><span class="n">translational_direction</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks_shifted</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">translational_direction</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span>
+            <span class="n">ymin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
+            <span class="n">ymax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="n">ymax</span><span class="o">-</span><span class="n">ymin</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">delta</span> <span class="k">else</span> <span class="n">delta</span>
+            <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">sign</span><span class="o">*</span><span class="n">dy</span><span class="p">,</span><span class="n">translational_direction</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks_shifted</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1">#  direction.lower().strip() == &quot;z&quot;</span>
+            <span class="n">zmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
+            <span class="n">zmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
+            <span class="n">dz</span> <span class="o">=</span> <span class="n">zmax</span><span class="o">-</span><span class="n">zmin</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">delta</span> <span class="k">else</span> <span class="n">delta</span>
+            <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">sign</span><span class="o">*</span><span class="n">dz</span><span class="p">,</span><span class="n">translational_direction</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks_shifted</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">blocks_shifted</span>
+
+    <span class="n">blocks_shifted</span> <span class="o">=</span> <span class="n">shift_blocks</span><span class="p">()</span>
+    <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># start of the loop </span>
     
     <span class="c1"># Here we make a list of all the outer faces</span>
-    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
-    <span class="n">matched_faces_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">times_failed</span> <span class="o">=</span> <span class="mi">0</span> 
     <span class="n">periodic_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>      <span class="c1"># This is the output of the code </span>
-    <span class="n">periodic_faces_export</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
-    
-    <span class="c1"># Speed up calculations: To make things faster we found the outer bounds of the blocks and filter the outerfaces so that, for example, if you translate in the x direction, we only use outer faces that are in the xmin and xmax of the block</span>
-    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="n">convert_dictionary_faces_to_face</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">,</span><span class="n">gcd_to_use</span><span class="p">)</span>
-
-    <span class="c1"># xbounds,ybounds,zbounds = get_outer_bounds(blocks)    </span>
-    <span class="c1"># if (shift_direction == &#39;x&#39;):</span>
-    <span class="c1">#     nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,xbounds[0]-0.1)</span>
-    <span class="c1">#     nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,xbounds[1]+0.1)</span>
-    <span class="c1"># if (shift_direction == &#39;y&#39;):</span>
-    <span class="c1">#     nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,ybounds[0]-0.1)</span>
-    <span class="c1">#     nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,ybounds[1]+0.1)</span>
-    <span class="c1"># if (shift_direction == &#39;z&#39;):</span>
-    <span class="c1">#     nearest_faces1 = find_face_near_plane(blocks,outer_faces_all,shift_direction,zbounds[0]-0.1)</span>
-    <span class="c1">#     nearest_faces2 = find_face_near_plane(blocks,outer_faces_all,shift_direction,zbounds[1]+0.1)</span>
-    <span class="c1"># outer_faces_all = nearest_faces1</span>
-    <span class="c1"># outer_faces_all.extend(nearest_faces2)</span>
-
-    <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">matched_faces</span><span class="p">):</span>
-        <span class="n">face1</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks_shifted</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> 
-                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> 
-                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">))</span>
-        <span class="n">face2</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> 
-                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> 
-                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">))</span>
-        <span class="n">face1</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
-        <span class="n">face2</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
-        <span class="n">matched_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span>
-        <span class="n">matched_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face2</span><span class="p">)</span>
-
-    <span class="n">split_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>         <span class="c1"># List of split but free surfaces, this will be appended to outer_faces_to_remove list</span>
+    <span class="n">periodic_faces_export</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">non_matching</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="k">while</span> <span class="n">periodic_found</span><span class="p">:</span>
-        <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">False</span>        
-        <span class="n">outer_faces_to_remove</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>  <span class="c1"># Integer list of which outer surfaces to remove</span>
-        <span class="n">outer_face_combos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">permutations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outer_faces_all</span><span class="p">)),</span><span class="mi">2</span><span class="p">))</span>
-        <span class="n">outer_face_combos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">outer_face_combos</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">non_matching</span><span class="p">))</span> <span class="c1"># removes face combinations already checked</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outer_face_combos</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span> 
+    <span class="n">lower_connected_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">lower_connected_faces</span><span class="p">))</span>
+    <span class="n">upper_connected_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">upper_connected_faces</span><span class="p">))</span>
+    <span class="n">lower_blocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lower_connected_faces</span><span class="p">]</span>
+    <span class="n">upper_blocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">upper_connected_faces</span><span class="p">]</span>
+    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lower_connected_faces</span><span class="p">))</span>
+    
+    <span class="n">periodicity_tol</span> <span class="o">=</span> <span class="mf">1E-6</span> 
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">lower_connected_faces</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">times_failed</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">:</span>
+        <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">face1</span> <span class="o">=</span> <span class="n">lower_connected_faces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">face2</span> <span class="ow">in</span> <span class="n">upper_connected_faces</span><span class="p">:</span>
             <span class="c1"># Check if surfaces are periodic with each other</span>
-            <span class="n">face1_indx</span> <span class="o">=</span> <span class="n">outer_face_combos</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">face2_indx</span> <span class="o">=</span> <span class="n">outer_face_combos</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">face1</span> <span class="o">=</span> <span class="n">outer_faces_all</span><span class="p">[</span><span class="n">face1_indx</span><span class="p">]</span>
-            <span class="n">face2</span> <span class="o">=</span> <span class="n">outer_faces_all</span><span class="p">[</span><span class="n">face2_indx</span><span class="p">]</span>
-            <span class="n">t</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Checking connections block </span><span class="si">{</span><span class="n">face1</span><span class="o">.</span><span class="n">blockIndex</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">face2</span><span class="o">.</span><span class="n">blockIndex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="n">face1</span><span class="o">.</span><span class="n">IMIN</span> <span class="o">==</span> <span class="n">face1</span><span class="o">.</span><span class="n">IMAX</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">face2</span><span class="o">.</span><span class="n">IMIN</span> <span class="o">==</span> <span class="n">face2</span><span class="o">.</span><span class="n">IMAX</span><span class="p">)</span> <span class="ow">or</span> \
-                <span class="p">(</span><span class="n">face1</span><span class="o">.</span><span class="n">JMIN</span> <span class="o">==</span> <span class="n">face1</span><span class="o">.</span><span class="n">JMAX</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">face2</span><span class="o">.</span><span class="n">JMIN</span> <span class="o">==</span> <span class="n">face2</span><span class="o">.</span><span class="n">JMAX</span><span class="p">)</span> <span class="ow">or</span> \
-                <span class="p">(</span><span class="n">face1</span><span class="o">.</span><span class="n">KMIN</span> <span class="o">==</span> <span class="n">face1</span><span class="o">.</span><span class="n">KMAX</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">face2</span><span class="o">.</span><span class="n">KMIN</span> <span class="o">==</span> <span class="n">face2</span><span class="o">.</span><span class="n">KMAX</span><span class="p">):</span>
-                    
-                <span class="c1"># Rotate Block 1 -&gt; Check periodicity -&gt; if not periodic -&gt; Rotate Block 1 opposite direction -&gt; Check periodicity</span>
-                <span class="c1">#   Rotate Block 1</span>
-                <span class="n">block1_rotated</span> <span class="o">=</span> <span class="n">blocks_shifted</span><span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">]</span>
-                <span class="n">block2</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">]</span>
-                <span class="c1">#   Check periodicity</span>
-                <span class="n">df</span><span class="p">,</span> <span class="n">periodic_faces_temp</span><span class="p">,</span> <span class="n">split_faces_temp</span> <span class="o">=</span> <span class="n">__periodicity_check__</span><span class="p">(</span><span class="n">face1</span><span class="p">,</span><span class="n">face2</span><span class="p">,</span><span class="n">block1_rotated</span><span class="p">,</span> <span class="n">block2</span><span class="p">)</span>
-                
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">outer_faces_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span>
-                    <span class="n">outer_faces_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face2</span><span class="p">)</span>
-                    <span class="n">outer_faces_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="n">outer_faces_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                    <span class="n">periodic_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">)</span>
-                    <span class="n">periodic_faces_export</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face_matches_to_dict</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">periodic_faces_temp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">block1_rotated</span><span class="p">,</span><span class="n">block2</span><span class="p">))</span>
-                    <span class="n">split_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_faces_temp</span><span class="p">)</span>
-                    <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">True</span>
-                    <span class="k">break</span>
-            <span class="k">else</span><span class="p">:</span> 
-                <span class="n">non_matching</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">face1_indx</span><span class="p">,</span><span class="n">face2_indx</span><span class="p">))</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Checking connections block </span><span class="si">{</span><span class="n">face1</span><span class="o">.</span><span class="n">blockIndex</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">face2</span><span class="o">.</span><span class="n">blockIndex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Shift block 1 -&gt; Check periodicity -&gt; if not periodic -&gt; shift Block 1 opposite direction -&gt; Check periodicity</span>
+            <span class="c1">#   Rotate Block 1</span>
+            <span class="n">block1_shifted</span> <span class="o">=</span> <span class="n">blocks_shifted</span><span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">]</span>
+            <span class="n">block2</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">]</span>
+            <span class="c1">#   Check periodicity</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">periodic_faces_temp</span><span class="p">,</span> <span class="n">split_faces_temp</span> <span class="o">=</span> <span class="n">__periodicity_check__</span><span class="p">(</span><span class="n">face1</span><span class="p">,</span><span class="n">face2</span><span class="p">,</span><span class="n">block1_shifted</span><span class="p">,</span> <span class="n">block2</span><span class="p">,</span><span class="n">periodicity_tol</span><span class="p">)</span>
             
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lower_connected_faces</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span>
+                <span class="n">upper_connected_faces</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">face2</span><span class="p">)</span>
+                <span class="n">periodic_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">)</span>
+                <span class="n">periodic_faces_export</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face_matches_to_dict</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">periodic_faces_temp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">block1_shifted</span><span class="p">,</span><span class="n">block2</span><span class="p">))</span>
+                <span class="n">lower_split_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">split_faces_temp</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="ow">in</span> <span class="n">lower_blocks</span><span class="p">]</span>
+                <span class="n">upper_split_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">split_faces_temp</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="ow">in</span> <span class="n">upper_blocks</span><span class="p">]</span>
+                <span class="n">lower_connected_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">lower_split_faces</span><span class="p">)</span>
+                <span class="n">upper_connected_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">upper_split_faces</span><span class="p">)</span>
+                <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">break</span>
+    
+        <span class="k">if</span> <span class="n">periodic_found</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="c1"># Lets switch the order </span>
+            <span class="n">non_matching</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span>
+            <span class="n">lower_connected_faces</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span>
+            <span class="n">periodicity_tol</span> <span class="o">*=</span><span class="mi">10</span>
+            <span class="n">times_failed</span><span class="o">+=</span><span class="mi">1</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">periodic_found</span><span class="p">):</span>
-            <span class="n">outer_faces_to_remove</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">outer_faces_to_remove</span><span class="p">))</span>
-            <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">outer_faces_all</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">outer_faces_to_remove</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">split_faces</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-                <span class="n">outer_faces_all</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_faces</span><span class="p">)</span>
-                <span class="n">split_faces</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_matching</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Not periodic </span><span class="si">{</span><span class="n">translational_direction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Periodic </span><span class="si">{</span><span class="n">translational_direction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># This is an added check to make sure all periodic faces are in the outer_faces_to_remove</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">periodic_faces</span><span class="p">:</span>
-        <span class="n">outer_faces_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">outer_faces_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matched_faces_all</span><span class="p">:</span>
-        <span class="n">outer_faces_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-
-    <span class="n">outer_faces_to_remove</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">outer_faces_to_remove</span><span class="p">))</span>    <span class="c1"># Use only unique values</span>
-    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">outer_faces_all</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">outer_faces_to_remove</span><span class="p">]</span>    <span class="c1"># remove from outer faces </span>
+                        
     <span class="c1"># remove any duplicate periodic face pairs </span>
     <span class="n">indx_to_remove</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">periodic_faces</span><span class="p">)):</span>
@@ -799,11 +770,6 @@
 
     <span class="n">periodic_faces_export</span> <span class="o">=</span> <span class="p">[</span><span class="n">periodic_faces_export</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">periodic_faces</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">indx_to_remove</span><span class="p">]</span>
     <span class="n">periodic_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">periodic_faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">periodic_faces</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">indx_to_remove</span><span class="p">]</span>
-    <span class="c1"># Export periodic faces and outer faces</span>
-    <span class="n">outer_faces_export</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
-
-    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces_all</span><span class="p">:</span>
-        <span class="n">outer_faces_export</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
 
     <span class="c1"># scale it up</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">periodic_faces_export</span><span class="p">)):</span>
@@ -832,22 +798,11 @@
         <span class="n">periodic_faces</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">J</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
         <span class="n">periodic_faces</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">K</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
 
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outer_faces_export</span><span class="p">)):</span>
-        <span class="n">outer_faces_export</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
-        <span class="n">outer_faces_export</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
-        <span class="n">outer_faces_export</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
-        <span class="n">outer_faces_export</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
-        <span class="n">outer_faces_export</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
-        <span class="n">outer_faces_export</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
-    
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outer_faces_all</span><span class="p">)):</span>
-        <span class="n">outer_faces_all</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">I</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
-        <span class="n">outer_faces_all</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">J</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
-        <span class="n">outer_faces_all</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">K</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
-    <span class="k">return</span> <span class="n">periodic_faces_export</span><span class="p">,</span> <span class="n">outer_faces_export</span><span class="p">,</span> <span class="n">periodic_faces</span><span class="p">,</span> <span class="n">outer_faces_all</span></div>
+    <span class="k">return</span> <span class="n">periodic_faces_export</span><span class="p">,</span> <span class="n">periodic_faces</span></div>
+
 
 <div class="viewcode-block" id="linear_real_transform"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.linear_real_transform">[docs]</a><span class="k">def</span> <span class="nf">linear_real_transform</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Computes the rotation angle from Face1 to Face2. This can be used to check if the faces are periodic </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the rotation angle from Face1 to Face2. This can be used to check if the faces are periodic </span>
 <span class="sd">        This function assumes the rotation axis is in the &quot;x&quot; direction. This is good for faces within the same block </span>
 
 <span class="sd">    Reference:</span>
@@ -897,8 +852,8 @@
             <span class="n">ang</span><span class="o">*=-</span><span class="mi">1</span>
     <span class="k">return</span> <span class="n">ang</span><span class="p">,</span> <span class="n">rotation_matrix</span></div>
 
-<div class="viewcode-block" id="__periodicity_check__"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.__periodicity_check__">[docs]</a><span class="k">def</span> <span class="nf">__periodicity_check__</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;General function to find periodicity within a given block. </span>
+<div class="viewcode-block" id="__periodicity_check__"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.__periodicity_check__">[docs]</a><span class="k">def</span> <span class="nf">__periodicity_check__</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;General function to find periodicity within a given block. </span>
 <span class="sd">    </span>
 <span class="sd">    Steps:</span>
 <span class="sd">        - 1: Take the face with the shorter diagonal. </span>
@@ -933,7 +888,7 @@
         <span class="n">block2</span> <span class="o">=</span> <span class="n">temp_block</span>        
         <span class="n">swapped</span> <span class="o">=</span> <span class="kc">True</span>
     
-    <span class="n">df</span><span class="p">,</span><span class="n">split_face1</span><span class="p">,</span><span class="n">split_face2</span> <span class="o">=</span> <span class="n">get_face_intersection</span><span class="p">(</span><span class="n">face1</span><span class="p">,</span><span class="n">face2</span><span class="p">,</span><span class="n">block1</span><span class="p">,</span><span class="n">block2</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">,</span><span class="n">split_face1</span><span class="p">,</span><span class="n">split_face2</span> <span class="o">=</span> <span class="n">get_face_intersection</span><span class="p">(</span><span class="n">face1</span><span class="p">,</span><span class="n">face2</span><span class="p">,</span><span class="n">block1</span><span class="p">,</span><span class="n">block2</span><span class="p">,</span><span class="n">tol</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">4</span><span class="p">:</span>
         <span class="n">f1</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block1</span><span class="p">,</span><span class="n">imin</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">jmin</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;j1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">kmin</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">imax</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="n">jmax</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;j1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="n">kmax</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
@@ -952,6 +907,8 @@
             <span class="n">periodic_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">df</span><span class="p">,</span><span class="n">periodic_faces</span><span class="p">,</span><span class="n">split_faces</span></div>
+
+
 </pre></div>
 
            </div>

@@ -29,11 +29,13 @@ A python library for reading, writing, finding connectivity for plot3d files.
    :glob:
    :maxdepth: 1
    :caption: Python Package Reference
-
-   modules/connectivity
+   
    modules/block
+   modules/blockfunctions
+   modules/connectivity
    modules/differencing
    modules/face
+   modules/facefunctions
    modules/read
    modules/write
    modules/split_block
