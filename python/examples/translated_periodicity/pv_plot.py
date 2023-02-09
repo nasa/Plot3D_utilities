@@ -33,75 +33,50 @@ if __name__=="__main__":
     Read the connectivity file
     '''
     plot3d_filename = 'CMC009_fine_binary.xyz'
-
-    with open('CMC009_periodicity.pickle','rb') as f:
+    what_to_plot = 'left_bound'
+    with open('cmc9_data.pickle','rb') as f:
         data = pickle.load(f)
-        face_matches = data['face_matches']
-        periodic_faces = CheckDictionary(data,'periodic_faces')
-        outer_faces = CheckDictionary(data,'outer_faces')
+        faces_to_plot = data[what_to_plot]
+        outer_faces = CheckDictionary(data,what_to_plot)
+        periodic_faces = CheckDictionary(data,'y_periodic')
 
-    blocks_to_extract = [f['block1']['block_index'] for f in face_matches]
-    blocks_to_extract.extend([f['block2']['block_index'] for f in face_matches])
+    blocks_to_extract = [o['block_index'] for o in outer_faces]
+    blocks_to_extract.extend([f['block1']['block_index'] for f in periodic_faces])
+    blocks_to_extract.extend([f['block2']['block_index'] for f in periodic_faces])
     blocks_to_extract = list(set(blocks_to_extract))
     blocks_to_extract.sort()
-    print(blocks_to_extract)
+    n = len(blocks_to_extract)
+    
     '''
     Generate Random Colors 
     
     This part generates random colors so that each color is associated with a face match. 
     Doesn't matter what the block is a single match is assigned the same color. 
     '''
-    rgb_face_matches = list()
-    for i in range(len(face_matches)):
-        rgb_face_matches.append([random.randint(0,255)/255, random.randint(0,255)/255, random.randint(0,255)/255])
-
     rgb_outer_faces = list()
     for i in range(len(outer_faces)):
         rgb_outer_faces.append([random.randint(0,255)/255, random.randint(0,255)/255, random.randint(0,255)/255])
 
     # Load mesh
     plot3D_source,plot3D_Display,View,LUT = Load(plot3d_filename,True)
-    
+    print(f"Total number of blocks: {n}")
     def check_and_swap(ijkmin, ijkmax):
         if (ijkmin> ijkmax):
             temp = ijkmax
             ijkmax = ijkmin
             ijkmin = temp
         return ijkmin, ijkmax
-    '''
-    Loop through all the blocks and create within each block the match and the outer surfaces
-    '''
+    
     for b in blocks_to_extract: # Block indicies 
         block_source,block_display,LUT = ExtractBlocks(plot3D_source,View,[b])
         RenameSource('Block '+str(b), block_source)
         block_source = FindSource('Block '+str(b))
         
-        # Plot the face matches 
-        for match_indx, f in enumerate(face_matches):
-            # Add Plots for Matched Faces 
-            if f['block1']['block_index'] == b or f['block2']['block_index'] == b : 
-                if f['block1']['block_index'] == b:
-                    # Do this for plotting purposes 
-                    f['block1']['IMIN'], f['block1']['IMAX'] = check_and_swap(f['block1']['IMIN'], f['block1']['IMAX'])
-                    f['block1']['JMIN'], f['block1']['JMAX'] = check_and_swap(f['block1']['JMIN'], f['block1']['JMAX'])
-                    f['block1']['KMIN'], f['block1']['KMAX'] = check_and_swap(f['block1']['KMIN'], f['block1']['KMAX'])
-                    voi = [f['block1']['IMIN'], f['block1']['IMAX'], f['block1']['JMIN'], f['block1']['JMAX'],f['block1']['KMIN'], f['block1']['KMAX']]
-                else:
-                    f['block2']['IMIN'], f['block2']['IMAX'] = check_and_swap(f['block2']['IMIN'], f['block2']['IMAX'])
-                    f['block2']['JMIN'], f['block2']['JMAX'] = check_and_swap(f['block2']['JMIN'], f['block2']['JMAX'])
-                    f['block2']['KMIN'], f['block2']['KMAX'] = check_and_swap(f['block2']['KMIN'], f['block2']['KMAX'])
-                    voi = [f['block2']['IMIN'], f['block2']['IMAX'], f['block2']['JMIN'], f['block2']['JMAX'],f['block2']['KMIN'], f['block2']['KMAX']]
-                CreateSubset(block_source, voi, name='match '+str(match_indx))
-        
-        # Plot the outer faces  
-    
-
-
         for surface_indx, o in enumerate(outer_faces):
             # Add Plots for Outer Faces
             if o['block_index'] == b:
                 voi = [o['IMIN'], o['IMAX'], o['JMIN'], o['JMAX'],o['KMIN'], o['KMAX']]
-                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
+                CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=1)
         
         # Plot the periodic faces  
         for periodic_indx, p in enumerate(periodic_faces):

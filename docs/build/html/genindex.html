@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; Plot3D 1.5.5 documentation</title>
+  <title>Index &mdash; Plot3D 1.5.7 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -12,11 +12,10 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,14 +28,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Plot3D
+
+          
+          
+          <a href="index.html">
+            
           </a>
               <div class="version">
-                1.5.5
+                1.5.7
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -66,14 +69,74 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules/connectivity.html">Connectivity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/block.html">Block</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/differencing.html">Differencing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/face.html">Face</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/read.html">Read</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/write.html">Write</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/split_block.html">Splitting Blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/block.html">Block</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/block.html#plot3d.block.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/block.html#plot3d.block.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/blockfunctions.html">Block Functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/blockfunctions.html#plot3d.blockfunctions.block_connection_matrix"><code class="docutils literal notranslate"><span class="pre">block_connection_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/blockfunctions.html#plot3d.blockfunctions.get_outer_bounds"><code class="docutils literal notranslate"><span class="pre">get_outer_bounds()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/blockfunctions.html#plot3d.blockfunctions.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/blockfunctions.html#plot3d.blockfunctions.rotate_block"><code class="docutils literal notranslate"><span class="pre">rotate_block()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/connectivity.html">Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks"><code class="docutils literal notranslate"><span class="pre">combinations_of_nearest_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/connectivity.html#plot3d.connectivity.connectivity"><code class="docutils literal notranslate"><span class="pre">connectivity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/connectivity.html#plot3d.connectivity.connectivity_fast"><code class="docutils literal notranslate"><span class="pre">connectivity_fast()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/connectivity.html#plot3d.connectivity.face_matches_to_dict"><code class="docutils literal notranslate"><span class="pre">face_matches_to_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/connectivity.html#plot3d.connectivity.find_matching_blocks"><code class="docutils literal notranslate"><span class="pre">find_matching_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/connectivity.html#plot3d.connectivity.get_face_intersection"><code class="docutils literal notranslate"><span class="pre">get_face_intersection()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/connectivity.html#plot3d.connectivity.select_multi_dimensional"><code class="docutils literal notranslate"><span class="pre">select_multi_dimensional()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/differencing.html">Differencing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/differencing.html#plot3d.differencing.find_edges"><code class="docutils literal notranslate"><span class="pre">find_edges()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/differencing.html#plot3d.differencing.find_face_edges"><code class="docutils literal notranslate"><span class="pre">find_face_edges()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/face.html">Face</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/face.html#plot3d.face.Face"><code class="docutils literal notranslate"><span class="pre">Face</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/facefunctions.html">Face Functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/facefunctions.html#plot3d.facefunctions.create_face_from_diagonals"><code class="docutils literal notranslate"><span class="pre">create_face_from_diagonals()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/facefunctions.html#plot3d.facefunctions.find_bounding_faces"><code class="docutils literal notranslate"><span class="pre">find_bounding_faces()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/facefunctions.html#plot3d.facefunctions.find_closest_block"><code class="docutils literal notranslate"><span class="pre">find_closest_block()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/facefunctions.html#plot3d.facefunctions.find_connected_faces"><code class="docutils literal notranslate"><span class="pre">find_connected_faces()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/facefunctions.html#plot3d.facefunctions.find_face_nearest_point"><code class="docutils literal notranslate"><span class="pre">find_face_nearest_point()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/facefunctions.html#plot3d.facefunctions.get_outer_faces"><code class="docutils literal notranslate"><span class="pre">get_outer_faces()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/facefunctions.html#plot3d.facefunctions.match_faces_dict_to_list"><code class="docutils literal notranslate"><span class="pre">match_faces_dict_to_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/facefunctions.html#plot3d.facefunctions.outer_face_dict_to_list"><code class="docutils literal notranslate"><span class="pre">outer_face_dict_to_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/facefunctions.html#plot3d.facefunctions.split_face"><code class="docutils literal notranslate"><span class="pre">split_face()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/read.html">Read</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/read.html#plot3d.read.read_ap_nasa"><code class="docutils literal notranslate"><span class="pre">read_ap_nasa()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/read.html#plot3d.read.read_plot3D"><code class="docutils literal notranslate"><span class="pre">read_plot3D()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/write.html">Write</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/write.html#plot3d.write.write_plot3D"><code class="docutils literal notranslate"><span class="pre">write_plot3D()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/split_block.html">Splitting Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/split_block.html#plot3d.split_block.Direction"><code class="docutils literal notranslate"><span class="pre">Direction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/split_block.html#plot3d.split_block.max_aspect_ratio"><code class="docutils literal notranslate"><span class="pre">max_aspect_ratio()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/split_block.html#plot3d.split_block.split_blocks"><code class="docutils literal notranslate"><span class="pre">split_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/periodicity.html">Periodicity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/periodicity.html#plot3d.periodicity.__periodicity_check__"><code class="docutils literal notranslate"><span class="pre">__periodicity_check__()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/periodicity.html#plot3d.periodicity.create_rotation_matrix"><code class="docutils literal notranslate"><span class="pre">create_rotation_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/periodicity.html#plot3d.periodicity.linear_real_transform"><code class="docutils literal notranslate"><span class="pre">linear_real_transform()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/periodicity.html#plot3d.periodicity.periodicity"><code class="docutils literal notranslate"><span class="pre">periodicity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/periodicity.html#plot3d.periodicity.periodicity_fast"><code class="docutils literal notranslate"><span class="pre">periodicity_fast()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/periodicity.html#plot3d.periodicity.rotated_periodicity"><code class="docutils literal notranslate"><span class="pre">rotated_periodicity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/periodicity.html#plot3d.periodicity.translational_periodicity"><code class="docutils literal notranslate"><span class="pre">translational_periodicity()</span></code></a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -89,8 +152,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Index</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com/nasa/plot3d_utilities/blob/main/docs/genindex" class="fa fa-github"> Edit on GitHub</a>
       </li>
@@ -114,11 +177,12 @@
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
- | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
@@ -130,11 +194,9 @@
 </li>
       <li><a href="modules/face.html#plot3d.face.Face.__hash__">__hash__() (plot3d.face.Face method)</a>
 </li>
-      <li><a href="modules/face.html#plot3d.face.Face.__ne__">__ne__() (plot3d.face.Face method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/face.html#plot3d.face.Face.__normal__">__normal__() (plot3d.face.Face method)</a>
+      <li><a href="modules/face.html#plot3d.face.Face.__ne__">__ne__() (plot3d.face.Face method)</a>
 </li>
       <li><a href="modules/periodicity.html#plot3d.periodicity.__periodicity_check__">__periodicity_check__() (in module plot3d.periodicity)</a>
 </li>
@@ -157,6 +219,10 @@
       <li><a href="modules/block.html#plot3d.block.Block">Block (class in plot3d.block)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/blockfunctions.html#plot3d.blockfunctions.block_connection_matrix">block_connection_matrix() (in module plot3d.blockfunctions)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="C">C</h2>
@@ -172,7 +238,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/connectivity.html#plot3d.connectivity.connectivity_fast">connectivity_fast() (in module plot3d.connectivity)</a>
 </li>
-      <li><a href="modules/face.html#plot3d.face.create_face_from_diagonals">create_face_from_diagonals() (in module plot3d.face)</a>
+      <li><a href="modules/facefunctions.html#plot3d.facefunctions.create_face_from_diagonals">create_face_from_diagonals() (in module plot3d.facefunctions)</a>
 </li>
       <li><a href="modules/periodicity.html#plot3d.periodicity.create_rotation_matrix">create_rotation_matrix() (in module plot3d.periodicity)</a>
 </li>
@@ -200,21 +266,19 @@
 </li>
       <li><a href="modules/connectivity.html#plot3d.connectivity.face_matches_to_dict">face_matches_to_dict() (in module plot3d.connectivity)</a>
 </li>
-      <li><a href="modules/connectivity.html#plot3d.connectivity.find_block_index_in_outer_faces">find_block_index_in_outer_faces() (in module plot3d.connectivity)</a>
+      <li><a href="modules/facefunctions.html#plot3d.facefunctions.find_bounding_faces">find_bounding_faces() (in module plot3d.facefunctions)</a>
 </li>
-      <li><a href="modules/face.html#plot3d.face.find_connected_face">find_connected_face() (in module plot3d.face)</a>
-</li>
-      <li><a href="modules/differencing.html#plot3d.differencing.find_edges">find_edges() (in module plot3d.differencing)</a>
+      <li><a href="modules/facefunctions.html#plot3d.facefunctions.find_closest_block">find_closest_block() (in module plot3d.facefunctions)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/face.html#plot3d.face.find_face">find_face() (in module plot3d.face)</a>
+      <li><a href="modules/facefunctions.html#plot3d.facefunctions.find_connected_faces">find_connected_faces() (in module plot3d.facefunctions)</a>
+</li>
+      <li><a href="modules/differencing.html#plot3d.differencing.find_edges">find_edges() (in module plot3d.differencing)</a>
 </li>
       <li><a href="modules/differencing.html#plot3d.differencing.find_face_edges">find_face_edges() (in module plot3d.differencing)</a>
 </li>
-      <li><a href="modules/face.html#plot3d.face.find_face_near_plane">find_face_near_plane() (in module plot3d.face)</a>
-</li>
-      <li><a href="modules/face.html#plot3d.face.find_face_nearest_point">find_face_nearest_point() (in module plot3d.face)</a>
+      <li><a href="modules/facefunctions.html#plot3d.facefunctions.find_face_nearest_point">find_face_nearest_point() (in module plot3d.facefunctions)</a>
 </li>
       <li><a href="modules/connectivity.html#plot3d.connectivity.find_matching_blocks">find_matching_blocks() (in module plot3d.connectivity)</a>
 </li>
@@ -230,9 +294,9 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/block.html#plot3d.block.get_outer_bounds">get_outer_bounds() (in module plot3d.block)</a>
+      <li><a href="modules/blockfunctions.html#plot3d.blockfunctions.get_outer_bounds">get_outer_bounds() (in module plot3d.blockfunctions)</a>
 </li>
-      <li><a href="modules/connectivity.html#plot3d.connectivity.get_outer_faces">get_outer_faces() (in module plot3d.connectivity)</a>
+      <li><a href="modules/facefunctions.html#plot3d.facefunctions.get_outer_faces">get_outer_faces() (in module plot3d.facefunctions)</a>
 </li>
       <li><a href="modules/face.html#plot3d.face.Face.get_val">get_val (plot3d.face.Face property)</a>
 </li>
@@ -243,6 +307,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/face.html#plot3d.face.Face.index_equals">index_equals() (plot3d.face.Face method)</a>
+</li>
+      <li><a href="modules/face.html#plot3d.face.Face.is_connected">is_connected() (plot3d.face.Face method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -264,6 +330,8 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/facefunctions.html#plot3d.facefunctions.match_faces_dict_to_list">match_faces_dict_to_list() (in module plot3d.facefunctions)</a>
+</li>
       <li><a href="modules/face.html#plot3d.face.Face.match_indices">match_indices() (plot3d.face.Face method)</a>
 </li>
       <li><a href="modules/split_block.html#plot3d.split_block.max_aspect_ratio">max_aspect_ratio() (in module plot3d.split_block)</a>
@@ -274,11 +342,15 @@
       <ul>
         <li><a href="modules/block.html#module-plot3d.block">plot3d.block</a>
 </li>
+        <li><a href="modules/blockfunctions.html#module-plot3d.blockfunctions">plot3d.blockfunctions</a>
+</li>
         <li><a href="modules/connectivity.html#module-plot3d.connectivity">plot3d.connectivity</a>
 </li>
         <li><a href="modules/differencing.html#module-plot3d.differencing">plot3d.differencing</a>
 </li>
         <li><a href="modules/face.html#module-plot3d.face">plot3d.face</a>
+</li>
+        <li><a href="modules/facefunctions.html#module-plot3d.facefunctions">plot3d.facefunctions</a>
 </li>
         <li><a href="modules/periodicity.html#module-plot3d.periodicity">plot3d.periodicity</a>
 </li>
@@ -289,6 +361,22 @@
         <li><a href="modules/write.html#module-plot3d.write">plot3d.write</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/face.html#plot3d.face.Face.normal">normal() (plot3d.face.Face method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/facefunctions.html#plot3d.facefunctions.outer_face_dict_to_list">outer_face_dict_to_list() (in module plot3d.facefunctions)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -304,6 +392,13 @@
 
       <ul>
         <li><a href="modules/block.html#module-plot3d.block">module</a>
+</li>
+      </ul></li>
+      <li>
+    plot3d.blockfunctions
+
+      <ul>
+        <li><a href="modules/blockfunctions.html#module-plot3d.blockfunctions">module</a>
 </li>
       </ul></li>
       <li>
@@ -329,6 +424,13 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    plot3d.facefunctions
+
+      <ul>
+        <li><a href="modules/facefunctions.html#module-plot3d.facefunctions">module</a>
+</li>
+      </ul></li>
       <li>
     plot3d.periodicity
 
@@ -367,11 +469,15 @@
 </li>
       <li><a href="modules/read.html#plot3d.read.read_plot3D">read_plot3D() (in module plot3d.read)</a>
 </li>
+      <li><a href="modules/block.html#plot3d.block.reduce_blocks">reduce_blocks() (in module plot3d.block)</a>
+
+      <ul>
+        <li><a href="modules/blockfunctions.html#plot3d.blockfunctions.reduce_blocks">(in module plot3d.blockfunctions)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/block.html#plot3d.block.reduce_blocks">reduce_blocks() (in module plot3d.block)</a>
-</li>
-      <li><a href="modules/block.html#plot3d.block.rotate_block">rotate_block() (in module plot3d.block)</a>
+      <li><a href="modules/blockfunctions.html#plot3d.blockfunctions.rotate_block">rotate_block() (in module plot3d.blockfunctions)</a>
 </li>
       <li><a href="modules/periodicity.html#plot3d.periodicity.rotated_periodicity">rotated_periodicity() (in module plot3d.periodicity)</a>
 </li>
@@ -385,13 +491,17 @@
 </li>
       <li><a href="modules/connectivity.html#plot3d.connectivity.select_multi_dimensional">select_multi_dimensional() (in module plot3d.connectivity)</a>
 </li>
+      <li><a href="modules/block.html#plot3d.block.Block.shift">shift() (plot3d.block.Block method)</a>
+
+      <ul>
+        <li><a href="modules/face.html#plot3d.face.Face.shift">(plot3d.face.Face method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/block.html#plot3d.block.Block.shift">shift() (plot3d.block.Block method)</a>
-</li>
       <li><a href="modules/split_block.html#plot3d.split_block.split_blocks">split_blocks() (in module plot3d.split_block)</a>
 </li>
-      <li><a href="modules/face.html#plot3d.face.split_face">split_face() (in module plot3d.face)</a>
+      <li><a href="modules/facefunctions.html#plot3d.facefunctions.split_face">split_face() (in module plot3d.facefunctions)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -404,14 +514,6 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/periodicity.html#plot3d.periodicity.translational_periodicity">translational_periodicity() (in module plot3d.periodicity)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="U">U</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/connectivity.html#plot3d.connectivity.unique_pairs">unique_pairs() (in module plot3d.connectivity)</a>
 </li>
   </ul></td>
 </tr></table>

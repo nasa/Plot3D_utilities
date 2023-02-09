@@ -130,7 +130,7 @@ def CreateSubset(block_source,voi:List[int],name:str,opacity:float=1,rgb_face_ma
     renderView1 = GetActiveViewOrCreate('RenderView')
     extractSubset1Display = Show(extractSubset1, renderView1, 'StructuredGridRepresentation')
     # trace defaults for the display properties.
-    extractSubset1Display.Representation = 'Outline'
+    extractSubset1Display.Representation = 'Surface'
     extractSubset1Display.ColorArrayName = [None, '']
     extractSubset1Display.SelectTCoordArray = 'None'
     extractSubset1Display.SelectNormalArray = 'None'
@@ -149,12 +149,13 @@ def CreateSubset(block_source,voi:List[int],name:str,opacity:float=1,rgb_face_ma
     extractSubset1Display.DataAxesGrid = 'GridAxesRepresentation'
     extractSubset1Display.PolarAxes = 'PolarAxesRepresentation'
     extractSubset1Display.ScalarOpacityUnitDistance = 6.758095838007181
-    extractSubset1Display.SetRepresentationType('Outline')
+    extractSubset1Display.SetRepresentationType('Surface')
     extractSubset1Display.Opacity = opacity
     # Add in the face color and update 
     extractSubset1Display.AmbientColor = rgb_face_matches
     extractSubset1Display.DiffuseColor = rgb_face_matches
-    renderView1.Update()
+    # renderView1.Update()
+    ColorBy(extractSubset1Display, ('FIELD', 'Solid Color'))
 
     return extractSubset1, extractSubset1Display
 
@@ -198,7 +199,7 @@ def ExtractSurface(source,name:str,VOI:List[int]):
     extractSubset1Display.ScalarOpacityUnitDistance = 6.758095838007181
 
     # update the view to ensure updated data information
-    renderView1.Update()
+    # renderView1.Update()
 
     extractSubset1Display.SetRepresentationType('Outline')
 

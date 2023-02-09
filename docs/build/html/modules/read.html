@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Read &mdash; Plot3D 1.5.5 documentation</title>
+  <title>Read &mdash; Plot3D 1.5.7 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -13,11 +13,10 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -32,14 +31,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> Plot3D
+
+          
+          
+          <a href="../index.html">
+            
           </a>
               <div class="version">
-                1.5.5
+                1.5.7
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -69,14 +72,55 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a></li>
-<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="face.html">Face</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Read</a></li>
-<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a></li>
-<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks"><code class="docutils literal notranslate"><span class="pre">combinations_of_nearest_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html#plot3d.connectivity.connectivity"><code class="docutils literal notranslate"><span class="pre">connectivity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html#plot3d.connectivity.connectivity_fast"><code class="docutils literal notranslate"><span class="pre">connectivity_fast()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html#plot3d.connectivity.face_matches_to_dict"><code class="docutils literal notranslate"><span class="pre">face_matches_to_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html#plot3d.connectivity.find_matching_blocks"><code class="docutils literal notranslate"><span class="pre">find_matching_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html#plot3d.connectivity.get_face_intersection"><code class="docutils literal notranslate"><span class="pre">get_face_intersection()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html#plot3d.connectivity.select_multi_dimensional"><code class="docutils literal notranslate"><span class="pre">select_multi_dimensional()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="block.html#plot3d.block.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="block.html#plot3d.block.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="differencing.html#plot3d.differencing.find_edges"><code class="docutils literal notranslate"><span class="pre">find_edges()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="differencing.html#plot3d.differencing.find_face_edges"><code class="docutils literal notranslate"><span class="pre">find_face_edges()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">Face</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="face.html#plot3d.face.Face"><code class="docutils literal notranslate"><span class="pre">Face</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Read</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.read.read_ap_nasa"><code class="docutils literal notranslate"><span class="pre">read_ap_nasa()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.read.read_plot3D"><code class="docutils literal notranslate"><span class="pre">read_plot3D()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="write.html#plot3d.write.write_plot3D"><code class="docutils literal notranslate"><span class="pre">write_plot3D()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="split_block.html#plot3d.split_block.Direction"><code class="docutils literal notranslate"><span class="pre">Direction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="split_block.html#plot3d.split_block.max_aspect_ratio"><code class="docutils literal notranslate"><span class="pre">max_aspect_ratio()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="split_block.html#plot3d.split_block.split_blocks"><code class="docutils literal notranslate"><span class="pre">split_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="periodicity.html#plot3d.periodicity.__periodicity_check__"><code class="docutils literal notranslate"><span class="pre">__periodicity_check__()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodicity.html#plot3d.periodicity.create_rotation_matrix"><code class="docutils literal notranslate"><span class="pre">create_rotation_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodicity.html#plot3d.periodicity.linear_real_transform"><code class="docutils literal notranslate"><span class="pre">linear_real_transform()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodicity.html#plot3d.periodicity.periodicity"><code class="docutils literal notranslate"><span class="pre">periodicity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodicity.html#plot3d.periodicity.periodicity_fast"><code class="docutils literal notranslate"><span class="pre">periodicity_fast()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodicity.html#plot3d.periodicity.rotated_periodicity"><code class="docutils literal notranslate"><span class="pre">rotated_periodicity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodicity.html#plot3d.periodicity.translational_periodicity"><code class="docutils literal notranslate"><span class="pre">translational_periodicity()</span></code></a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -92,8 +136,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Read</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Read</li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com/nasa/plot3d_utilities/blob/main/docs/modules/read.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
@@ -113,14 +157,14 @@
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – location of the .ap file</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>block</em> (Block): file in block format
 <em>nbld</em> (int): Number of blades</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Tuple containing</p>
 </dd>
 </dl>
@@ -131,17 +175,17 @@
 <span class="sig-prename descclassname"><span class="pre">plot3d.read.</span></span><span class="sig-name descname"><span class="pre">read_plot3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">big_endian</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/read.html#read_plot3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.read.read_plot3D" title="Permalink to this definition"></a></dt>
 <dd><p>Reads a plot3d file and returns Blocks</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename</strong> (<em>str</em>) – name of the file to read, .p3d, .xyz, .pdc, .plot3d?</p></li>
 <li><p><strong>binary</strong> (<em>bool</em><em>, </em><em>optional</em>) – indicates if the file is binary. Defaults to True.</p></li>
 <li><p><strong>big_endian</strong> (<em>bool</em><em>, </em><em>optional</em>) – use big endian format for reading binary files</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of blocks insdie the plot3d file</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List[<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block">Block</a>]</p>
 </dd>
 </dl>

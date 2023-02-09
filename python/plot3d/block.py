@@ -15,7 +15,7 @@ class Block:
             Z (np.ndarray): All the Z coordinates (i,j,k)
 
         """
-        self.IMAX, self.JMAX, self.KMAX = X.shape
+        self.IMAX,self.JMAX,self.KMAX = X.shape; 
         self.X = X
         self.Y = Y
         self.Z = Z
@@ -23,6 +23,7 @@ class Block:
         self.cx = np.mean(X) 
         self.cy = np.mean(Y)
         self.cz = np.mean(Z)
+        
     
     def scale(self,factor:float):
         """Scales a mesh by a certain factor 
@@ -163,41 +164,77 @@ class Block:
                     v[i,j,k]= vol12/12
         return v
 
-    
-def rotate_block(block,rotation_matrix:np.ndarray) -> Block:
-    """Rotates a block by a rotation matrix 
+def checkCollinearity(v1:np.ndarray, v2:np.ndarray):
+    # Calculate their cross product
+    cross_P = np.cross(v1,v2) 
+ 
+    # Check if their cross product
+    # is a NULL Vector or not
+    if (cross_P[0] == 0 and
+        cross_P[1] == 0 and
+        cross_P[2] == 0):
+        return True
+    else:
+        return False
 
-    Args:
-        rotation_matrix (np.ndarray): 3x3 rotation matrix 
+def calculate_outward_normals(block:Block):
+    # Calculate Normals
+        X = block.X
+        Y = block.Y
+        Z = block.Z
+        imax = block.IMAX
+        jmax = block.JMAX
+        kmax = block.KMAX 
+        # IMAX - Normal should be out of the page        
+        # Normals I direction: IMIN https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
+        x = [X[0,0,0],X[0,jmax,0],X[0,0,kmax]] 
+        y = [Y[0,0,0],Y[0,jmax,0],Y[0,0,kmax]]
+        z = [Z[0,0,0],Z[0,jmax,0],Z[0,0,kmax]]
+        u = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]]) 
+        v = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_imin = np.cross(v1,v2)
+        
+        # Normals I direction: IMAX
+        x = [X[imax,0,0],X[imax,jmax,0],X[imax,0,kmax]] 
+        y = [Y[imax,0,0],Y[imax,jmax,0],Y[imax,0,kmax]]
+        z = [Z[imax,0,0],Z[imax,jmax,0],Z[imax,0,kmax]]
+        v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
+        v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_imax = np.cross(v1,v2)
 
-    Returns:
-        Block: returns a new rotated block 
-    """
-    X = block.X.copy()
-    Y = block.Y.copy()
-    Z = block.Z.copy()
-    points = np.zeros(shape=(3,block.IMAX*block.JMAX*block.KMAX))
-    indx = 0
-    for i in range(block.IMAX):
-        for j in range(block.JMAX):
-            for k in range(block.KMAX):
-                points[0,indx] = block.X[i,j,k]
-                points[1,indx] = block.Y[i,j,k]
-                points[2,indx] = block.Z[i,j,k]
-                indx+=1
-    points_rotated = np.matmul(rotation_matrix,points)
-    indx=0
-    for i in range(block.IMAX):
-        for j in range(block.JMAX):
-            for k in range(block.KMAX):
-                X[i,j,k] = points_rotated[0,indx]
-                Y[i,j,k] = points_rotated[1,indx]
-                Z[i,j,k] = points_rotated[2,indx]
-                indx+=1
-                
-    return Block(X,Y,Z)
-                    
+        # Normals J direction: JMIN
+        x = [X[0,0,0],X[imax,0,0],X[0,0,kmax]] 
+        y = [Y[0,0,0],Y[imax,0,0],Y[0,0,kmax]]
+        z = [Z[0,0,0],Z[imax,0,0],Z[0,0,kmax]]
+        v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
+        v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_jmin = np.cross(v1,v2)
 
+        # Normals J direction: JMAX
+        x = [X[0,jmax,0],X[imax,jmax,0],X[0,jmax,kmax]] 
+        y = [Y[0,jmax,0],Y[imax,jmax,0],Y[0,jmax,kmax]]
+        z = [Z[0,jmax,0],Z[imax,jmax,0],Z[0,jmax,kmax]]
+        v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
+        v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_jmax = np.cross(v1,v2)
+
+        # Normals K direction: KMIN
+        x = [X[imax,0,0],X[0,jmax,0],X[0,0,0]] 
+        y = [Y[imax,0,0],Y[0,jmax,0],Y[0,0,0]]
+        z = [Z[imax,0,0],Z[0,jmax,0],Z[0,0,0]]
+        v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
+        v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_kmin = np.cross(v1,v2)
+
+        # Normals K direction: KMAX
+        x = [X[imax,0,kmax],X[0,jmax,kmax],X[0,0,kmax]] 
+        y = [Y[imax,0,kmax],Y[0,jmax,kmax],Y[0,0,kmax]]
+        z = [Z[imax,0,kmax],Z[0,jmax,kmax],Z[0,0,kmax]]
+        v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
+        v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
+        n_kmax = np.cross(v1,v2)
+
+        return n_imin,n_jmin,n_kmin,n_imax,n_jmax,n_kmax
 
 def reduce_blocks(blocks:List[Block],factor:int):
     """reduce the blocks by a factor of (factor)
@@ -215,47 +252,3 @@ def reduce_blocks(blocks:List[Block],factor:int):
         blocks[i].Z = blocks[i].Z[::factor,::factor,::factor]
         blocks[i].IMAX,blocks[i].JMAX,blocks[i].KMAX = blocks[i].X.shape
     return blocks
-
-def get_outer_bounds(blocks:List[Block]):
-    """Get outer bounds for a set of blocks
-
-    Args:
-        blocks (List[Block]): Blocks defining your shape
-
-    Returns:
-        (Tuple) containing: 
-
-            **xbounds** (Tuple[float,float]): xmin,xmax
-            **ybounds** (Tuple[float,float]): ymin,ymax
-            **zbounds** (Tuple[float,float]): zmin,zmax
-    """
-    xbounds = [blocks[0].X.min(),blocks[0].X.max()]
-    ybounds = [blocks[0].Y.min(),blocks[0].Y.max()]
-    zbounds = [blocks[0].Z.min(),blocks[0].Z.max()]
-    
-    for i in range(1,len(blocks)):
-        xmin = blocks[i].X.min()
-        xmax = blocks[i].X.max()
-
-        ymin = blocks[i].Y.min()
-        ymax = blocks[i].Y.max()
-
-        zmin = blocks[i].Z.min()
-        zmax = blocks[i].Z.max()
-
-        if xmin<xbounds[0]:
-            xbounds[0] = xmin
-        elif xmax>xbounds[1]:
-            xbounds[1] = xmax
-        
-        if ymin<ybounds[0]:
-            ybounds[0] = ymin
-        elif ymax>ybounds[1]:
-            ybounds[1] = ymax
-
-        if zmin<zbounds[0]:
-            zbounds[0] = zmin
-        elif zmax>zbounds[1]:
-            zbounds[1] = zmax
-    
-    return tuple(xbounds),tuple(ybounds),tuple(zbounds)
