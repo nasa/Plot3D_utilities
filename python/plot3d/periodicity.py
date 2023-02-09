@@ -570,10 +570,13 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
     pbar = tqdm(total = len(lower_connected_faces))
     
     periodicity_tol = 1E-6 
-    while len(lower_connected_faces)>0 and times_failed<3:
+    while len(lower_connected_faces)>0:
         periodic_found = False
         face1 = lower_connected_faces[0]
-        for face2 in upper_connected_faces:
+        for indx in range(len(upper_connected_faces)):
+            face2 = upper_connected_faces[indx]
+            if face1.BlockIndex == 26 and face2.BlockIndex == 62:
+                print('check')
             # Check if surfaces are periodic with each other
             pbar.set_description(f"Checking connections block {face1.blockIndex} with {face2.blockIndex}")
             # Shift block 1 -> Check periodicity -> if not periodic -> shift Block 1 opposite direction -> Check periodicity
@@ -584,8 +587,8 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
             _, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_shifted, block2,periodicity_tol)
             
             if len(periodic_faces_temp) > 0:
-                lower_connected_faces.remove(face1)
-                upper_connected_faces.remove(face2)
+                lower_connected_faces.pop(0)
+                upper_connected_faces.pop(indx)
                 periodic_faces.append(periodic_faces_temp)
                 periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1_shifted,block2))
                 lower_split_faces = [s for s in split_faces_temp if s.BlockIndex in lower_blocks]
@@ -598,9 +601,9 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
     
         if periodic_found == False:
             # Lets switch the order 
-            non_matching.append(face1)
-            lower_connected_faces.remove(face1)
-            periodicity_tol *=10
+            non_matching.append(deepcopy(face1))
+            lower_connected_faces.pop(0)
+            # periodicity_tol *=10
             times_failed+=1
 
     if len(non_matching)>0:
@@ -743,7 +746,7 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
     
     df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2,tol)
 
-    if len(df)>4:
+    if len(df)>=4:
         f1 = create_face_from_diagonals(block1,imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(), imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max())
         f1.set_block_index(face1.blockIndex)
 
