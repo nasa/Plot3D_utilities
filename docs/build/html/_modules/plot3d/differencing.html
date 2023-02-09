@@ -12,11 +12,10 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -29,14 +28,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> Plot3D
+
+          
+          
+          <a href="../../index.html">
+            
           </a>
               <div class="version">
                 1.5.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -66,14 +69,55 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Connectivity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Block</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Differencing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Face</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Read</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Write</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/split_block.html">Splitting Blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks"><code class="docutils literal notranslate"><span class="pre">combinations_of_nearest_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.connectivity"><code class="docutils literal notranslate"><span class="pre">connectivity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.connectivity_fast"><code class="docutils literal notranslate"><span class="pre">connectivity_fast()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.face_matches_to_dict"><code class="docutils literal notranslate"><span class="pre">face_matches_to_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks"><code class="docutils literal notranslate"><span class="pre">find_matching_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.get_face_intersection"><code class="docutils literal notranslate"><span class="pre">get_face_intersection()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/connectivity.html#plot3d.connectivity.select_multi_dimensional"><code class="docutils literal notranslate"><span class="pre">select_multi_dimensional()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Block</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/block.html#plot3d.block.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/block.html#plot3d.block.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Differencing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/differencing.html#plot3d.differencing.find_edges"><code class="docutils literal notranslate"><span class="pre">find_edges()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/differencing.html#plot3d.differencing.find_face_edges"><code class="docutils literal notranslate"><span class="pre">find_face_edges()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Face</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/face.html#plot3d.face.Face"><code class="docutils literal notranslate"><span class="pre">Face</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Read</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/read.html#plot3d.read.read_ap_nasa"><code class="docutils literal notranslate"><span class="pre">read_ap_nasa()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/read.html#plot3d.read.read_plot3D"><code class="docutils literal notranslate"><span class="pre">read_plot3D()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Write</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/write.html#plot3d.write.write_plot3D"><code class="docutils literal notranslate"><span class="pre">write_plot3D()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/split_block.html">Splitting Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/split_block.html#plot3d.split_block.Direction"><code class="docutils literal notranslate"><span class="pre">Direction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/split_block.html#plot3d.split_block.max_aspect_ratio"><code class="docutils literal notranslate"><span class="pre">max_aspect_ratio()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/split_block.html#plot3d.split_block.split_blocks"><code class="docutils literal notranslate"><span class="pre">split_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Periodicity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.__periodicity_check__"><code class="docutils literal notranslate"><span class="pre">__periodicity_check__()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.create_rotation_matrix"><code class="docutils literal notranslate"><span class="pre">create_rotation_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.linear_real_transform"><code class="docutils literal notranslate"><span class="pre">linear_real_transform()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.periodicity"><code class="docutils literal notranslate"><span class="pre">periodicity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.periodicity_fast"><code class="docutils literal notranslate"><span class="pre">periodicity_fast()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.rotated_periodicity"><code class="docutils literal notranslate"><span class="pre">rotated_periodicity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/periodicity.html#plot3d.periodicity.translational_periodicity"><code class="docutils literal notranslate"><span class="pre">translational_periodicity()</span></code></a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -89,9 +133,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>plot3d.differencing</li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plot3d.differencing</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -108,7 +152,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
 
 <div class="viewcode-block" id="find_face_edges"><a class="viewcode-back" href="../../modules/differencing.html#plot3d.differencing.find_face_edges">[docs]</a><span class="k">def</span> <span class="nf">find_face_edges</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Check if the edges of both faces to see if they are parallel. Face can be in any direction (I,J) (I,K) etc.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the edges of both faces to see if they are parallel. Face can be in any direction (I,J) (I,K) etc.</span>
 <span class="sd">        if edges are parallel then their vertices might intersect</span>
 <span class="sd">        Find edges will always deal with faces and not something that is in 3D</span>
 
@@ -155,7 +199,7 @@
     <span class="k">return</span> <span class="n">df</span> </div>
 
 <div class="viewcode-block" id="find_edges"><a class="viewcode-back" href="../../modules/differencing.html#plot3d.differencing.find_edges">[docs]</a><span class="k">def</span> <span class="nf">find_edges</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Check if the edges of both blocks that are parallel. Takes into account the whole block and not a single face</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the edges of both blocks that are parallel. Takes into account the whole block and not a single face</span>
 <span class="sd">        if edges are parallel then their vertices might intersect. </span>
 
 <span class="sd">    Args:</span>
