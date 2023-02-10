@@ -288,7 +288,7 @@ def __check_edge(df:pd.DataFrame):
     Returns:
         boolean: True = It is an edge, False = not edge 
     """
-    diagonal = [(df['i1'].min(),df['j1'].min(),df['k1'].min()), (df['i1'].max(),df['j2'].max(),df['k2'].max())]
+    diagonal = [(df['i1'].min(),df['j1'].min(),df['k1'].min()), (df['i2'].max(),df['j2'].max(),df['k2'].max())]
     edge1 = diagonal[0]
     edge2 = diagonal[1]
     edge_matches = 0 

@@ -150,8 +150,6 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
             for f in faces_to_check:
                 if (len(face_to_search.match_indices(f))==2):
                     n2 = f.normal(blocks[f.BlockIndex])
-                    if f.BlockIndex == 704:
-                        print('check')
                     angle = abs(math.degrees(math.acos(np.dot(n1,n2)/(np.linalg.norm(n1)*np.linalg.norm(n2)))))
                     if angle>90:
                         angle = 180-angle
