@@ -49,7 +49,7 @@ def Load(filename:str,binary_file:bool=False):
     # show color bar/color legend
     plot3D_Display.SetRepresentationType('Outline')
     ColorBy(plot3D_Display, ('FIELD', 'vtkBlockColors'))
-    LUT = GetColorTransferFunction('SolidColor')
+    LUT = GetColorTransferFunction('Solid Color')
     HideScalarBarIfNotNeeded(LUT, View) # Change to solid color
     return plot3D,plot3D_Display,View,LUT
 
@@ -151,11 +151,15 @@ def CreateSubset(block_source,voi:List[int],name:str,opacity:float=1,rgb_face_ma
     extractSubset1Display.ScalarOpacityUnitDistance = 6.758095838007181
     extractSubset1Display.SetRepresentationType('Surface')
     extractSubset1Display.Opacity = opacity
-    # Add in the face color and update 
+
+    solidColorLUT = GetColorTransferFunction('SolidColor')
+    solidColorPWF = GetOpacityTransferFunction('SolidColor')
+
+    ColorBy(extractSubset1Display, None)
+
     extractSubset1Display.AmbientColor = rgb_face_matches
     extractSubset1Display.DiffuseColor = rgb_face_matches
-    # renderView1.Update()
-    ColorBy(extractSubset1Display, ('FIELD', 'Solid Color'))
+    renderView1.Update()
 
     return extractSubset1, extractSubset1Display
 
@@ -199,7 +203,7 @@ def ExtractSurface(source,name:str,VOI:List[int]):
     extractSubset1Display.ScalarOpacityUnitDistance = 6.758095838007181
 
     # update the view to ensure updated data information
-    # renderView1.Update()
+    renderView1.Update()
 
     extractSubset1Display.SetRepresentationType('Outline')
 
