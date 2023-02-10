@@ -154,8 +154,8 @@ def CreateSubset(block_source,voi:List[int],name:str,opacity:float=1,rgb_face_ma
     # Add in the face color and update 
     extractSubset1Display.AmbientColor = rgb_face_matches
     extractSubset1Display.DiffuseColor = rgb_face_matches
-    # renderView1.Update()
-    ColorBy(extractSubset1Display, ('FIELD', 'Solid Color'))
+    renderView1.Update()
+    ColorBy(extractSubset1Display, ('FIELD', 'SolidColor'))
 
     return extractSubset1, extractSubset1Display
 
@@ -199,7 +199,7 @@ def ExtractSurface(source,name:str,VOI:List[int]):
     extractSubset1Display.ScalarOpacityUnitDistance = 6.758095838007181
 
     # update the view to ensure updated data information
-    # renderView1.Update()
+    renderView1.Update()
 
     extractSubset1Display.SetRepresentationType('Outline')
 
