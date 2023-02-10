@@ -71,5 +71,3 @@ right_periodic_blocks_found = [p['block2']['block_index'] for p in y_periodic_fa
 right_faces_missing = [r for r in right_bound if r['block_index'] not in right_periodic_blocks_found]
 print('Right faces missing')
 [print(r) for r in right_faces_missing]
-
-# Lets find out why it's missing
