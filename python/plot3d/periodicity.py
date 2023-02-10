@@ -575,8 +575,6 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
         face1 = lower_connected_faces[0]
         for indx in range(len(upper_connected_faces)):
             face2 = upper_connected_faces[indx]
-            if face1.BlockIndex == 656 and face2.BlockIndex == 1173:
-                print('check')
             # Check if surfaces are periodic with each other
             pbar.set_description(f"Checking connections block {face1.blockIndex} with {face2.blockIndex}")
             # Shift block 1 -> Check periodicity -> if not periodic -> shift Block 1 opposite direction -> Check periodicity
