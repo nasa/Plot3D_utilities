@@ -288,9 +288,10 @@ def __check_edge(df:pd.DataFrame):
     Returns:
         boolean: True = It is an edge, False = not edge 
     """
-    diagonal = [(df['i1'].min(),df['j1'].min(),df['k1'].min()), (df['i2'].max(),df['j2'].max(),df['k2'].max())]
-    edge1 = diagonal[0]
-    edge2 = diagonal[1]
+    face1_diagonal = [(df['i1'].min(),df['j1'].min(),df['k1'].min()),(df['i1'].max(),df['j1'].max(),df['k1'].max()) ]
+    face2_diagonal = [(df['i2'].min(),df['j2'].min(),df['k2'].min()), (df['i2'].max(),df['j2'].max(),df['k2'].max())]
+    edge1 = face1_diagonal[0]
+    edge2 = face1_diagonal[1]
     edge_matches = 0 
     for i in range(3):
         if edge1[i]==edge2[i]:

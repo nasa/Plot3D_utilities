@@ -38,7 +38,7 @@ data = read_data()
 all_faces = data['all_faces']
 connectivity_matrix = data['connectivity_matrix']
 
-#%% Find bounding Faces
+# %% Find bounding Faces
 lower_bound, upper_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"z")
 left_bound, right_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"y")
 data['lower_bound'] = lower_bound
