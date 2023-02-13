@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Differencing &mdash; Plot3D 1.5.7 documentation</title>
+  <title>Differencing &mdash; Plot3D 1.5.12 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -23,7 +23,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Face" href="face.html" />
-    <link rel="prev" title="Block" href="block.html" /> 
+    <link rel="prev" title="Connectivity" href="connectivity.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -38,7 +38,7 @@
             
           </a>
               <div class="version">
-                1.5.7
+                1.5.12
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -72,6 +72,18 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Package Reference</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="block.html#plot3d.block.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="block.html#plot3d.block.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="blockfunctions.html">Block Functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="blockfunctions.html#plot3d.blockfunctions.block_connection_matrix"><code class="docutils literal notranslate"><span class="pre">block_connection_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="blockfunctions.html#plot3d.blockfunctions.get_outer_bounds"><code class="docutils literal notranslate"><span class="pre">get_outer_bounds()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="blockfunctions.html#plot3d.blockfunctions.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="blockfunctions.html#plot3d.blockfunctions.rotate_block"><code class="docutils literal notranslate"><span class="pre">rotate_block()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks"><code class="docutils literal notranslate"><span class="pre">combinations_of_nearest_blocks()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html#plot3d.connectivity.connectivity"><code class="docutils literal notranslate"><span class="pre">connectivity()</span></code></a></li>
@@ -82,11 +94,6 @@
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html#plot3d.connectivity.select_multi_dimensional"><code class="docutils literal notranslate"><span class="pre">select_multi_dimensional()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="block.html#plot3d.block.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="block.html#plot3d.block.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Differencing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#plot3d.differencing.find_edges"><code class="docutils literal notranslate"><span class="pre">find_edges()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#plot3d.differencing.find_face_edges"><code class="docutils literal notranslate"><span class="pre">find_face_edges()</span></code></a></li>
@@ -94,6 +101,18 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="face.html">Face</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="face.html#plot3d.face.Face"><code class="docutils literal notranslate"><span class="pre">Face</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="facefunctions.html">Face Functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="facefunctions.html#plot3d.facefunctions.create_face_from_diagonals"><code class="docutils literal notranslate"><span class="pre">create_face_from_diagonals()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="facefunctions.html#plot3d.facefunctions.find_bounding_faces"><code class="docutils literal notranslate"><span class="pre">find_bounding_faces()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="facefunctions.html#plot3d.facefunctions.find_closest_block"><code class="docutils literal notranslate"><span class="pre">find_closest_block()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="facefunctions.html#plot3d.facefunctions.find_connected_faces"><code class="docutils literal notranslate"><span class="pre">find_connected_faces()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="facefunctions.html#plot3d.facefunctions.find_face_nearest_point"><code class="docutils literal notranslate"><span class="pre">find_face_nearest_point()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="facefunctions.html#plot3d.facefunctions.get_outer_faces"><code class="docutils literal notranslate"><span class="pre">get_outer_faces()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="facefunctions.html#plot3d.facefunctions.match_faces_dict_to_list"><code class="docutils literal notranslate"><span class="pre">match_faces_dict_to_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="facefunctions.html#plot3d.facefunctions.outer_face_dict_to_list"><code class="docutils literal notranslate"><span class="pre">outer_face_dict_to_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="facefunctions.html#plot3d.facefunctions.split_face"><code class="docutils literal notranslate"><span class="pre">split_face()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="read.html">Read</a><ul>
@@ -209,14 +228,14 @@ Find edges will always deal with faces and not something that is in 3D</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="block.html" class="btn btn-neutral float-left" title="Block" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="connectivity.html" class="btn btn-neutral float-left" title="Connectivity" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="face.html" class="btn btn-neutral float-right" title="Face" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Paht Juangphanich.</p>
+    <p>&#169; Copyright 2023, Paht Juangphanich.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
