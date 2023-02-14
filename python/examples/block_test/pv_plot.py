@@ -37,10 +37,10 @@ if __name__=="__main__":
     with open('block_data.pickle','rb') as f:
         data = pickle.load(f)
         faces_to_plot = data[what_to_plot]
-        outer_faces = CheckDictionary(data,'outer_faces_final')
+        outer_faces = CheckDictionary(data,'left_bound')
         x_periodic_faces = CheckDictionary(data,'x_periodic')
-        y_periodic_faces = CheckDictionary(data,'x_periodic')
-        z_periodic_faces = CheckDictionary(data,'x_periodic')
+        y_periodic_faces = CheckDictionary(data,'y_periodic')
+        z_periodic_faces = CheckDictionary(data,'z_periodic')
 
     blocks_to_extract = [o['block_index'] for o in outer_faces]
     blocks_to_extract.extend([f['block1']['block_index'] for f in x_periodic_faces])
