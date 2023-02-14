@@ -311,31 +311,24 @@ def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
     Returns:
         List[Tuple[int,int]]: combinations of nearest blocks 
     """
-
     # Pick a block get centroid of all outer faces        
-    combos = list(combinations(range(len(blocks)),2))
-    distances_to_block_i = np.zeros((len(blocks),len(blocks))) + 10000 # rows for block i, columns for i distance to block j
-    t = trange(len(combos))    
-    for indx in t:     # block i        
-        i,j = combos[indx]
-        t.set_description(f"Finding nearest blocks comparing {i} with {j}")
-        block_i_outerfaces,_ = get_outer_faces(blocks[i])
-        block_j_outerfaces,_ = get_outer_faces(blocks[j])
-        min_dist = 10000
-        for i_o in block_i_outerfaces:
-            for j_o in block_j_outerfaces:
-                if i_o.const_type == j_o.const_type:
-                    d = np.linalg.norm(i_o.centroid-j_o.centroid)
-                    if d<min_dist:
-                        min_dist = d
-        distances_to_block_i[i,j] = min_dist # This is the minium distance from one block to another 
+    centroids = np.array([(b.cx,b.cy,b.cz) for b in blocks])
+    distance_matrix = np.zeros((centroids.shape[0],centroids.shape[0]))+1000
+    # Build a matrix 
+    for i in range(centroids.shape[0]):
+        for j in range(centroids.shape[0]):
+            if i!=j:
+                dx = centroids[i,0]-centroids[j,0]
+                dy = centroids[i,1]-centroids[j,1]
+                dz = centroids[i,2]-centroids[j,2]
+                distance_matrix[i,j] = np.sqrt(dx*dx+dy*dy+dz*dz)
     
     # Now that we have this matrix, we sort the distances by rows and pick the closest 8 blocks, can use 4 but 8 might be safer
     new_combos = list()
     for i in range(len(blocks)): # For block i
-        indices = np.argsort(distances_to_block_i[i,:])
+        indices = np.argsort(distance_matrix[i,:])
         for j in indices[:nearest_nblocks]:
-            if distances_to_block_i[i,j] < 10000:
+            if distance_matrix[i,j] < 10000:
                 new_combos.append((i,j))
     return new_combos
     
