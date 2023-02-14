@@ -313,7 +313,7 @@ def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
     """
     # Pick a block get centroid of all outer faces        
     centroids = np.array([(b.cx,b.cy,b.cz) for b in blocks])
-    distance_matrix = np.zeros((centroids.shape[0],centroids.shape[0]))+1000
+    distance_matrix = np.zeros((centroids.shape[0],centroids.shape[0]))+10000
     # Build a matrix 
     for i in range(centroids.shape[0]):
         for j in range(centroids.shape[0]):
