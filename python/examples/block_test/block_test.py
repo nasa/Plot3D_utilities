@@ -39,7 +39,7 @@ all_faces = data['all_faces']
 connectivity_matrix = data['connectivity_matrix']
 
 #%% Find bounding Faces
-forward_bound, backward_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"x")
+backward_bound,forward_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"x")
 lower_bound, upper_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"z")
 left_bound, right_bound,_,_ = find_bounding_faces(blocks,connectivity_matrix,all_faces,"y")
 data['forward_bound'] = forward_bound
@@ -55,7 +55,7 @@ data = read_data()
 forward_bound = data['forward_bound']; backward_bound = data['backward_bound']
 lower_bound = data['lower_bound']; upper_bound = data['upper_bound']
 left_bound = data['left_bound']; right_bound = data['right_bound']
-x_periodic_faces_export, periodic_faces = translational_periodicity(blocks,forward_bound,backward_bound,translational_direction='x')
+x_periodic_faces_export, periodic_faces = translational_periodicity(blocks,backward_bound,forward_bound,translational_direction='x')
 y_periodic_faces_export, periodic_faces = translational_periodicity(blocks,left_bound,right_bound,translational_direction='y')
 z_periodic_faces_export, periodic_faces = translational_periodicity(blocks,lower_bound,upper_bound,translational_direction='z')
 data['x_periodic'] = x_periodic_faces_export
@@ -63,19 +63,20 @@ data['z_periodic'] = z_periodic_faces_export
 data['y_periodic'] = y_periodic_faces_export
 dump_data(data)
 
-#%%  Lets check with faces are not periodic in the y-direction
+# Export to GlennHT Format
 data = read_data()
-y_periodic_faces_export = data['y_periodic']
-left_bound = data['left_bound']; right_bound = data['right_bound']
+matched_faces = data['x_periodic']
+matched_faces.extend(data['y_periodic'])
+matched_faces.extend(data['z_periodic'])
+matched_faces.extend(data['face_matches'])
 
-left_periodic_blocks_found = [p['block1']['block_index'] for p in y_periodic_faces_export]
-left_faces_missing = [l for l in left_bound if l['block_index'] not in left_periodic_blocks_found]
-print('Left faces missing')
-[print(l) for l in left_faces_missing]
+# Filter outer faces
+outer_faces = data['outer_faces']
+outer_faces = outer_face_dict_to_list(blocks,outer_faces)
+matched_faces = list(set(match_faces_dict_to_list(blocks,matched_faces)))
 
-right_periodic_blocks_found = [p['block2']['block_index'] for p in y_periodic_faces_export]
-right_faces_missing = [r for r in right_bound if r['block_index'] not in right_periodic_blocks_found]
-print('Right faces missing')
-[print(r) for r in right_faces_missing]
+outer_faces = [o.to_dict() for o in outer_faces if o not in matched_faces]
+data['outer_faces'] = outer_faces
+dump_data(data)
 
-# Lets find out why it's missing
+print(f"Number of outer_faces: {len(outer_faces)}")
