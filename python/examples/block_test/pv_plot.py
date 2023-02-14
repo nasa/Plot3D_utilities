@@ -92,7 +92,7 @@ if __name__=="__main__":
             ijkmin = temp
         return ijkmin, ijkmax
     
-    for b in blocks_to_extract: # Block indicies 
+    for b in range(10):# blocks_to_extract: # Block indicies 
         block_source,block_display,LUT = ExtractBlocks(plot3D_source,View,[b])
         RenameSource('Block '+str(b), block_source)
         block_source = FindSource('Block '+str(b))
