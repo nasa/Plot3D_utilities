@@ -9,7 +9,7 @@ import pickle
 # Convert to binary because of size 
 
 if not os.path.exists('connectivity.pickle'):
-    blocks = read_plot3D('vspt-ASCII.xyz', binary = False)
+    blocks = read_plot3D('VSPT_ASCII.xyz', binary = False)
     write_plot3D('vspt.xyz', blocks,binary = True)
     # Block 1 is the blade O-Mesh k=0
     # outer_faces, _ = get_outer_faces(blocks[0]) # lets check
