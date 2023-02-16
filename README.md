@@ -11,6 +11,8 @@ To install simply do a `pip install plot3d`
 
 [Periodicity with axially rotated and copied blocks](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_AxialDuplication.ipynb)
 
+[Translated periodicity](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_TranslatedPeriodicity.ipynb)
+
 [Learning Python with VSCode](https://www.youtube.com/watch?v=lZiK9e8b21M) 
 
 [Learning Bash for Automating Tasks](https://www.youtube.com/watch?v=oxuRxtrO2Ag) 

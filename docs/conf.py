@@ -18,11 +18,11 @@ import plot3d
 # -- Project information -----------------------------------------------------
 
 project = 'Plot3D'
-copyright = '2021, Paht Juangphanich'
+copyright = '2023, Paht Juangphanich'
 author = 'Paht Juangphanich <paht.juangphanich@nasa.gov>'
 
 # The full version, including alpha/beta/rc tags
-version = '1.5.7' # plot3d.__version__
+version = '1.5.12' # plot3d.__version__
 release = version # plot3d.__version__
 
 

@@ -1,8 +1,8 @@
 from itertools import combinations
 import os, sys
 sys.path.insert(0,'../../')
-from plot3d import write_plot3D, read_plot3D, periodicity, split_blocks, Direction,get_face_intersection
-from plot3d import find_matching_blocks, get_outer_faces, connectivity
+from plot3d import write_plot3D, read_plot3D,periodicity_fast, split_blocks, Direction,get_face_intersection
+from plot3d import find_matching_blocks, get_outer_faces, connectivity_fast
 from glennht_con import export_to_glennht_conn
 import pickle
 
@@ -13,11 +13,11 @@ import pickle
 '''
 def find_connectivity():
     if not os.path.exists('connectivity-block-split.pickle'):
-        blocks = read_plot3D('../../../testfiles/finalmesh.xyz', binary = True, big_endian=False)
-        blocks_split = split_blocks(blocks,300000, direction=Direction.i)
+        blocks = read_plot3D('PahtCascade-ASCII.xyz', binary = False, big_endian=False)
+        blocks_split = split_blocks(blocks,600000, direction=Direction.i)
         write_plot3D('finalmesh_split.xyz',blocks_split,binary=True)
         # Note: Block splits may not be exactly matching with each other so we have to run the connecitvity code again 
-        face_matches, outer_faces_formatted = connectivity(blocks_split)
+        face_matches, outer_faces_formatted = connectivity_fast(blocks_split)
         with open('connectivity-block-split.pickle','wb') as f:
             pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_formatted},f)
 
@@ -29,7 +29,7 @@ def find_periodicity():
 
     blocks = read_plot3D('finalmesh_split.xyz', binary = True, big_endian=False)
 
-    periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
+    periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity_fast(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
     face_matches.extend(periodic_surfaces)
 
     with open('connectivity-block-split_v02.pickle','wb') as f:
@@ -42,24 +42,6 @@ def find_periodicity():
 
     export_to_glennht_conn(face_matches,outer_faces_to_keep,'finalmesh-block-split')
 
-def debug():
-    with open('connectivity-block-split_v02.pickle','rb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
-        pickle.dump({
-            "face_matches":face_matches, 
-            "periodic_faces":periodic_faces,
-            "outer_faces":outer_faces_to_keep,
-            "outer_faces_debug":outer_faces,
-            },f)
-
-    with open('connectivity-block-split_v02.pickle','wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
-        pickle.dump({
-            "face_matches":face_matches, 
-            "periodic_faces":periodic_faces,
-            "outer_faces":outer_faces_to_keep,
-            "outer_faces_debug":outer_faces,
-            },f)
 
 if __name__=="__main__":
     find_connectivity()

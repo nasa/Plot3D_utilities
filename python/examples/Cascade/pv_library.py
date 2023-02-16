@@ -5,7 +5,7 @@ import math
 #pylint: skip-file
 paraview.simple._DisableFirstRenderCameraReset()
 
-def Load(filename:str):
+def Load(filename:str,binary_file:bool=False):
     """Calls pvpython and displays the file
 
     Args:
@@ -22,7 +22,9 @@ def Load(filename:str):
     plot3D = PLOT3DReader(registrationName=filename,
             QFileName='',
             FileName=filename,
-            FunctionFileName='')
+            FunctionFileName='',
+            BinaryFile=binary_file,
+            MultiGrid=True)
 
     # set active source
     SetActiveSource(plot3D)
@@ -60,9 +62,23 @@ def SetCamera(View,position,focalPoint,ViewUp):
 
 # Extracts the mesh block
 # Block indicies should be an array format
-def ExtractBlocks(source,View,BlockIndicies):
+def ExtractBlocks(source,View,BlockIndicies:List[int]):
+    """Extracts block(s) from a mesh in paraview 
+
+    Args:
+        source ([unknown]): This is a paraview object that describes a source 
+        View ([unknown]): Thisi s a paraview object that describes a view 
+        BlockIndicies (List[int]): List of blocks you wish to extract to look at. Index should start at 1
+
+    Returns:
+        (tuple): tuple containing:
+
+            - **extractBlock1** (paraview source): source object representing the block.
+            - **extractBlock1Display** (paraview display): display settings for the source.
+            - **extractBlock1Display** (paraview display): display settings for the source.
+    """
     extractBlock1 = ExtractBlock(Input=source)
-    extractBlock1.BlockIndices = BlockIndicies
+    extractBlock1.Selectors = [f'Root/Block{i}' for i in BlockIndicies]
     extractBlock1Display = Show(extractBlock1, View)
     extractBlock1Display.Representation = 'Outline'
     extractBlock1Display.ColorArrayName = ['POINTS', '']
@@ -88,6 +104,60 @@ def ExtractBlocks(source,View,BlockIndicies):
     ColorBy(extractBlock1Display, ('FIELD', 'Solid Color'))
     HideScalarBarIfNotNeeded(LUT, View) # Change to solid color
     return extractBlock1,extractBlock1Display,LUT
+
+def CreateSubset(block_source,voi:List[int],name:str,opacity:float=1,rgb_face_matches:List[int]=[0.5,0.5,0.5]):
+    """Creates a subset within paraview to display the mesh 
+
+    Args:
+        block_source ([type]): [description]
+        voi (List[int]): This is the volume of interest. When (I,J,K)MIN=(I,J,K)MAX it is a surface/face. When two quantities is the same e.g. IMIN=IMAX and JMIN=JMAX you have an edge. If none of them are equal then you have a volume 
+        name (str): Name you want paraview to display in the left 
+        opacity (float, optional): [description]. Defaults to 1.
+
+    Returns:
+        (tuple): tuple containing:
+
+            - **extractSubset1** (paraview source): source object representing the subset.
+            - **extractSubset1Display** (paraview display): display settings for the source.
+    """
+    # Plot the Face 
+    View = GetActiveViewOrCreate('RenderView')    
+
+    Hide(block_source, View)
+    extractSubset1 = ExtractSubset(registrationName=name, Input=block_source)
+    extractSubset1.VOI = voi
+
+    renderView1 = GetActiveViewOrCreate('RenderView')
+    extractSubset1Display = Show(extractSubset1, renderView1, 'StructuredGridRepresentation')
+    # trace defaults for the display properties.
+    extractSubset1Display.Representation = 'Surface'
+    extractSubset1Display.ColorArrayName = [None, '']
+    extractSubset1Display.SelectTCoordArray = 'None'
+    extractSubset1Display.SelectNormalArray = 'None'
+    extractSubset1Display.SelectTangentArray = 'None'
+    extractSubset1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+    extractSubset1Display.SelectOrientationVectors = 'None'
+    extractSubset1Display.ScaleFactor = 7.410221099853516
+    extractSubset1Display.SelectScaleArray = 'None'
+    extractSubset1Display.GlyphType = 'Arrow'
+    extractSubset1Display.GlyphTableIndexArray = 'None'
+    extractSubset1Display.GaussianRadius = 0.3705110549926758
+    extractSubset1Display.SetScaleArray = [None, '']
+    extractSubset1Display.ScaleTransferFunction = 'PiecewiseFunction'
+    extractSubset1Display.OpacityArray = [None, '']
+    extractSubset1Display.OpacityTransferFunction = 'PiecewiseFunction'
+    extractSubset1Display.DataAxesGrid = 'GridAxesRepresentation'
+    extractSubset1Display.PolarAxes = 'PolarAxesRepresentation'
+    extractSubset1Display.ScalarOpacityUnitDistance = 6.758095838007181
+    extractSubset1Display.SetRepresentationType('Surface')
+    extractSubset1Display.Opacity = opacity
+    # Add in the face color and update 
+    extractSubset1Display.AmbientColor = rgb_face_matches
+    extractSubset1Display.DiffuseColor = rgb_face_matches
+    renderView1.Update()
+    ColorBy(extractSubset1Display, ('FIELD', 'SolidColor'))
+
+    return extractSubset1, extractSubset1Display
 
 def ExtractSurface(source,name:str,VOI:List[int]):
     """[summary]
