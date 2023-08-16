@@ -5,7 +5,7 @@ from typing import List
 from .block import Block
 from scipy.io import FortranFile
 
-def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=False):
+def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=False,read_double:bool=True):
     """Reads and formats a binary chunk of data into a plot3D block
 
     Args:
@@ -22,7 +22,10 @@ def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=Fal
     for k in range(KMAX):
         for j in range(JMAX):
             for i in range(IMAX):
-                A[i,j,k] = struct.unpack(">f",f.read(4))[0] if big_endian else struct.unpack("f",f.read(4))[0]
+                if read_double:
+                    A[i,j,k] = struct.unpack(">d",f.read(8))[0] if big_endian else struct.unpack("<d",f.read(8))[0]
+                else:
+                    A[i,j,k] = struct.unpack(">f",f.read(4))[0] if big_endian else struct.unpack("<f",f.read(4))[0]
     return A
 
 def __read_plot3D_chunk_ASCII(tokenArray:List[str],offset:int,IMAX:int,JMAX:int,KMAX:int):
@@ -103,13 +106,14 @@ def read_ap_nasa(filename:str):
     return Block(X=meshx,Y=y,Z=z), nbld
 
 
-def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False):
+def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False,read_double:bool=True):
     """Reads a plot3d file and returns Blocks
 
     Args:
         filename (str): name of the file to read, .p3d, .xyz, .pdc, .plot3d? 
         binary (bool, optional): indicates if the file is binary. Defaults to True.
         big_endian (bool, optional): use big endian format for reading binary files
+        read_float (bool, optional): read floating point. Only affects binary files
 
     Returns:
         List[Block]: List of blocks insdie the plot3d file
@@ -132,9 +136,9 @@ def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False):
                         KMAX.append(struct.unpack("I",f.read(4))[0]) # Read bytes
 
                 for b in range(nblocks):
-                    X = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian)
-                    Y = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian)
-                    Z = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian)
+                    X = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
+                    Y = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
+                    Z = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
                     b_temp = Block(X,Y,Z)                    
                     blocks.append(b_temp)
         else:

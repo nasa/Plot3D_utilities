@@ -4,7 +4,7 @@ import math
 import numpy as np
 from typing import Dict, List
 from tqdm import trange
-from .facefunctions import create_face_from_diagonals
+from .facefunctions import create_face_from_diagonals, get_outer_faces
 from .block import Block
 from .face import Face
 
@@ -102,13 +102,14 @@ def get_outer_bounds(blocks:List[Block]):
     
     return tuple(xbounds),tuple(ybounds),tuple(zbounds)
 
-def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[]):
+def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[],tol:float=1E-8):
     """Creates a matrix representing how block edges are connected to each other 
 
     Args:
-        blocks (List[Block]): _description_
+        blocks (List[Block]): List of blocks that describe the Plot3D mesh
         outer_faces (List[Dict[str,int]], optional): List of outer faces remaining from connectivity. Useful if you are interested in finding faces that are exterior to the block. Also useful if you combine outerfaces with match faces, this will help identify connections by looking at split faces. Defaults to [].
-
+        tol (float, optional): Matching tolerance to look for when comparing face centroids.
+    
     Returns:
         (Tuple): containing
 
@@ -161,16 +162,16 @@ def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[
             connection_found=False             
             for f1 in b1_outer_faces:
                 for f2 in b2_outer_faces:
-                    if (f1.is_connected(f2)): # Check if face centroid is the same
+                    if (f1.is_connected(f2,tol)):   # Check if face centroid is the same
                         connectivity[i,j] = 1       # Default block to block connection matrix 
                         connectivity[j,i] = 1
                         connection_found=True
+                        # c = np.sum(connectivity[i,:]==1)
+                        # print(f"block {i} connections {c}")
                         break
                 if connection_found:
                     break
             if not connection_found:
                 connectivity[i,j] = -1
-                connectivity[j,i] = -1
-        # c = np.sum(connectivity[i,:]==1)
-        # print(f"block {i} connections {c}")
+                connectivity[j,i] = -1      
     return connectivity
