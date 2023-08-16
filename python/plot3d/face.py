@@ -336,14 +336,14 @@ class Face:
                 maxIndx = indx
         return (self.x[minIndx],self.y[minIndx], self.z[minIndx]),(self.x[maxIndx],self.y[maxIndx], self.z[maxIndx])
     
-    def is_connected(self,f):
+    def is_connected(self,f,tol:float=1E-8):
         """Determines if face is connected by looking at the face centroid
 
         Args:
             f (Face): another face object 
         """
         val = np.sqrt((self.cx-f.cx)**2 + (self.cy-f.cy)**2 + (self.cz-f.cz)**2)
-        if val <1E-8:
+        if val <tol:
             return True
         else:
             return False
