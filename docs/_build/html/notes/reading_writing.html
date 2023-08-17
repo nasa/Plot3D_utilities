@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Reading and Writing Plot3D Files &#8212; Plot3D 1.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    
+    <script src="../_static/documentation_options.js?v=72d88caf"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Block to Block Connectivity" href="connectivity.html" />
+    <link rel="prev" title="Plot3D Data Format" href="plot3d.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="connectivity.html" title="Block to Block Connectivity"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="plot3d.html" title="Plot3D Data Format"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Reading and Writing Plot3D Files</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="reading-and-writing-plot3d-files">
+<h1>Reading and Writing Plot3D Files<a class="headerlink" href="#reading-and-writing-plot3d-files" title="Link to this heading">¶</a></h1>
+<p>This Plot3D library is capable of reading binary (big endian/little endian) and ASCII plot3d files. This is an example of how to read a plot3D file in binary and convert it to ASCII</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span>
+
+<span class="c1"># Convert to binary because of size</span>
+<span class="n">blocks</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;finalmesh.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">big_endian</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">write_plot3D</span><span class="p">(</span><span class="s1">&#39;finalmesh-ASCII.xyz&#39;</span><span class="p">,</span><span class="n">blocks</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also use it to append blocks</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span>
+
+<span class="c1"># Convert to binary because of size</span>
+<span class="n">blocks_mesh1</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;mesh1.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">big_endian</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">blocks_mesh2</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;mesh2.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">big_endian</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">blocks_mesh1</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">blocks_mesh2</span><span class="p">)</span>\
+<span class="n">write_plot3D</span><span class="p">(</span><span class="s1">&#39;finalmesh-ASCII.xyz&#39;</span><span class="p">,</span><span class="n">blocks_mesh1</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="plot3d.html"
+                          title="previous chapter">Plot3D Data Format</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="connectivity.html"
+                          title="next chapter">Block to Block Connectivity</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/notes/reading_writing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="connectivity.html" title="Block to Block Connectivity"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="plot3d.html" title="Plot3D Data Format"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Reading and Writing Plot3D Files</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.0.
+    </div>
+  </body>
+</html>

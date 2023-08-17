@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>plot3d.facefunctions &#8212; Plot3D 1.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
+    
+    <script src="../../_static/documentation_options.js?v=72d88caf"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">plot3d.facefunctions</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for plot3d.facefunctions</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">.listfunctions</span> <span class="kn">import</span> <span class="n">unique_pairs</span>
+<span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">reduce_blocks</span>
+<span class="kn">from</span> <span class="nn">.face</span> <span class="kn">import</span> <span class="n">Face</span> 
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="get_outer_faces">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.get_outer_faces">[docs]</a>
+<span class="k">def</span> <span class="nf">get_outer_faces</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the outer faces of a block</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        block1 (Block): A plot3D block</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[Face]: Non matching faces of the block </span>
+<span class="sd">        List[(Face,Face)]: Matching faces inside the block </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">block1</span><span class="o">.</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>               <span class="c1"># Python index starts at 0, need to subtract 1 for it to get the i,j,k</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">block1</span><span class="o">.</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">block1</span><span class="o">.</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># Create the outer faces        </span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">i</span><span class="o">=</span><span class="n">I</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">i</span><span class="o">=</span><span class="n">I</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">j</span><span class="o">=</span><span class="n">J</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">I</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">j</span><span class="o">=</span><span class="n">J</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">I</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">k</span><span class="o">=</span><span class="n">K</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">I</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">k</span><span class="o">=</span><span class="n">K</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">I</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">block1</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">block1</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+
+    <span class="c1"># Check if faces match each other</span>
+    <span class="n">matching</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">non_matching</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)):</span>
+        <span class="n">matchFound</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">!=</span><span class="n">j</span> <span class="ow">and</span> <span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vertices_equals</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">j</span><span class="p">])):</span>
+                <span class="n">matching</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
+                <span class="n">matchFound</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">matchFound</span><span class="p">:</span>
+            <span class="n">non_matching</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="c1"># these are guaranteed to be exterior </span>
+    <span class="n">matching</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">unique_pairs</span><span class="p">(</span><span class="n">matching</span><span class="p">))</span>
+    <span class="n">matching</span> <span class="o">=</span> <span class="p">[(</span><span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">faces</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">matching</span><span class="p">]</span>
+    
+    <span class="c1"># Make sure normals do not intersect </span>
+    <span class="c1"># block_center_to_face_center =  block1.cx</span>
+    <span class="k">return</span> <span class="n">non_matching</span><span class="p">,</span> <span class="n">matching</span> <span class="c1"># these should be the outer faces</span></div>
+
+    
+<div class="viewcode-block" id="create_face_from_diagonals">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.create_face_from_diagonals">[docs]</a>
+<span class="k">def</span> <span class="nf">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">imin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">imax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmax</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a face on a block given a the diagonals defined as (IMIN,JMIN,KMIN), (IMAX, JMAX, KMAX)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        block (Block): Block to create a face on </span>
+<span class="sd">        imin (int): Lower Corner IMIN</span>
+<span class="sd">        jmin (int): Lower Corner JMIN</span>
+<span class="sd">        kmin (int): Lower Corner KMIN</span>
+<span class="sd">        imax (int): Upper Corner IMAX</span>
+<span class="sd">        jmax (int): Upper Corner JMAX</span>
+<span class="sd">        kmax (int): Upper Corner</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (Face): Face created from diagonals </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">newFace</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>           <span class="c1"># This is because two of the corners either imin or imax can be equal</span>
+    <span class="k">if</span> <span class="n">imin</span><span class="o">==</span><span class="n">imax</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">imin</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">[</span><span class="n">jmin</span><span class="p">,</span><span class="n">jmax</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="n">kmin</span><span class="p">,</span><span class="n">kmax</span><span class="p">]:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">newFace</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">jmin</span><span class="o">==</span><span class="n">jmax</span><span class="p">:</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">jmin</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="n">kmin</span><span class="p">,</span><span class="n">kmax</span><span class="p">]:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">newFace</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">kmin</span><span class="o">==</span><span class="n">kmax</span><span class="p">:</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">kmin</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">[</span><span class="n">jmin</span><span class="p">,</span><span class="n">jmax</span><span class="p">]:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">newFace</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newFace</span></div>
+
+
+<div class="viewcode-block" id="find_connected_faces">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_connected_faces">[docs]</a>
+<span class="k">def</span> <span class="nf">find_connected_faces</span><span class="p">(</span><span class="n">face_to_search</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span><span class="n">connectivity_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursive program to return all the matching faces. Note faces must have the same I,J,K definition so faces will be matching if for example: Face1 IMIN=IMAX and Face2 IMIN=IMAX and they share a common edge (2 vertices)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        face_to_search (Face): This is the face to search for </span>
+<span class="sd">        outer_faces (List[Face]): List of outer faces </span>
+<span class="sd">        connectivity_matrix (np.ndarray): block connectivity matrix</span>
+<span class="sd">        searched_faces (List[Face]): Leave this as blank</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[Face]: list of all faces that connect with face_to_search and it&#39;s neighbors. Beware of duplicates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_matching_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">face_to_search</span><span class="p">]</span>
+    <span class="n">faces_to_search</span> <span class="o">=</span> <span class="p">[</span><span class="n">face_to_search</span><span class="p">]</span>
+    <span class="n">faces_searched</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">faces_to_search</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">matching_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">face_to_search</span> <span class="ow">in</span> <span class="n">faces_to_search</span><span class="p">:</span>
+            <span class="n">n1</span> <span class="o">=</span> <span class="n">face_to_search</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">face_to_search</span><span class="o">.</span><span class="n">BlockIndex</span><span class="p">])</span>
+            <span class="n">selected_block_indx</span> <span class="o">=</span> <span class="n">face_to_search</span><span class="o">.</span><span class="n">BlockIndex</span>    
+            <span class="n">connected_block_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">connectivity_matrix</span><span class="p">[</span><span class="n">selected_block_indx</span><span class="p">,:]</span><span class="o">==</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">faces_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="ow">in</span> <span class="n">connected_block_indices</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+            
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">faces_to_check</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">face_to_search</span><span class="o">.</span><span class="n">match_indices</span><span class="p">(</span><span class="n">f</span><span class="p">))</span><span class="o">==</span><span class="mi">2</span><span class="p">):</span>
+                    <span class="n">n2</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">BlockIndex</span><span class="p">])</span>
+                    <span class="n">angle</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">n1</span><span class="p">,</span><span class="n">n2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">n2</span><span class="p">)))))</span>
+                    <span class="k">if</span> <span class="n">angle</span><span class="o">&gt;</span><span class="mi">90</span><span class="p">:</span>
+                        <span class="n">angle</span> <span class="o">=</span> <span class="mi">180</span><span class="o">-</span><span class="n">angle</span>
+                    <span class="k">if</span> <span class="n">angle</span><span class="o">&lt;</span><span class="mi">50</span><span class="p">:</span>
+                        <span class="n">connectivity_matrix</span><span class="p">[</span><span class="n">selected_block_indx</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">BlockIndex</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="n">connectivity_matrix</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">BlockIndex</span><span class="p">,</span> <span class="n">selected_block_indx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="n">matching_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>        
+              
+        <span class="n">faces_searched</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">faces_to_search</span><span class="p">)</span>
+        <span class="n">matching_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matching_faces</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_matching_faces</span><span class="p">]</span>
+        <span class="n">faces_to_search</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">faces_to_search</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">matching_faces</span><span class="p">)</span>
+        <span class="n">all_matching_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">matching_faces</span><span class="p">)</span>        
+        <span class="n">matching_faces</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">all_matching_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">all_matching_faces</span><span class="p">))</span>  
+    <span class="k">return</span> <span class="n">all_matching_faces</span></div>
+
+
+
+<div class="viewcode-block" id="find_closest_block">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_closest_block">[docs]</a>
+<span class="k">def</span> <span class="nf">find_closest_block</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">x</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">centroid</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">translational_direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="n">minvalue</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the closest block to an extreme in the x,y, or z direction and returns the targetting point. </span>
+<span class="sd">    Target point is the reference point where we want the closest block and the closest face </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (np.ndarray): x coordinate of all the blocks&#39; centroid</span>
+<span class="sd">        y (np.ndarray): y coordinate of all the blocks&#39; centroid</span>
+<span class="sd">        z (np.ndarray): z coordinate of all the blocks&#39; centroid</span>
+<span class="sd">        centroid (np.ndarray): centroid (cx,cy,cz)</span>
+<span class="sd">        translational_direction (str, optional): _description_. Defaults to &quot;x&quot;.</span>
+<span class="sd">        minvalue (bool, optional): _description_. Defaults to True.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (tuple): containing</span>
+
+<span class="sd">            *selected block index* (int): index of closest block</span>
+<span class="sd">            *target_x* (float): this is the x value where selected block is closest to</span>
+<span class="sd">            *target_y* (float): this is the y value where selected block is closest to</span>
+<span class="sd">            *target_z* (float): this is the z value where selected block is closest to</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cx</span> <span class="o">=</span> <span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">cz</span> <span class="o">=</span> <span class="n">centroid</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">target_x</span> <span class="o">=</span> <span class="n">cx</span><span class="p">;</span> <span class="n">target_y</span> <span class="o">=</span> <span class="n">cy</span><span class="p">;</span> <span class="n">target_z</span> <span class="o">=</span> <span class="n">cz</span>
+    <span class="k">if</span> <span class="n">translational_direction</span><span class="o">==</span><span class="s2">&quot;x&quot;</span><span class="p">:</span>
+        <span class="n">xmins</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
+        <span class="n">xmaxes</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">xmins</span><span class="p">)</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">xmaxes</span><span class="p">)</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span>
+        <span class="k">if</span> <span class="n">minvalue</span><span class="p">:</span>
+            <span class="n">target_x</span> <span class="o">=</span> <span class="n">xmin</span> <span class="o">-</span> <span class="n">dx</span><span class="o">*</span><span class="mf">0.5</span>
+            <span class="n">selected_block_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">target_x</span><span class="o">-</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">cy</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">cz</span><span class="o">-</span><span class="n">z</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">target_x</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">+</span> <span class="n">dx</span><span class="o">*</span><span class="mf">0.5</span>
+            <span class="n">selected_block_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">target_x</span><span class="o">-</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">cy</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">cz</span><span class="o">-</span><span class="n">z</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>            
+        <span class="n">target_y</span><span class="o">=</span> <span class="n">cy</span>
+        <span class="n">target_z</span> <span class="o">=</span> <span class="n">cz</span>
+    <span class="k">elif</span> <span class="n">translational_direction</span><span class="o">==</span><span class="s2">&quot;y&quot;</span><span class="p">:</span>
+        <span class="n">ymins</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
+        <span class="n">ymaxes</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
+        <span class="n">ymin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ymins</span><span class="p">)</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">ymaxes</span><span class="p">)</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">ymax</span><span class="o">-</span><span class="n">ymin</span>
+        <span class="k">if</span> <span class="n">minvalue</span><span class="p">:</span>
+            <span class="n">target_y</span> <span class="o">=</span> <span class="n">ymin</span> <span class="o">-</span> <span class="n">dy</span><span class="o">*</span><span class="mf">0.5</span>
+            <span class="n">selected_block_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">cx</span><span class="o">-</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">target_y</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">cz</span><span class="o">-</span><span class="n">z</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">target_y</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">+</span> <span class="n">dy</span><span class="o">*</span><span class="mf">0.5</span>
+            <span class="n">selected_block_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">cx</span><span class="o">-</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">target_y</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">cz</span><span class="o">-</span><span class="n">z</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">target_x</span> <span class="o">=</span> <span class="n">cx</span>
+        <span class="n">target_z</span> <span class="o">=</span> <span class="n">cz</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1">#  translational_direction==&quot;z&quot;:</span>
+        <span class="n">zmins</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
+        <span class="n">zmaxes</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
+        <span class="n">zmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">zmins</span><span class="p">)</span>
+        <span class="n">zmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">zmaxes</span><span class="p">)</span>
+        <span class="n">dz</span> <span class="o">=</span> <span class="n">zmax</span> <span class="o">-</span> <span class="n">zmin</span>
+        <span class="k">if</span> <span class="n">minvalue</span><span class="p">:</span>
+            <span class="n">target_z</span> <span class="o">=</span> <span class="n">zmin</span> <span class="o">-</span> <span class="n">dz</span><span class="o">*</span><span class="mf">0.5</span>
+            <span class="n">selected_block_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">cx</span><span class="o">-</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">cy</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">target_z</span><span class="o">-</span><span class="n">z</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">target_z</span> <span class="o">=</span> <span class="n">zmax</span> <span class="o">+</span> <span class="n">dz</span><span class="o">*</span><span class="mf">0.5</span>
+            <span class="n">selected_block_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">cx</span><span class="o">-</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">cy</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">target_z</span><span class="o">-</span><span class="n">z</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">target_x</span> <span class="o">=</span> <span class="n">cx</span>
+        <span class="n">target_y</span> <span class="o">=</span> <span class="n">cy</span>
+
+    <span class="k">return</span> <span class="n">selected_block_indx</span><span class="p">,</span><span class="n">target_x</span><span class="p">,</span><span class="n">target_y</span><span class="p">,</span><span class="n">target_z</span> </div>
+
+
+<div class="viewcode-block" id="find_bounding_faces">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_bounding_faces">[docs]</a>
+<span class="k">def</span> <span class="nf">find_bounding_faces</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">connectivity_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds bounding faces in x,y,z direction so think of this as the xmin and xmax faces of a block.</span>
+<span class="sd">    This is useful for translational periodicity where you want the bounds to check</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blocks (List[Block]): List of blocks</span>
+<span class="sd">        outer_faces (List[Dict[str,int]]): outer faces as a list of dictionaries </span>
+<span class="sd">        direction (str, optional): Direction to search for. Defaults to &quot;z&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (tuple) containing:</span>
+<span class="sd">        </span>
+<span class="sd">            *lower_connected_faces_export* (List[Dict[str,int]]): Export ready version of lower/left connected faces</span>
+<span class="sd">            *upper_connected_faces_export* (List[Dict[str,int]]): Export ready version of upper/right connected faces</span>
+<span class="sd">            *lower_connected_faces* (List[face]): List of lower/left connected faces</span>
+<span class="sd">            *upper_connected_faces* (List[face]): List of upper/right connected faces</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gcd_array</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="c1"># Find the gcd of all the blocks</span>
+    <span class="k">for</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">block_indx</span><span class="p">]</span>
+        <span class="n">gcd_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">gcd_to_use</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">gcd_array</span><span class="p">)</span> <span class="c1"># You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">reduce_blocks</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span><span class="n">gcd_to_use</span><span class="p">)</span>    
+    
+    <span class="n">xyz_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">b</span><span class="o">.</span><span class="n">cx</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">cy</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">cz</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]);</span> 
+    
+    <span class="n">cx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">xyz_array</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># Centroid </span>
+    <span class="n">cy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">xyz_array</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">cz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">xyz_array</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">xyz_array</span><span class="p">[:,</span><span class="mi">0</span><span class="p">];</span> <span class="n">y</span> <span class="o">=</span> <span class="n">xyz_array</span><span class="p">[:,</span><span class="mi">1</span><span class="p">];</span> <span class="n">z</span> <span class="o">=</span> <span class="n">xyz_array</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">blocks</span><span class="p">):</span>
+            <span class="n">outer</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer</span><span class="p">]</span>
+            <span class="n">outer_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+        <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="n">outer_faces</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="n">outer_face_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">,</span><span class="n">gcd_to_use</span><span class="p">)</span>
+
+    <span class="c1"># Find closest face to the min value </span>
+    <span class="n">selected_block_index</span><span class="p">,</span><span class="n">tx</span><span class="p">,</span><span class="n">ty</span><span class="p">,</span><span class="n">tz</span> <span class="o">=</span> <span class="n">find_closest_block</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cx</span><span class="p">,</span><span class="n">cy</span><span class="p">,</span><span class="n">cz</span><span class="p">]),</span><span class="n">direction</span><span class="p">,</span><span class="n">minvalue</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">outer_faces_all</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="o">==</span> <span class="n">selected_block_index</span><span class="p">]</span>    <span class="c1"># Pick all the faces for the selected block </span>
+    <span class="n">min_face_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">f</span><span class="o">.</span><span class="n">cx</span><span class="o">-</span><span class="n">tx</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">cy</span><span class="o">-</span><span class="n">ty</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">cz</span><span class="o">-</span><span class="n">tz</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">]))</span>
+    <span class="n">min_face</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">min_face_indx</span><span class="p">]</span>     <span class="c1"># Just need this</span>
+    
+    <span class="n">selected_block_index</span><span class="p">,</span><span class="n">tx</span><span class="p">,</span><span class="n">ty</span><span class="p">,</span><span class="n">tz</span> <span class="o">=</span> <span class="n">find_closest_block</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cx</span><span class="p">,</span><span class="n">cy</span><span class="p">,</span><span class="n">cz</span><span class="p">]),</span><span class="n">direction</span><span class="p">,</span><span class="n">minvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">outer_faces_all</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="o">==</span> <span class="n">selected_block_index</span><span class="p">]</span>    <span class="c1"># Pick all the faces for the selected block </span>
+    <span class="n">max_face_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">f</span><span class="o">.</span><span class="n">cx</span><span class="o">-</span><span class="n">tx</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">cy</span><span class="o">-</span><span class="n">ty</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">cz</span><span class="o">-</span><span class="n">tz</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">]))</span>
+    <span class="n">max_face</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">max_face_indx</span><span class="p">]</span>     <span class="c1"># Also need this</span>
+
+    <span class="c1"># Search face connectivity in block connectivity matrix </span>
+    <span class="n">connectivity_matrix</span> <span class="o">=</span> <span class="n">connectivity_matrix</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">connectivity_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span> <span class="c1"># turn off connections with itself </span>
+
+    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces_all</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="o">!=</span> <span class="n">min_face</span><span class="o">.</span><span class="n">BlockIndex</span><span class="p">]</span>
+    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces_all</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="o">!=</span> <span class="n">max_face</span><span class="o">.</span><span class="n">BlockIndex</span><span class="p">]</span>
+    
+    <span class="c1"># !print(&quot;Recursively searching for connected faces&quot;)</span>
+    <span class="n">lower_connected_faces</span> <span class="o">=</span> <span class="n">find_connected_faces</span><span class="p">(</span><span class="n">min_face</span><span class="p">,</span><span class="n">outer_faces_all</span><span class="p">,</span><span class="n">connectivity_matrix</span><span class="p">,</span><span class="n">blocks</span><span class="p">)</span>
+    <span class="n">upper_connected_faces</span> <span class="o">=</span> <span class="n">find_connected_faces</span><span class="p">(</span><span class="n">max_face</span><span class="p">,</span><span class="n">outer_faces_all</span><span class="p">,</span><span class="n">connectivity_matrix</span><span class="p">,</span><span class="n">blocks</span><span class="p">)</span>
+    
+    <span class="n">lower_connected_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">min_face</span><span class="p">)</span>
+    <span class="n">upper_connected_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_face</span><span class="p">)</span>
+    <span class="c1"># Unscale faces</span>
+    <span class="n">lower_connected_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">lower_connected_faces</span><span class="p">))</span>
+    <span class="n">upper_connected_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">upper_connected_faces</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lower_connected_faces</span><span class="p">:</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">I</span><span class="o">*=</span><span class="n">gcd_to_use</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">J</span><span class="o">*=</span><span class="n">gcd_to_use</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">K</span><span class="o">*=</span><span class="n">gcd_to_use</span>
+    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">upper_connected_faces</span><span class="p">:</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">I</span><span class="o">*=</span><span class="n">gcd_to_use</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">J</span><span class="o">*=</span><span class="n">gcd_to_use</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">K</span><span class="o">*=</span><span class="n">gcd_to_use</span>
+
+    <span class="n">lower_connected_faces_export</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lower_connected_faces</span><span class="p">]</span>
+    <span class="n">upper_connected_faces_export</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">upper_connected_faces</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">lower_connected_faces_export</span><span class="p">,</span><span class="n">upper_connected_faces_export</span><span class="p">,</span> <span class="n">lower_connected_faces</span><span class="p">,</span> <span class="n">upper_connected_faces</span></div>
+
+
+<div class="viewcode-block" id="split_face">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.split_face">[docs]</a>
+<span class="k">def</span> <span class="nf">split_face</span><span class="p">(</span><span class="n">face_to_split</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">imin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">imax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmax</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Splits a face with another face within the same block </span>
+<span class="sd">        picture the split as a two rectangles inside each other</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        face_to_split (Face): Face on the block to be split </span>
+<span class="sd">        block (Block): Block the split is occuring on </span>
+<span class="sd">        imin (int): IMIN index of the split (diagonals)</span>
+<span class="sd">        jmin (int): JMIN index of the split (diagonals)</span>
+<span class="sd">        kmin (int): KMIN index of the split (diagonals) </span>
+<span class="sd">        imax (int): IMAX index of the split</span>
+<span class="sd">        jmax (int): JMAX index of the split</span>
+<span class="sd">        kmax (int): KMAX index of the split </span>
+
+<span class="sd">    :: </span>
+
+<span class="sd">                    left face    top face     right face</span>
+<span class="sd">         ________       __          __            __</span>
+<span class="sd">        |   __   |     |  |        |__|          |  |     __</span>
+<span class="sd">        |  |__|  |     |  |         __           |  |    |__|  face_to_split/center face </span>
+<span class="sd">        |________|     |__|        |__|          |__|</span>
+<span class="sd">                                bottom face</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        [List[Faces]]: List of unique faces from the split </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">center_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">kmin</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">kmax</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">kmin</span> <span class="o">==</span> <span class="n">kmax</span><span class="p">:</span>
+        <span class="c1"># In the picture above Horizontal = i, vertical = j</span>
+        <span class="n">left_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+                <span class="n">imin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">IMIN</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span>
+                <span class="n">jmin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span>
+                <span class="n">kmin</span><span class="o">=</span><span class="n">kmin</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="n">kmax</span><span class="p">)</span>
+
+        
+        <span class="n">right_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+                <span class="n">imin</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span> <span class="n">imax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span>
+                <span class="n">jmin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span> <span class="n">jmax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span>
+                <span class="n">kmin</span><span class="o">=</span><span class="n">kmin</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="n">kmax</span><span class="p">)</span>
+
+        <span class="n">top_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">kmin</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">kmax</span><span class="p">)</span>
+        
+        <span class="n">bottom_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">kmin</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">kmax</span><span class="p">)</span>  
+
+    <span class="k">elif</span> <span class="p">(</span><span class="n">imin</span><span class="o">==</span><span class="n">imax</span><span class="p">):</span>
+        <span class="c1"># In the picture above Horizontal = j, vertical = k</span>
+        <span class="n">left_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span> <span class="n">jmax</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMAX</span><span class="p">)</span>
+
+        <span class="n">right_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span> <span class="n">jmax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMAX</span><span class="p">)</span>
+
+        <span class="n">top_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">kmax</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMAX</span><span class="p">)</span>
+
+        <span class="n">bottom_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">kmin</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="p">(</span><span class="n">jmin</span><span class="o">==</span><span class="n">jmax</span><span class="p">):</span>
+        <span class="c1"># In the picture above Horizontal = i, vertical = k </span>
+        <span class="n">left_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">IMIN</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMAX</span><span class="p">)</span>
+
+        <span class="n">right_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMAX</span><span class="p">)</span>
+        
+        <span class="n">top_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span><span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span><span class="n">jmax</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">kmax</span><span class="p">,</span><span class="n">kmax</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMAX</span><span class="p">)</span>
+        
+        <span class="n">bottom_face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">imin</span><span class="o">=</span><span class="n">imin</span><span class="p">,</span> <span class="n">imax</span><span class="o">=</span><span class="n">imax</span><span class="p">,</span>
+            <span class="n">jmin</span><span class="o">=</span><span class="n">jmin</span><span class="p">,</span> <span class="n">jmax</span><span class="o">=</span><span class="n">jmax</span><span class="p">,</span>
+            <span class="n">kmin</span><span class="o">=</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="n">kmin</span><span class="p">)</span>
+    
+    <span class="n">faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">top_face</span><span class="p">,</span><span class="n">bottom_face</span><span class="p">,</span><span class="n">left_face</span><span class="p">,</span><span class="n">right_face</span><span class="p">]</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">faces</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">isEdge</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">index_equals</span><span class="p">(</span><span class="n">center_face</span><span class="p">)]</span> <span class="c1"># Remove edges</span>
+    <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">]</span> 
+    <span class="k">return</span> <span class="n">faces</span> </div>
+
+
+<div class="viewcode-block" id="find_face_nearest_point">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_face_nearest_point">[docs]</a>
+<span class="k">def</span> <span class="nf">find_face_nearest_point</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">x</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">z</span><span class="p">:</span><span class="nb">float</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find a face nearest to a given point</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blocks (List[Block]): List of blocks</span>
+<span class="sd">        faces (List[Face]): List of faces</span>
+<span class="sd">        x (float): x coordinate of a reference point</span>
+<span class="sd">        y (float): y coordinate of a reference point</span>
+<span class="sd">        z (float): z coordinate of a reference point</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)))</span>
+    <span class="n">dv</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">n</span><span class="p">:</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="o">-</span><span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cx</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">y</span><span class="o">-</span><span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cy</span>
+        <span class="n">dz</span> <span class="o">=</span> <span class="n">z</span><span class="o">-</span><span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cz</span>
+        <span class="n">dv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">*</span><span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span><span class="o">*</span><span class="n">dy</span> <span class="o">+</span> <span class="n">dz</span><span class="o">*</span><span class="n">dz</span><span class="p">))</span>
+    <span class="n">face_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dv</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">face_index</span></div>
+
+
+<div class="viewcode-block" id="outer_face_dict_to_list">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.outer_face_dict_to_list">[docs]</a>
+<span class="k">def</span> <span class="nf">outer_face_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">gcd</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a list of dictionary face representations to a list of faces. Use this only for outer faces </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blocks (List[Block]): List of blocks</span>
+<span class="sd">        outer_faces (List[Dict[str,int]]): List of outer faces represented as a dictionary </span>
+<span class="sd">        gcd (int, optional): Greatst common divisor. Defaults to 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[Face]: List of Face objects </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span><span class="p">:</span>
+        <span class="n">face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> 
+            <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">))</span>
+        <span class="n">face</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
+        <span class="n">outer_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">outer_faces_all</span></div>
+
+
+<div class="viewcode-block" id="match_faces_dict_to_list">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.match_faces_dict_to_list">[docs]</a>
+<span class="k">def</span> <span class="nf">match_faces_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">gcd</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a list of dictionaries representing matched faces to a list of Faces</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blocks (List[Block]): List of blocks </span>
+<span class="sd">        matched_faces (List[Dict[str,int]]): List of matched faces represented as a dictionary </span>
+<span class="sd">        gcd (int, optional): _description_. Defaults to 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        _type_: _description_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">matched_faces_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> 
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">matched_faces</span><span class="p">):</span>
+        <span class="n">face1</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> 
+                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> 
+                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">))</span>
+        <span class="n">face2</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> 
+                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> 
+                            <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd</span><span class="p">))</span>
+        <span class="n">face1</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
+        <span class="n">face2</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
+        <span class="n">matched_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span>
+        <span class="n">matched_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">matched_faces_all</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">plot3d.facefunctions</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>plot3d.differencing &#8212; Plot3D 1.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
+    
+    <script src="../../_static/documentation_options.js?v=72d88caf"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">plot3d.differencing</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for plot3d.differencing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This code computes all the edges of a block or block face </span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
+
+<div class="viewcode-block" id="find_face_edges">
+<a class="viewcode-back" href="../../modules/differencing.html#plot3d.differencing.find_face_edges">[docs]</a>
+<span class="k">def</span> <span class="nf">find_face_edges</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the edges of both faces to see if they are parallel. Face can be in any direction (I,J) (I,K) etc.</span>
+<span class="sd">        if edges are parallel then their vertices might intersect</span>
+<span class="sd">        Find edges will always deal with faces and not something that is in 3D</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (np.ndarray): Multi-dimensional array (2 dimensions PMAX,QMAX ) representing values of X for the block domain</span>
+<span class="sd">        Y (np.ndarray): Multi-dimensional array (2 dimensions PMAX,QMAX ) representing values of Y for the block domain</span>
+<span class="sd">        Z (np.ndarray): Multi-dimensional array (2 dimensions PMAX,QMAX ) representing values of Z for the block domain</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.DataFrame: with columns p,q,dp,dq where dp, dq are each tuples containing (dx_b,dy_b,dz_b),(dx_f,dy_f,dz_f)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">PMAX</span><span class="p">,</span><span class="n">QMAX</span><span class="p">)</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">diffArray</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">PMAX</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">QMAX</span><span class="p">):</span>
+                <span class="n">dx_b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">dy_b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">dz_b</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c1"># Preset to 0</span>
+                <span class="k">if</span> <span class="n">p</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">dx_b</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">q</span><span class="p">]</span><span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                    <span class="n">dy_b</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">q</span><span class="p">]</span><span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                    <span class="n">dz_b</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">q</span><span class="p">]</span><span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+
+                <span class="n">dx_f</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">dy_f</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">dz_f</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c1"># Preset to 0</span>
+                <span class="k">if</span> <span class="n">p</span><span class="o">!=</span><span class="n">PMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">dx_f</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">q</span><span class="p">]</span><span class="o">-</span>  <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                    <span class="n">dy_f</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">q</span><span class="p">]</span> <span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                    <span class="n">dz_f</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">q</span><span class="p">]</span> <span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span> 
+
+                <span class="n">dp</span> <span class="o">=</span> <span class="p">((</span><span class="n">dx_b</span><span class="p">,</span><span class="n">dy_b</span><span class="p">,</span><span class="n">dz_b</span><span class="p">),(</span><span class="n">dx_f</span><span class="p">,</span><span class="n">dy_f</span><span class="p">,</span><span class="n">dz_f</span><span class="p">))</span>                
+                <span class="k">if</span> <span class="n">q</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">dx_b</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                    <span class="n">dy_b</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                    <span class="n">dz_b</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">q</span><span class="o">!=</span><span class="n">QMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">dx_f</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                    <span class="n">dy_f</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                    <span class="n">dz_f</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">p</span><span class="p">,</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">dq</span> <span class="o">=</span> <span class="p">((</span><span class="n">dx_b</span><span class="p">,</span><span class="n">dy_b</span><span class="p">,</span><span class="n">dz_b</span><span class="p">),(</span><span class="n">dx_f</span><span class="p">,</span><span class="n">dy_f</span><span class="p">,</span><span class="n">dz_f</span><span class="p">))</span>
+
+                <span class="n">diffArray</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;p&quot;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;q&quot;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span><span class="s1">&#39;dp&#39;</span><span class="p">:</span><span class="n">dp</span><span class="p">,</span><span class="s1">&#39;dq&#39;</span><span class="p">:</span><span class="n">dq</span><span class="p">})</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diffArray</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span> </div>
+
+
+<div class="viewcode-block" id="find_edges">
+<a class="viewcode-back" href="../../modules/differencing.html#plot3d.differencing.find_edges">[docs]</a>
+<span class="k">def</span> <span class="nf">find_edges</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the edges of both blocks that are parallel. Takes into account the whole block and not a single face</span>
+<span class="sd">        if edges are parallel then their vertices might intersect. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (np.ndarray): Multi-dimensional array (3 dimensions IMAX,JMAX,KMAX ) representing values of X for the block/face domain</span>
+<span class="sd">        Y (np.ndarray): Multi-dimensional array (3 dimensions IMAX,JMAX,KMAX ) representing values of Y for the block/face domain</span>
+<span class="sd">        Z (np.ndarray): Multi-dimensional array (3 dimensions IMAX,JMAX,KMAX ) representing values of Z for the block/face domain</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.DataFrame: Dataframe with columns i,j,k,di,dj,dk where di,dj,dk are each tuples containing (dx_b,dy_b,dz_b),(dx_f,dy_f,dz_f)</span>
+<span class="sd">                _f = forward differencing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">IMAX</span><span class="p">,</span><span class="n">JMAX</span><span class="p">,</span> <span class="n">KMAX</span><span class="p">)</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">diffArray</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">IMAX</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">JMAX</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">KMAX</span><span class="p">):</span>
+                <span class="n">dx_b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">dy_b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">dz_b</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c1"># Preset to 0</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Backward Differencing i</span>
+                    <span class="n">dx_b</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dy_b</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dz_b</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+
+                <span class="n">dx_f</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">dy_f</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">dz_f</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c1"># Preset to 0</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">!=</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># Forward Differencing i</span>
+                    <span class="n">dx_f</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dy_f</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dz_f</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+
+                <span class="n">di</span> <span class="o">=</span> <span class="p">((</span><span class="n">dx_b</span><span class="p">,</span><span class="n">dy_b</span><span class="p">,</span><span class="n">dz_b</span><span class="p">),(</span><span class="n">dx_f</span><span class="p">,</span><span class="n">dy_f</span><span class="p">,</span><span class="n">dz_f</span><span class="p">))</span>                
+                <span class="k">if</span> <span class="n">j</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Backward Differencing j</span>
+                    <span class="n">dx_b</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dy_b</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dz_b</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">j</span><span class="o">!=</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># Forward Differencing j</span>
+                    <span class="n">dx_f</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dy_f</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dz_f</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">dj</span> <span class="o">=</span> <span class="p">((</span><span class="n">dx_b</span><span class="p">,</span><span class="n">dy_b</span><span class="p">,</span><span class="n">dz_b</span><span class="p">),(</span><span class="n">dx_f</span><span class="p">,</span><span class="n">dy_f</span><span class="p">,</span><span class="n">dz_f</span><span class="p">))</span>
+
+                <span class="n">dx_f</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">dy_f</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">dz_f</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c1"># Preset to 0</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Backward Differencing k</span>
+                    <span class="n">dx_b</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dy_b</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dz_b</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">k</span><span class="o">!=</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># Forward Differencing k</span>
+                    <span class="n">dx_f</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">dy_f</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">dz_f</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">dk</span> <span class="o">=</span> <span class="p">((</span><span class="n">dx_b</span><span class="p">,</span><span class="n">dy_b</span><span class="p">,</span><span class="n">dz_b</span><span class="p">),(</span><span class="n">dx_f</span><span class="p">,</span><span class="n">dy_f</span><span class="p">,</span><span class="n">dz_f</span><span class="p">))</span>
+                
+                <span class="n">diffArray</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i&quot;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot;j&quot;</span><span class="p">:</span><span class="n">j</span><span class="p">,</span><span class="s2">&quot;k&quot;</span><span class="p">:</span><span class="n">k</span><span class="p">,</span><span class="s1">&#39;di&#39;</span><span class="p">:</span><span class="n">di</span><span class="p">,</span><span class="s1">&#39;dj&#39;</span><span class="p">:</span><span class="n">dj</span><span class="p">,</span><span class="s1">&#39;dk&#39;</span><span class="p">:</span><span class="n">dk</span><span class="p">})</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span><span class="n">diffArray</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span> </div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">plot3d.differencing</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.0.
+    </div>
+  </body>
+</html>
