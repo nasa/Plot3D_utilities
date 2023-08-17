@@ -4,7 +4,7 @@ A python plot3D library for reading, writing, finding connectivity, and post pro
 ## Install Instructions
 To install simply do a `pip install plot3d` 
 
-> [Link to documentation](https://nasa.github.io/Plot3D_utilities/build/html/)
+> [Link to documentation](https://nasa.github.io/Plot3D_utilities/_build/html/)
 
 # Tutorials
 [Reading Writing and Viewing Plot3D files](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_SplitBlocksExample.ipynb)
