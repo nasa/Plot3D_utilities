@@ -419,7 +419,7 @@ def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:i
     [f.set_block_index(face_to_split.blockIndex) for f in faces] 
     return faces 
 
-def find_face_nearest_point(blocks:List[Block], faces:List[Face], x:float,y:float,z:float):
+def find_face_nearest_point(faces:List[Face], x:float,y:float,z:float):
     """Find a face nearest to a given point
 
     Args:
@@ -454,6 +454,8 @@ def outer_face_dict_to_list(blocks:List[Block],outer_faces:List[Dict[str,int]],g
     for o in outer_faces:
         face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd), int(o['JMIN']/gcd), 
             int(o['KMIN']/gcd), int(o['IMAX']/gcd), int(o['JMAX']/gcd), int(o['KMAX']/gcd))
+        if 'id' in o.keys():
+            face.id = o['id']
         face.set_block_index(o['block_index'])
         outer_faces_all.append(face)
 
@@ -479,7 +481,11 @@ def match_faces_dict_to_list(blocks:List[Block],matched_faces:List[Dict[str,int]
                             int(m['block2']['IMIN']/gcd), int(m['block2']['JMIN']/gcd), int(m['block2']['KMIN']/gcd), 
                             int(m['block2']['IMAX']/gcd), int(m['block2']['JMAX']/gcd), int(m['block2']['KMAX']/gcd))
         face1.set_block_index(m['block1']['block_index'])
+        if 'id' in m['block1'].keys():
+            face1.id = m['block1']['id']
         face2.set_block_index(m['block2']['block_index'])
+        if 'id' in m['block2'].keys():
+            face2.id = m['block2']['id']
         matched_faces_all.append(face1)
         matched_faces_all.append(face2)
     return matched_faces_all
