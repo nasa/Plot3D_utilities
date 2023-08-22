@@ -228,6 +228,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                 if int(imin==imax) + int(jmin==jmax) + int(kmin==kmax)==1:
                     split_faces1 = split_face(main_face,block1,imin=imin,imax=imax,jmin=jmin,jmax=jmax,kmin=kmin,kmax=kmax)
                     [s.set_block_index(face1.blockIndex) for s in split_faces1]
+                    [s.set_face_id(face1.id) for s in split_faces1]
 
                 ## Block 2
                 main_face = create_face_from_diagonals(block2,imin=I2[0],imax=I2[1], jmin=J2[0],jmax=J2[1],kmin=K2[0],kmax=K2[1])
@@ -236,7 +237,8 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                 if int(imin==imax) + int(jmin==jmax) + int(kmin==kmax)==1:
                     split_faces2 = split_face(main_face,block2,imin=imin,imax=imax,jmin=jmin,jmax=jmax,kmin=kmin,kmax=kmax)
                     [s.set_block_index(face2.blockIndex) for s in split_faces2]
-                    
+                    [s.set_face_id(face2.id) for s in split_faces2]
+
     else:
         df = pd.DataFrame() # set df to empty dataframe
     return df, split_faces1, split_faces2
