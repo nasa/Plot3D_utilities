@@ -500,12 +500,14 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
             'block1':{
                             'block_index':face1.BlockIndex,
                             'IMIN':-1,'JMIN':-1,'KMIN':-1,  # Lower Corner
-                            'IMAX':-1,'JMAX':-1,'KMAX':-1   # Upper Corner
+                            'IMAX':-1,'JMAX':-1,'KMAX':-1,   # Upper Corner
+                            'id':face1.id
                         },
                 'block2':{
                             'block_index':face2.BlockIndex,
                             'IMIN':-1,'JMIN':-1,'KMIN':-1,  # Lower Corner
-                            'IMAX':-1,'JMAX':-1,'KMAX':-1   # Upper Corner
+                            'IMAX':-1,'JMAX':-1,'KMAX':-1,   # Upper Corner
+                            'id':face2.id
                         }
                 }
             
