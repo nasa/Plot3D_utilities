@@ -23,13 +23,14 @@ class Face:
         self.cz = 0
         self.nvertex=0
         self.blockIndex = 0 # not really needed except in periodicity 
+        self.id = 0
         
     def to_dict(self):
         """Returns a dictionary representaon of a face
         """
         return {'IMIN':min(self.I), 'JMIN':min(self.J), 'KMIN':min(self.K),
                     'IMAX':max(self.I), 'JMAX':max(self.J), 'KMAX':max(self.K),
-                    'id':0, 'block_index':self.blockIndex}
+                    'id':self.id, 'block_index':self.blockIndex}
 
     @property
     def centroid(self):
@@ -156,6 +157,9 @@ class Face:
 
     def set_block_index(self,val):
         self.blockIndex = val
+
+    def set_face_id(self,val):
+        self.id = val
         
     def normal(self,block):
         """Computes the normal vector of the face 

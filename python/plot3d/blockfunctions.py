@@ -133,6 +133,8 @@ def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[
         face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['JMIN']/gcd_to_use), 
             int(o['KMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMAX']/gcd_to_use))
         face.set_block_index(o['block_index'])
+        if "id" in o:
+            face.id = o['id']
         outer_faces_all.append(face)
 
     outer_faces = outer_faces_all

@@ -748,9 +748,11 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
     if len(df)>=4:
         f1 = create_face_from_diagonals(block1,imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(), imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max())
         f1.set_block_index(face1.blockIndex)
+        f1.set_face_id(face1.id)
 
         f2 = create_face_from_diagonals(block2,imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(), imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max())
         f2.set_block_index(face2.blockIndex)
+        f2.set_face_id(face2.id)
         
         split_faces.extend(split_face1)
         split_faces.extend(split_face2)
