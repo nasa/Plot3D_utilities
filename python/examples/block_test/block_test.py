@@ -13,8 +13,7 @@ def read_data():
     with open('block_data.pickle','rb') as f:
         return pickle.load(f)
 
-blocks = read_plot3D('iso65_64blocks.xyz',True)
-write_plot3D("dominick.xyz",[blocks[0]],False)
+blocks = read_plot3D('iso65_64blocks.xyz',binary=True,read_double=False)
 if not os.path.exists(f'block_data.pickle'):    
     print('Finding connectivity')
     face_matches, outer_faces = connectivity_fast(blocks)
