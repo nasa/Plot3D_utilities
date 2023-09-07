@@ -14,7 +14,7 @@ def read_data():
         return pickle.load(f)
 
 blocks = read_plot3D('iso65_64blocks.xyz',binary=True,read_double=False)
-if not os.path.exists(f'block_data.pickle'):    
+if not os.path.exists(f'block_data.pickle'):
     print('Finding connectivity')
     face_matches, outer_faces = connectivity_fast(blocks)
     [m.pop('match',None) for m in face_matches] # Remove the dataframe
@@ -63,11 +63,12 @@ data['y_periodic'] = y_periodic_faces_export
 dump_data(data)
 
 # Export to GlennHT Format
+import copy
 data = read_data()
-matched_faces = data['x_periodic']
-matched_faces.extend(data['y_periodic'])
-matched_faces.extend(data['z_periodic'])
-matched_faces.extend(data['face_matches'])
+matched_faces = copy.deepcopy(data['x_periodic'])
+matched_faces.extend(copy.deepcopy(data['y_periodic']))
+matched_faces.extend(copy.deepcopy(data['z_periodic']))
+matched_faces.extend(copy.deepcopy(data['face_matches']))
 
 # Filter outer faces
 outer_faces = data['outer_faces']
