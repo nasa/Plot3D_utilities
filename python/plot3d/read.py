@@ -65,7 +65,8 @@ def __read_plot3D_chunk_ASCII(f,IMAX:int,JMAX:int,KMAX:int):
         if i>len(tokenArray)-1:
             break
 
-    A = np.reshape(tokenArray,newshape=(IMAX,JMAX,KMAX))
+    A = np.reshape(tokenArray,newshape=(KMAX,JMAX,IMAX))
+    A = np.transpose(A,[2,1,0])    
     return A
 
 def read_ap_nasa(filename:str):
