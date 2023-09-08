@@ -545,9 +545,18 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
             dx = xmax-xmin if not delta else delta
             [b.shift(sign*dx,translational_direction) for b in blocks_shifted]
         elif translational_direction.lower().strip() == "y":
-            ymin = min([b.Y.min() for b in blocks])
-            ymax = max([b.Y.max() for b in blocks])
-            dy = ymax-ymin if not delta else delta
+            ymin = np.array([(b.X.min(), b.Y.min(), b.Z.min()) for b in blocks]) # Look at the front face 
+            ymax = np.array([(b.X.min(), b.Y.max(), b.Z.min()) for b in blocks])
+            xmin = min([b.X.min() for b in blocks])
+            zmin = min([b.Z.min() for b in blocks])
+
+            ymin = ymin[ymin[:,0] == xmin,:]
+            ymax = ymax[ymax[:,0] == xmin,:]
+
+            ymin = ymin[ymin[:,2] == zmin,:]
+            ymax = ymax[ymax[:,2] == zmin,:]
+            
+            dy = ymax[:,1].max()- ymin[:,1].min() if not delta else delta
             [b.shift(sign*dy,translational_direction) for b in blocks_shifted]
         else: #  direction.lower().strip() == "z"
             zmin = min([b.Z.min() for b in blocks])
