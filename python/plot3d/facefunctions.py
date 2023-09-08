@@ -136,6 +136,7 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
     Returns:
         List[Face]: list of all faces that connect with face_to_search and it's neighbors. Beware of duplicates.
     """
+    connectivity_matrix = connectivity_matrix.copy()
     all_matching_faces = [face_to_search]
     faces_to_search = [face_to_search]
     faces_searched = []
