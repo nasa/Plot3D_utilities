@@ -136,6 +136,7 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
     Returns:
         List[Face]: list of all faces that connect with face_to_search and it's neighbors. Beware of duplicates.
     """
+    connectivity_matrix = connectivity_matrix.copy()
     all_matching_faces = [face_to_search]
     faces_to_search = [face_to_search]
     faces_searched = []
@@ -153,7 +154,8 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
                     angle = abs(math.degrees(math.acos(np.dot(n1,n2)/(np.linalg.norm(n1)*np.linalg.norm(n2)))))
                     if angle>90:
                         angle = 180-angle
-                    if angle<50:
+
+                    if angle<30:
                         connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
                         connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
                         matching_faces.append(f)        
