@@ -545,9 +545,18 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
             dx = xmax-xmin if not delta else delta
             [b.shift(sign*dx,translational_direction) for b in blocks_shifted]
         elif translational_direction.lower().strip() == "y":
-            ymin = min([b.Y.min() for b in blocks])
-            ymax = max([b.Y.max() for b in blocks])
-            dy = ymax-ymin if not delta else delta
+            ymin = np.array([(b.X.min(), b.Y.min(), b.Z.min()) for b in blocks]) # Look at the front face 
+            ymax = np.array([(b.X.min(), b.Y.max(), b.Z.min()) for b in blocks])
+            xmin = min([b.X.min() for b in blocks])
+            zmin = min([b.Z.min() for b in blocks])
+
+            ymin = ymin[ymin[:,0] == xmin,:]
+            ymax = ymax[ymax[:,0] == xmin,:]
+
+            ymin = ymin[ymin[:,2] == zmin,:]
+            ymax = ymax[ymax[:,2] == zmin,:]
+            
+            dy = ymax[:,1].max() - ymin[:,1].min() if not delta else delta
             [b.shift(sign*dy,translational_direction) for b in blocks_shifted]
         else: #  direction.lower().strip() == "z"
             zmin = min([b.Z.min() for b in blocks])
@@ -580,11 +589,14 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
             pbar.set_description(f"Checking connections block {face1.blockIndex} with {face2.blockIndex}")
             # Shift block 1 -> Check periodicity -> if not periodic -> shift Block 1 opposite direction -> Check periodicity
             #   Rotate Block 1
+            block1 = blocks[face1.blockIndex]
             block1_shifted = blocks_shifted[face1.blockIndex]
             block2 = blocks[face2.blockIndex]
+            block2_shifted = blocks_shifted[face2.blockIndex]
+
             #   Check periodicity
-            _, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_shifted, block2,periodicity_tol)
-            
+            _, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_shifted, block2,periodicity_tol)                           
+
             if len(periodic_faces_temp) > 0:
                 lower_connected_faces.pop(0)
                 upper_connected_faces.pop(indx)
@@ -597,6 +609,21 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
                 periodic_found = True
                 pbar.update(1)
                 break
+            else:
+                # Try the other way 
+                _, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1,block2_shifted,periodicity_tol)
+                if len(periodic_faces_temp) > 0:
+                    lower_connected_faces.pop(0)
+                    upper_connected_faces.pop(indx)
+                    periodic_faces.append(periodic_faces_temp)
+                    periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1, block2_shifted))
+                    lower_split_faces = [s for s in split_faces_temp if s.BlockIndex in lower_blocks]
+                    upper_split_faces = [s for s in split_faces_temp if s.BlockIndex in upper_blocks]
+                    lower_connected_faces.extend(lower_split_faces)
+                    upper_connected_faces.extend(upper_split_faces)
+                    periodic_found = True
+                    pbar.update(1)
+                    break
     
         if periodic_found == False:
             # Lets switch the order 
@@ -609,8 +636,7 @@ def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dic
         print(f"\nNot periodic {translational_direction}")
     else:
         print(f"\nPeriodic {translational_direction}")
-
-                        
+        
     # remove any duplicate periodic face pairs 
     indx_to_remove = list()
     for i in range(len(periodic_faces)):

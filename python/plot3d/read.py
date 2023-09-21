@@ -4,6 +4,7 @@ import struct
 from typing import List
 from .block import Block
 from scipy.io import FortranFile
+from tqdm import trange
 
 def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=False,read_double:bool=True):
     """Reads and formats a binary chunk of data into a plot3D block
@@ -28,29 +29,45 @@ def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=Fal
                     A[i,j,k] = struct.unpack(">f",f.read(4))[0] if big_endian else struct.unpack("<f",f.read(4))[0]
     return A
 
-def __read_plot3D_chunk_ASCII(tokenArray:List[str],offset:int,IMAX:int,JMAX:int,KMAX:int):
-    """Reads an ascii chunk of plot3D data into a block 
+def read_word(f):
+    """Continously read a word from an ascii file
 
     Args:
-        tokenArray (List[str]): this is a list of strings separated by a space, new line character removed ["12","22", ... etc]
-        offset (int): how many entries to skip in the array based on block size (IMAX*JMAX*KMAX) of the previous block
+        f (io): file handle
+
+    Yields:
+        float: value from ascii file
+    """
+    for line in f:
+        line = line.strip().replace('\n','').split(' ')
+        tokenArray = [float(entry) for entry in line if entry]
+        for token in tokenArray:
+            yield token
+
+def __read_plot3D_chunk_ASCII(f,IMAX:int,JMAX:int,KMAX:int):
+    """Reads and formats a binary chunk of data into a plot3D block
+
+    Args:
+        f (io): file handle
         IMAX (int): maximum I index
         JMAX (int): maximum J index
-        KMAX (int): maximum K index 
+        KMAX (int): maximum K index
+        big_endian (bool, Optional): Use big endian format for reading binary files. Defaults False.
 
     Returns:
-        numpy.ndarray: Plot3D variable either X,Y, or Z
+        numpy.ndarray: Plot3D variable either X,Y, or Z 
     """
-    '''Works for ASCII files 
-    '''
-    A = np.empty(shape=(IMAX, JMAX, KMAX))
-    for k in range(KMAX):
-        for j in range(JMAX):
-            for i in range(IMAX):
-                A[i,j,k] = tokenArray[offset]
-                offset+=1
+    tokenArray = np.zeros(shape=(IMAX*JMAX*KMAX))
+    i = 0
+    for w in read_word(f):
+        tokenArray[i] = w
+        i+=1
+        if i>len(tokenArray)-1:
+            break
 
-    return A, offset
+    A = np.reshape(tokenArray,newshape=(KMAX,JMAX,IMAX))
+    A = np.transpose(A,[2,1,0])    
+    return A
 
 def read_ap_nasa(filename:str):
     """Reads an AP NASA File and converts it to Block format which can be exported to a plot3d file
@@ -151,17 +168,12 @@ def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False,read_double
                     tokens = [int(w) for w in IJK if w]
                     IMAX.append(tokens[0])
                     JMAX.append(tokens[1])
-                    KMAX.append(tokens[2])
-                
-                lines = [l.replace('\n','').split(' ') for l in f.readlines()] # Basically an array of strings representing numbers
-                lines = [item for sublist in lines for item in sublist]         # Flatten list of lists https://stackabuse.com/python-how-to-flatten-list-of-lists/
- 
-                tokenArray = [float(entry) for entry in lines if entry] # Convert everything to float 
-                offset = 0
-                for b in range(nblocks):
-                    X, offset = __read_plot3D_chunk_ASCII(tokenArray,offset,IMAX[b],JMAX[b],KMAX[b])
-                    Y, offset = __read_plot3D_chunk_ASCII(tokenArray,offset,IMAX[b],JMAX[b],KMAX[b])
-                    Z, offset = __read_plot3D_chunk_ASCII(tokenArray,offset,IMAX[b],JMAX[b],KMAX[b])
+                    KMAX.append(tokens[2])            
+
+                for b in trange(nblocks):
+                    X = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
+                    Y = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
+                    Z = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
                     b_temp = Block(X,Y,Z)                    
                     blocks.append(b_temp)
     return blocks
