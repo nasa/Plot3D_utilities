@@ -1,7 +1,5 @@
 import sys, os, pickle
 sys.path.insert(0,'../../')
-from plot3d import read_plot3D, connectivity_fast,translational_periodicity, write_plot3D, Direction, split_blocks, block_connection_matrix, find_bounding_faces
-from plot3d import outer_face_dict_to_list, match_faces_dict_to_list
 import numpy as np
 import numpy.typing as npt
 import networkx as nx 
@@ -38,7 +36,7 @@ def block_to_graph(IMAX:int,JMAX:int,KMAX:int,offset:int = 0):
     return G
 
 
-def getFaceVertexIndicies(IMIN:int,IMAX:int,JMIN:int,JMAX:int,KMIN:int,KMAX:int,block_size:Tuple[int,int,int]) -> npt.NDArray:
+def get_face_vertex_indices(IMIN:int,IMAX:int,JMIN:int,JMAX:int,KMIN:int,KMAX:int,block_size:Tuple[int,int,int]) -> npt.NDArray:
     """Returns an array containing the vertex number of a given face 
 
     Args:
@@ -48,16 +46,18 @@ def getFaceVertexIndicies(IMIN:int,IMAX:int,JMIN:int,JMAX:int,KMIN:int,KMAX:int,
         JMAX (int): ending J index
         KMIN (int): starting K index
         KMAX (int): ending K index
-        block_size (Tuple[int,int,int]): This is the actual IMAX,JMAX,KMAX of the block 
+        block_size (Tuple[int,int,int]): This is the actual IMAX,JMAX,KMAX of the block
+        
+    
     Returns:
-        npt.NDArray: _description_
+        npt.NDArray: an array containing all the vertices 
     """
 
     def create_range(indx1,indx2):
         if indx1<indx2:
             return np.arange(indx1,indx2)
         else:
-            return np.arange(indx2-1,indx1-1,-1)
+            return np.arange(indx1-1,indx2-1,-1)
         
     indices = list()
     if IMIN==IMAX:
@@ -92,21 +92,18 @@ def getFaceVertexIndicies(IMIN:int,IMAX:int,JMIN:int,JMAX:int,KMIN:int,KMAX:int,
             offset = 0 
         for j in jrange:
             indices.append(offset+block_size[0]*j + irange)
-    return indices
+    return np.array(indices).flatten()
     
     
 def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[int,int,int]],connectivities:List[Dict[str,int]]):
-    """_summary_
+    """Convert plot3d defined connectivity into additional graph edges 
 
     Args:
-        G (nx.classes.graph.Graph): _description_
+        G (nx.classes.graph.Graph): Giant graph 
         block_sizes (List[Tuple[int,int,int]]): _description_
         connectivity (List[Dict[str,int]]): _description_
     """
     
-    
-    
-            
     for con in connectivities: 
         block1_index = con['block1']['index']
         block2_index = con['block2']['index']
@@ -124,9 +121,10 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
         assert nodes1 == nodes2, f"Number of connections from {block1_index} I[{IMIN1},{IMAX1}], J[{JMIN1},{JMAX1}], K[{KMIN1},{KMAX1}] to {block2_index} I[{IMIN2},{IMAX2}], J[{JMIN2},{JMAX2}], K[{KMIN2},{KMAX2}] should match."
         
 
-        # shift1 = getStartingVIndex(block1_index)
-        # shift2 = getStartingVIndex(block2_index)
-        
+        shift1 = getStartingVIndex(block1_index)
+        shift2 = getStartingVIndex(block2_index)
+        get_face_vertex_indices(IMIN1,IMAX1,JMIN1,JMAX1,KMIN1,KMAX1)
+
         
         G.add_edge(F,T)
 
@@ -140,54 +138,58 @@ G1 = block_to_graph(IMAX,JMAX,KMAX)
 G2 = block_to_graph(IMAX,JMAX,KMAX,IMAX*JMAX*KMAX)
 
 #%% Test get face vertex indices 
-indices_imin_face = getFaceVertexIndicies(0,0,0,JMAX,0,KMAX,(IMAX,JMAX,KMAX))       # Constant IMIN Face
-indices_imax_face = getFaceVertexIndicies(IMAX,IMAX,0,JMAX,0,KMAX,(IMAX,JMAX,KMAX)) # Constant IMAX Face
+indices_imin_face = get_face_vertex_indices(0,0,0,JMAX,0,KMAX,(IMAX,JMAX,KMAX))       # Constant IMIN Face
+indices_imax_face = get_face_vertex_indices(IMAX,IMAX,0,JMAX,0,KMAX,(IMAX,JMAX,KMAX)) # Constant IMAX Face
 
-indices_jmin_face = getFaceVertexIndicies(0,IMAX,0,0,0,KMAX,(IMAX,JMAX,KMAX))       # Constant JMIN Face
-indices_jmax_face = getFaceVertexIndicies(0,IMAX,JMAX,JMAX,0,KMAX,(IMAX,JMAX,KMAX)) # Constant JMAX Face
+indices_jmin_face = get_face_vertex_indices(0,IMAX,0,0,0,KMAX,(IMAX,JMAX,KMAX))       # Constant JMIN Face
+indices_jmax_face = get_face_vertex_indices(0,IMAX,JMAX,JMAX,0,KMAX,(IMAX,JMAX,KMAX)) # Constant JMAX Face
 
-indices_kmin_face = getFaceVertexIndicies(0,IMAX,0,JMAX,0,0,(IMAX,JMAX,KMAX))       # Constant KMIN Face
-indices_kmax_face = getFaceVertexIndicies(0,IMAX,0,JMAX,KMAX,KMAX,(IMAX,JMAX,KMAX)) # Constant KMAX Face
+indices_kmin_face = get_face_vertex_indices(0,IMAX,0,JMAX,0,0,(IMAX,JMAX,KMAX))       # Constant KMIN Face
+indices_kmax_face = get_face_vertex_indices(0,IMAX,0,JMAX,KMAX,KMAX,(IMAX,JMAX,KMAX)) # Constant KMAX Face
 
+indices_jmin_face_reverseI = get_face_vertex_indices(IMAX,0,0,0,0,KMAX,(IMAX,JMAX,KMAX))       # Constant JMIN Face, reversing direction of I
 #%% Test Connectivity 
-
-
+G1 = block_to_graph(IMAX,JMAX,KMAX)
+G2 = block_to_graph(IMAX,JMAX,KMAX,IMAX*JMAX*KMAX)
 G = nx.compose_all([G1,G2])
+
 block_sizes = [(IMAX,JMAX,KMAX),(IMAX,JMAX,KMAX)]
+
 # Block 0 and Block 0 share a top face
-connectivity = [{
+interblock_k_connectivity = [{
     'block1': 
             {
                 'index':0,
-                'IMIN':0,'IMAX':6,
-                'JMIN':0,'JMAX':6,
+                'IMIN':0,'IMAX':IMAX,
+                'JMIN':0,'JMAX':JMAX,
                 'KMIN':0,'KMAX':0
             },
     'block2': 
             {
                 'index':0,
-                'IMIN':0,'IMAX':6,
-                'JMIN':0,'JMAX':6,
-                'KMIN':3,'KMAX':3
+                'IMIN':0,'IMAX':IMAX,
+                'JMIN':0,'JMAX':JMAX,
+                'KMIN':KMAX,'KMAX':KMAX
             }
     }]
 
-connectivity.append({
+interblock_i_connectivity = [{
     'block1': 
             {
                 'index':0,
-                'IMIN':6,'IMAX':6,
-                'JMIN':0,'JMAX':6,
-                'KMIN':0,'KMAX':3
+                'IMIN':0,'IMAX':0,
+                'JMIN':0,'JMAX':JMAX,
+                'KMIN':0,'KMAX':KMAX
             },
     'block2': 
             {
-                'index':1,
-                'IMIN':0,'IMAX':0,
-                'JMIN':0,'JMAX':6,
-                'KMIN':0,'KMAX':3
+                'index':0,
+                'IMIN':IMAX,'IMAX':IMAX,
+                'JMIN':0,'JMAX':JMAX,
+                'KMIN':0,'KMAX':KMAX
             }
-    })
+}]
+
 
 
 # IMAX, JMAX, KMAX = block[0].IMAX, block[0].JMAX, block[0].KMAX
