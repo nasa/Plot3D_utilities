@@ -5,7 +5,7 @@ import numpy.typing as npt
 import networkx as nx 
 from typing import Dict, Tuple, List
 
-def block_to_graph(IMAX:int,JMAX:int,KMAX:int,offset:int = 0):
+def block_to_graph(IMAX:int,JMAX:int,KMAX:int,offset:int = 0) -> nx.graph.Graph:
     """Converts a block to a graph
 
     Args:
@@ -15,7 +15,7 @@ def block_to_graph(IMAX:int,JMAX:int,KMAX:int,offset:int = 0):
         offset (int): IMAX*JMAX*KMAX of previous block 
 
     Returns:
-        G: networkx graph object 
+        nx.graph.Graph: networkx graph object 
     """
     G = nx.Graph()
     irange = np.arange(IMAX)
@@ -93,42 +93,57 @@ def get_face_vertex_indices(IMIN:int,IMAX:int,JMIN:int,JMAX:int,KMIN:int,KMAX:in
         for j in jrange:
             indices.append(offset+block_size[0]*j + irange)
     return np.array(indices).flatten()
-    
-    
-def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[int,int,int]],connectivities:List[Dict[str,int]]):
+
+def get_starting_vertex(blockIndex:int,block_sizes:List[Tuple[int,int,int]]) -> int:
+    """Gets the starting vertex index of the block
+
+    Args:
+        blockIndex (int): index of block
+        block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] 
+
+    Returns:
+        int: offset
+    """
+    offset = 0 
+    for i in range(blockIndex):
+        offset+=block_sizes[i][0]*block_sizes[i][1]*block_sizes[i][2]
+    return offset
+
+def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[int,int,int]],connectivities:List[Dict[str,int]]) -> nx.graph.Graph:
     """Convert plot3d defined connectivity into additional graph edges 
 
     Args:
         G (nx.classes.graph.Graph): Giant graph 
         block_sizes (List[Tuple[int,int,int]]): _description_
         connectivity (List[Dict[str,int]]): _description_
+    
+    Returns:
+        nx.graph.Graph: networkx graph object with added edges 
     """
     
     for con in connectivities: 
         block1_index = con['block1']['index']
         block2_index = con['block2']['index']
-        IMIN1,IMAX1 = con['block1']['index']['IMIN'], con['block1']['index']['IMAX']
-        JMIN1,JMAX1 = con['block1']['index']['IMIN'], con['block1']['index']['IMAX']
-        KMIN1,KMAX1 = con['block1']['index']['IMIN'], con['block1']['index']['IMAX']
+        IMIN1,IMAX1 = con['block1']['IMIN'], con['block1']['index']['IMAX']
+        JMIN1,JMAX1 = con['block1']['JMIN'], con['block1']['JMAX']
+        KMIN1,KMAX1 = con['block1']['KMIN'], con['block1']['KMAX']
         
-        IMIN2,IMAX2 = con['block1']['index']['IMIN'], con['block1']['index']['IMAX']
-        JMIN2,JMAX2 = con['block1']['index']['IMIN'], con['block1']['index']['IMAX']
-        KMIN2,KMAX2 = con['block1']['index']['IMIN'], con['block1']['index']['IMAX']
+        IMIN2,IMAX2 = con['block2']['IMIN'], con['block2']['IMAX']
+        JMIN2,JMAX2 = con['block2']['JMIN'], con['block2']['JMAX']
+        KMIN2,KMAX2 = con['block2']['KMIN'], con['block2']['KMAX']
         
         # Number of connectivities should match
         nodes1 = (IMAX1-IMIN1)*(JMAX1-JMIN1)*(KMAX1-KMIN1)
         nodes2 = (IMAX2-IMIN2)*(JMAX2-JMIN2)*(KMAX2-KMIN2)
         assert nodes1 == nodes2, f"Number of connections from {block1_index} I[{IMIN1},{IMAX1}], J[{JMIN1},{JMAX1}], K[{KMIN1},{KMAX1}] to {block2_index} I[{IMIN2},{IMAX2}], J[{JMIN2},{JMAX2}], K[{KMIN2},{KMAX2}] should match."
         
+        face1 = get_face_vertex_indices(IMIN1,IMAX1,JMIN1,JMAX1,KMIN1,KMAX1) + get_starting_vertex(block1_index, block_sizes)
+        face2 = get_face_vertex_indices(IMIN1,IMAX1,JMIN1,JMAX1,KMIN1,KMAX1) + get_starting_vertex(block2_index, block_sizes)
 
-        shift1 = getStartingVIndex(block1_index)
-        shift2 = getStartingVIndex(block2_index)
-        get_face_vertex_indices(IMIN1,IMAX1,JMIN1,JMAX1,KMIN1,KMAX1)
-
-        
-        G.add_edge(F,T)
-
-    block_sizes[connectivity]
+        for i in range(len(face1)):
+            G.add_edge(face1[i],face2[i])
+            
+    return G
 
 #%% Example of a 6x6 block 
 IMAX = 4
@@ -190,11 +205,11 @@ interblock_i_connectivity = [{
             }
 }]
 
-
-
+block_sizes=[(IMAX,JMAX,KMAX), (IMAX,JMAX,KMAX)]
+G = add_connectivity_to_graph(G,block_sizes,interblock_i_connectivity)
+G = add_connectivity_to_graph(G,block_sizes,interblock_i_connectivity)
 # IMAX, JMAX, KMAX = block[0].IMAX, block[0].JMAX, block[0].KMAX
-graphs = list() 
-graphs.append(G)
+
 
 print('done')
     
