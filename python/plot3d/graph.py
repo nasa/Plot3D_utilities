@@ -35,15 +35,15 @@ def block_to_graph(IMAX:int,JMAX:int,KMAX:int,offset:int = 0) -> nx.graph.Graph:
         nx.add_star(G, offset + p + IMAX*JMAX*krange)
     return G
 
-def get_face_vertex_indices(IMIN:int,IMAX:int,JMIN:int,JMAX:int,KMIN:int,KMAX:int,block_size:Tuple[int,int,int]) -> npt.NDArray:
+def get_face_vertex_indices(IMIN:int,JMIN:int,KMIN:int,IMAX:int,JMAX:int,KMAX:int,block_size:Tuple[int,int,int]) -> npt.NDArray:
     """Returns an array containing the vertex number of a given face 
 
     Args:
         IMIN (int): starting I index
-        IMAX (int): ending I index
         JMIN (int): starting J index
-        JMAX (int): ending J index
         KMIN (int): starting K index
+        IMAX (int): ending I index
+        JMAX (int): ending J index
         KMAX (int): ending K index
         block_size (Tuple[int,int,int]): This is the actual IMAX,JMAX,KMAX of the block
     
@@ -62,13 +62,13 @@ def get_face_vertex_indices(IMIN:int,IMAX:int,JMIN:int,JMAX:int,KMIN:int,KMAX:in
         jrange = create_range(JMIN,JMAX)
         krange = create_range(KMIN,KMAX)
         if IMIN==block_size[0]: # IMIN is really IMAX
-            for k in krange:
-                k_offset = k*block_size[0]*block_size[1]    # IMAX * JMAX
-                indices.append(k_offset + block_size[0]*(jrange+1)-1)
+            for j in jrange:
+                j_offset = j*block_size[0]    # IMAX * JMAX
+                indices.append(j_offset + block_size[0]*block_size[1]*krange + IMAX-1)
         else:
-            for k in krange:
-                k_offset = k*block_size[0]*block_size[1]
-                indices.append(k_offset + block_size[0]*jrange)
+            for j in jrange:
+                j_offset = j*block_size[0]
+                indices.append(j_offset + block_size[0]*block_size[1]*krange)
         
     elif JMIN == JMAX:
         irange = create_range(IMIN,IMAX)
