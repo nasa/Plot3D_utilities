@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>plot3d.blockfunctions &#8212; Plot3D 1.6.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=452006c5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -49,7 +46,9 @@
 <span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
 <span class="kn">from</span> <span class="nn">.face</span> <span class="kn">import</span> <span class="n">Face</span>
 
-<div class="viewcode-block" id="rotate_block"><a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.rotate_block">[docs]</a><span class="k">def</span> <span class="nf">rotate_block</span><span class="p">(</span><span class="n">block</span><span class="p">,</span><span class="n">rotation_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+<div class="viewcode-block" id="rotate_block">
+<a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.rotate_block">[docs]</a>
+<span class="k">def</span> <span class="nf">rotate_block</span><span class="p">(</span><span class="n">block</span><span class="p">,</span><span class="n">rotation_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotates a block by a rotation matrix </span>
 
 <span class="sd">    Args:</span>
@@ -82,7 +81,10 @@
                 
     <span class="k">return</span> <span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="reduce_blocks"><a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.reduce_blocks">[docs]</a><span class="k">def</span> <span class="nf">reduce_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">factor</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+
+<div class="viewcode-block" id="reduce_blocks">
+<a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.reduce_blocks">[docs]</a>
+<span class="k">def</span> <span class="nf">reduce_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">factor</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;reduce the blocks by a factor of (factor)</span>
 
 <span class="sd">    Args:</span>
@@ -99,7 +101,10 @@
         <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">KMAX</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span>
     <span class="k">return</span> <span class="n">blocks</span></div>
 
-<div class="viewcode-block" id="get_outer_bounds"><a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.get_outer_bounds">[docs]</a><span class="k">def</span> <span class="nf">get_outer_bounds</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+
+<div class="viewcode-block" id="get_outer_bounds">
+<a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.get_outer_bounds">[docs]</a>
+<span class="k">def</span> <span class="nf">get_outer_bounds</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get outer bounds for a set of blocks</span>
 
 <span class="sd">    Args:</span>
@@ -143,7 +148,10 @@
     
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">xbounds</span><span class="p">),</span><span class="nb">tuple</span><span class="p">(</span><span class="n">ybounds</span><span class="p">),</span><span class="nb">tuple</span><span class="p">(</span><span class="n">zbounds</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="block_connection_matrix"><a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.block_connection_matrix">[docs]</a><span class="k">def</span> <span class="nf">block_connection_matrix</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="p">[],</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-8</span><span class="p">):</span>
+
+<div class="viewcode-block" id="block_connection_matrix">
+<a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.block_connection_matrix">[docs]</a>
+<span class="k">def</span> <span class="nf">block_connection_matrix</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="p">[],</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-8</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a matrix representing how block edges are connected to each other </span>
 
 <span class="sd">    Args:</span>
@@ -218,6 +226,7 @@
                 <span class="n">connectivity</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
                 <span class="n">connectivity</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>      
     <span class="k">return</span> <span class="n">connectivity</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -226,7 +235,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
@@ -234,7 +243,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -255,8 +264,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>

@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>plot3d.connectivity &#8212; Plot3D 1.6.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=452006c5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -54,7 +51,9 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 
 
-<div class="viewcode-block" id="find_matching_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks">[docs]</a><span class="k">def</span> <span class="nf">find_matching_blocks</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block1_outer</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">block2_outer</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>  
+<div class="viewcode-block" id="find_matching_blocks">
+<a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks">[docs]</a>
+<span class="k">def</span> <span class="nf">find_matching_blocks</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block1_outer</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">block2_outer</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>  
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes two blocks and finds all matching pairs</span>
 
 <span class="sd">    Args:</span>
@@ -108,7 +107,10 @@
 
     <span class="k">return</span> <span class="n">block_match_indices</span><span class="p">,</span> <span class="n">block1_outer</span><span class="p">,</span> <span class="n">block2_outer</span> <span class="c1"># Remove duplicates using set and list </span></div>
 
-<div class="viewcode-block" id="select_multi_dimensional"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.select_multi_dimensional">[docs]</a><span class="k">def</span> <span class="nf">select_multi_dimensional</span><span class="p">(</span><span class="n">T</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">dim1</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span><span class="n">dim2</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">dim3</span><span class="p">:</span><span class="nb">tuple</span><span class="p">):</span>
+
+<div class="viewcode-block" id="select_multi_dimensional">
+<a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.select_multi_dimensional">[docs]</a>
+<span class="k">def</span> <span class="nf">select_multi_dimensional</span><span class="p">(</span><span class="n">T</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">dim1</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span><span class="n">dim2</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">dim3</span><span class="p">:</span><span class="nb">tuple</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes a block (T) and selects X,Y,Z from the block given a face&#39;s dimensions</span>
 <span class="sd">        theres really no good way to do this in python </span>
 <span class="sd">        </span>
@@ -131,7 +133,10 @@
     
     <span class="k">return</span> <span class="n">T</span><span class="p">[</span><span class="n">dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim2</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim3</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">dim3</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span></div>
 
-<div class="viewcode-block" id="get_face_intersection"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.get_face_intersection">[docs]</a><span class="k">def</span> <span class="nf">get_face_intersection</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get_face_intersection">
+<a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.get_face_intersection">[docs]</a>
+<span class="k">def</span> <span class="nf">get_face_intersection</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the index of the intersection between two faces located on two different blocks </span>
 <span class="sd">        Face1 needs to be the smaller face. </span>
 
@@ -284,6 +289,7 @@
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span> <span class="c1"># set df to empty dataframe</span>
     <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">split_faces1</span><span class="p">,</span> <span class="n">split_faces2</span></div>
 
+
 <span class="k">def</span> <span class="nf">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span><span class="n">key1</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filters dataframe results of get_face_intersection to make sure both key1 is increasing. </span>
 <span class="sd">        When searching through a plot3D we check based on the planes e.g. const i, j, or k </span>
@@ -344,7 +350,9 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
     
-<div class="viewcode-block" id="combinations_of_nearest_blocks"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks">[docs]</a><span class="k">def</span> <span class="nf">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">nearest_nblocks</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<div class="viewcode-block" id="combinations_of_nearest_blocks">
+<a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks">[docs]</a>
+<span class="k">def</span> <span class="nf">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">nearest_nblocks</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the indices of the nearest 6 blocks based on their centroid</span>
 
 <span class="sd">    Args:</span>
@@ -374,8 +382,11 @@
             <span class="k">if</span> <span class="n">distance_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">10000</span><span class="p">:</span>
                 <span class="n">new_combos</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">new_combos</span></div>
+
     
-<div class="viewcode-block" id="connectivity_fast"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity_fast">[docs]</a><span class="k">def</span> <span class="nf">connectivity_fast</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+<div class="viewcode-block" id="connectivity_fast">
+<a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity_fast">[docs]</a>
+<span class="k">def</span> <span class="nf">connectivity_fast</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity </span>
 
 <span class="sd">    Args:</span>
@@ -421,7 +432,10 @@
         <span class="n">outer_faces_formatted</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
     <span class="k">return</span> <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span></div>
 
-<div class="viewcode-block" id="connectivity"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity">[docs]</a><span class="k">def</span> <span class="nf">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+
+<div class="viewcode-block" id="connectivity">
+<a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity">[docs]</a>
+<span class="k">def</span> <span class="nf">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces </span>
 
 <span class="sd">    Args:</span>
@@ -524,7 +538,10 @@
 
     <span class="k">return</span> <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span>  </div>
 
-<div class="viewcode-block" id="face_matches_to_dict"><a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.face_matches_to_dict">[docs]</a><span class="k">def</span> <span class="nf">face_matches_to_dict</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
+
+<div class="viewcode-block" id="face_matches_to_dict">
+<a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.face_matches_to_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">face_matches_to_dict</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Makes sure the diagonal of face 1 match the diagonal of face 2</span>
 
 <span class="sd">    Args:</span>
@@ -606,6 +623,7 @@
     <span class="k">match</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;J&#39;</span><span class="p">])</span>
     <span class="k">match</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;K&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">match</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -614,7 +632,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
@@ -622,7 +640,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -643,8 +661,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>

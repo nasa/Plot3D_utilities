@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "plot3d"
-version = "1.6.3"
+version = "1.6.4"
 description = "Plot3D python utilities for reading and writing and also finding connectivity between blocks"
 authors = ["Paht Juangphanich <paht.juangphanich@nasa.gov>"]
 
@@ -10,6 +10,7 @@ numpy = "*"
 scipy = "*"
 pandas = "*"
 tqdm = "*"
+networkx = "*"
 
 [tool.poetry.dev-dependencies]
 
