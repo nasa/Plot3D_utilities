@@ -10,3 +10,4 @@ from .periodicity import periodicity, periodicity_fast, create_rotation_matrix, 
 from .point_match import point_match
 from .split_block import split_blocks, Direction
 from .listfunctions import unique_pairs
+from .graph import block_to_graph,get_face_vertex_indices,get_starting_vertex,add_connectivity_to_graph
