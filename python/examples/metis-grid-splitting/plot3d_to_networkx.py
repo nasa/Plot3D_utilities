@@ -3,6 +3,7 @@ sys.path.insert(0,'../../')
 import numpy as np
 import numpy.typing as npt
 import networkx as nx 
+import itertools as it
 from typing import Dict, Tuple, List
 
 def block_to_graph(IMAX:int,JMAX:int,KMAX:int,offset:int = 0) -> nx.graph.Graph:
@@ -132,17 +133,29 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
         KMIN2,KMAX2 = con['block2']['KMIN'], con['block2']['KMAX']
         
         # Number of connectivities should match
-        if block1_index == block2_index:
-            face1 = get_face_vertex_indices(IMIN1,IMAX1,JMIN1,JMAX1,KMIN1,KMAX1,block_sizes[block1_index]) + get_starting_vertex(block1_index, block_sizes[block1_index])
-            
-            face2 = get_face_vertex_indices(IMIN2,IMAX2,JMIN2,JMAX2,KMIN2,KMAX2,block_sizes[block2_index]) + get_starting_vertex(block2_index, block_sizes[block2_index])
+        face1 = get_face_vertex_indices(IMIN1,IMAX1,JMIN1,JMAX1,KMIN1,KMAX1,block_sizes[block1_index]) + get_starting_vertex(block1_index, block_sizes)    
+        face2 = get_face_vertex_indices(IMIN2,IMAX2,JMIN2,JMAX2,KMIN2,KMAX2,block_sizes[block2_index]) + get_starting_vertex(block2_index, block_sizes)
         
+        if block1_index!= block2_index:
+            nodes_to_add = face1
+            nodes_to_replace = face2
+            for node_to_add,node_to_replace in zip(nodes_to_add,nodes_to_replace):
+                G.add_edges_from(
+                    it.product(
+                        G.neighbors(node_to_add),
+                        G.neighbors(node_to_replace)
+                        )
+                )
+                G.remove_node(node_to_replace)
+                
         assert len(face1) == len(face2), f"Number of connections from {block1_index} I[{IMIN1},{IMAX1}], J[{JMIN1},{JMAX1}], K[{KMIN1},{KMAX1}] to {block2_index} I[{IMIN2},{IMAX2}], J[{JMIN2},{JMAX2}], K[{KMIN2},{KMAX2}] should match."
         
         for i in range(len(face1)):
             G.add_edge(face1[i],face2[i])
             
     return G
+
+
 
 #%% Example of a 6x6 block 
 IMAX = 4
@@ -151,8 +164,12 @@ KMAX = 3
 G1 = block_to_graph(IMAX,JMAX,KMAX)
 G2 = block_to_graph(IMAX,JMAX,KMAX,IMAX*JMAX*KMAX)
 
+#%% Flatten Test
+A = np.arange(IMAX*JMAX*KMAX).reshape((IMAX,JMAX,KMAX),order='F')
+A_flat = A.flatten(order='F')
+
 #%% Test get face vertex indices 
-indices_imin_face = get_face_vertex_indices(0,0,0,JMAX,0,KMAX,(IMAX,JMAX,KMAX))       # Constant IMIN Face
+indices_imin_face = get_face_vertex_indices(0,0,0,IMAX,0,KMAX,(IMAX,JMAX,KMAX))       # Constant IMIN Face
 indices_imax_face = get_face_vertex_indices(IMAX,IMAX,0,JMAX,0,KMAX,(IMAX,JMAX,KMAX)) # Constant IMAX Face
 
 indices_jmin_face = get_face_vertex_indices(0,IMAX,0,0,0,KMAX,(IMAX,JMAX,KMAX))       # Constant JMIN Face
@@ -223,7 +240,12 @@ block_to_block_connectivity = [{
 block_sizes=[(IMAX,JMAX,KMAX), (IMAX,JMAX,KMAX)]
 G = add_connectivity_to_graph(G,block_sizes,interblock_i_connectivity)
 G = add_connectivity_to_graph(G,block_sizes,interblock_k_connectivity)
+
+# Block to Block connectivity 
+G1 = block_to_graph(IMAX,JMAX,KMAX)
+G2 = block_to_graph(IMAX,JMAX,KMAX,IMAX*JMAX*KMAX)
+G = nx.compose_all([G1,G2])
+G = add_connectivity_to_graph(G,block_sizes,block_to_block_connectivity)
 # IMAX, JMAX, KMAX = block[0].IMAX, block[0].JMAX, block[0].KMAX
 
 print('done')
-    
