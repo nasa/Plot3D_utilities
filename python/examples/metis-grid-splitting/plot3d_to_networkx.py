@@ -2,7 +2,10 @@ import sys
 sys.path.insert(0,'../../')
 import numpy as np
 import networkx as nx 
+from plot3d import read_plot3D
 from plot3d.graph import block_to_graph, get_face_vertex_indices, add_connectivity_to_graph
+
+# blocks = read_plot3D('VSPT_ASCII.xyz',binary=False,read_double=False)
 
 
 #%% Example of a 6x6 block 
@@ -13,8 +16,9 @@ G1 = block_to_graph(IMAX,JMAX,KMAX)
 G2 = block_to_graph(IMAX,JMAX,KMAX,IMAX*JMAX*KMAX)
 
 #%% Flatten Test
-A = np.arange(IMAX*JMAX*KMAX).reshape((IMAX,JMAX,KMAX),order='F')
-A_flat = A.flatten(order='F')
+A = np.arange(IMAX*JMAX*KMAX).reshape((KMAX,JMAX,IMAX))
+A = np.transpose(A,[2,1,0]) 
+A_flat = A.flatten()
 
 #%% Test get face vertex indices 
 indices_imin_face = get_face_vertex_indices(0,0,0,IMAX,0,KMAX,(IMAX,JMAX,KMAX))       # Constant IMIN Face

@@ -1,17 +1,20 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Block to Block Connectivity &#8212; Plot3D 1.6.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <title>Block to Block Connectivity &#8212; Plot3D 1.6.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
-    <script src="../_static/documentation_options.js?v=72d88caf"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -33,7 +36,7 @@
         <li class="right" >
           <a href="reading_writing.html" title="Reading and Writing Plot3D Files"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.3 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Block to Block Connectivity</a></li> 
       </ul>
     </div>  
@@ -44,7 +47,7 @@
           <div class="body" role="main">
             
   <section id="block-to-block-connectivity">
-<h1>Block to Block Connectivity<a class="headerlink" href="#block-to-block-connectivity" title="Link to this heading">¶</a></h1>
+<h1>Block to Block Connectivity<a class="headerlink" href="#block-to-block-connectivity" title="Permalink to this heading">¶</a></h1>
 <p>Computational Grids are often divided into blocks for easier gridding. It is important to know how these blocks connect with each other in order to model the transfer of information. Computational Fluid Dynamics (CFD) requires the solver to know the “connectivity” of these blocks.</p>
 <p>The plot3D python library has a function for determining the connectivity. This is found by taking the combination of each block with another block and scanning the nodes on the exterior faces of block 1 with the exterior face of block 2. If there is a match then the two faces are connected. The code can search for <em>full face matches</em> or <em>partial matching</em>. <em>Full face matching</em> is much faster and should be used if your grid has a definite match.</p>
 <p>Below is an example of a turbine domain with two blocks: HGrid in (red) and ogrid in (white). The two share a connected face with partial matching. There’s also the o-mesh which within itself has a connected face.</p>
@@ -67,7 +70,7 @@
 <a class="reference internal image-reference" href="../_images/turbine_domain-matching1-1.png"><img alt="matching block 1 and block 2 faces" src="../_images/turbine_domain-matching1-1.png" style="width: 800px;" /></a>
 </figure>
 <section id="plotting-connectivity-using-paraview">
-<h2>Plotting Connectivity using Paraview<a class="headerlink" href="#plotting-connectivity-using-paraview" title="Link to this heading">¶</a></h2>
+<h2>Plotting Connectivity using Paraview<a class="headerlink" href="#plotting-connectivity-using-paraview" title="Permalink to this heading">¶</a></h2>
 <p>This example shows how you can take a mesh created Numeca Autogrid and plot the connecitivity using paraview. With this information, anyone should be able to comprehend the format and export it to whatever solver.
 This code has been tested using paraview 5.9. Modifications may need to be added for Paraview 5.10</p>
 <div class="admonition note">
@@ -79,7 +82,7 @@ You do not have full access to this library, so pip installs won’t work. This 
 <p><strong>Part 2</strong> the other code runs from paraview’s python environment.</p>
 </div>
 <section id="part-1-processing-the-data-locally-for-paraview-import">
-<h3>Part 1 - Processing the data locally for paraview import<a class="headerlink" href="#part-1-processing-the-data-locally-for-paraview-import" title="Link to this heading">¶</a></h3>
+<h3>Part 1 - Processing the data locally for paraview import<a class="headerlink" href="#part-1-processing-the-data-locally-for-paraview-import" title="Permalink to this heading">¶</a></h3>
 <p>The goal if this code is to create a pickle file that is read in part 2. This pickle file contains the matching faces and outer faces.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
 <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
@@ -103,7 +106,7 @@ You do not have full access to this library, so pip installs won’t work. This 
 </div>
 </section>
 <section id="part-2-calling-paraview-in-script-mode">
-<h3>Part 2 - Calling Paraview in script mode<a class="headerlink" href="#part-2-calling-paraview-in-script-mode" title="Link to this heading">¶</a></h3>
+<h3>Part 2 - Calling Paraview in script mode<a class="headerlink" href="#part-2-calling-paraview-in-script-mode" title="Permalink to this heading">¶</a></h3>
 <p>This part of the code shows how you can read the pickle file in part 1 from within paraview to display all your plots.</p>
 <p>This code was tested with Paraview version 5.9 <a class="reference external" href="https://www.paraview.org/download/">https://www.paraview.org/download/</a></p>
 <p>Paraview executable can be called with the script option to have it automatically create the plots for you.</p>
@@ -548,13 +551,13 @@ You do not have full access to this library, so pip installs won’t work. This 
         <li class="right" >
           <a href="reading_writing.html" title="Reading and Writing Plot3D Files"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.3 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Block to Block Connectivity</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2023, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.0.
+        &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>
