@@ -47,7 +47,6 @@ def get_face_vertex_indices(IMIN:int,IMAX:int,JMIN:int,JMAX:int,KMIN:int,KMAX:in
         KMIN (int): starting K index
         KMAX (int): ending K index
         block_size (Tuple[int,int,int]): This is the actual IMAX,JMAX,KMAX of the block
-        
     
     Returns:
         npt.NDArray: an array containing all the vertices 
@@ -133,9 +132,10 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
         KMIN2,KMAX2 = con['block2']['KMIN'], con['block2']['KMAX']
         
         # Number of connectivities should match
-        face1 = get_face_vertex_indices(IMIN1,IMAX1,JMIN1,JMAX1,KMIN1,KMAX1,block_sizes[block1_index]) + get_starting_vertex(block1_index, block_sizes[block1_index])
-        
-        face2 = get_face_vertex_indices(IMIN2,IMAX2,JMIN2,JMAX2,KMIN2,KMAX2,block_sizes[block2_index]) + get_starting_vertex(block2_index, block_sizes[block2_index])
+        if block1_index == block2_index:
+            face1 = get_face_vertex_indices(IMIN1,IMAX1,JMIN1,JMAX1,KMIN1,KMAX1,block_sizes[block1_index]) + get_starting_vertex(block1_index, block_sizes[block1_index])
+            
+            face2 = get_face_vertex_indices(IMIN2,IMAX2,JMIN2,JMAX2,KMIN2,KMAX2,block_sizes[block2_index]) + get_starting_vertex(block2_index, block_sizes[block2_index])
         
         assert len(face1) == len(face2), f"Number of connections from {block1_index} I[{IMIN1},{IMAX1}], J[{JMIN1},{JMAX1}], K[{KMIN1},{KMAX1}] to {block2_index} I[{IMIN2},{IMAX2}], J[{JMIN2},{JMAX2}], K[{KMIN2},{KMAX2}] should match."
         
