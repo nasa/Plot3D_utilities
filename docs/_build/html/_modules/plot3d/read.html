@@ -1,16 +1,19 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plot3d.read &#8212; Plot3D 1.6.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b76e3c8a" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
+    <title>plot3d.read &#8212; Plot3D 1.6.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
-    <script src="../../_static/documentation_options.js?v=72d88caf"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -24,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.read</a></li> 
       </ul>
@@ -42,6 +45,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 <span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
 <span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">FortranFile</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
 
 <span class="k">def</span> <span class="nf">__read_plot3D_chunk_binary</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">read_double</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads and formats a binary chunk of data into a plot3D block</span>
@@ -66,33 +70,47 @@
                     <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;f&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">big_endian</span> <span class="k">else</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&lt;f&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">A</span>
 
-<span class="k">def</span> <span class="nf">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span><span class="n">offset</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads an ascii chunk of plot3D data into a block </span>
+<div class="viewcode-block" id="read_word"><a class="viewcode-back" href="../../modules/read.html#plot3d.read.read_word">[docs]</a><span class="k">def</span> <span class="nf">read_word</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Continously read a word from an ascii file</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        tokenArray (List[str]): this is a list of strings separated by a space, new line character removed [&quot;12&quot;,&quot;22&quot;, ... etc]</span>
-<span class="sd">        offset (int): how many entries to skip in the array based on block size (IMAX*JMAX*KMAX) of the previous block</span>
+<span class="sd">        f (io): file handle</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        float: value from ascii file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">tokenArray</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">line</span> <span class="k">if</span> <span class="n">entry</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokenArray</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">token</span></div>
+
+<span class="k">def</span> <span class="nf">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads and formats a binary chunk of data into a plot3D block</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        f (io): file handle</span>
 <span class="sd">        IMAX (int): maximum I index</span>
 <span class="sd">        JMAX (int): maximum J index</span>
-<span class="sd">        KMAX (int): maximum K index </span>
+<span class="sd">        KMAX (int): maximum K index</span>
+<span class="sd">        big_endian (bool, Optional): Use big endian format for reading binary files. Defaults False.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        numpy.ndarray: Plot3D variable either X,Y, or Z</span>
+<span class="sd">        numpy.ndarray: Plot3D variable either X,Y, or Z </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Works for ASCII files </span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">IMAX</span><span class="p">,</span> <span class="n">JMAX</span><span class="p">,</span> <span class="n">KMAX</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KMAX</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">JMAX</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">IMAX</span><span class="p">):</span>
-                <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokenArray</span><span class="p">[</span><span class="n">offset</span><span class="p">]</span>
-                <span class="n">offset</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="n">tokenArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">IMAX</span><span class="o">*</span><span class="n">JMAX</span><span class="o">*</span><span class="n">KMAX</span><span class="p">))</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">read_word</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="n">tokenArray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span>
+        <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">break</span>
 
-    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">offset</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">,</span><span class="n">newshape</span><span class="o">=</span><span class="p">(</span><span class="n">KMAX</span><span class="p">,</span><span class="n">JMAX</span><span class="p">,</span><span class="n">IMAX</span><span class="p">))</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">A</span><span class="p">,[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>    
+    <span class="k">return</span> <span class="n">A</span>
 
-<div class="viewcode-block" id="read_ap_nasa">
-<a class="viewcode-back" href="../../modules/read.html#plot3d.read.read_ap_nasa">[docs]</a>
-<span class="k">def</span> <span class="nf">read_ap_nasa</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="read_ap_nasa"><a class="viewcode-back" href="../../modules/read.html#plot3d.read.read_ap_nasa">[docs]</a><span class="k">def</span> <span class="nf">read_ap_nasa</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads an AP NASA File and converts it to Block format which can be exported to a plot3d file</span>
 <span class="sd">        AP NASA file represents a single block. The first 7 integers are il,jl,kl,ile,ite,jtip,nbld</span>
 <span class="sd">    </span>
@@ -146,10 +164,7 @@
     <span class="k">return</span> <span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">meshx</span><span class="p">,</span><span class="n">Y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span><span class="n">Z</span><span class="o">=</span><span class="n">z</span><span class="p">),</span> <span class="n">nbld</span></div>
 
 
-
-<div class="viewcode-block" id="read_plot3D">
-<a class="viewcode-back" href="../../modules/read.html#plot3d.read.read_plot3D">[docs]</a>
-<span class="k">def</span> <span class="nf">read_plot3D</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">binary</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">read_double</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="read_plot3D"><a class="viewcode-back" href="../../modules/read.html#plot3d.read.read_plot3D">[docs]</a><span class="k">def</span> <span class="nf">read_plot3D</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">binary</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">read_double</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads a plot3d file and returns Blocks</span>
 
 <span class="sd">    Args:</span>
@@ -194,21 +209,15 @@
                     <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">IJK</span> <span class="k">if</span> <span class="n">w</span><span class="p">]</span>
                     <span class="n">IMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">JMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                    <span class="n">KMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-                
-                <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span> <span class="c1"># Basically an array of strings representing numbers</span>
-                <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>         <span class="c1"># Flatten list of lists https://stackabuse.com/python-how-to-flatten-list-of-lists/</span>
- 
-                <span class="n">tokenArray</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="n">entry</span><span class="p">]</span> <span class="c1"># Convert everything to float </span>
-                <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nblocks</span><span class="p">):</span>
-                    <span class="n">X</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">,</span><span class="n">offset</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
-                    <span class="n">Y</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">,</span><span class="n">offset</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
-                    <span class="n">Z</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">,</span><span class="n">offset</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+                    <span class="n">KMAX</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>            
+
+                <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">trange</span><span class="p">(</span><span class="n">nblocks</span><span class="p">):</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+                    <span class="n">Y</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+                    <span class="n">Z</span> <span class="o">=</span> <span class="n">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">JMAX</span><span class="p">[</span><span class="n">b</span><span class="p">],</span><span class="n">KMAX</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
                     <span class="n">b_temp</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">)</span>                    
                     <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b_temp</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">blocks</span></div>
-
 
 
 </pre></div>
@@ -242,14 +251,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.read</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2023, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.0.
+        &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>

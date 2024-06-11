@@ -1,16 +1,19 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plot3d.periodicity &#8212; Plot3D 1.6.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b76e3c8a" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
+    <title>plot3d.periodicity &#8212; Plot3D 1.6.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
-    <script src="../../_static/documentation_options.js?v=72d88caf"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -24,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.periodicity</a></li> 
       </ul>
@@ -49,9 +52,7 @@
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span><span class="p">,</span> <span class="n">tqdm</span>
 <span class="kn">import</span> <span class="nn">math</span> 
 
-<div class="viewcode-block" id="periodicity_fast">
-<a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.periodicity_fast">[docs]</a>
-<span class="k">def</span> <span class="nf">periodicity_fast</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">periodic_direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">nblades</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">55</span><span class="p">):</span>
+<div class="viewcode-block" id="periodicity_fast"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.periodicity_fast">[docs]</a><span class="k">def</span> <span class="nf">periodicity_fast</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">periodic_direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">nblades</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">55</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds the connectivity of blocks when they are rotated by an angle defined by the number of blades. Only use this if your mesh is of an annulus. </span>
 <span class="sd">        This function reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity </span>
 
@@ -148,10 +149,7 @@
         
     <span class="k">return</span> <span class="n">periodic_faces_export</span><span class="p">,</span> <span class="n">outer_faces_export</span><span class="p">,</span> <span class="n">periodic_faces</span><span class="p">,</span> <span class="n">outer_faces_all</span></div>
 
-
-<div class="viewcode-block" id="create_rotation_matrix">
-<a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.create_rotation_matrix">[docs]</a>
-<span class="k">def</span> <span class="nf">create_rotation_matrix</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="create_rotation_matrix"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.create_rotation_matrix">[docs]</a><span class="k">def</span> <span class="nf">create_rotation_matrix</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a rotation matrix given an angle and axis </span>
 
 <span class="sd">    Args:</span>
@@ -178,10 +176,7 @@
 
     <span class="k">return</span> <span class="n">rotation_matrix</span> </div>
 
-
-<div class="viewcode-block" id="periodicity">
-<a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.periodicity">[docs]</a>
-<span class="k">def</span> <span class="nf">periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">periodic_direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">nblades</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">55</span><span class="p">):</span>
+<div class="viewcode-block" id="periodicity"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.periodicity">[docs]</a><span class="k">def</span> <span class="nf">periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">periodic_direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">nblades</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">55</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is used to check for periodicity of the other faces rotated about an axis. Use periodicity_fast instead. Periodicity_fast calls this function after reducing the size of the mesh.</span>
 <span class="sd">        The way it works is to find faces of a constant i,j, or k value</span>
 
@@ -374,10 +369,7 @@
     <span class="k">return</span> <span class="n">periodic_faces_export</span><span class="p">,</span> <span class="n">outer_faces_export</span><span class="p">,</span> <span class="n">periodic_faces</span><span class="p">,</span> <span class="n">outer_faces_all</span></div>
 
 
-
-<div class="viewcode-block" id="rotated_periodicity">
-<a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.rotated_periodicity">[docs]</a>
-<span class="k">def</span> <span class="nf">rotated_periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">rotation_angle</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ReduceMesh</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="rotated_periodicity"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.rotated_periodicity">[docs]</a><span class="k">def</span> <span class="nf">rotated_periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">rotation_angle</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ReduceMesh</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds the peridocity/connectivity by rotating a block. This is a bit different from &quot;periodicity_fast&quot; where you specify the periodic direction. This method doesn&#39;t care about the direction as long as the angle you specify results in a match between the Left Face and the Right Face. I would use this instead.</span>
 
 <span class="sd">    Example 1:              </span>
@@ -553,10 +545,7 @@
         <span class="n">outer_faces_all</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">K</span> <span class="o">*=</span> <span class="n">gcd_to_use</span>
     <span class="k">return</span> <span class="n">periodic_faces_export</span><span class="p">,</span> <span class="n">outer_faces_export</span><span class="p">,</span> <span class="n">periodic_faces</span><span class="p">,</span> <span class="n">outer_faces_all</span></div>
 
-
-<div class="viewcode-block" id="translational_periodicity">
-<a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.translational_periodicity">[docs]</a>
-<span class="k">def</span> <span class="nf">translational_periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">lower_connected_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">upper_connected_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">delta</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">translational_direction</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="translational_periodicity"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.translational_periodicity">[docs]</a><span class="k">def</span> <span class="nf">translational_periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">lower_connected_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">upper_connected_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">delta</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">translational_direction</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Find periodicity using translated blocks. Simple example: if you have a rectangle and the top and bottom surfaces are periodic, this will copy the rectangle and shift it up to find which surfaces match. </span>
 
 <span class="sd">    Args:</span>
@@ -597,9 +586,18 @@
             <span class="n">dx</span> <span class="o">=</span> <span class="n">xmax</span><span class="o">-</span><span class="n">xmin</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">delta</span> <span class="k">else</span> <span class="n">delta</span>
             <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">sign</span><span class="o">*</span><span class="n">dx</span><span class="p">,</span><span class="n">translational_direction</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks_shifted</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">translational_direction</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span>
-            <span class="n">ymin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
-            <span class="n">ymax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
-            <span class="n">dy</span> <span class="o">=</span> <span class="n">ymax</span><span class="o">-</span><span class="n">ymin</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">delta</span> <span class="k">else</span> <span class="n">delta</span>
+            <span class="n">ymin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">b</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span> <span class="c1"># Look at the front face </span>
+            <span class="n">ymax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">b</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
+            <span class="n">zmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
+
+            <span class="n">ymin</span> <span class="o">=</span> <span class="n">ymin</span><span class="p">[</span><span class="n">ymin</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">xmin</span><span class="p">,:]</span>
+            <span class="n">ymax</span> <span class="o">=</span> <span class="n">ymax</span><span class="p">[</span><span class="n">ymax</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">xmin</span><span class="p">,:]</span>
+
+            <span class="n">ymin</span> <span class="o">=</span> <span class="n">ymin</span><span class="p">[</span><span class="n">ymin</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">zmin</span><span class="p">,:]</span>
+            <span class="n">ymax</span> <span class="o">=</span> <span class="n">ymax</span><span class="p">[</span><span class="n">ymax</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">zmin</span><span class="p">,:]</span>
+            
+            <span class="n">dy</span> <span class="o">=</span> <span class="n">ymax</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">ymin</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">delta</span> <span class="k">else</span> <span class="n">delta</span>
             <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">sign</span><span class="o">*</span><span class="n">dy</span><span class="p">,</span><span class="n">translational_direction</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks_shifted</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span> <span class="c1">#  direction.lower().strip() == &quot;z&quot;</span>
             <span class="n">zmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">])</span>
@@ -632,11 +630,14 @@
             <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Checking connections block </span><span class="si">{</span><span class="n">face1</span><span class="o">.</span><span class="n">blockIndex</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">face2</span><span class="o">.</span><span class="n">blockIndex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="c1"># Shift block 1 -&gt; Check periodicity -&gt; if not periodic -&gt; shift Block 1 opposite direction -&gt; Check periodicity</span>
             <span class="c1">#   Rotate Block 1</span>
+            <span class="n">block1</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">]</span>
             <span class="n">block1_shifted</span> <span class="o">=</span> <span class="n">blocks_shifted</span><span class="p">[</span><span class="n">face1</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">]</span>
             <span class="n">block2</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">]</span>
+            <span class="n">block2_shifted</span> <span class="o">=</span> <span class="n">blocks_shifted</span><span class="p">[</span><span class="n">face2</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">]</span>
+
             <span class="c1">#   Check periodicity</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">periodic_faces_temp</span><span class="p">,</span> <span class="n">split_faces_temp</span> <span class="o">=</span> <span class="n">__periodicity_check__</span><span class="p">(</span><span class="n">face1</span><span class="p">,</span><span class="n">face2</span><span class="p">,</span><span class="n">block1_shifted</span><span class="p">,</span> <span class="n">block2</span><span class="p">,</span><span class="n">periodicity_tol</span><span class="p">)</span>
-            
+            <span class="n">_</span><span class="p">,</span> <span class="n">periodic_faces_temp</span><span class="p">,</span> <span class="n">split_faces_temp</span> <span class="o">=</span> <span class="n">__periodicity_check__</span><span class="p">(</span><span class="n">face1</span><span class="p">,</span><span class="n">face2</span><span class="p">,</span><span class="n">block1_shifted</span><span class="p">,</span> <span class="n">block2</span><span class="p">,</span><span class="n">periodicity_tol</span><span class="p">)</span>                           
+
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">lower_connected_faces</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
                 <span class="n">upper_connected_faces</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">indx</span><span class="p">)</span>
@@ -649,6 +650,21 @@
                 <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Try the other way </span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">periodic_faces_temp</span><span class="p">,</span> <span class="n">split_faces_temp</span> <span class="o">=</span> <span class="n">__periodicity_check__</span><span class="p">(</span><span class="n">face1</span><span class="p">,</span><span class="n">face2</span><span class="p">,</span><span class="n">block1</span><span class="p">,</span><span class="n">block2_shifted</span><span class="p">,</span><span class="n">periodicity_tol</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">lower_connected_faces</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">upper_connected_faces</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">indx</span><span class="p">)</span>
+                    <span class="n">periodic_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">)</span>
+                    <span class="n">periodic_faces_export</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face_matches_to_dict</span><span class="p">(</span><span class="n">periodic_faces_temp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">periodic_faces_temp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">block1</span><span class="p">,</span> <span class="n">block2_shifted</span><span class="p">))</span>
+                    <span class="n">lower_split_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">split_faces_temp</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="ow">in</span> <span class="n">lower_blocks</span><span class="p">]</span>
+                    <span class="n">upper_split_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">split_faces_temp</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="ow">in</span> <span class="n">upper_blocks</span><span class="p">]</span>
+                    <span class="n">lower_connected_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">lower_split_faces</span><span class="p">)</span>
+                    <span class="n">upper_connected_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">upper_split_faces</span><span class="p">)</span>
+                    <span class="n">periodic_found</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">break</span>
     
         <span class="k">if</span> <span class="n">periodic_found</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
             <span class="c1"># Lets switch the order </span>
@@ -661,8 +677,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Not periodic </span><span class="si">{</span><span class="n">translational_direction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Periodic </span><span class="si">{</span><span class="n">translational_direction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-                        
+        
     <span class="c1"># remove any duplicate periodic face pairs </span>
     <span class="n">indx_to_remove</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">periodic_faces</span><span class="p">)):</span>
@@ -708,10 +723,7 @@
     <span class="k">return</span> <span class="n">periodic_faces_export</span><span class="p">,</span> <span class="n">periodic_faces</span></div>
 
 
-
-<div class="viewcode-block" id="linear_real_transform">
-<a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.linear_real_transform">[docs]</a>
-<span class="k">def</span> <span class="nf">linear_real_transform</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+<div class="viewcode-block" id="linear_real_transform"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.linear_real_transform">[docs]</a><span class="k">def</span> <span class="nf">linear_real_transform</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the rotation angle from Face1 to Face2. This can be used to check if the faces are periodic </span>
 <span class="sd">        This function assumes the rotation axis is in the &quot;x&quot; direction. This is good for faces within the same block </span>
 
@@ -762,10 +774,7 @@
             <span class="n">ang</span><span class="o">*=-</span><span class="mi">1</span>
     <span class="k">return</span> <span class="n">ang</span><span class="p">,</span> <span class="n">rotation_matrix</span></div>
 
-
-<div class="viewcode-block" id="__periodicity_check__">
-<a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.__periodicity_check__">[docs]</a>
-<span class="k">def</span> <span class="nf">__periodicity_check__</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>
+<div class="viewcode-block" id="__periodicity_check__"><a class="viewcode-back" href="../../modules/periodicity.html#plot3d.periodicity.__periodicity_check__">[docs]</a><span class="k">def</span> <span class="nf">__periodicity_check__</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;General function to find periodicity within a given block. </span>
 <span class="sd">    </span>
 <span class="sd">    Steps:</span>
@@ -806,9 +815,11 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">4</span><span class="p">:</span>
         <span class="n">f1</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block1</span><span class="p">,</span><span class="n">imin</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">jmin</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;j1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">kmin</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">imax</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;i1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="n">jmax</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;j1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="n">kmax</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
         <span class="n">f1</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">face1</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">)</span>
+        <span class="n">f1</span><span class="o">.</span><span class="n">set_face_id</span><span class="p">(</span><span class="n">face1</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 
         <span class="n">f2</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">block2</span><span class="p">,</span><span class="n">imin</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;i2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">jmin</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;j2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">kmin</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">imax</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;i2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="n">jmax</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;j2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="n">kmax</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
         <span class="n">f2</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">face2</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">)</span>
+        <span class="n">f2</span><span class="o">.</span><span class="n">set_face_id</span><span class="p">(</span><span class="n">face2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
         
         <span class="n">split_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_face1</span><span class="p">)</span>
         <span class="n">split_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">split_face2</span><span class="p">)</span>
@@ -820,7 +831,6 @@
             <span class="n">periodic_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">df</span><span class="p">,</span><span class="n">periodic_faces</span><span class="p">,</span><span class="n">split_faces</span></div>
-
 
 
 </pre></div>
@@ -854,14 +864,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.periodicity</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2023, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.0.
+        &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>
