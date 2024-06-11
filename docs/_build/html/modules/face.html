@@ -1,17 +1,20 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Face &#8212; Plot3D 1.6.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <title>Face &#8212; Plot3D 1.6.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
-    <script src="../_static/documentation_options.js?v=72d88caf"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -33,7 +36,7 @@
         <li class="right" >
           <a href="differencing.html" title="Differencing"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.3 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Face</a></li> 
       </ul>
     </div>  
@@ -43,25 +46,25 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="face">
-<h1>Face<a class="headerlink" href="#face" title="Link to this heading">¶</a></h1>
-<dl class="py class" id="module-plot3d.face">
+  <section id="module-plot3d.face">
+<span id="face"></span><h1>Face<a class="headerlink" href="#module-plot3d.face" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
 <dt class="sig sig-object py" id="plot3d.face.Face">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.face.</span></span><span class="sig-name descname"><span class="pre">Face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvertex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.face.</span></span><span class="sig-name descname"><span class="pre">Face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvertex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines a Face of a block for example IMIN,JMIN,JMIN to IMAX,JMIN,JMIN</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.__eq__">
-<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__eq__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__eq__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check to see if two faces are the same by looking at the I,J,K
 Checks to see if any of vertices x,y,z match</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>f</strong> (<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – another face</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True if faces match, False if no match is found</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Boolean</p>
 </dd>
 </dl>
@@ -69,22 +72,22 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.__hash__">
-<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__hash__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__hash__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__hash__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__hash__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return hash(self).</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.__ne__">
-<span class="sig-name descname"><span class="pre">__ne__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__ne__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__ne__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__ne__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__ne__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__ne__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if two faces are not equal</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>f</strong> (<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – another face</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True if faces match, False if no match is found</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Boolean</p>
 </dd>
 </dl>
@@ -92,16 +95,16 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__str__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__str__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return str(self).</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.add_vertex">
-<span class="sig-name descname"><span class="pre">add_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.add_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.add_vertex" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.add_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.add_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add vertex to define a face</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>float</em>) – x-coordinate</p></li>
 <li><p><strong>y</strong> (<em>float</em>) – y-coordinate</p></li>
@@ -116,13 +119,13 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="plot3d.face.Face.diagonal_length">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">diagonal_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#plot3d.face.Face.diagonal_length" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">diagonal_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#plot3d.face.Face.diagonal_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the diagonal length of the face</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>diagonal length computed using IMIN, IMAX, JMIN, JMAX, KMIN, KMAX</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p>float</p>
 </dd>
 </dl>
@@ -130,10 +133,10 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.get_corners">
-<span class="sig-name descname"><span class="pre">get_corners</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.get_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.get_corners" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_corners</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.get_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.get_corners" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the corners defined by (IMIN,JMIN,KMIN), (IMAX,JMAX,KMAX),</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><p>containing</p>
 <blockquote>
 <div><ul class="simple">
@@ -143,7 +146,7 @@ Checks to see if any of vertices x,y,z match</p>
 </div></blockquote>
 </p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p>Tuple</p>
 </dd>
 </dl>
@@ -157,22 +160,22 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="plot3d.face.Face.get_val">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_val</span></span><a class="headerlink" href="#plot3d.face.Face.get_val" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_val</span></span><a class="headerlink" href="#plot3d.face.Face.get_val" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the value where key (I,J,K) is equal to val</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>i_val</strong> (<em>int</em>) – value of I</p></li>
 <li><p><strong>j_val</strong> (<em>int</em>) – value of J</p></li>
 <li><p><strong>k_val</strong> (<em>int</em>) – value of K</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>x value
 [float]: y value
 [float]: z value</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>[float]</p>
 </dd>
 </dl>
@@ -180,10 +183,10 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.index_equals">
-<span class="sig-name descname"><span class="pre">index_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.index_equals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.index_equals" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">index_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.index_equals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.index_equals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check to see of the face indices are equal</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>f2</strong> (<em>[</em><em>type</em><em>]</em>) – [description]</p>
 </dd>
 </dl>
@@ -191,13 +194,13 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="plot3d.face.Face.isEdge">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isEdge</span></span><a class="headerlink" href="#plot3d.face.Face.isEdge" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isEdge</span></span><a class="headerlink" href="#plot3d.face.Face.isEdge" title="Permalink to this definition">¶</a></dt>
 <dd><p>check if the face is actually an edge. This is an edge if two indicies IMIN == IMAX or JMIN=JMAX or KMIN=KMAX</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>True if face is really an edge</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p>[bool]</p>
 </dd>
 </dl>
@@ -205,13 +208,13 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="plot3d.face.Face.isPoint">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isPoint</span></span><a class="headerlink" href="#plot3d.face.Face.isPoint" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isPoint</span></span><a class="headerlink" href="#plot3d.face.Face.isPoint" title="Permalink to this definition">¶</a></dt>
 <dd><p>check if the face is actually an edge. This is an edge if two indicies IMIN == IMAX or JMIN=JMAX or KMIN=KMAX</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>True if face is really a point</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p>[type]</p>
 </dd>
 </dl>
@@ -219,10 +222,10 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.is_connected">
-<span class="sig-name descname"><span class="pre">is_connected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.is_connected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.is_connected" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_connected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.is_connected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if face is connected by looking at the face centroid</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>f</strong> (<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – another face object</p>
 </dd>
 </dl>
@@ -230,19 +233,19 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.match_indices">
-<span class="sig-name descname"><span class="pre">match_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.match_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.match_indices" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">match_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.match_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.match_indices" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Check to see if two faces are the same. Checks to see if any of vertices x,y,z match</dt><dd><p>Normally this is used by Face1==Face2</p>
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>f</strong> (<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – another face</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>list of indicies where there’s a match.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>List[(int,int)]</p>
 </dd>
 </dl>
@@ -250,17 +253,17 @@ Checks to see if any of vertices x,y,z match</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.normal">
-<span class="sig-name descname"><span class="pre">normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.normal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.normal" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.normal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.normal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the normal vector of the face
 not really used but if anyone wants it.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.shift">
-<span class="sig-name descname"><span class="pre">shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.shift" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.shift" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shifts the faces</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dx</strong> (<em>float</em>) – delta x</p></li>
 <li><p><strong>dy</strong> (<em>float</em>) – delta y</p></li>
@@ -272,22 +275,22 @@ not really used but if anyone wants it.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.to_dict">
-<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.to_dict" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.to_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dictionary representaon of a face</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.face.Face.vertices_equals">
-<span class="sig-name descname"><span class="pre">vertices_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.vertices_equals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.vertices_equals" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">vertices_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.vertices_equals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.vertices_equals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if two faces are the same by looking at the vertices</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>f</strong> (<a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – Another face</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True = face vertices are equal</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
@@ -304,35 +307,6 @@ not really used but if anyone wants it.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="../index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Face</a><ul>
-<li><a class="reference internal" href="#plot3d.face.Face"><code class="docutils literal notranslate"><span class="pre">Face</span></code></a><ul>
-<li><a class="reference internal" href="#plot3d.face.Face.__eq__"><code class="docutils literal notranslate"><span class="pre">Face.__eq__()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.__hash__"><code class="docutils literal notranslate"><span class="pre">Face.__hash__()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.__ne__"><code class="docutils literal notranslate"><span class="pre">Face.__ne__()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.__str__"><code class="docutils literal notranslate"><span class="pre">Face.__str__()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.add_vertex"><code class="docutils literal notranslate"><span class="pre">Face.add_vertex()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.diagonal_length"><code class="docutils literal notranslate"><span class="pre">Face.diagonal_length</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.get_corners"><code class="docutils literal notranslate"><span class="pre">Face.get_corners()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.get_val"><code class="docutils literal notranslate"><span class="pre">Face.get_val</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.index_equals"><code class="docutils literal notranslate"><span class="pre">Face.index_equals()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.isEdge"><code class="docutils literal notranslate"><span class="pre">Face.isEdge</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.isPoint"><code class="docutils literal notranslate"><span class="pre">Face.isPoint</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.is_connected"><code class="docutils literal notranslate"><span class="pre">Face.is_connected()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.match_indices"><code class="docutils literal notranslate"><span class="pre">Face.match_indices()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.normal"><code class="docutils literal notranslate"><span class="pre">Face.normal()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.shift"><code class="docutils literal notranslate"><span class="pre">Face.shift()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.to_dict"><code class="docutils literal notranslate"><span class="pre">Face.to_dict()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.face.Face.vertices_equals"><code class="docutils literal notranslate"><span class="pre">Face.vertices_equals()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-  </div>
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="differencing.html"
@@ -379,13 +353,13 @@ not really used but if anyone wants it.</p>
         <li class="right" >
           <a href="differencing.html" title="Differencing"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.3 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Face</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2023, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.0.
+        &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>

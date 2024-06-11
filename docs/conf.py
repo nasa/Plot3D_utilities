@@ -8,9 +8,9 @@
 
 import plot3d
 project = 'Plot3D'
-copyright = '2023, Paht Juangphanich'
+copyright = '2024, Paht Juangphanich'
 author = 'Paht Juangphanich <paht.juangphanich@nasa.gov>'
-release = '1.6.0'
+release = '1.6.3'
 
 rst_context = {'plot3d': plot3d}
 

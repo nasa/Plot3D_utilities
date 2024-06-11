@@ -1,16 +1,19 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plot3d.differencing &#8212; Plot3D 1.6.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b76e3c8a" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
+    <title>plot3d.differencing &#8212; Plot3D 1.6.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
-    <script src="../../_static/documentation_options.js?v=72d88caf"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -24,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.differencing</a></li> 
       </ul>
@@ -42,9 +45,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
 
-<div class="viewcode-block" id="find_face_edges">
-<a class="viewcode-back" href="../../modules/differencing.html#plot3d.differencing.find_face_edges">[docs]</a>
-<span class="k">def</span> <span class="nf">find_face_edges</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<div class="viewcode-block" id="find_face_edges"><a class="viewcode-back" href="../../modules/differencing.html#plot3d.differencing.find_face_edges">[docs]</a><span class="k">def</span> <span class="nf">find_face_edges</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the edges of both faces to see if they are parallel. Face can be in any direction (I,J) (I,K) etc.</span>
 <span class="sd">        if edges are parallel then their vertices might intersect</span>
 <span class="sd">        Find edges will always deal with faces and not something that is in 3D</span>
@@ -91,10 +92,7 @@
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diffArray</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span> </div>
 
-
-<div class="viewcode-block" id="find_edges">
-<a class="viewcode-back" href="../../modules/differencing.html#plot3d.differencing.find_edges">[docs]</a>
-<span class="k">def</span> <span class="nf">find_edges</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<div class="viewcode-block" id="find_edges"><a class="viewcode-back" href="../../modules/differencing.html#plot3d.differencing.find_edges">[docs]</a><span class="k">def</span> <span class="nf">find_edges</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the edges of both blocks that are parallel. Takes into account the whole block and not a single face</span>
 <span class="sd">        if edges are parallel then their vertices might intersect. </span>
 
@@ -158,7 +156,6 @@
                 <span class="n">diffArray</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;i&quot;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot;j&quot;</span><span class="p">:</span><span class="n">j</span><span class="p">,</span><span class="s2">&quot;k&quot;</span><span class="p">:</span><span class="n">k</span><span class="p">,</span><span class="s1">&#39;di&#39;</span><span class="p">:</span><span class="n">di</span><span class="p">,</span><span class="s1">&#39;dj&#39;</span><span class="p">:</span><span class="n">dj</span><span class="p">,</span><span class="s1">&#39;dk&#39;</span><span class="p">:</span><span class="n">dk</span><span class="p">})</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span><span class="n">diffArray</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span> </div>
-
 </pre></div>
 
             <div class="clearer"></div>
@@ -190,14 +187,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.differencing</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2023, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.0.
+        &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>
