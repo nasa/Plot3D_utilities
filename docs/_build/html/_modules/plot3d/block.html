@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>plot3d.block &#8212; Plot3D 1.6.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=452006c5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -44,7 +41,9 @@
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
-<div class="viewcode-block" id="Block"><a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block">[docs]</a><span class="k">class</span> <span class="nc">Block</span><span class="p">:</span>
+<div class="viewcode-block" id="Block">
+<a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block">[docs]</a>
+<span class="k">class</span> <span class="nc">Block</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot3D Block definition</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -66,7 +65,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
         
     
-<div class="viewcode-block" id="Block.scale"><a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">factor</span><span class="p">:</span><span class="nb">float</span><span class="p">):</span>
+<div class="viewcode-block" id="Block.scale">
+<a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block.scale">[docs]</a>
+    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">factor</span><span class="p">:</span><span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Scales a mesh by a certain factor </span>
 
 <span class="sd">        Args:</span>
@@ -77,7 +78,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">*=</span> <span class="n">factor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">*=</span> <span class="n">factor</span></div>
 
-<div class="viewcode-block" id="Block.shift"><a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block.shift">[docs]</a>    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">shift_amount</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Block.shift">
+<a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block.shift">[docs]</a>
+    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">shift_amount</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;shifts the blocks by a certain amount</span>
 
 <span class="sd">        Args:</span>
@@ -91,13 +95,19 @@
         <span class="k">elif</span> <span class="n">direction</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">+=</span><span class="n">shift_amount</span></div>
 
-<div class="viewcode-block" id="Block.cylindrical"><a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block.cylindrical">[docs]</a>    <span class="k">def</span> <span class="nf">cylindrical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Block.cylindrical">
+<a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block.cylindrical">[docs]</a>
+    <span class="k">def</span> <span class="nf">cylindrical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the block to cylindrical coordinate system. The rotation axis is assumed to be &quot;x&quot; direction</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Block.cell_volumes"><a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block.cell_volumes">[docs]</a>    <span class="k">def</span> <span class="nf">cell_volumes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Block.cell_volumes">
+<a class="viewcode-back" href="../../modules/block.html#plot3d.block.Block.cell_volumes">[docs]</a>
+    <span class="k">def</span> <span class="nf">cell_volumes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute volume of all cells</span>
 
 <span class="sd">        Returns:</span>
@@ -203,7 +213,9 @@
                                         <span class="o">+</span><span class="n">cf</span><span class="p">[</span><span class="mi">2</span><span class="o">+</span><span class="n">n</span><span class="p">,</span><span class="n">l</span><span class="p">]</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="o">+</span><span class="n">l</span><span class="p">][</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="n">n</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
                                         <span class="o">+</span><span class="n">cf</span><span class="p">[</span><span class="mi">4</span><span class="o">+</span><span class="n">n</span><span class="p">,</span><span class="n">l</span><span class="p">]</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="o">+</span><span class="n">l</span><span class="p">][</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="n">n</span><span class="p">])</span>
                     <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">=</span> <span class="n">vol12</span><span class="o">/</span><span class="mi">12</span>
-        <span class="k">return</span> <span class="n">v</span></div></div>
+        <span class="k">return</span> <span class="n">v</span></div>
+</div>
+
 
 <span class="k">def</span> <span class="nf">checkCollinearity</span><span class="p">(</span><span class="n">v1</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">v2</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
     <span class="c1"># Calculate their cross product</span>
@@ -277,7 +289,9 @@
 
     <span class="k">return</span> <span class="n">n_imin</span><span class="p">,</span><span class="n">n_jmin</span><span class="p">,</span><span class="n">n_kmin</span><span class="p">,</span><span class="n">n_imax</span><span class="p">,</span><span class="n">n_jmax</span><span class="p">,</span><span class="n">n_kmax</span>
 
-<div class="viewcode-block" id="reduce_blocks"><a class="viewcode-back" href="../../modules/block.html#plot3d.block.reduce_blocks">[docs]</a><span class="k">def</span> <span class="nf">reduce_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">factor</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="reduce_blocks">
+<a class="viewcode-back" href="../../modules/block.html#plot3d.block.reduce_blocks">[docs]</a>
+<span class="k">def</span> <span class="nf">reduce_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">factor</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;reduce the blocks by a factor of (factor)</span>
 
 <span class="sd">    Args:</span>
@@ -293,6 +307,7 @@
         <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Z</span><span class="p">[::</span><span class="n">factor</span><span class="p">,::</span><span class="n">factor</span><span class="p">,::</span><span class="n">factor</span><span class="p">]</span>
         <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">KMAX</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span>
     <span class="k">return</span> <span class="n">blocks</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -301,7 +316,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
@@ -309,7 +324,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -330,8 +345,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>

@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>plot3d.face &#8212; Plot3D 1.6.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=452006c5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -43,7 +40,9 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
-<div class="viewcode-block" id="Face"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face">[docs]</a><span class="k">class</span> <span class="nc">Face</span><span class="p">:</span>
+<div class="viewcode-block" id="Face">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face">[docs]</a>
+<span class="k">class</span> <span class="nc">Face</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a Face of a block for example IMIN,JMIN,JMIN to IMAX,JMIN,JMIN</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nvertex</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
@@ -66,12 +65,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">blockIndex</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># not really needed except in periodicity </span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="mi">0</span>
         
-<div class="viewcode-block" id="Face.to_dict"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Face.to_dict">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.to_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a dictionary representaon of a face</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;IMIN&#39;</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="p">),</span> <span class="s1">&#39;JMIN&#39;</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">),</span> <span class="s1">&#39;KMIN&#39;</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">),</span>
                     <span class="s1">&#39;IMAX&#39;</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="p">),</span> <span class="s1">&#39;JMAX&#39;</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">),</span> <span class="s1">&#39;KMAX&#39;</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">),</span>
                     <span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">&#39;block_index&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">}</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -162,7 +164,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">J</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="o">*</span><span class="n">gcd</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="o">*</span><span class="n">gcd</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Face.add_vertex"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.add_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">add_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">z</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="Face.add_vertex">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.add_vertex">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">z</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add vertex to define a face</span>
 
 <span class="sd">        Args:</span>
@@ -185,6 +189,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">IMIN</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">IMAX</span><span class="p">:</span>
@@ -202,7 +207,9 @@
     <span class="k">def</span> <span class="nf">set_face_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">val</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">val</span>
         
-<div class="viewcode-block" id="Face.normal"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.normal">[docs]</a>    <span class="k">def</span> <span class="nf">normal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">block</span><span class="p">):</span>
+<div class="viewcode-block" id="Face.normal">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.normal">[docs]</a>
+    <span class="k">def</span> <span class="nf">normal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">block</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the normal vector of the face </span>
 <span class="sd">            not really used but if anyone wants it. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -248,7 +255,10 @@
         
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Face.match_indices"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.match_indices">[docs]</a>    <span class="k">def</span> <span class="nf">match_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Face.match_indices">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.match_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">match_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check to see if two faces are the same. Checks to see if any of vertices x,y,z match</span>
 <span class="sd">            Normally this is used by Face1==Face2</span>
 
@@ -272,7 +282,10 @@
                     <span class="k">break</span> <span class="c1"># each index can only have a single match</span>
         <span class="k">return</span> <span class="n">matchedIndices</span></div>
 
-<div class="viewcode-block" id="Face.__eq__"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Face.__eq__">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.__eq__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check to see if two faces are the same by looking at the I,J,K</span>
 <span class="sd">        Checks to see if any of vertices x,y,z match</span>
 
@@ -288,8 +301,11 @@
             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">IMIN</span> <span class="o">==</span> <span class="n">f</span><span class="o">.</span><span class="n">IMIN</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">IMAX</span> <span class="o">==</span> <span class="n">f</span><span class="o">.</span><span class="n">IMAX</span><span class="p">)</span> 
             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">JMIN</span> <span class="o">==</span> <span class="n">f</span><span class="o">.</span><span class="n">JMIN</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">JMAX</span> <span class="o">==</span> <span class="n">f</span><span class="o">.</span><span class="n">JMAX</span><span class="p">)</span> 
             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KMIN</span> <span class="o">==</span> <span class="n">f</span><span class="o">.</span><span class="n">KMIN</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KMAX</span> <span class="o">==</span> <span class="n">f</span><span class="o">.</span><span class="n">KMAX</span><span class="p">)</span> <span class="p">)</span></div>
+
     
-<div class="viewcode-block" id="Face.vertices_equals"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.vertices_equals">[docs]</a>    <span class="k">def</span> <span class="nf">vertices_equals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
+<div class="viewcode-block" id="Face.vertices_equals">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.vertices_equals">[docs]</a>
+    <span class="k">def</span> <span class="nf">vertices_equals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks to see if two faces are the same by looking at the vertices</span>
 
 <span class="sd">        Args:</span>
@@ -301,7 +317,10 @@
         <span class="n">matchedIndices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">match_indices</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">matchedIndices</span><span class="p">)</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">nvertex</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Face.__ne__"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.__ne__">[docs]</a>    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Face.__ne__">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.__ne__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if two faces are not equal </span>
 
 <span class="sd">        Args:</span>
@@ -312,8 +331,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="n">match</span></div>
+
     
-<div class="viewcode-block" id="Face.index_equals"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.index_equals">[docs]</a>    <span class="k">def</span> <span class="nf">index_equals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f2</span><span class="p">):</span>
+<div class="viewcode-block" id="Face.index_equals">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.index_equals">[docs]</a>
+    <span class="k">def</span> <span class="nf">index_equals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f2</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check to see of the face indices are equal</span>
 
 <span class="sd">        Args:</span>
@@ -326,17 +348,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">JMAX</span> <span class="o">==</span> <span class="n">f2</span><span class="o">.</span><span class="n">JMAX</span> <span class="ow">and</span> 
             <span class="bp">self</span><span class="o">.</span><span class="n">KMAX</span> <span class="o">==</span> <span class="n">f2</span><span class="o">.</span><span class="n">KMAX</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span></div>
-<div class="viewcode-block" id="Face.__hash__"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.__hash__">[docs]</a>    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Face.__hash__">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.__hash__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span></div>
+
             
-<div class="viewcode-block" id="Face.__str__"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Face.__str__">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.__str__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span>
             <span class="k">return</span> <span class="s1">&#39;blk: </span><span class="si">{:d}</span><span class="s1"> [</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">IMIN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">KMAX</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;blk: </span><span class="si">{:d}</span><span class="s1"> [</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span></div>
+
     
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -360,7 +389,9 @@
         <span class="n">dz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">minIndx</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">maxIndx</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">*</span><span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span><span class="o">*</span><span class="n">dy</span> <span class="o">+</span> <span class="n">dz</span><span class="o">*</span><span class="n">dz</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Face.get_corners"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.get_corners">[docs]</a>    <span class="k">def</span> <span class="nf">get_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+<div class="viewcode-block" id="Face.get_corners">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.get_corners">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the corners defined by (IMIN,JMIN,KMIN), (IMAX,JMAX,KMAX),</span>
 <span class="sd">        </span>
 <span class="sd">        Returns:</span>
@@ -380,8 +411,11 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IMAX</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">JMAX</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">KMAX</span><span class="p">:</span>
                 <span class="n">maxIndx</span> <span class="o">=</span> <span class="n">indx</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">minIndx</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">minIndx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">minIndx</span><span class="p">]),(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">maxIndx</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">maxIndx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">maxIndx</span><span class="p">])</span></div>
+
     
-<div class="viewcode-block" id="Face.is_connected"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.is_connected">[docs]</a>    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-8</span><span class="p">):</span>
+<div class="viewcode-block" id="Face.is_connected">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.is_connected">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-8</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines if face is connected by looking at the face centroid</span>
 
 <span class="sd">        Args:</span>
@@ -394,7 +428,10 @@
             <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="Face.shift"><a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.shift">[docs]</a>    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dx</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">dy</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">dz</span><span class="p">:</span><span class="nb">float</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Face.shift">
+<a class="viewcode-back" href="../../modules/face.html#plot3d.face.Face.shift">[docs]</a>
+    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dx</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">dy</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">dz</span><span class="p">:</span><span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Shifts the faces </span>
 
 <span class="sd">        Args:</span>
@@ -404,7 +441,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">+=</span><span class="n">dx</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">+=</span><span class="n">dy</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dz</span><span class="o">+=</span><span class="n">dz</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dz</span><span class="o">+=</span><span class="n">dz</span></div>
+</div>
+
 
 
 </pre></div>
@@ -415,7 +454,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
@@ -423,7 +462,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -444,8 +483,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>

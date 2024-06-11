@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>plot3d.facefunctions &#8212; Plot3D 1.6.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=452006c5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -48,7 +45,9 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<div class="viewcode-block" id="get_outer_faces"><a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.get_outer_faces">[docs]</a><span class="k">def</span> <span class="nf">get_outer_faces</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
+<div class="viewcode-block" id="get_outer_faces">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.get_outer_faces">[docs]</a>
+<span class="k">def</span> <span class="nf">get_outer_faces</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the outer faces of a block</span>
 
 <span class="sd">    Args:</span>
@@ -122,8 +121,11 @@
     <span class="c1"># Make sure normals do not intersect </span>
     <span class="c1"># block_center_to_face_center =  block1.cx</span>
     <span class="k">return</span> <span class="n">non_matching</span><span class="p">,</span> <span class="n">matching</span> <span class="c1"># these should be the outer faces</span></div>
+
     
-<div class="viewcode-block" id="create_face_from_diagonals"><a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.create_face_from_diagonals">[docs]</a><span class="k">def</span> <span class="nf">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">imin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">imax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmax</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="create_face_from_diagonals">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.create_face_from_diagonals">[docs]</a>
+<span class="k">def</span> <span class="nf">create_face_from_diagonals</span><span class="p">(</span><span class="n">block</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">imin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">imax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmax</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a face on a block given a the diagonals defined as (IMIN,JMIN,KMIN), (IMAX, JMAX, KMAX)</span>
 
 <span class="sd">    Args:</span>
@@ -165,7 +167,10 @@
                 <span class="n">newFace</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">newFace</span></div>
 
-<div class="viewcode-block" id="find_connected_faces"><a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_connected_faces">[docs]</a><span class="k">def</span> <span class="nf">find_connected_faces</span><span class="p">(</span><span class="n">face_to_search</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span><span class="n">connectivity_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+
+<div class="viewcode-block" id="find_connected_faces">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_connected_faces">[docs]</a>
+<span class="k">def</span> <span class="nf">find_connected_faces</span><span class="p">(</span><span class="n">face_to_search</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span><span class="n">connectivity_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursive program to return all the matching faces. Note faces must have the same I,J,K definition so faces will be matching if for example: Face1 IMIN=IMAX and Face2 IMIN=IMAX and they share a common edge (2 vertices)</span>
 
 <span class="sd">    Args:</span>
@@ -211,7 +216,10 @@
     <span class="k">return</span> <span class="n">all_matching_faces</span></div>
 
 
-<div class="viewcode-block" id="find_closest_block"><a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_closest_block">[docs]</a><span class="k">def</span> <span class="nf">find_closest_block</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">x</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">centroid</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">translational_direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="n">minvalue</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="find_closest_block">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_closest_block">[docs]</a>
+<span class="k">def</span> <span class="nf">find_closest_block</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">x</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">centroid</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">translational_direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="n">minvalue</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the closest block to an extreme in the x,y, or z direction and returns the targetting point. </span>
 <span class="sd">    Target point is the reference point where we want the closest block and the closest face </span>
 
@@ -278,7 +286,10 @@
 
     <span class="k">return</span> <span class="n">selected_block_indx</span><span class="p">,</span><span class="n">target_x</span><span class="p">,</span><span class="n">target_y</span><span class="p">,</span><span class="n">target_z</span> </div>
 
-<div class="viewcode-block" id="find_bounding_faces"><a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_bounding_faces">[docs]</a><span class="k">def</span> <span class="nf">find_bounding_faces</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">connectivity_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="find_bounding_faces">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_bounding_faces">[docs]</a>
+<span class="k">def</span> <span class="nf">find_bounding_faces</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">connectivity_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span> <span class="n">direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds bounding faces in x,y,z direction so think of this as the xmin and xmax faces of a block.</span>
 <span class="sd">    This is useful for translational periodicity where you want the bounds to check</span>
 
@@ -359,7 +370,10 @@
     <span class="n">upper_connected_faces_export</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">upper_connected_faces</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">lower_connected_faces_export</span><span class="p">,</span><span class="n">upper_connected_faces_export</span><span class="p">,</span> <span class="n">lower_connected_faces</span><span class="p">,</span> <span class="n">upper_connected_faces</span></div>
 
-<div class="viewcode-block" id="split_face"><a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.split_face">[docs]</a><span class="k">def</span> <span class="nf">split_face</span><span class="p">(</span><span class="n">face_to_split</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">imin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">imax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmax</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+
+<div class="viewcode-block" id="split_face">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.split_face">[docs]</a>
+<span class="k">def</span> <span class="nf">split_face</span><span class="p">(</span><span class="n">face_to_split</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">imin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmin</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">imax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jmax</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kmax</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Splits a face with another face within the same block </span>
 <span class="sd">        picture the split as a two rectangles inside each other</span>
 
@@ -462,7 +476,10 @@
     <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">face_to_split</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">]</span> 
     <span class="k">return</span> <span class="n">faces</span> </div>
 
-<div class="viewcode-block" id="find_face_nearest_point"><a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_face_nearest_point">[docs]</a><span class="k">def</span> <span class="nf">find_face_nearest_point</span><span class="p">(</span><span class="n">faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">x</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">z</span><span class="p">:</span><span class="nb">float</span><span class="p">):</span>
+
+<div class="viewcode-block" id="find_face_nearest_point">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.find_face_nearest_point">[docs]</a>
+<span class="k">def</span> <span class="nf">find_face_nearest_point</span><span class="p">(</span><span class="n">faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">x</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">z</span><span class="p">:</span><span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Find a face nearest to a given point</span>
 
 <span class="sd">    Args:</span>
@@ -482,7 +499,10 @@
     <span class="n">face_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dv</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">face_index</span></div>
 
-<div class="viewcode-block" id="outer_face_dict_to_list"><a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.outer_face_dict_to_list">[docs]</a><span class="k">def</span> <span class="nf">outer_face_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">gcd</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="outer_face_dict_to_list">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.outer_face_dict_to_list">[docs]</a>
+<span class="k">def</span> <span class="nf">outer_face_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">gcd</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a list of dictionary face representations to a list of faces. Use this only for outer faces </span>
 
 <span class="sd">    Args:</span>
@@ -504,7 +524,10 @@
 
     <span class="k">return</span> <span class="n">outer_faces_all</span></div>
 
-<div class="viewcode-block" id="match_faces_dict_to_list"><a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.match_faces_dict_to_list">[docs]</a><span class="k">def</span> <span class="nf">match_faces_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">gcd</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+
+<div class="viewcode-block" id="match_faces_dict_to_list">
+<a class="viewcode-back" href="../../modules/facefunctions.html#plot3d.facefunctions.match_faces_dict_to_list">[docs]</a>
+<span class="k">def</span> <span class="nf">match_faces_dict_to_list</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">matched_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">gcd</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a list of dictionaries representing matched faces to a list of Faces</span>
 
 <span class="sd">    Args:</span>
@@ -532,6 +555,7 @@
         <span class="n">matched_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span>
         <span class="n">matched_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face2</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">matched_faces_all</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -540,7 +564,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
@@ -548,7 +572,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -569,8 +593,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>
