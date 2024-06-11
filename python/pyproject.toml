@@ -10,6 +10,7 @@ numpy = "*"
 scipy = "*"
 pandas = "*"
 tqdm = "*"
+networkx = "*"
 
 [tool.poetry.dev-dependencies]
 
