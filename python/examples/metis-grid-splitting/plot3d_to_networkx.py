@@ -15,20 +15,20 @@ KMAX = 3
 G1 = block_to_graph(IMAX,JMAX,KMAX)
 G2 = block_to_graph(IMAX,JMAX,KMAX,IMAX*JMAX*KMAX)
 
-#%% Flatten Test
+#%% Flatten Test: Create a simple Plot3D Block structure
 A = np.arange(IMAX*JMAX*KMAX).reshape((KMAX,JMAX,IMAX))
 A = np.transpose(A,[2,1,0]) 
-A_flat = A.flatten()
+A_flat = A.flatten(order='F')
 
 #%% Test get face vertex indices 
-indices_imin_face = get_face_vertex_indices(0,0,0,IMAX,0,KMAX,(IMAX,JMAX,KMAX))       # Constant IMIN Face
-indices_imax_face = get_face_vertex_indices(IMAX,IMAX,0,JMAX,0,KMAX,(IMAX,JMAX,KMAX)) # Constant IMAX Face
+indices_imin_face = get_face_vertex_indices(0,0,0,0,JMAX,KMAX,(IMAX,JMAX,KMAX))       # Constant IMIN Face
+indices_imax_face = get_face_vertex_indices(IMAX,0,0,IMAX,JMAX,KMAX,(IMAX,JMAX,KMAX)) # Constant IMAX Face
 
-indices_jmin_face = get_face_vertex_indices(0,IMAX,0,0,0,KMAX,(IMAX,JMAX,KMAX))       # Constant JMIN Face
-indices_jmax_face = get_face_vertex_indices(0,IMAX,JMAX,JMAX,0,KMAX,(IMAX,JMAX,KMAX)) # Constant JMAX Face
+indices_jmin_face = get_face_vertex_indices(0,0,0,IMAX,0,KMAX,(IMAX,JMAX,KMAX))       # Constant JMIN Face
+indices_jmax_face = get_face_vertex_indices(0,JMAX,0,IMAX,JMAX,KMAX,(IMAX,JMAX,KMAX)) # Constant JMAX Face
 
-indices_kmin_face = get_face_vertex_indices(0,IMAX,0,JMAX,0,0,(IMAX,JMAX,KMAX))       # Constant KMIN Face
-indices_kmax_face = get_face_vertex_indices(0,IMAX,0,JMAX,KMAX,KMAX,(IMAX,JMAX,KMAX)) # Constant KMAX Face
+indices_kmin_face = get_face_vertex_indices(0,0,0,IMAX,JMAX,0,(IMAX,JMAX,KMAX))       # Constant KMIN Face
+indices_kmax_face = get_face_vertex_indices(0,0,KMAX,IMAX,JMAX,KMAX,(IMAX,JMAX,KMAX)) # Constant KMAX Face
 
 indices_jmin_face_reverseI = get_face_vertex_indices(IMAX,0,0,0,0,KMAX,(IMAX,JMAX,KMAX))       # Constant JMIN Face, reversing direction of I
 #%% Test Connectivity 
