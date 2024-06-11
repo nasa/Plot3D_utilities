@@ -1,20 +1,17 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Periodicity &#8212; Plot3D 1.6.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <script src="../_static/documentation_options.js?v=452006c5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -47,7 +44,7 @@
           <div class="body" role="main">
             
   <section id="periodicity">
-<h1>Periodicity<a class="headerlink" href="#periodicity" title="Permalink to this heading">¶</a></h1>
+<h1>Periodicity<a class="headerlink" href="#periodicity" title="Link to this heading">¶</a></h1>
 <p>The domain above has a periodicity on the side walls and from block 1 to block 2 on the suction side. Plot3D library can find periodic surfaces. Periodic surfaces can only be found by rotation about the x-axis. The user also needs to specify which direction is periodic either <em>i</em>, <em>j</em>, or <em>k</em>. Combinations of outer faces are searched to find the ones that are periodic when rotated about the x-axis and in the “k” direction (default option). Below is an example on how to find periodic surfaces.</p>
 <p>In this example we will use the file  <a class="reference external" href="https://nasa-public-data.s3.amazonaws.com/plot3d_utilities/PahtCascade-ASCII.xyz">PahtCascade-ASCII</a></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">periodicity</span><span class="p">,</span> <span class="n">connectivity</span>
@@ -60,13 +57,16 @@
 </pre></div>
 </div>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block1-2.png"><img alt="periodic surface from block 1 to block 2" src="../_images/turbine_domain-periodic-block1-2.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block1-2.png"><img alt="periodic surface from block 1 to block 2" src="../_images/turbine_domain-periodic-block1-2.png" style="width: 800px;" />
+</a>
 </figure>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block2-inlet.png"><img alt="periodic surface block 2 entrance of the domain" src="../_images/turbine_domain-periodic-block2-inlet.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block2-inlet.png"><img alt="periodic surface block 2 entrance of the domain" src="../_images/turbine_domain-periodic-block2-inlet.png" style="width: 800px;" />
+</a>
 </figure>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block2-outlet.png"><img alt="periodic surface block 2 exit of the domain" src="../_images/turbine_domain-periodic-block2-outlet.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block2-outlet.png"><img alt="periodic surface block 2 exit of the domain" src="../_images/turbine_domain-periodic-block2-outlet.png" style="width: 800px;" />
+</a>
 </figure>
 </section>
 
@@ -94,7 +94,7 @@
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
@@ -102,7 +102,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -128,8 +128,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>
