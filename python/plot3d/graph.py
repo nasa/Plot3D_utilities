@@ -120,8 +120,8 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
     """
     
     for con in connectivities: 
-        block1_index = con['block1']['index']
-        block2_index = con['block2']['index']
+        block1_index = con['block1']['block_index']
+        block2_index = con['block2']['block_index']
         IMIN1,IMAX1 = con['block1']['IMIN'], con['block1']['IMAX']
         JMIN1,JMAX1 = con['block1']['JMIN'], con['block1']['JMAX']
         KMIN1,KMAX1 = con['block1']['KMIN'], con['block1']['KMAX']
