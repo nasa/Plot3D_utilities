@@ -2,10 +2,10 @@ import sys
 sys.path.insert(0,'../../')
 import numpy as np
 import networkx as nx 
-from plot3d import read_plot3D
+from plot3d import read_plot3D, write_plot3D
 from plot3d.graph import block_to_graph, get_face_vertex_indices, add_connectivity_to_graph
 
-# blocks = read_plot3D('VSPT_ASCII.xyz',binary=False,read_double=False)
+
 
 
 #%% Example of a 6x6 block 
@@ -100,4 +100,5 @@ G = nx.compose_all([G1,G2])
 G = add_connectivity_to_graph(G,block_sizes,block_to_block_connectivity)
 # IMAX, JMAX, KMAX = block[0].IMAX, block[0].JMAX, block[0].KMAX
 
-print('done')
+
+
