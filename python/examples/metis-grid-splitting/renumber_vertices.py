@@ -16,7 +16,6 @@ def reindex_vertices(v:npt.NDArray,G:nx.graph.Graph):
 
 if not os.path.exists('./VSPT_Binary.xyz'):
     blocks = read_plot3D('VSPT_ASCII.xyz',binary=False,read_double=False)
-    write_plot3D('VSPT_Binary.xyz',blocks,binary=True)    # Writing plot3D to binary file
     
     face_matches, outer_faces = connectivity_fast(blocks)
     
@@ -42,6 +41,7 @@ if not os.path.exists('./VSPT_Binary.xyz'):
                         "outer_faces":outer_faces,
                         "graph":G
                     },f)    
+    write_plot3D('VSPT_Binary.xyz',blocks,binary=True)    # Writing plot3D to binary file
 
 else:
     blocks = read_plot3D('VSPT_Binary.xyz',binary=True)
