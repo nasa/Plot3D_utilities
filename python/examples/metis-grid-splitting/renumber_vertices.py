@@ -37,7 +37,8 @@ if not os.path.exists('./VSPT_Binary.xyz'):
     
     
     G = nx.compose_all(graphs)    
-    
+    G = add_connectivity_to_graph(G,block_sizes,face_matches)
+
     with open('connectivity.pickle','wb') as f:
         [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({
@@ -55,6 +56,5 @@ with open('connectivity.pickle','rb') as f:
     outer_faces = data['outer_faces']
     G = data["graph"]
     block_sizes = data["block_sizes"]
-    
-G = add_connectivity_to_graph(G,block_sizes,face_matches)
+print("done")
 

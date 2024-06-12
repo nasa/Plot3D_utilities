@@ -3,7 +3,7 @@ import numpy.typing as npt
 import networkx as nx 
 import itertools as it
 from typing import Dict, Tuple, List
-
+import tqdm 
 
 def block_to_graph(IMAX:int,JMAX:int,KMAX:int,offset:int = 0) -> nx.graph.Graph:
     """Converts a block to a graph
@@ -119,7 +119,7 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
         nx.graph.Graph: networkx graph object with added edges 
     """
     
-    for con in connectivities: 
+    for con in tqdm.tqdm(connectivities,"Adding connectivity to Graph"):
         block1_index = con['block1']['block_index']
         block2_index = con['block2']['block_index']
         IMIN1,IMAX1 = con['block1']['IMIN'], con['block1']['IMAX']
