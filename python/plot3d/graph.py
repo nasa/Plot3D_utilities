@@ -137,7 +137,7 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
         if block1_index!= block2_index:
             nodes_to_add = face1
             nodes_to_replace = face2
-            for node_to_add,node_to_replace in zip(nodes_to_add,nodes_to_replace):
+            for node_to_add,node_to_replace in tqdm.tqdm(zip(nodes_to_add,nodes_to_replace)):
                 G.add_edges_from(
                     it.product(
                         G.neighbors(node_to_add),
