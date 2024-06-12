@@ -131,8 +131,8 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
         KMIN2,KMAX2 = con['block2']['KMIN'], con['block2']['KMAX']
         
         # Number of connectivities should match
-        face1 = get_face_vertex_indices(IMIN1,IMAX1,JMIN1,JMAX1,KMIN1,KMAX1,block_sizes[block1_index]) + get_starting_vertex(block1_index, block_sizes)    
-        face2 = get_face_vertex_indices(IMIN2,IMAX2,JMIN2,JMAX2,KMIN2,KMAX2,block_sizes[block2_index]) + get_starting_vertex(block2_index, block_sizes)
+        face1 = get_face_vertex_indices(IMIN1,JMIN1,KMIN1,IMAX1,JMAX1,KMAX1,block_sizes[block1_index]) + get_starting_vertex(block1_index, block_sizes)    
+        face2 = get_face_vertex_indices(IMIN2,JMIN2,KMIN2,IMAX2,JMAX2,KMAX2,block_sizes[block2_index]) + get_starting_vertex(block2_index, block_sizes)
         
         if block1_index!= block2_index:
             nodes_to_add = face1
