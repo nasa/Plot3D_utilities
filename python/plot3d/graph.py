@@ -174,7 +174,7 @@ def block_connectivity_to_graph(connectivities:List[Dict[str,int]],block_sizes:L
 
     
     for i in range(len(block_sizes)):
-        G.add_node(i, weight=block_sizes[i])
+        G.add_node(i, weight=block_sizes[i][0]*block_sizes[i][1]*block_sizes[i][2])
     
     # Adds the connectivity information 
     G.add_edges_from(block_to_block)
