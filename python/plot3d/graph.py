@@ -3,7 +3,7 @@ import numpy.typing as npt
 import networkx as nx 
 import itertools as it
 from typing import Dict, Tuple, List
-
+import tqdm 
 
 def block_to_graph(IMAX:int,JMAX:int,KMAX:int,offset:int = 0) -> nx.graph.Graph:
     """Converts a block to a graph
@@ -112,16 +112,16 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
 
     Args:
         G (nx.classes.graph.Graph): Giant graph 
-        block_sizes (List[Tuple[int,int,int]]): _description_
+        block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] 
         connectivity (List[Dict[str,int]]): _description_
     
     Returns:
         nx.graph.Graph: networkx graph object with added edges 
     """
     
-    for con in connectivities: 
-        block1_index = con['block1']['index']
-        block2_index = con['block2']['index']
+    for con in tqdm.tqdm(connectivities,"Adding connectivity to Graph"):
+        block1_index = con['block1']['block_index']
+        block2_index = con['block2']['block_index']
         IMIN1,IMAX1 = con['block1']['IMIN'], con['block1']['IMAX']
         JMIN1,JMAX1 = con['block1']['JMIN'], con['block1']['JMAX']
         KMIN1,KMAX1 = con['block1']['KMIN'], con['block1']['KMAX']
@@ -131,13 +131,13 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
         KMIN2,KMAX2 = con['block2']['KMIN'], con['block2']['KMAX']
         
         # Number of connectivities should match
-        face1 = get_face_vertex_indices(IMIN1,IMAX1,JMIN1,JMAX1,KMIN1,KMAX1,block_sizes[block1_index]) + get_starting_vertex(block1_index, block_sizes)    
-        face2 = get_face_vertex_indices(IMIN2,IMAX2,JMIN2,JMAX2,KMIN2,KMAX2,block_sizes[block2_index]) + get_starting_vertex(block2_index, block_sizes)
+        face1 = get_face_vertex_indices(IMIN1,JMIN1,KMIN1,IMAX1,JMAX1,KMAX1,block_sizes[block1_index]) + get_starting_vertex(block1_index, block_sizes)    
+        face2 = get_face_vertex_indices(IMIN2,JMIN2,KMIN2,IMAX2,JMAX2,KMAX2,block_sizes[block2_index]) + get_starting_vertex(block2_index, block_sizes)
         
         if block1_index!= block2_index:
             nodes_to_add = face1
             nodes_to_replace = face2
-            for node_to_add,node_to_replace in zip(nodes_to_add,nodes_to_replace):
+            for node_to_add,node_to_replace in tqdm.tqdm(zip(nodes_to_add,nodes_to_replace)):
                 G.add_edges_from(
                     it.product(
                         G.neighbors(node_to_add),
@@ -152,3 +152,33 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
             G.add_edge(face1[i],face2[i])
             
     return G
+
+def block_connectivity_to_graph(connectivities:List[Dict[str,int]],block_sizes:List[Tuple[int,int,int]]) -> nx.graph.Graph:
+    """Models the blocks at vertices connected to each other 
+
+    Args:
+        connectivities (List[Dict[str,int]]): List of connectivities 
+        block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] 
+    Returns:
+        nx.graph.Graph: Graph object 
+    """
+    block_to_block = list()
+    G = nx.Graph()
+    for con in tqdm.tqdm(connectivities,"Adding connectivity to Graph"):
+        block1_index = con['block1']['block_index']
+        block2_index = con['block2']['block_index']
+        
+        block_to_block.append((block1_index,block2_index))
+    
+    # Adds the nodes
+
+    
+    for i in range(len(block_sizes)):
+        G.add_node(i, weight=block_sizes[i])
+    
+    # Adds the connectivity information 
+    G.add_edges_from(block_to_block)
+    
+    return G
+    
+    
