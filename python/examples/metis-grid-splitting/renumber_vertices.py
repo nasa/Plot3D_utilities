@@ -7,13 +7,24 @@ import numpy.typing as npt
 import networkx as nx
 import pickle
 from glennht_con import export_to_glennht_conn
+import json
+
 
 def reindex_vertices(v:npt.NDArray,G:nx.graph.Graph):
     mapping = dict()
     nodes = np.array(list(G.nodes()))
     
     nx.relabel_nodes(G,mapping)
-    
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NpEncoder, self).default(obj)
 
 if not os.path.exists('./VSPT_Binary.xyz'):
     blocks = read_plot3D('VSPT_ASCII.xyz',binary=False,read_double=False)
@@ -37,7 +48,6 @@ if not os.path.exists('./VSPT_Binary.xyz'):
     
     
     G = nx.compose_all(graphs)    
-    G = add_connectivity_to_graph(G,block_sizes,face_matches)
 
     with open('connectivity.pickle','wb') as f:
         [m.pop('match',None) for m in face_matches] # Remove the dataframe
@@ -46,15 +56,24 @@ if not os.path.exists('./VSPT_Binary.xyz'):
                         "outer_faces":outer_faces_to_keep,
                         "graph":G,
                         "block_sizes":block_sizes
-                    },f)    
+                    },f)
+    
+    with open('connectivity-julia.json','w') as f:
+        
+        [m.pop('match',None) for m in face_matches] # Remove the dataframe
+        json.dump({
+                        "face_matches":face_matches, 
+                        "outer_faces":outer_faces_to_keep,  
+                        "block_sizes":block_sizes                      
+                    },f,cls=NpEncoder)    
     write_plot3D('VSPT_Binary.xyz',blocks,binary=True)    # Writing plot3D to binary file
     
-# blocks = read_plot3D('VSPT_Binary.xyz',binary=True)
-with open('connectivity.pickle','rb') as f:
-    data = pickle.load(f)
-    face_matches = data['face_matches']
-    outer_faces = data['outer_faces']
-    G = data["graph"]
-    block_sizes = data["block_sizes"]
-print("done")
+# # blocks = read_plot3D('VSPT_Binary.xyz',binary=True)
+# with open('connectivity.pickle','rb') as f:
+#     data = pickle.load(f)
+#     face_matches = data['face_matches']
+#     outer_faces = data['outer_faces']
+#     G = data["graph"]
+#     block_sizes = data["block_sizes"]
+# print("done")
 

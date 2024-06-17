@@ -112,7 +112,7 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
 
     Args:
         G (nx.classes.graph.Graph): Giant graph 
-        block_sizes (List[Tuple[int,int,int]]): _description_
+        block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] 
         connectivity (List[Dict[str,int]]): _description_
     
     Returns:
@@ -152,3 +152,33 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
             G.add_edge(face1[i],face2[i])
             
     return G
+
+def block_connectivity_to_graph(connectivities:List[Dict[str,int]],block_sizes:List[Tuple[int,int,int]]) -> nx.graph.Graph:
+    """Models the blocks at vertices connected to each other 
+
+    Args:
+        connectivities (List[Dict[str,int]]): List of connectivities 
+        block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] 
+    Returns:
+        nx.graph.Graph: Graph object 
+    """
+    block_to_block = list()
+    G = nx.Graph()
+    for con in tqdm.tqdm(connectivities,"Adding connectivity to Graph"):
+        block1_index = con['block1']['block_index']
+        block2_index = con['block2']['block_index']
+        
+        block_to_block.append((block1_index,block2_index))
+    
+    # Adds the nodes
+
+    
+    for i in range(len(block_sizes)):
+        G.add_node(i, weight=block_sizes[i])
+    
+    # Adds the connectivity information 
+    G.add_edges_from(block_to_block)
+    
+    return G
+    
+    

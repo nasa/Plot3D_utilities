@@ -163,6 +163,15 @@ class Block:
                                         +cf[4+n,l]*a[6+l][i,j,k-1+n])
                     v[i,j,k]= vol12/12
         return v
+    
+    @property
+    def size(self)->int:
+        """returns the total number of nodes 
+
+        Returns:
+            int: number of nodes
+        """
+        return self.IMAX*self.JMAX*self.KMAX
 
 def checkCollinearity(v1:np.ndarray, v2:np.ndarray):
     # Calculate their cross product
@@ -252,3 +261,4 @@ def reduce_blocks(blocks:List[Block],factor:int):
         blocks[i].Z = blocks[i].Z[::factor,::factor,::factor]
         blocks[i].IMAX,blocks[i].JMAX,blocks[i].KMAX = blocks[i].X.shape
     return blocks
+
