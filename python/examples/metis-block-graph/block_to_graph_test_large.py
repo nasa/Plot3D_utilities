@@ -12,7 +12,6 @@ def view_pydot(pdot):
     plt = Image(pdot.create_png())
     display(plt)
     
-
 face_matches =  glennht_to_con('kenji_diced_1.p3d_conn')
 max_block_index = [(f['block1']['block_index'], f['block2']['block_index']) for f in face_matches]
 max_block_index = np.max(np.array(max_block_index).flatten())
