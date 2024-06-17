@@ -10,7 +10,7 @@ import plot3d
 project = 'Plot3D'
 copyright = '2024, Paht Juangphanich'
 author = 'Paht Juangphanich <paht.juangphanich@nasa.gov>'
-release = '1.6.3'
+release = '1.6.5'
 
 rst_context = {'plot3d': plot3d}
 
