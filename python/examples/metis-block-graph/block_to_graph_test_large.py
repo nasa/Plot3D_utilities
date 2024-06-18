@@ -1,7 +1,7 @@
 #%% Import Scripts 
 import sys
 sys.path.insert(0,'../../')
-# sys.path.insert(1,'/mnt/c/GitHub/metis-python')
+sys.path.insert(0,'~/miniconda3/envs/dev/lib/python3.10/site-packages/')
 from plot3d.graph import block_connectivity_to_graph
 import numpy as np
 import networkx as nx
@@ -20,7 +20,7 @@ G = block_connectivity_to_graph(face_matches,block_sizes)
 
 #%% Split the Graph
 import metis
-G.graph['node_weight_attr'] = ['weights']
+G.graph['node_weight_attr'] = ['weight']
 nparts = 3
 (edgecuts, parts) = metis.part_graph(G, nparts,tpwgts=[0.3,0.3,0.4])
 nodes_per_part = list()
