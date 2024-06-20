@@ -167,14 +167,18 @@ def block_connectivity_to_graph(connectivities:List[Dict[str,int]],block_sizes:L
     for con in tqdm.tqdm(connectivities,"Adding connectivity to Graph"):
         block1_index = con['block1']['block_index']
         block2_index = con['block2']['block_index']
-        
-        block_to_block.append((block1_index,block2_index))
+        dI = max(con['block1']['IMAX']-con['block1']['IMIN'],1)
+        dJ = max(con['block1']['JMAX']-con['block1']['JMIN'],1)
+        dK = max(con['block1']['KMAX']-con['block1']['KMIN'],1)
+        edge_weight = dI * dJ * dK 
+        # Weight the edges based on number of connections
+        block_to_block.append((block1_index,block2_index,{"weight": int(edge_weight)}))
     
     # Adds the nodes
 
     
     for i in range(len(block_sizes)):
-        G.add_node(i, weight=block_sizes[i][0]*block_sizes[i][1]*block_sizes[i][2])
+        G.add_node(i, weight=block_sizes[i])
     
     # Adds the connectivity information 
     G.add_edges_from(block_to_block)

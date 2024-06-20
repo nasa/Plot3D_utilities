@@ -42,8 +42,8 @@ if not os.path.exists('data.pickle'):
 
 import metis
 G = read_data()['Graph']
-G.graph['node_weight_attr'] = ['weights']
-
+G.graph['node_weight_attr'] = ['weight']
+G.graph['edge_weight_attr'] = 'weight'
 (edgecuts, parts) = metis.part_graph(G, 2,tpwgts=[0.5,0.5])
 
 colors = ['red','blue','green','magenta']
