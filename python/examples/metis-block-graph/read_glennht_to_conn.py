@@ -15,13 +15,20 @@ def glennht_to_con(filename:str):
             if (len(temp) == 7):
                 if idx % 2 == 0:
                     block_to_block.append({
-                        'block1':{'block_index':blk_id1},
-                        'block2':{'block_index':temp[0]},
+                        'block1':{'block_index':blk_id1,
+                                  "IMIN":IMIN,"JMIN":JMIN,"KMIN":KMIN,
+                                  "IMAX":IMAX,"JMAX":JMAX,"KMAX":KMAX},
+                        'block2':{'block_index':temp[0],
+                                  "IMIN":temp[1],"JMIN":temp[2],"KMIN":temp[3],
+                                  "IMAX":temp[4],"JMAX":temp[5],"KMAX":temp[6]},
+                        
                     })
                                             
                 else:
                     blk_id1 = temp[0]
-                
+                    IMIN = temp[1]; JMIN = temp[2]; KMIN = temp[3]
+                    IMAX = temp[4]; JMAX = temp[5]; KMAX = temp[6]
+                    
             if idx>pairs*2:
                 break
         return block_to_block
