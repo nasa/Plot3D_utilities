@@ -37,26 +37,31 @@ if not os.path.exists('data.pickle'):
     all_faces = [m.to_dict() for m in all_faces]
 
     block_sizes = [b.size for b in blocks]
+    # This is where the edge weighting and block cell count weighting takes place
     G = block_connectivity_to_graph(face_matches,block_sizes)
     dump_data({'Graph':G})
-
+#%%
 import metis
+num_partitions = 2              # Number of partitions
+partition_weights = [0.5,0.5]   # This is how to weight each partition
+
 G = read_data()['Graph']
 G.graph['node_weight_attr'] = ['weight']
 G.graph['edge_weight_attr'] = 'weight'
 (edgecuts, parts) = metis.part_graph(G, 2,tpwgts=[0.5,0.5])
 
-colors = ['red','blue','green','magenta']
-for i, p in enumerate(parts):
-    G.nodes[i]['color'] = colors[p]
-nx.drawing.nx_pydot.write_dot(G, 'example.dot') # Requires pydot or pygraphviz
-pdot = nx.drawing.nx_pydot.to_pydot(G)
+for i in num_partitions:
+    print(f'Parition {i} has {parts.count(i)} blocks')
 
-red = parts.count(0)
-blue = parts.count(1)
-green = parts.count(2)
-magenta = parts.count(3)
-view_pydot(pdot)
-print('done')
-    
-# %%
+# colors = ['red','blue','green','magenta']
+# for i, p in enumerate(parts):
+#     G.nodes[i]['color'] = colors[p]
+# nx.drawing.nx_pydot.write_dot(G, 'example.dot') # Requires pydot or pygraphviz
+# pdot = nx.drawing.nx_pydot.to_pydot(G)
+
+# red = parts.count(0)
+# blue = parts.count(1)
+# green = parts.count(2)
+# magenta = parts.count(3)
+# view_pydot(pdot)
+# print('done')

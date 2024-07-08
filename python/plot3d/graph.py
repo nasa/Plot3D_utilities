@@ -153,12 +153,15 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
             
     return G
 
-def block_connectivity_to_graph(connectivities:List[Dict[str,int]],block_sizes:List[Tuple[int,int,int]]) -> nx.graph.Graph:
+def block_connectivity_to_graph(connectivities:List[Dict[str,int]],block_sizes:List[Tuple[int,int,int]],connectivity_multiplier:float=1,block_size_multiplier:float=1) -> nx.graph.Graph:
     """Models the blocks at vertices connected to each other 
 
     Args:
         connectivities (List[Dict[str,int]]): List of connectivities 
         block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] 
+        connectivity_multiplier (float): amount to weight the block connections by. Defaults to 1.
+        block_size_multiplier (float): amount to weight the size of the blocks by. Defaults to 1 
+        
     Returns:
         nx.graph.Graph: Graph object 
     """
@@ -170,15 +173,13 @@ def block_connectivity_to_graph(connectivities:List[Dict[str,int]],block_sizes:L
         dI = max(con['block1']['IMAX']-con['block1']['IMIN'],1)
         dJ = max(con['block1']['JMAX']-con['block1']['JMIN'],1)
         dK = max(con['block1']['KMAX']-con['block1']['KMIN'],1)
-        edge_weight = dI * dJ * dK 
+        edge_weight = dI * dJ * dK *connectivity_multiplier
         # Weight the edges based on number of connections
         block_to_block.append((block1_index,block2_index,{"weight": int(edge_weight)}))
     
-    # Adds the nodes
-
-    
+    # Adds the nodes and node weights
     for i in range(len(block_sizes)):
-        G.add_node(i, weight=block_sizes[i])
+        G.add_node(i, weight=block_sizes[i]*block_size_multiplier)
     
     # Adds the connectivity information 
     G.add_edges_from(block_to_block)
