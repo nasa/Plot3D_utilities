@@ -20,10 +20,10 @@ G = block_connectivity_to_graph(face_matches,block_sizes)
 
 #%% Split the Graph
 import metis
-G.graph['node_weight_attr'] = ['weight']
+# G.graph['node_weight_attr'] = ['weight']
 G.graph['edge_weight_attr'] = 'weight'
 nparts = 3
-(edgecuts, parts) = metis.part_graph(G, nparts,tpwgts=[0.3,0.3,0.4])
+(edgecuts, parts) = metis.part_graph(G, nparts,tpwgts=None)
 nodes_per_part = list()
 # Print number of cells for each part
 for i in range(nparts):
@@ -33,6 +33,25 @@ for i in range(nparts):
         nodes += block_sizes[idx-1]
     nodes_per_part.append(nodes)
 
+for i in range(nparts):
+    print(f'Parition {i} has {parts.count(i)} blocks')
+
+# Determine work for each partition
+communication_work = np.zeros((nparts,))
+partition_edge_weights = np.zeros((nparts,))
+for b in range(max_block_index+1):
+    partition_id = parts[b]
+    for connected_block in G.adj[b]:
+        connected_block_partition = parts[connected_block]
+        edge_weight = G.adj[b][connected_block]['weight']
+        if connected_block_partition != partition_id:
+            communication_work[partition_id]+=1
+            partition_edge_weights[partition_id] += edge_weight
+
+for i in range(nparts):
+    print(f'Parition {i} com_work {communication_work[i]} edge_work {partition_edge_weights[i]}')
+
+    
 #%% Plotting
 colors = ['red','blue','green','magenta']
 for i, p in enumerate(parts):

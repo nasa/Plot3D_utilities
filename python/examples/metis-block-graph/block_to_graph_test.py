@@ -50,7 +50,7 @@ G.graph['node_weight_attr'] = ['weight']
 G.graph['edge_weight_attr'] = 'weight'
 (edgecuts, parts) = metis.part_graph(G, 2,tpwgts=[0.5,0.5])
 
-for i in num_partitions:
+for i in range(num_partitions):
     print(f'Parition {i} has {parts.count(i)} blocks')
 
 # colors = ['red','blue','green','magenta']
