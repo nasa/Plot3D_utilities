@@ -153,7 +153,7 @@ def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[in
             
     return G
 
-def block_connectivity_to_graph(connectivities:List[Dict[str,int]],block_sizes:List[Tuple[int,int,int]],connectivity_multiplier:float=1,block_size_multiplier:float=1) -> nx.graph.Graph:
+def block_connectivity_to_graph(connectivities:List[Dict[str,int]],block_sizes:List[int],connectivity_multiplier:float=1,block_size_multiplier:float=1) -> nx.graph.Graph:
     """Models the blocks at vertices connected to each other 
 
     Args:
