@@ -27,10 +27,10 @@ connection_weights.append(10) # 0 to 2
 face_matches = []
 for con,weight in zip(connections,connection_weights):
     face_matches.append({
-        'block1':{'block_index':0,"IMAX":weight,"JMAX":1,"KMAX":1,
-                  "IMIN":weight,"JMIN":1,"KMIN":1},
-        "block2":{'block_index':1,"IMAX":weight,"JMAX":1,"KMAX":1,
-                "IMIN":weight,"JMIN":1,"KMIN":1}})
+        'block1':{'block_index':con[0],"IMAX":weight,"JMAX":1,"KMAX":1,
+                  "IMIN":0,"JMIN":1,"KMIN":1},
+        "block2":{'block_index':con[1],"IMAX":weight,"JMAX":1,"KMAX":1,
+                "IMIN":0,"JMIN":1,"KMIN":1}})
 nparts=2 # Number of splits 
 block_sizes = [20,20,20,20] # Block size
 
