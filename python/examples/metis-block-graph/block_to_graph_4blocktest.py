@@ -8,14 +8,32 @@ import networkx as nx
 from read_glennht_to_conn import glennht_to_con
 from IPython.display import Image, display
 
-def view_pydot(pdot):
-    plt = Image(pdot.create_png())
-    display(plt)
-    
-face_matches =  glennht_to_con('kenji_diced_1.p3d_conn')
-max_block_index = [(f['block1']['block_index'], f['block2']['block_index']) for f in face_matches]
-max_block_index = np.max(np.array(max_block_index).flatten())
-block_sizes = [(np.random.randint(33,101)*np.random.randint(33,101)*np.random.randint(33,101)) for _ in range(max_block_index)]
+'''  _____ _____
+    |     |     |
+    |  0  |  1  |
+    |_____|_____|
+    |     |     |
+    |  2  |  3  |
+    |_____|_____|
+    edge from 0 to 1:
+'''
+connections = [(0,1),(0,2),
+                (2,3),(1,3)]
+connection_weights = [10]      # 0 to 1
+connection_weights.append(10) # 0 to 2
+connection_weights.append(10) # 0 to 2
+connection_weights.append(10) # 0 to 2
+
+face_matches = []
+for con,weight in zip(connections,connection_weights):
+    face_matches.append({
+        'block1':{'block_index':con[0],"IMAX":weight,"JMAX":1,"KMAX":1,
+                  "IMIN":0,"JMIN":1,"KMIN":1},
+        "block2":{'block_index':con[1],"IMAX":weight,"JMAX":1,"KMAX":1,
+                "IMIN":0,"JMIN":1,"KMIN":1}})
+nparts=2 # Number of splits 
+block_sizes = [20,20,20,20] # Block size
+
 G = block_connectivity_to_graph(face_matches,block_sizes)
 
 #%% Split the Graph
@@ -39,7 +57,7 @@ for i in range(nparts):
 # Determine work for each partition
 communication_work = np.zeros((nparts,))
 partition_edge_weights = np.zeros((nparts,))
-for b in range(max_block_index+1):
+for b in range(len(block_sizes)+1):
     partition_id = parts[b]
     for connected_block in G.adj[b]:
         connected_block_partition = parts[connected_block]
@@ -50,18 +68,3 @@ for b in range(max_block_index+1):
 
 for i in range(nparts):
     print(f'Parition {i} com_work {communication_work[i]} edge_work {partition_edge_weights[i]}')
-
-    
-#%% Plotting
-colors = ['red','blue','green','magenta']
-for i, p in enumerate(parts):
-    G.nodes[i]['color'] = colors[p]
-nx.drawing.nx_pydot.write_dot(G, 'example.dot') # Requires pydot or pygraphviz
-pdot = nx.drawing.nx_pydot.to_pydot(G)
-
-red = parts.count(0)
-blue = parts.count(1)
-green = parts.count(2)
-magenta = parts.count(3)
-view_pydot(pdot)
-print('done')
