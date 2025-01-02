@@ -36,6 +36,7 @@ A python library for reading, writing, finding connectivity for plot3d files.
    modules/differencing
    modules/face
    modules/facefunctions
+   modules/graph
    modules/read
    modules/write
    modules/split_block

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>plot3d.graph &#8212; Plot3D 1.6.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
+    
+    <script src="../../_static/documentation_options.js?v=2ad11211"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">plot3d.graph</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for plot3d.graph</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span> 
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+
+
+<div class="viewcode-block" id="block_to_graph">
+<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.block_to_graph">[docs]</a>
+<span class="k">def</span> <span class="nf">block_to_graph</span><span class="p">(</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">offset</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a block to a graph</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        IMAX (int): block.IMAX</span>
+<span class="sd">        JMAX (int): block.JMAX</span>
+<span class="sd">        KMAX (int): block.KMAX</span>
+<span class="sd">        offset (int): IMAX*JMAX*KMAX of previous block </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        nx.graph.Graph: networkx graph object </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="n">irange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">IMAX</span><span class="p">)</span>
+    <span class="n">jrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">JMAX</span><span class="p">)</span>
+    <span class="n">krange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">KMAX</span><span class="p">)</span>
+    <span class="n">kshift</span> <span class="o">=</span> <span class="mi">0</span> 
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KMAX</span><span class="p">):</span> <span class="c1"># K slices </span>
+        <span class="n">kshift</span> <span class="o">=</span> <span class="n">IMAX</span><span class="o">*</span><span class="n">JMAX</span><span class="o">*</span><span class="n">k</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">JMAX</span><span class="p">):</span>
+            <span class="n">nx</span><span class="o">.</span><span class="n">add_star</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">offset</span><span class="o">+</span> <span class="n">kshift</span> <span class="o">+</span> <span class="n">IMAX</span><span class="o">*</span><span class="n">j</span> <span class="o">+</span> <span class="n">irange</span><span class="p">,</span><span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">IMAX</span><span class="p">):</span>
+            <span class="n">nx</span><span class="o">.</span><span class="n">add_star</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">offset</span><span class="o">+</span><span class="n">kshift</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="n">IMAX</span><span class="o">*</span><span class="n">jrange</span><span class="p">,</span><span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">IMAX</span><span class="o">*</span><span class="n">JMAX</span><span class="p">):</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">add_star</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">p</span> <span class="o">+</span> <span class="n">IMAX</span><span class="o">*</span><span class="n">JMAX</span><span class="o">*</span><span class="n">krange</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">G</span></div>
+
+
+<div class="viewcode-block" id="get_face_vertex_indices">
+<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.get_face_vertex_indices">[docs]</a>
+<span class="k">def</span> <span class="nf">get_face_vertex_indices</span><span class="p">(</span><span class="n">IMIN</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMIN</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMIN</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">block_size</span><span class="p">:</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns an array containing the vertex number of a given face </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        IMIN (int): starting I index</span>
+<span class="sd">        JMIN (int): starting J index</span>
+<span class="sd">        KMIN (int): starting K index</span>
+<span class="sd">        IMAX (int): ending I index</span>
+<span class="sd">        JMAX (int): ending J index</span>
+<span class="sd">        KMAX (int): ending K index</span>
+<span class="sd">        block_size (Tuple[int,int,int]): This is the actual IMAX,JMAX,KMAX of the block</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        npt.NDArray: an array containing all the vertices </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">create_range</span><span class="p">(</span><span class="n">indx1</span><span class="p">,</span><span class="n">indx2</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">indx1</span><span class="o">&lt;</span><span class="n">indx2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">indx1</span><span class="p">,</span><span class="n">indx2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">indx1</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">indx2</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        
+    <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">IMIN</span><span class="o">==</span><span class="n">IMAX</span><span class="p">:</span>
+        <span class="n">jrange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">JMIN</span><span class="p">,</span><span class="n">JMAX</span><span class="p">)</span>
+        <span class="n">krange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">KMIN</span><span class="p">,</span><span class="n">KMAX</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">IMIN</span><span class="o">==</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="c1"># IMIN is really IMAX</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jrange</span><span class="p">:</span>
+                <span class="n">j_offset</span> <span class="o">=</span> <span class="n">j</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="c1"># IMAX * JMAX</span>
+                <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j_offset</span> <span class="o">+</span> <span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">krange</span> <span class="o">+</span> <span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jrange</span><span class="p">:</span>
+                <span class="n">j_offset</span> <span class="o">=</span> <span class="n">j</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j_offset</span> <span class="o">+</span> <span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">krange</span><span class="p">)</span>
+        
+    <span class="k">elif</span> <span class="n">JMIN</span> <span class="o">==</span> <span class="n">JMAX</span><span class="p">:</span>
+        <span class="n">irange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">IMIN</span><span class="p">,</span><span class="n">IMAX</span><span class="p">)</span>
+        <span class="n">krange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">KMIN</span><span class="p">,</span><span class="n">KMAX</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">JMIN</span><span class="o">==</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># JMIN is really JMAX</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">krange</span><span class="p">:</span>
+                <span class="n">k_offset</span> <span class="o">=</span> <span class="n">k</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> 
+                <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k_offset</span> <span class="o">+</span> <span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">irange</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>                   <span class="c1"># JMIN</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">krange</span><span class="p">:</span>
+                <span class="n">k_offset</span> <span class="o">=</span> <span class="n">k</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k_offset</span> <span class="o">+</span> <span class="n">irange</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">irange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">IMIN</span><span class="p">,</span><span class="n">IMAX</span><span class="p">)</span>
+        <span class="n">jrange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">JMIN</span><span class="p">,</span><span class="n">JMAX</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">KMIN</span> <span class="o">==</span> <span class="n">block_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="c1"># KMIN is really KMAX</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">KMIN</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span> 
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jrange</span><span class="p">:</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">offset</span><span class="o">+</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">j</span> <span class="o">+</span> <span class="n">irange</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_starting_vertex">
+<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.get_starting_vertex">[docs]</a>
+<span class="k">def</span> <span class="nf">get_starting_vertex</span><span class="p">(</span><span class="n">blockIndex</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">block_sizes</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the starting vertex index of the block</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blockIndex (int): index of block</span>
+<span class="sd">        block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: offset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span> 
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">blockIndex</span><span class="p">):</span>
+        <span class="n">offset</span><span class="o">+=</span><span class="n">block_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">block_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">offset</span></div>
+
+
+<div class="viewcode-block" id="add_connectivity_to_graph">
+<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.add_connectivity_to_graph">[docs]</a>
+<span class="k">def</span> <span class="nf">add_connectivity_to_graph</span><span class="p">(</span><span class="n">G</span><span class="p">:</span><span class="n">nx</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span><span class="n">block_sizes</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">connectivities</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert plot3d defined connectivity into additional graph edges </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        G (nx.classes.graph.Graph): Giant graph </span>
+<span class="sd">        block_sizes (List[Tuple[int,int,int]]): _description_</span>
+<span class="sd">        connectivity (List[Dict[str,int]]): _description_</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        nx.graph.Graph: networkx graph object with added edges </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">connectivities</span><span class="p">:</span> 
+        <span class="n">block1_index</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
+        <span class="n">block2_index</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
+        <span class="n">IMIN1</span><span class="p">,</span><span class="n">IMAX1</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span>
+        <span class="n">JMIN1</span><span class="p">,</span><span class="n">JMAX1</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span>
+        <span class="n">KMIN1</span><span class="p">,</span><span class="n">KMAX1</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span>
+        
+        <span class="n">IMIN2</span><span class="p">,</span><span class="n">IMAX2</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span>
+        <span class="n">JMIN2</span><span class="p">,</span><span class="n">JMAX2</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span>
+        <span class="n">KMIN2</span><span class="p">,</span><span class="n">KMAX2</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span>
+        
+        <span class="c1"># Number of connectivities should match</span>
+        <span class="n">face1</span> <span class="o">=</span> <span class="n">get_face_vertex_indices</span><span class="p">(</span><span class="n">IMIN1</span><span class="p">,</span><span class="n">IMAX1</span><span class="p">,</span><span class="n">JMIN1</span><span class="p">,</span><span class="n">JMAX1</span><span class="p">,</span><span class="n">KMIN1</span><span class="p">,</span><span class="n">KMAX1</span><span class="p">,</span><span class="n">block_sizes</span><span class="p">[</span><span class="n">block1_index</span><span class="p">])</span> <span class="o">+</span> <span class="n">get_starting_vertex</span><span class="p">(</span><span class="n">block1_index</span><span class="p">,</span> <span class="n">block_sizes</span><span class="p">)</span>    
+        <span class="n">face2</span> <span class="o">=</span> <span class="n">get_face_vertex_indices</span><span class="p">(</span><span class="n">IMIN2</span><span class="p">,</span><span class="n">IMAX2</span><span class="p">,</span><span class="n">JMIN2</span><span class="p">,</span><span class="n">JMAX2</span><span class="p">,</span><span class="n">KMIN2</span><span class="p">,</span><span class="n">KMAX2</span><span class="p">,</span><span class="n">block_sizes</span><span class="p">[</span><span class="n">block2_index</span><span class="p">])</span> <span class="o">+</span> <span class="n">get_starting_vertex</span><span class="p">(</span><span class="n">block2_index</span><span class="p">,</span> <span class="n">block_sizes</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">block1_index</span><span class="o">!=</span> <span class="n">block2_index</span><span class="p">:</span>
+            <span class="n">nodes_to_add</span> <span class="o">=</span> <span class="n">face1</span>
+            <span class="n">nodes_to_replace</span> <span class="o">=</span> <span class="n">face2</span>
+            <span class="k">for</span> <span class="n">node_to_add</span><span class="p">,</span><span class="n">node_to_replace</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nodes_to_add</span><span class="p">,</span><span class="n">nodes_to_replace</span><span class="p">):</span>
+                <span class="n">G</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span>
+                    <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+                        <span class="n">G</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">node_to_add</span><span class="p">),</span>
+                        <span class="n">G</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">node_to_replace</span><span class="p">)</span>
+                        <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">G</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">node_to_replace</span><span class="p">)</span>
+                
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">face2</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Number of connections from </span><span class="si">{</span><span class="n">block1_index</span><span class="si">}</span><span class="s2"> I[</span><span class="si">{</span><span class="n">IMIN1</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">IMAX1</span><span class="si">}</span><span class="s2">], J[</span><span class="si">{</span><span class="n">JMIN1</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">JMAX1</span><span class="si">}</span><span class="s2">], K[</span><span class="si">{</span><span class="n">KMIN1</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">KMAX1</span><span class="si">}</span><span class="s2">] to </span><span class="si">{</span><span class="n">block2_index</span><span class="si">}</span><span class="s2"> I[</span><span class="si">{</span><span class="n">IMIN2</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">IMAX2</span><span class="si">}</span><span class="s2">], J[</span><span class="si">{</span><span class="n">JMIN2</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">JMAX2</span><span class="si">}</span><span class="s2">], K[</span><span class="si">{</span><span class="n">KMIN2</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">KMAX2</span><span class="si">}</span><span class="s2">] should match.&quot;</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">face1</span><span class="p">)):</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">face1</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">face2</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            
+    <span class="k">return</span> <span class="n">G</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">plot3d.graph</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>
