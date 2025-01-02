@@ -1,3 +1,7 @@
+from __future__ import absolute_import
+from importlib import import_module     
+import os, warnings
+
 from .block import Block, reduce_blocks
 from .blockfunctions import rotate_block,get_outer_bounds,block_connection_matrix
 from .connectivity import find_matching_blocks, get_face_intersection, connectivity_fast, face_matches_to_dict
@@ -10,4 +14,11 @@ from .periodicity import periodicity, periodicity_fast, create_rotation_matrix, 
 from .point_match import point_match
 from .split_block import split_blocks, Direction
 from .listfunctions import unique_pairs
-from .graph import block_to_graph,get_face_vertex_indices,get_starting_vertex,add_connectivity_to_graph, block_connectivity_to_graph
+
+# Try importing metis
+if os.getenv('METIS_DLL') is not None:
+    if import_module('metis') is not None:
+        import metis
+        from .graph import block_to_graph,get_face_vertex_indices,get_starting_vertex,add_connectivity_to_graph, block_connectivity_to_graph
+else:
+    print("METIS_DLL is not set. metis may not be configured. plot3D will function without metis")
