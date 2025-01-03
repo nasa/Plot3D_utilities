@@ -1,0 +1,4 @@
+Number of partitions 3
+Parition 0 has communication work 21.0 edge_work 20992.0
+Parition 1 has communication work 43.0 edge_work 43008.0
+Parition 2 has communication work 22.0 edge_work 22016.0

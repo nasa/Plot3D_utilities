@@ -142,6 +142,7 @@ def create_ddcmp(ght_conn:str,ddcmp_file:str='ddcmp.dat',nparts:int=3,pkl_file_b
             for isp in range(nISP):
                 for bIdx in range(nBlocks):
                     f.write(f'{bIdx+1:d} {isp+1:d}\n')
+            # Write which block goes to which Processor 
             for block_indx,p in enumerate(parts):
                 f.write(f'{block_indx+1:d} {p+1:d}\n')
            
@@ -186,8 +187,8 @@ def create_ddcmp(ght_conn:str,ddcmp_file:str='ddcmp.dat',nparts:int=3,pkl_file_b
     write_ddcmp(parts[1:],nZones=nZones,filename=ddcmp_file) # Fortran starts at 1 
 
 if __name__=="__main__":
-    create_ddcmp("CMC9/conn.ght_conn",ddcmp_file='CMC9/ddcmp.dat',nparts=3,pkl_file_blocksizes='CMC9/blocksizes.pickle')
-    create_ddcmp("EEE-Stator/conn.ght_conn",ddcmp_file='EEE-Stator/ddcmp.dat',nparts=3,pkl_file_blocksizes='EEE-Stator/blocksizes.pickle')
+    create_ddcmp("python/examples/metis-block-graph/CMC9/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/CMC9/ddcmp.dat',nparts=3,pkl_file_blocksizes='python/examples/metis-block-graph/CMC9/blocksizes.pickle')
+    create_ddcmp("python/examples/metis-block-graph/EEE-Stator/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/EEE-Stator/ddcmp.dat',nparts=3,pkl_file_blocksizes='python/examples/metis-block-graph/EEE-Stator/blocksizes.pickle')
 
 
 
