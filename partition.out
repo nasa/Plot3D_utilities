@@ -1,4 +1,6 @@
-Number of partitions 3
-Parition 0 has communication work 198.0 edge_work 17088.0
-Parition 1 has communication work 317.0 edge_work 31584.0
-Parition 2 has communication work 329.0 edge_work 32928.0
+Number of partitions/processors 5
+Parition/processor 0 has communication work 209.0 edge_work 18944.0
+Parition/processor 1 has communication work 420.0 edge_work 38624.0
+Parition/processor 2 has communication work 337.0 edge_work 33568.0
+Parition/processor 3 has communication work 313.0 edge_work 32096.0
+Parition/processor 4 has communication work 317.0 edge_work 32272.0

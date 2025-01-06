@@ -132,7 +132,7 @@ def create_ddcmp(ght_conn:str,ddcmp_file:str='ddcmp.dat',nprocessors:int=3,pkl_f
             np.ndarray: Number of connections between partitions
         """
         nProc = max(parts)+1 # Fortran starts at 1
-        nISP = nZones # not always true
+        nISP = nProc # not always true
         nBlocks = len(parts)
         with open(filename,'w') as f:
             f.write(f'{nProc:d}\n')
@@ -143,23 +143,25 @@ def create_ddcmp(ght_conn:str,ddcmp_file:str='ddcmp.dat',nprocessors:int=3,pkl_f
                 for isp in range(nISP):
                     f.write(f'{bIdx+1:d} {isp+1:d}\n')
             # Write which ISP goes to which Processor 
-            for isp,p in enumerate(parts):
+            for isp,p in zip(range(nISP),range(nProc)):
                 f.write(f'{isp+1:d} {p:d}\n')
            
     max_block_index, face_matches,connections,nZones,zone_types,Zones,GIFs = read_ght_conn(ght_conn)
         
-    assert (nZones==1,"Code is configured to only use single zone (Fluid) or (Solid) not both")
+    assert (nZones!=1,"Code is configured to only use single zone (Fluid) or (Solid) not both")
 
     G = block_connectivity_to_graph(face_matches,connections[:,1])
+    
+    if nprocessors>max_block_index:
+        print(f"Number of processors cannot exceed number of blocks, setting nprocessors to {max_block_index}")
+        nprocessors=max_block_index
     
     # G.graph['node_weight_attr'] = ['weight']
     G.graph['edge_weight_attr'] = 'weight'
     (edgecuts, parts) = metis.part_graph(G, nprocessors,tpwgts=None)
 
     # Single zone, number of ISP = number of processors = keep it simple stupid
-
     nBlocks = len(parts)
-
     if not pkl_file_blocksizes:
         blocksizes = read_data(pkl_file_blocksizes)         # Useful for knowing how many nodes per partition
         nodes_per_part = list()
@@ -194,8 +196,9 @@ def create_ddcmp(ght_conn:str,ddcmp_file:str='ddcmp.dat',nprocessors:int=3,pkl_f
     write_ddcmp(parts[1:],nZones=nZones,filename=ddcmp_file) # Fortran starts at 1 
 
 if __name__=="__main__":
-    create_ddcmp("python/examples/metis-block-graph/CMC9/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/CMC9/ddcmp.dat',nprocessors=3,pkl_file_blocksizes='python/examples/metis-block-graph/CMC9/blocksizes.pickle')
-    create_ddcmp("python/examples/metis-block-graph/EEE-Stator/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/EEE-Stator/ddcmp.dat',nprocessors=3,pkl_file_blocksizes='python/examples/metis-block-graph/EEE-Stator/blocksizes.pickle')
+    create_ddcmp("python/examples/metis-block-graph/CMC9/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/CMC9/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/CMC9/blocksizes.pickle')
+
+    create_ddcmp("python/examples/metis-block-graph/EEE-Stator/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/EEE-Stator/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/EEE-Stator/blocksizes.pickle')
 
 
 
