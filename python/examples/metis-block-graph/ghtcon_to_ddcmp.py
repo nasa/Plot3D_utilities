@@ -162,7 +162,7 @@ def create_ddcmp(ght_conn:str,ddcmp_file:str='ddcmp.dat',nprocessors:int=3,pkl_f
 
     # Single zone, number of ISP = number of processors = keep it simple stupid
     nBlocks = len(parts)
-    if not pkl_file_blocksizes:
+    if pkl_file_blocksizes:
         blocksizes = read_data(pkl_file_blocksizes)         # Useful for knowing how many nodes per partition
         nodes_per_part = list()
         # Print number of cells for each part
@@ -173,32 +173,34 @@ def create_ddcmp(ght_conn:str,ddcmp_file:str='ddcmp.dat',nprocessors:int=3,pkl_f
                 nodes += blocksizes[idx-1]
             nodes_per_part.append(nodes)
 
-    for i in range(nprocessors):
-        print(f'Parition {i} has {parts.count(i)} blocks')
-
-    # Determine work for each partition
-    communication_work = np.zeros((nprocessors,))
-    partition_edge_weights = np.zeros((nprocessors,))
-    for b in range(1,max_block_index+1):
-        partition_id = parts[b]
-        for connected_block in G.adj[b]:
-            connected_block_partition = parts[connected_block]
-            edge_weight = G.adj[b][connected_block]['weight']
-            if connected_block_partition != partition_id:
-                communication_work[partition_id]+=1
-                partition_edge_weights[partition_id] += edge_weight
-
-    with open('partition.out','w') as f:
-        f.write(f'Number of partitions/processors {nprocessors}\n')
         for i in range(nprocessors):
-            f.write(f'Parition/processor {i} has communication work {communication_work[i]} edge_work {partition_edge_weights[i]}\n')
+            print(f'Parition {i} has {parts.count(i)} blocks')
+
+        # Determine work for each partition
+        communication_work = np.zeros((nprocessors,))       # Number of blocks for each processor
+        partition_edge_weights = np.zeros((nprocessors,))   # Number of face nodes 
+        volume_nodes = np.zeros((nprocessors,))             # Number of nodes per processor
+        for b in range(1,max_block_index+1):
+            partition_id = parts[b]
+            volume_nodes[partition_id] += blocksizes[b-1]
+            for connected_block in G.adj[b]:
+                connected_block_partition = parts[connected_block]
+                edge_weight = G.adj[b][connected_block]['weight']
+                if connected_block_partition != partition_id:
+                    communication_work[partition_id]+=1
+                    partition_edge_weights[partition_id] += edge_weight
+
+        with open('partition.out','w') as f:
+            f.write(f'Number of partitions/processors {nprocessors}\n')
+            for i in range(nprocessors):
+                f.write(f'Parition/processor {i} has communication work {communication_work[i]:d} edge_work {partition_edge_weights[i]:d} volume_nodes {volume_nodes[i]:d}\n')
     
     write_ddcmp(parts[1:],nZones=nZones,filename=ddcmp_file) # Fortran starts at 1 
 
 if __name__=="__main__":
-    create_ddcmp("python/examples/metis-block-graph/CMC9/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/CMC9/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/CMC9/blocksizes.pickle')
+    create_ddcmp("python/examples/metis-block-graph/CMC9/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/CMC9/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/CMC9/CMC009_blocksizes.pickle')
 
-    create_ddcmp("python/examples/metis-block-graph/EEE-Stator/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/EEE-Stator/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/EEE-Stator/blocksizes.pickle')
+    create_ddcmp("python/examples/metis-block-graph/EEE-Stator/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/EEE-Stator/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/EEE-Stator/Combust_diced_blocksizes.pickle')
 
 
 

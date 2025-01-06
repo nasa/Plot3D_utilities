@@ -1,6 +1,6 @@
 Number of partitions/processors 5
-Parition/processor 0 has communication work 209.0 edge_work 18944.0
-Parition/processor 1 has communication work 420.0 edge_work 38624.0
-Parition/processor 2 has communication work 337.0 edge_work 33568.0
-Parition/processor 3 has communication work 313.0 edge_work 32096.0
-Parition/processor 4 has communication work 317.0 edge_work 32272.0
+Parition/processor 0 has communication work 209.0 edge_work 18944.0 volume_nodes 1007235.0
+Parition/processor 1 has communication work 420.0 edge_work 38624.0 volume_nodes 915156.0
+Parition/processor 2 has communication work 337.0 edge_work 33568.0 volume_nodes 1233756.0
+Parition/processor 3 has communication work 313.0 edge_work 32096.0 volume_nodes 1106487.0
+Parition/processor 4 has communication work 317.0 edge_work 32272.0 volume_nodes 1087740.0
