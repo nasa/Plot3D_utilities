@@ -22,4 +22,4 @@ For Mac. install homebrew and do `brew install metis` then add this to your ~/.z
 
 3. Install metis python library `pip install metis`
 
-Now you are ready to run the test code.
+Now you are ready to run the [test code](https://github.com/nasa/Plot3D_utilities/blob/main/python/examples/metis-block-graph/ghtcon_to_ddcmp.py).
