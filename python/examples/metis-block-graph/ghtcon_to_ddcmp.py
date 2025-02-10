@@ -198,9 +198,13 @@ def create_ddcmp(ght_conn:str,ddcmp_file:str='ddcmp.dat',nprocessors:int=3,pkl_f
     write_ddcmp(parts[1:],nZones=nZones,filename=ddcmp_file) # Fortran starts at 1 
 
 if __name__=="__main__":
-    create_ddcmp("python/examples/metis-block-graph/CMC9/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/CMC9/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/CMC9/CMC009_blocksizes.pickle')
+    
+    create_ddcmp("/Users/pjuangph/Documents/GitHub/glennht_gui/ddcmp_test/combine/connectivity.ght_conn",ddcmp_file="/Users/pjuangph/Documents/GitHub/glennht_gui/ddcmp_test/combine/ddcmp",nprocessors=3,pkl_file_blocksizes='python/examples/metis-block-graph/CMC9/CMC009_blocksizes.pickle')
+    
+    
+    # create_ddcmp("python/examples/metis-block-graph/CMC9/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/CMC9/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/CMC9/CMC009_blocksizes.pickle')
 
-    create_ddcmp("python/examples/metis-block-graph/EEE-Stator/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/EEE-Stator/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/EEE-Stator/Combust_diced_blocksizes.pickle')
+    # create_ddcmp("python/examples/metis-block-graph/EEE-Stator/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/EEE-Stator/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/EEE-Stator/Combust_diced_blocksizes.pickle')
 
 
 
