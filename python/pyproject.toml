@@ -12,7 +12,7 @@ pandas = "*"
 tqdm = "*"
 networkx = "*"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.deve.dependencies]
 
 [build-system]
 requires = ["poetry>=1.1.2"]

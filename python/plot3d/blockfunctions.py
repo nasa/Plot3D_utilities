@@ -1,12 +1,17 @@
 from copy import deepcopy
-from itertools import combinations
+from itertools import combinations, product
 import math
 import numpy as np
-from typing import Dict, List
+from typing import Dict, List, Optional, Set, Tuple
 from tqdm import trange
 from .facefunctions import create_face_from_diagonals, get_outer_faces
-from .block import Block
+from .block import Block, combine_8_blocks,find_matching_faces
 from .face import Face
+import tqdm
+import networkx as nx
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  
+
 
 def rotate_block(block,rotation_matrix:np.ndarray) -> Block:
     """Rotates a block by a rotation matrix 
@@ -150,7 +155,7 @@ def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[
         if len(outer_faces)==0:                     # Get the outerfaces to search
             b1_outer_faces,_ = get_outer_faces(b1)
         else:
-            b1_outer_faces = [o for o in outer_faces if o.BlockIndex == i]
+            b1_outer_faces = [o for o in outer_faces if o.BlockIndex == i] # type: ignore
         
         if i != j and connectivity[i,j]!=-1:
             b2 = blocks[j]
@@ -158,13 +163,13 @@ def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[
             if len(outer_faces)==0:                 # Get the outerfaces to search
                 b2_outer_faces,_ = get_outer_faces(b2)
             else:
-                b2_outer_faces = [o for o in outer_faces if o.BlockIndex == j]                
+                b2_outer_faces = [o for o in outer_faces if o.BlockIndex == j]                 # type: ignore
 
             # Check to see if any of the outer faces of the blocks match   
             connection_found=False             
             for f1 in b1_outer_faces:
                 for f2 in b2_outer_faces:
-                    if (f1.is_connected(f2,tol)):   # Check if face centroid is the same
+                    if (f1.is_connected(f2,tol)):   # type: ignore # Check if face centroid is the same
                         connectivity[i,j] = 1       # Default block to block connection matrix 
                         connectivity[j,i] = 1
                         connection_found=True
@@ -177,3 +182,121 @@ def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[
                 connectivity[i,j] = -1
                 connectivity[j,i] = -1      
     return connectivity
+
+
+def plot_blocks(blocks):
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    markers = ['o', 's']  # circle, square
+
+    for i,b in enumerate(blocks):
+        x_flat = b.X.ravel()
+        y_flat = b.Y.ravel()
+        z_flat = b.Z.ravel()
+        ax.scatter(
+                x_flat, y_flat, z_flat,
+                s=1, alpha=0.4, # type: ignore
+                marker=markers[i % len(markers)],
+                label=f'Block {i}'
+            )    
+        ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z') # type: ignore
+    ax.set_title('3D Block Grid')
+    plt.show()
+
+def split_blocks(blocks:List[Block],gcd:int=4):
+    """Split blocks but also keep greatest common divisor
+
+    Args:
+        blocks (List[]): _description_
+        gcd (int, optional): _description_. Defaults to 4.
+    """
+    pass
+
+def common_neighbor(G: nx.Graph, a: int, b: int, exclude: Set[int]) -> int:
+    """
+    Return a node that is connected to both `a` and `b` and not in `exclude`.
+    """
+    for n in G.neighbors(a):
+        if n in exclude:
+            continue
+        if G.has_edge(n, b):
+            return n
+    return None
+
+def build_connectivity_graph(connectivities: List[List[Dict]]) -> nx.Graph:
+    """
+    Build an undirected graph from a list of face-to-face block connectivities.
+    Each edge connects two block indices.
+    """
+    G = nx.Graph()
+    for pair in connectivities:
+        block1 = pair['block1']['block_index'] # type: ignore
+        block2 = pair['block2']['block_index'] # type: ignore
+        G.add_edge(block1, block2)
+    return G
+
+def combine_spatial_group_from_connectivity(blocks:List[Block],
+    seed_index: int,
+    connectivities: List[List[Dict]],
+    already_used: Optional[Set[int]] = None
+) -> Tuple[Optional[Block], Set[int]]:
+    """
+    Combine a group of `count` connected blocks starting from `seed_index` using connectivity data.
+
+    Args:
+        seed_index: Index of the starting block.
+        blocks_by_index: Dict from block_index to Block object.
+        connectivities: List of connectivity pairs (each pair = two dicts with block_index and face extents).
+        count: Number of blocks to group (4, 8, or 26).
+        already_used: Optional set of block indices already grouped.
+
+    Returns:
+        A merged Block and the set of block indices used.
+    """
+    if already_used is None:
+        already_used = set()
+
+    if seed_index in already_used:
+        return None, set() # type: ignore
+
+    # Build graph from connectivity info
+    G = build_connectivity_graph(connectivities)
+    neighbors = list(G.neighbors(seed_index))
+    full_group = []
+    for i in range(len(neighbors)):
+        for j in range(i+1, len(neighbors)):
+            for k in range(j+1, len(neighbors)):
+                n1, n2, n3 = neighbors[i], neighbors[j], neighbors[k]
+
+                # Ensure they are not directly connected to each other (orthogonal assumption)
+                if G.has_edge(n1, n2) or G.has_edge(n1, n3) or G.has_edge(n2, n3):
+                    continue
+
+                base_corner = {seed_index, n1, n2, n3}
+
+                # Try to find the 4 diagonal opposites
+                ab = common_neighbor(G, n1, n2, exclude=base_corner)
+                if ab is None:
+                    continue
+                bc = common_neighbor(G, n2, n3, exclude=base_corner.union({ab}))
+                if bc is None:
+                    continue
+                ac = common_neighbor(G, n1, n3, exclude=base_corner.union({ab, bc}))
+                if ac is None:
+                    continue
+
+                abc = common_neighbor(G, ab, bc, exclude=base_corner.union({ac}))
+                if abc is None or not G.has_edge(abc, ac):
+                    continue
+
+                full_group = base_corner.union({ab, bc, ac, abc})
+
+
+    if len(full_group) == 8:
+        visited_blocks = [blocks[b] for b in full_group]
+        merged = combine_8_blocks(visited_blocks)
+        visited_blocks.append(merged)
+        plot_blocks(visited_blocks)
+    print('check')

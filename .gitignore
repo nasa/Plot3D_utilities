@@ -8,3 +8,5 @@
 *.p3d
 *.x
 *.lock
+python/mesh.pickle
+python/examples/WELD/weld_ascii.bxyz

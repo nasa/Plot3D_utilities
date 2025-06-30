@@ -58,8 +58,8 @@ def find_matching_blocks(block1:Block,block2:Block,block1_outer:List[Face], bloc
             if match:
                 break
         if match:
-            block1_outer.pop(p)
-            block2_outer.pop(q)
+            block1_outer.pop(p) # type: ignore
+            block2_outer.pop(q) # type: ignore
             block1_outer.extend(block1_split_faces)
             block2_outer.extend(block2_split_faces)
             block1_split_faces.clear()
@@ -395,10 +395,10 @@ def connectivity(blocks:List[Block]):
     outer_faces = list()      
     face_matches = list()
     matches_to_remove = list()
-    # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[4],blocks[7],1E-12)    # This function finds partial matches between blocks
     temp = [get_outer_faces(b) for b in blocks]
     block_outer_faces = [t[0] for t in temp]
     combos = combinations_of_nearest_blocks(blocks,6) # Find the 6 nearest Blocks and search through all that. 
+    # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[0],blocks[1],[block_outer_faces[0][0],block_outer_faces[0][1]],[block_outer_faces[1][0],block_outer_faces[1][1]],1E-12)    # This function finds partial matches between blocks
 
     t = trange(len(combos))    
     for indx in t:     # block i        
