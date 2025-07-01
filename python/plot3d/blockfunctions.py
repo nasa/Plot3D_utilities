@@ -546,3 +546,101 @@ def combine_2x2x2_cubes(
             break
 
     return merged_groups
+
+def combine_nxnxn_cubes(
+    blocks: List[Block],
+    connectivities: List[List[Dict]],
+    cube_size: int = 2,
+    tol: float = 1e-8
+) -> List[Tuple[Block, Set[int]]]:
+    """
+    Find and combine all non-overlapping nxnxn cube groups of blocks
+    using face connectivity data and return the merged components.
+
+    Parameters
+    ----------
+    blocks : List[Block]
+        All input block objects.
+    connectivities : List of face match metadata pairs
+        Face connectivity between blocks.
+    cube_size : int
+        Size of the cube (e.g. 2 for 2x2x2, 4 for 4x4x4).
+    tol : float
+        Face match tolerance.
+
+    Returns
+    -------
+    List[Tuple[Block, Set[int]]]
+        A list of merged Block objects and their source block indices.
+    """
+    from itertools import product
+
+    used = set()
+    merged_groups = []
+    G = build_connectivity_graph(connectivities)
+
+    remaining_indices = list(range(len(blocks)))
+
+    def find_nxnxn_group(seed_index):
+        from collections import deque
+        visited = set()
+        queue = deque([seed_index])
+        group = set()
+
+        while queue and len(group) < cube_size ** 3:
+            idx = queue.popleft()
+            if idx in visited or idx in used:
+                continue
+            visited.add(idx)
+            group.add(idx)
+            for nbr in G.neighbors(idx):
+                if nbr not in visited and nbr not in used:
+                    queue.append(nbr)
+
+        return group if len(group) == cube_size ** 3 else None
+
+    while True:
+        before_len = len(remaining_indices)
+        merged_this_round = False
+        new_used = set()
+
+        i = 0
+        while i < len(remaining_indices):
+            seed_index = remaining_indices[i]
+            if seed_index in used:
+                i += 1
+                continue
+
+            group_indices = find_nxnxn_group(seed_index)
+            if not group_indices or group_indices & new_used:
+                i += 1
+                continue
+
+            group_block_list = [blocks[k] for k in sorted(group_indices)]
+            index_mapping = {i: orig_idx for i, orig_idx in enumerate(sorted(group_indices))}
+
+            try:
+                partial_merges, local_indices = combine_8_blocks(group_block_list, tol=tol)
+                for merged_block in partial_merges:
+                    merged_group = {index_mapping[i] for i in local_indices}
+                    merged_groups.append((merged_block, merged_group))
+                    new_used.update(merged_group)
+                merged_this_round = True
+            except Exception as e:
+                print(f"⚠️ Skipping group {group_indices} due to error: {e}")
+                i += 1
+                continue
+
+            # Update remaining_indices and restart inner loop
+            remaining_indices = [idx for idx in remaining_indices if idx not in new_used]
+            i = 0
+
+        used.update(new_used)
+
+        if not merged_this_round or len(remaining_indices) == before_len:
+            print("✅ No further merges possible. Appending unmerged blocks.")
+            for idx in remaining_indices:
+                merged_groups.append((blocks[idx], {idx}))
+            break
+
+    return merged_groups

@@ -1,5 +1,5 @@
 import os 
-from plot3d import write_plot3D, read_plot3D, split_blocks,combine_2x2x2_cubes
+from plot3d import write_plot3D, read_plot3D, split_blocks,combine_2x2x2_cubes,combine_nxnxn_cubes
 from plot3d import connectivity_fast, plot_blocks, find_matching_faces, combine_blocks
 import pickle 
 
@@ -27,10 +27,14 @@ with open('connectivity.pickle','rb') as f:
     blocks = pickle.load(open('mesh.pickle','rb'))
     print('mesh read')
 
-    merged = combine_2x2x2_cubes(blocks, face_matches)
-    merged_block_only = [m[0] for m in merged]
+    merged_2x2x2 = combine_2x2x2_cubes(blocks, face_matches)
+    merged_2x2x2_block_only = [m[0] for m in merged_2x2x2]
+    
+    merged_3x3x3 = combine_nxnxn_cubes(blocks, face_matches,cube_size=3)
+    merged_3x3x3_block_only = [m[0] for m in merged_3x3x3]
     # write_plot3D("unmerged.xyz",blocks,binary=False)
     # print('wrote unmerged')
-    write_plot3D("merged.xyz",merged_block_only,binary=False)
+    write_plot3D("merged_2x2x2.xyz",merged_2x2x2_block_only,binary=False)
+    write_plot3D("merged_3x3x3.xyz",merged_2x2x2_block_only,binary=False)
     print('wrote merged')
     print('check')
