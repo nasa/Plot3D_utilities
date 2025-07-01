@@ -1,5 +1,5 @@
 import os 
-from plot3d import write_plot3D, read_plot3D, split_blocks,combine_spatial_group_from_connectivity
+from plot3d import write_plot3D, read_plot3D, split_blocks,combine_2x2x2_cubes
 from plot3d import connectivity_fast, plot_blocks, find_matching_faces, combine_blocks
 import pickle 
 
@@ -27,29 +27,10 @@ with open('connectivity.pickle','rb') as f:
     blocks = pickle.load(open('mesh.pickle','rb'))
     print('mesh read')
 
-        
-    blocks_by_index = {i: block for i, block in enumerate(blocks)}
-
-    used_blocks = set()
-    merged_blocks = []
-
-    for seed_index in blocks_by_index:
-        if seed_index in used_blocks:
-            continue
-
-        merged, used = combine_spatial_group_from_connectivity(blocks=blocks,
-            seed_index=seed_index,
-            connectivities=face_matches,
-            already_used=used_blocks
-        )
-
-        if merged:
-            merged_blocks.append(merged)
-            used_blocks.update(used)
-
-    print(f"Merged {len(merged_blocks)} block groups.")
-
-    # unique_blocks_indices = list(set([item for sublist in groups[0] for item in sublist]))
-    # unique_blocks = [blocks[b] for b in unique_blocks_indices]
-    # plot_blocks(unique_blocks)
+    merged = combine_2x2x2_cubes(blocks, face_matches)
+    merged_block_only = [m[0] for m in merged]
+    # write_plot3D("unmerged.xyz",blocks,binary=False)
+    # print('wrote unmerged')
+    write_plot3D("merged.xyz",merged_block_only,binary=False)
+    print('wrote merged')
     print('check')

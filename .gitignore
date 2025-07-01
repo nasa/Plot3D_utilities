@@ -10,3 +10,4 @@
 *.lock
 python/mesh.pickle
 python/examples/WELD/weld_ascii.bxyz
+python/connectivity.pickle

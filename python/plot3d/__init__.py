@@ -2,8 +2,8 @@ from __future__ import absolute_import
 from importlib import import_module     
 import os, warnings
 
-from .block import Block, reduce_blocks, find_matching_faces, combine_blocks
-from .blockfunctions import rotate_block,get_outer_bounds,block_connection_matrix,split_blocks,combine_spatial_group_from_connectivity, plot_blocks
+from .block import Block
+from .blockfunctions import rotate_block, get_outer_bounds, block_connection_matrix,split_blocks, combine_2x2x2_cubes, plot_blocks, reduce_blocks, find_matching_faces, combine_blocks
 from .connectivity import find_matching_blocks, get_face_intersection, connectivity_fast, face_matches_to_dict
 from .face import Face
 from .facefunctions import create_face_from_diagonals, get_outer_faces, find_connected_faces, find_bounding_faces,split_face,find_face_nearest_point,match_faces_dict_to_list,outer_face_dict_to_list,find_closest_block
