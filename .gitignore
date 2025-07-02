@@ -11,3 +11,4 @@
 python/mesh.pickle
 python/examples/WELD/weld_ascii.bxyz
 python/connectivity.pickle
+python/connectivity_2x2x2.pickle

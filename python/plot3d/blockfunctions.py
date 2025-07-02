@@ -215,7 +215,7 @@ def transform_block_to_match_face(block, face_name_src, face_name_dst):
 
     return Block(X, Y, Z)
 
-def combine_8_blocks(blocks: List[Block], tol: float = 1e-8, max_tries: int = 4) -> Tuple[List[Block], List[int]]:
+def combine_blocks(blocks: List[Block], tol: float = 1e-8, max_tries: int = 4) -> Tuple[List[Block], List[int]]:
     """
     Combine as many blocks as possible from a group of up to 8 blocks via face matching.
 
@@ -268,7 +268,7 @@ def combine_8_blocks(blocks: List[Block], tol: float = 1e-8, max_tries: int = 4)
                 face1, face2 = find_matching_faces(blk_a, blk_b, tol=tol)
                 if face1 is not None:
                     try:
-                        merged = combine_blocks(blk_a, blk_b, tol=tol)
+                        merged = combine_2_blocks(blk_a, blk_b, tol=tol)
                         found = True
                         break
                     except Exception as e:
@@ -297,7 +297,7 @@ def combine_8_blocks(blocks: List[Block], tol: float = 1e-8, max_tries: int = 4)
     return merged_blocks, used_indices
 
 
-def combine_blocks(block1, block2, tol=1e-8):
+def combine_2_blocks(block1, block2, tol=1e-8):
     """
     Combine block1 and block2 by matching and aligning one of their faces.
     Supports all 6 face pairs, including same-direction ones (e.g., jmax-jmax).
@@ -521,7 +521,7 @@ def combine_2x2x2_cubes(
             index_mapping = {i: orig_idx for i, orig_idx in enumerate(sorted(found_group))}
 
             try:
-                partial_merges, local_indices = combine_8_blocks(group_block_list, tol=tol)
+                partial_merges, local_indices = combine_blocks(group_block_list, tol=tol)
                 for merged_block in partial_merges:
                     merged_group = {index_mapping[i] for i in local_indices}
                     merged_groups.append((merged_block, merged_group))
@@ -620,7 +620,7 @@ def combine_nxnxn_cubes(
             index_mapping = {i: orig_idx for i, orig_idx in enumerate(sorted(group_indices))}
 
             try:
-                partial_merges, local_indices = combine_8_blocks(group_block_list, tol=tol)
+                partial_merges, local_indices = combine_blocks(group_block_list, tol=tol)
                 for merged_block in partial_merges:
                     merged_group = {index_mapping[i] for i in local_indices}
                     merged_groups.append((merged_block, merged_group))
