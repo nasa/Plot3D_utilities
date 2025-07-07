@@ -4,8 +4,9 @@ import math
 import numpy as np
 from typing import Dict, List, Optional, Set, Tuple
 from tqdm import trange
-from .facefunctions import create_face_from_diagonals, get_outer_faces, find_matching_faces
+from .facefunctions import create_face_from_diagonals, get_outer_faces, find_matching_faces,faces_match
 from .block import Block, reduce_blocks
+from .write import write_plot3D
 from .face import Face
 import tqdm
 import networkx as nx
@@ -164,56 +165,90 @@ def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[
                 connectivity[i,j] = -1
                 connectivity[j,i] = -1      
     return connectivity
+
 def plot_blocks(blocks):
+    gcd_array = list()    
+    for block_indx in range(len(blocks)):
+        block = blocks[block_indx]
+        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
+    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+    blocks = reduce_blocks(deepcopy(blocks),4)
+    
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
-    markers = ['o', 's']  # circle, square
+    markers = ['o', 's']  # alternate between circle and square
 
-    for i,b in enumerate(blocks):
-        x_flat = b.X.ravel()
-        y_flat = b.Y.ravel()
-        z_flat = b.Z.ravel()
-        ax.scatter(
-                x_flat, y_flat, z_flat,
-                s=1, alpha=0.4, # type: ignore
-                marker=markers[i % len(markers)],
-                label=f'Block {i}'
-            )    
-        ax.set_xlabel('X')
+    for i, b in enumerate(blocks):
+        color = f"C{i % 10}"
+        X, Y, Z = b.X, b.Y, b.Z
+        ax.scatter(X.ravel(), Y.ravel(), Z.ravel(), s=20, alpha=0.4,
+                   marker=markers[i % len(markers)], label=f'Block {i}', color=color)
+
+        # Draw lines along i-direction (axis 0)
+        for j in range(X.shape[1]):
+            for k in range(X.shape[2]):
+                ax.plot(X[:, j, k], Y[:, j, k], Z[:, j, k], color=color, linewidth=0.8, alpha=0.6)
+
+        # Draw lines along j-direction (axis 1)
+        for i_ in range(X.shape[0]):
+            for k in range(X.shape[2]):
+                ax.plot(X[i_, :, k], Y[i_, :, k], Z[i_, :, k], color=color, linewidth=0.8, alpha=0.6)
+
+        # Draw lines along k-direction (axis 2)
+        for i_ in range(X.shape[0]):
+            for j_ in range(X.shape[1]):
+                ax.plot(X[i_, j_, :], Y[i_, j_, :], Z[i_, j_, :], color=color, linewidth=0.8, alpha=0.6)
+
+    ax.set_xlabel('X')
     ax.set_ylabel('Y')
-    ax.set_zlabel('Z') # type: ignore
-    ax.set_title('3D Block Grid')
+    ax.set_zlabel('Z')
+    ax.set_title('3D Block Grid with Connected Lines')
+    ax.legend()
+    plt.tight_layout()
     plt.show()
-
-def transform_block_to_match_face(block, face_name_src, face_name_dst):
-    """
-    Given a block and two face names, transform the block so that face_name_src
-    aligns with face_name_dst in orientation.
     
-    Returns a new transformed Block instance.
+
+def transform_block_to_match_face(block, face_src: str, face_dst: str) -> Block:
+    """
+    Transform `block` so that `face_src` aligns with `face_dst`.
+
+    Handles both axis permutation and flipping.
     """
     X, Y, Z = block.X.copy(), block.Y.copy(), block.Z.copy()
 
-    # Face alignment logic
-    flip_map = {
-        ('imin', 'imax'): 0,  # flip i
-        ('imax', 'imin'): 0,
-        ('jmin', 'jmax'): 1,
-        ('jmax', 'jmin'): 1,
-        ('kmin', 'kmax'): 2,
-        ('kmax', 'kmin'): 2,
-    }
+    def face_to_axis(face: str) -> int:
+        if face.startswith('i'): return 0
+        if face.startswith('j'): return 1
+        if face.startswith('k'): return 2
+        raise ValueError(f"Invalid face name: {face}")
 
-    flip_axis = flip_map.get((face_name_src, face_name_dst))
-    if flip_axis is not None:
+    axis_src = face_to_axis(face_src)
+    axis_dst = face_to_axis(face_dst)
+
+    axes = [0, 1, 2]
+    # Step 1: transpose if axis_src != axis_dst
+    if axis_src != axis_dst:
+        axes[axis_src], axes[axis_dst] = axes[axis_dst], axes[axis_src]
+        X = np.transpose(X, axes)
+        Y = np.transpose(Y, axes)
+        Z = np.transpose(Z, axes)
+        # After transpose, axis_dst is now at position axis_src
+        flip_axis = axis_src
+    else:
+        flip_axis = axis_dst
+
+    # Step 2: flip if min ↔ max
+    flip_needed = (
+        (face_src.endswith('min') and face_dst.endswith('max')) or
+        (face_src.endswith('max') and face_dst.endswith('min'))
+    )
+    if flip_needed:
         X = np.flip(X, axis=flip_axis)
         Y = np.flip(Y, axis=flip_axis)
         Z = np.flip(Z, axis=flip_axis)
 
-    # Note: for true rotation (e.g., rotated faces), we’d need to handle transposes or axis permutations.
-    # You can expand this logic if needed.
-
     return Block(X, Y, Z)
+
 
 def combine_blocks(blocks: List[Block], tol: float = 1e-8, max_tries: int = 4) -> Tuple[List[Block], List[int]]:
     """
@@ -265,10 +300,11 @@ def combine_blocks(blocks: List[Block], tol: float = 1e-8, max_tries: int = 4) -
                 if j in skip:
                     continue
                 blk_b = merged_blocks[j]
-                face1, face2 = find_matching_faces(blk_a, blk_b, tol=tol)
+                face1, face2,_ = find_matching_faces(blk_a, blk_b, tol=tol)
                 if face1 is not None:
                     try:
                         merged = combine_2_blocks(blk_a, blk_b, tol=tol)
+                        write_plot3D('test.xyz',[merged],False)
                         found = True
                         break
                     except Exception as e:
@@ -296,50 +332,237 @@ def combine_blocks(blocks: List[Block], tol: float = 1e-8, max_tries: int = 4) -
 
     return merged_blocks, used_indices
 
+def standardize_block_orientation(block: Block) -> Block:
+    """
+    Ensures the block is oriented such that:
+    - i increases → positive X
+    - j increases → positive Y
+    - k increases → positive Z
+
+    This makes stacking blocks via concatenate safe and physically consistent.
+    """
+    X, Y, Z = block.X.copy(), block.Y.copy(), block.Z.copy()
+
+    # Check i-axis: should point in +X direction
+    dx_i = np.mean(X[1, :, :] - X[0, :, :])
+    if dx_i < 0:
+        X = np.flip(X, axis=0)
+        Y = np.flip(Y, axis=0)
+        Z = np.flip(Z, axis=0)
+
+    # Check j-axis: should point in +Y direction
+    dy_j = np.mean(Y[:, 1, :] - Y[:, 0, :])
+    if dy_j < 0:
+        X = np.flip(X, axis=1)
+        Y = np.flip(Y, axis=1)
+        Z = np.flip(Z, axis=1)
+
+    # Check k-axis: should point in +Z direction
+    dz_k = np.mean(Z[:, :, 1] - Z[:, :, 0])
+    if dz_k < 0:
+        X = np.flip(X, axis=2)
+        Y = np.flip(Y, axis=2)
+        Z = np.flip(Z, axis=2)
+
+    return Block(X, Y, Z)
+
+# Detect geometric direction mismatch and fix by flipping the sliced block2 region
+def fix_physical_direction(block1, X2s, Y2s, Z2s, axis):
+    # Determine which physical direction (X, Y, or Z) changes the most across axis
+    grads = []
+    for arr in [block1.X, block1.Y, block1.Z]:
+        grad = np.abs(np.mean(np.gradient(arr, axis=axis)))
+        grads.append(grad)
+    max_dim = np.argmax(grads)  # 0 = X, 1 = Y, 2 = Z
+
+    # Pick center line through the shared face
+    shape = block1.X.shape
+    imid, jmid, kmid = shape[0] // 2, shape[1] // 2, shape[2] // 2
+
+    # Extract 1D profile along stacking axis
+    if axis == 0:
+        p1 = [block1.X[:, jmid, kmid], block1.Y[:, jmid, kmid], block1.Z[:, jmid, kmid]]
+        p2 = [X2s[:, jmid, kmid], Y2s[:, jmid, kmid], Z2s[:, jmid, kmid]]
+    elif axis == 1:
+        p1 = [block1.X[imid, :, kmid], block1.Y[imid, :, kmid], block1.Z[imid, :, kmid]]
+        p2 = [X2s[imid, :, kmid], Y2s[imid, :, kmid], Z2s[imid, :, kmid]]
+    else:  # axis == 2
+        p1 = [block1.X[imid, jmid, :], block1.Y[imid, jmid, :], block1.Z[imid, jmid, :]]
+        p2 = [X2s[imid, jmid, :], Y2s[imid, jmid, :], Z2s[imid, jmid, :]]
+
+    v1 = np.gradient(p1[max_dim])
+    v2 = np.gradient(p2[max_dim])
+
+    if np.mean(v1) * np.mean(v2) < 0:
+        print(f"Detected physical reversal along axis {axis}, flipping block2 face region")
+        X2s = np.flip(X2s, axis=axis)
+        Y2s = np.flip(Y2s, axis=axis)
+        Z2s = np.flip(Z2s, axis=axis)
+
+    return X2s, Y2s, Z2s
+
+
+def fix_physical_direction(block1, X2s, Y2s, Z2s, axis):
+    """
+    Detects physical direction reversal (e.g., z decreasing in one block and increasing in the other).
+    Flips X2s, Y2s, Z2s along axis if needed to maintain continuity.
+    """
+    grads = []
+    for arr in [block1.X, block1.Y, block1.Z]:
+        grad = np.abs(np.mean(np.gradient(arr, axis=axis)))
+        grads.append(grad)
+    max_dim = np.argmax(grads)  # 0 = X, 1 = Y, 2 = Z
+
+    shape = block1.X.shape
+    imid, jmid, kmid = shape[0] // 2, shape[1] // 2, shape[2] // 2
+
+    if axis == 0:
+        p1 = [block1.X[:, jmid, kmid], block1.Y[:, jmid, kmid], block1.Z[:, jmid, kmid]]
+        p2 = [X2s[:, jmid, kmid], Y2s[:, jmid, kmid], Z2s[:, jmid, kmid]]
+    elif axis == 1:
+        p1 = [block1.X[imid, :, kmid], block1.Y[imid, :, kmid], block1.Z[imid, :, kmid]]
+        p2 = [X2s[imid, :, kmid], Y2s[imid, :, kmid], Z2s[imid, :, kmid]]
+    else:  # axis == 2
+        p1 = [block1.X[imid, jmid, :], block1.Y[imid, jmid, :], block1.Z[imid, jmid, :]]
+        p2 = [X2s[imid, jmid, :], Y2s[imid, jmid, :], Z2s[imid, jmid, :]]
+
+    v1 = np.gradient(p1[max_dim])
+    v2 = np.gradient(p2[max_dim])
+
+    if np.mean(v1) * np.mean(v2) < 0:
+        print(f"Detected physical reversal along axis {axis}, flipping block2 face region")
+        X2s = np.flip(X2s, axis=axis)
+        Y2s = np.flip(Y2s, axis=axis)
+        Z2s = np.flip(Z2s, axis=axis)
+
+    return X2s, Y2s, Z2s
+
+def fix_block1_physical_direction(block1: Block, axis: int) -> Block:
+    """
+    Flip block1 along the specified axis if the dominant spatial dimension
+    decreases from index min to index max (i.e., physically upside down).
+    """
+    X, Y, Z = block1.X.copy(), block1.Y.copy(), block1.Z.copy()
+    shape = X.shape
+    imid, jmid, kmid = shape[0] // 2, shape[1] // 2, shape[2] // 2
+
+    if axis == 0:
+        line = np.array([X[:, jmid, kmid], Y[:, jmid, kmid], Z[:, jmid, kmid]])
+    elif axis == 1:
+        line = np.array([X[imid, :, kmid], Y[imid, :, kmid], Z[imid, :, kmid]])
+    else:  # axis == 2
+        line = np.array([X[imid, jmid, :], Y[imid, jmid, :], Z[imid, jmid, :]])
+
+    # Compute average delta of each spatial component
+    dz = line[2][-1] - line[2][0]
+    dy = line[1][-1] - line[1][0]
+    dx = line[0][-1] - line[0][0]
+
+    # Find dominant spatial direction
+    deltas = [dx, dy, dz]
+    dominant_axis = np.argmax(np.abs(deltas))
+    dominant_delta = deltas[dominant_axis]
+
+    if dominant_delta < 0:
+        print(f"Flipping block1 along axis {axis} to align dominant direction (axis {dominant_axis})")
+        X = np.flip(X, axis=axis)
+        Y = np.flip(Y, axis=axis)
+        Z = np.flip(Z, axis=axis)
+
+    return Block(X, Y, Z)
+
 
 def combine_2_blocks(block1, block2, tol=1e-8):
     """
     Combine block1 and block2 by matching and aligning one of their faces.
-    Supports all 6 face pairs, including same-direction ones (e.g., jmax-jmax).
-    Returns a new merged Block with geometry preserved.
+    Corrects both index and physical direction mismatches.
     """
-    face1, face2 = find_matching_faces(block1, block2, tol=tol)
-    if face1 is None:
-        print("No matching faces found between the blocks.")
+    face1, face2, flip_flags = find_matching_faces(block1, block2, tol=tol)
+
+    if face1 is None or flip_flags is None:
+        print("No matching faces or face mismatch.")
         return block1
 
     print(f"Blocks connected: block1.{face1} matches block2.{face2}")
+    flip_ud, flip_lr = flip_flags
+    X2, Y2, Z2 = block2.X.copy(), block2.Y.copy(), block2.Z.copy()
 
+    # Determine axis of stacking
     axis_map = {
         ('imax', 'imin'): 0, ('imin', 'imax'): 0, ('imin', 'imin'): 0, ('imax', 'imax'): 0,
         ('jmax', 'jmin'): 1, ('jmin', 'jmax'): 1, ('jmin', 'jmin'): 1, ('jmax', 'jmax'): 1,
         ('kmax', 'kmin'): 2, ('kmin', 'kmax'): 2, ('kmin', 'kmin'): 2, ('kmax', 'kmax'): 2,
     }
-
     key = (face1, face2)
     if key not in axis_map:
         raise NotImplementedError(f"Merge not supported for face pair: {key}")
     axis = axis_map[key]
 
-    # Transform block2 to align with block1
-    aligned_block2 = transform_block_to_match_face(block2, face2, face1)
+    # Flip block1 for correct stacking direction
+    block1 = fix_block1_physical_direction(block1, axis)
 
-    # Slice off overlapping face to avoid duplication
-    slicer = [slice(None), slice(None), slice(None)]
-    if face2 in ['imin', 'jmin', 'kmin']:
-        slicer[axis] = slice(1, None)  # Keep tail of block2
+    # Step 1: Flip block2 for face alignment
+    if face2 in ['imin', 'imax']:
+        if flip_ud:
+            X2 = np.flip(X2, axis=1)
+            Y2 = np.flip(Y2, axis=1)
+            Z2 = np.flip(Z2, axis=1)
+        if flip_lr:
+            X2 = np.flip(X2, axis=2)
+            Y2 = np.flip(Y2, axis=2)
+            Z2 = np.flip(Z2, axis=2)
+    elif face2 in ['jmin', 'jmax']:
+        if flip_ud:
+            X2 = np.flip(X2, axis=0)
+            Y2 = np.flip(Y2, axis=0)
+            Z2 = np.flip(Z2, axis=0)
+        if flip_lr:
+            X2 = np.flip(X2, axis=2)
+            Y2 = np.flip(Y2, axis=2)
+            Z2 = np.flip(Z2, axis=2)
+    elif face2 in ['kmin', 'kmax']:
+        if flip_ud:
+            X2 = np.flip(X2, axis=0)
+            Y2 = np.flip(Y2, axis=0)
+            Z2 = np.flip(Z2, axis=0)
+        if flip_lr:
+            X2 = np.flip(X2, axis=1)
+            Y2 = np.flip(Y2, axis=1)
+            Z2 = np.flip(Z2, axis=1)
+
+    # Step 2: Slice off overlapping face from block2
+    if face2 == 'imin':
+        X2s, Y2s, Z2s = X2[1:,:,:], Y2[1:,:,:], Z2[1:,:,:]
+    elif face2 == 'imax':
+        X2s, Y2s, Z2s = X2[:-1,:,:], Y2[:-1,:,:], Z2[:-1,:,:]
+    elif face2 == 'jmin':
+        X2s, Y2s, Z2s = X2[:,1:,:], Y2[:,1:,:], Z2[:,1:,:]
+    elif face2 == 'jmax':
+        X2s, Y2s, Z2s = X2[:,:-1,:], Y2[:,:-1,:], Z2[:,:-1,:]
+    elif face2 == 'kmin':
+        X2s, Y2s, Z2s = X2[:,:,1:], Y2[:,:,1:], Z2[:,:,1:]
+    elif face2 == 'kmax':
+        X2s, Y2s, Z2s = X2[:,:,:-1], Y2[:,:,:-1], Z2[:,:,:-1]
     else:
-        slicer[axis] = slice(0, -1)  # Keep head of block2
+        raise ValueError(f"Unexpected face2: {face2}")
 
-    X2s = aligned_block2.X[tuple(slicer)]
-    Y2s = aligned_block2.Y[tuple(slicer)]
-    Z2s = aligned_block2.Z[tuple(slicer)]
+    # Step 3: Concatenate in correct order
+    if face2 in ['imin', 'jmin', 'kmin']:
+        X = np.concatenate([block1.X, X2s], axis=axis)
+        Y = np.concatenate([block1.Y, Y2s], axis=axis)
+        Z = np.concatenate([block1.Z, Z2s], axis=axis)
+    else:
+        X = np.concatenate([X2s, block1.X], axis=axis)
+        Y = np.concatenate([Y2s, block1.Y], axis=axis)
+        Z = np.concatenate([Z2s, block1.Z], axis=axis)
 
-    X = np.concatenate([block1.X, X2s], axis=axis)
-    Y = np.concatenate([block1.Y, Y2s], axis=axis)
-    Z = np.concatenate([block1.Z, Z2s], axis=axis)
+    # Step 4: Standardize and return
+    merged = Block(X, Y, Z)
+    write_plot3D('block1.xyz',[block1,block2,merged],False)
+    return standardize_block_orientation(merged)
 
-    return Block(X, Y, Z)
+
+
 
 def checkCollinearity(v1:npt.NDArray, v2:npt.NDArray):
     # Calculate their cross product
@@ -642,5 +865,5 @@ def combine_nxnxn_cubes(
             for idx in remaining_indices:
                 merged_groups.append((blocks[idx], {idx}))
             break
-
+    
     return merged_groups

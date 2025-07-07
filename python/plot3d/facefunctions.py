@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 from .listfunctions import unique_pairs
 from .block import Block, reduce_blocks
 from .face import Face 
@@ -7,66 +7,54 @@ import numpy.typing as npt
 import numpy as np
 import math
 
-def faces_match(face1: Tuple[npt.NDArray, npt.NDArray, npt.NDArray],face2: Tuple[npt.NDArray, npt.NDArray, npt.NDArray],tol: float = 1e-12) -> bool:
+def faces_match(face1: Tuple[npt.NDArray, npt.NDArray, npt.NDArray],face2: Tuple[npt.NDArray, npt.NDArray, npt.NDArray],tol: float = 1e-12) -> Tuple[bool, Optional[Tuple[bool, bool]]]:
     """
-    Quickly compare two block faces by checking if their corners and diagonals match geometrically.
-    Faces are a tuple of (X, Y, Z) arrays of shape (m, n).
-    
-    Returns True if face1 and face2 have matching corner and diagonal geometry within tolerance.
+    Compare two block faces and return whether they match and the flip required on face2 to match face1.
+    Returns (True, (flip_ud, flip_lr)) if matching, otherwise (False, None).
     """
-    def extract_diagonals(X, Y, Z):
-        diagonals = [
-            ((X[0, 0] + X[-1, -1]) / 2, (Y[0, 0] + Y[-1, -1]) / 2, (Z[0, 0] + Z[-1, -1]) / 2),
-            ((X[0, -1] + X[-1, 0]) / 2, (Y[0, -1] + Y[-1, 0]) / 2, (Z[0, -1] + Z[-1, 0]) / 2)
-        ]
-        return np.array(diagonals)
+    def get_corners(X, Y, Z):
+        return np.array([
+            [X[0, 0], Y[0, 0], Z[0, 0]],
+            [X[0, -1], Y[0, -1], Z[0, -1]],
+            [X[-1, 0], Y[-1, 0], Z[-1, 0]],
+            [X[-1, -1], Y[-1, -1], Z[-1, -1]],
+        ])
 
     X1, Y1, Z1 = face1
     X2, Y2, Z2 = face2
 
     if X1.shape != X2.shape:
-        return False
+        return False, None
 
-    # Extract corners and diagonals
-    diagonals1 = extract_diagonals(X1, Y1, Z1)
-    diagonals2 = extract_diagonals(X2, Y2, Z2)
+    corners1 = get_corners(X1, Y1, Z1)
+    for flip_ud in [False, True]:
+        for flip_lr in [False, True]:
+            X2f, Y2f, Z2f = X2.copy(), Y2.copy(), Z2.copy()
+            if flip_ud:
+                X2f, Y2f, Z2f = np.flip(X2f, axis=0), np.flip(Y2f, axis=0), np.flip(Z2f, axis=0)
+            if flip_lr:
+                X2f, Y2f, Z2f = np.flip(X2f, axis=1), np.flip(Y2f, axis=1), np.flip(Z2f, axis=1)
 
-    # Diagonal match: check all 2x2 combinations
-    diagonals_match = False
-    for d1 in diagonals1:
-        for d2 in diagonals2:
-            if np.linalg.norm(np.array(d1) - np.array(d2)) <= tol:
-                diagonals_match = True
-                break
-        if diagonals_match:
-            break
+            corners2 = get_corners(X2f, Y2f, Z2f)
+            diffs = np.linalg.norm(corners1 - corners2, axis=1)
+            if np.all(diffs <= tol):
+                return True, (flip_ud, flip_lr)
 
-    return diagonals_match 
-
-def find_matching_faces(block1:Block, block2:Block,tol:float=1E-12):
-    """Return the matching face pair (name1, name2) if any faces match between block1 and block2.
-
-    Note: 
-        Use for fully connected faces
-        
-    Args:
-        block1 (Block): First Block
-        block2 (Block): Second Block
-        tol (float, optional): _description_. Defaults to 1E-12.
-
-    Returns:
-        _type_: _description_
+    return False, None
+def find_matching_faces(block1, block2, tol=1e-8):
     """
-    
-    
+    Returns a tuple (face1_name, face2_name, flip_flags) if a matching face is found.
+    Otherwise returns (None, None, None).
+    """
     faces1 = block1.get_faces()
     faces2 = block2.get_faces()
-    
-    for name1, f1 in faces1.items():
-        for name2, f2 in faces2.items():
-            if faces_match(f1, f2, tol):
-                return name1, name2
-    return None, None
+    for face1_name, face1_data in faces1.items():
+        for face2_name, face2_data in faces2.items():
+            match, flip_flags = faces_match(face1_data, face2_data, tol=tol)
+            if match:
+                return face1_name, face2_name, flip_flags
+    return None, None, None
+
 
 def get_outer_faces(block1:Block):
     """Get the outer faces of a block
