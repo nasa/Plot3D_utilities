@@ -181,7 +181,7 @@ def plot_blocks(blocks):
     for i, b in enumerate(blocks):
         color = f"C{i % 10}"
         X, Y, Z = b.X, b.Y, b.Z
-        ax.scatter(X.ravel(), Y.ravel(), Z.ravel(), s=20, alpha=0.4,
+        ax.scatter(X.ravel(), Y.ravel(), Z.ravel(), s=20, alpha=0.4, # type: ignore
                    marker=markers[i % len(markers)], label=f'Block {i}', color=color)
 
         # Draw lines along i-direction (axis 0)
@@ -201,7 +201,7 @@ def plot_blocks(blocks):
 
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
+    ax.set_zlabel('Z') # type: ignore
     ax.set_title('3D Block Grid with Connected Lines')
     ax.legend()
     plt.tight_layout()
@@ -449,7 +449,7 @@ def combine_2_blocks(block1, block2, tol=1e-8):
     key = (face1, face2)
     if key not in axis_map:
         raise NotImplementedError(f"Merge not supported for face pair: {key}")
-    axis = axis_map[key]
+    axis = axis_map[key] # type: ignore
 
     # Flip block1 for correct stacking direction
     block1 = fix_physical_direction(block1, axis)
@@ -597,7 +597,7 @@ def split_blocks(blocks:List[Block],gcd:int=4):
     """
     pass
 
-def common_neighbor(G: nx.Graph, a: int, b: int, exclude: Set[int]) -> int:
+def common_neighbor(G: nx.Graph, a: int, b: int, exclude: Set[int]) -> Optional[int]:
     """
     Return a node that is connected to both `a` and `b` and not in `exclude`.
     """
@@ -606,7 +606,7 @@ def common_neighbor(G: nx.Graph, a: int, b: int, exclude: Set[int]) -> int:
             continue
         if G.has_edge(n, b):
             return n
-    return None
+    return None 
 
 def build_connectivity_graph(connectivities: List[List[Dict]]) -> nx.Graph:
     """

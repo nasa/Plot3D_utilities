@@ -1,5 +1,5 @@
 import os 
-from plot3d import write_plot3D, read_plot3D, split_blocks,combine_2x2x2_cubes,combine_nxnxn_cubes
+from plot3d import write_plot3D, read_plot3D, split_blocks,combine_2x2x2_cubes,combine_nxnxn_cubes, combine_nxnxn_cubes_mixed_pairs
 from plot3d import connectivity_fast, plot_blocks, find_matching_faces, combine_blocks
 import pickle
 import numpy as np 
@@ -34,12 +34,12 @@ with open('connectivity.pickle','rb') as f:
     merged_outer_faces = outer_faces
     merged_block_only = blocks
     for i in range(1):
-        merged = combine_nxnxn_cubes(merged_block_only, merged_face_matches,cube_size=3)
+        merged = combine_nxnxn_cubes_mixed_pairs(merged_block_only, merged_face_matches,cube_size=3)
         merged_block_only = [m[0] for m in merged]
         # plot_blocks([merged_block_only[0],merged_block_only[1],merged_block_only[2]])
         # face_matches_2x2x2, outer_faces_formatted_2x2x2 = connectivity_fast([merged_2x2x2_block_only[0],merged_2x2x2_block_only[2]])
-        merged_n_blocks = [merged_block_only[i] for i in range(10)]
-        write_plot3D("merged_3x3x3.xyz",merged_n_blocks,binary=False) 
+        # merged_n_blocks = [merged_block_only[i] for i in range(10)]
+        write_plot3D("merged_3x3x3.xyz",merged_block_only,binary=False) 
         # merged_face_matches, merged_outer_faces = connectivity_fast(merged_block_only)
         
         # test = np.array([(c['block1']['block_index'],c['block2']['block_index'])  for c in merged_face_matches])
