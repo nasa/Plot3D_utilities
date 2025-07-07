@@ -3,7 +3,7 @@ from importlib import import_module
 import os, warnings
 
 from .block import Block
-from .blockfunctions import rotate_block, get_outer_bounds, block_connection_matrix,split_blocks, combine_2x2x2_cubes, combine_nxnxn_cubes, plot_blocks, reduce_blocks, find_matching_faces, combine_blocks
+from .blockfunctions import rotate_block, get_outer_bounds, block_connection_matrix,split_blocks, plot_blocks, reduce_blocks, find_matching_faces
 from .block_merging_mixed_facepairs import combine_nxnxn_cubes_mixed_pairs
 from .connectivity import find_matching_blocks, get_face_intersection, connectivity_fast, face_matches_to_dict
 from .face import Face
