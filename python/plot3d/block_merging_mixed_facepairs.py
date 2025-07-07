@@ -1,8 +1,9 @@
 from typing import Dict, List, Set, Tuple
 import numpy as np 
 from .block import Block
-from .blockfunctions import find_matching_faces,standardize_block_orientation, build_connectivity_graph
+from .blockfunctions import find_matching_faces, build_connectivity_graph, standardize_block_orientation
 from .write import write_plot3D
+
 
 def rotate_block_to_align_faces(X, Y, Z, face_from: str, face_to: str):
     """
@@ -44,7 +45,7 @@ def combine_2_blocks_mixed_pairing(block1, block2, tol=1e-8):
     }
 
     axis1, dir1 = face_axis_normal[face1]
-    axis2, dir2 = face_axis_normal[face2]
+    axis2, dir2 = face_axis_normal[face2] # type: ignore
 
     # Transpose block2 to align its face axis with block1's
     transpose = None
@@ -103,11 +104,11 @@ def combine_2_blocks_mixed_pairing(block1, block2, tol=1e-8):
 
     # Slice off overlapping face from block2
     slicer = [slice(None)] * 3
-    slicer[stack_axis] = slice(1, None) if face2.endswith('min') else slice(0, -1)
+    slicer[stack_axis] = slice(1, None) if face2.endswith('min') else slice(0, -1) # type: ignore
     X2s, Y2s, Z2s = X2[tuple(slicer)], Y2[tuple(slicer)], Z2[tuple(slicer)]
 
     # Concatenate along stack axis
-    if face2.endswith('min'):
+    if face2.endswith('min'): # type: ignore
         X = np.concatenate([block1.X, X2s], axis=stack_axis)
         Y = np.concatenate([block1.Y, Y2s], axis=stack_axis)
         Z = np.concatenate([block1.Z, Z2s], axis=stack_axis)
@@ -180,7 +181,7 @@ def combine_blocks_mixed_pairs(blocks: List[Block], tol: float = 1e-8, max_tries
 
             if found:
                 new_merged.append(merged)
-                skip.update([i, j])
+                skip.update([i, j]) # type: ignore
             else:
                 new_merged.append(blk_a)
                 skip.add(i)
