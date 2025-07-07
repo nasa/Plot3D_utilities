@@ -60,7 +60,7 @@ Never use jupyter notebook unless you are done with your .py file and want to de
 
 
 # Funding
-The development of this library was supported by NASA AATT (Advance Air Transport Technology). The development is supported by NASA Glenn LTE Branch however anyone is welcome to contribute by submitting a pull request. 
+The development of this library was supported by NASA AATT (Advance Air Transport Technology). The development is supported by NASA Glenn LTE Branch. Anyone is welcome to contribute by submitting a pull request. 
 
 # License
 [NASA Open Source Agreement](https://opensource.org/licenses/NASA-1.3)
