@@ -304,7 +304,6 @@ def combine_blocks(blocks: List[Block], tol: float = 1e-8, max_tries: int = 4) -
                 if face1 is not None:
                     try:
                         merged = combine_2_blocks(blk_a, blk_b, tol=tol)
-                        write_plot3D('test.xyz',[merged],False)
                         found = True
                         break
                     except Exception as e:
@@ -332,33 +331,48 @@ def combine_blocks(blocks: List[Block], tol: float = 1e-8, max_tries: int = 4) -
 
     return merged_blocks, used_indices
 
-def standardize_block_orientation(block: Block) -> Block:
-    """
-    Ensures the block is oriented such that:
-    - i increases → positive X
-    - j increases → positive Y
-    - k increases → positive Z
 
-    This makes stacking blocks via concatenate safe and physically consistent.
+def standardize_block_orientation(block:Block):
+    """Standardizes the orientation of a block so that its physical coordinates increase
+    consistently along each of the indexing axes:
+
+        - X increases along the i-axis
+        - Y increases along the j-axis
+        - Z increases along the k-axis
+
+    This ensures consistent face orientation and alignment across multiple blocks,
+    especially useful when merging, visualizing, or exporting grids. The function
+    checks the dominant physical component (X, Y, or Z) along each axis, and flips
+    the block along that axis if the component decreases.
+
+    Parameters:
+        block (Block): The input block to be standardized.
+
+    Returns:
+        Block: A new block instance with all three axes oriented consistently.
     """
+
     X, Y, Z = block.X.copy(), block.Y.copy(), block.Z.copy()
+    i_center = X.shape[0] // 2
+    j_center = X.shape[1] // 2
+    k_center = X.shape[2] // 2
 
-    # Check i-axis: should point in +X direction
-    dx_i = np.mean(X[1, :, :] - X[0, :, :])
+    # Check i-direction
+    dx_i = X[-1, j_center, k_center] - X[0, j_center, k_center]
     if dx_i < 0:
         X = np.flip(X, axis=0)
         Y = np.flip(Y, axis=0)
         Z = np.flip(Z, axis=0)
 
-    # Check j-axis: should point in +Y direction
-    dy_j = np.mean(Y[:, 1, :] - Y[:, 0, :])
+    # Check j-direction
+    dy_j = Y[i_center, -1, k_center] - Y[i_center, 0, k_center]
     if dy_j < 0:
         X = np.flip(X, axis=1)
         Y = np.flip(Y, axis=1)
         Z = np.flip(Z, axis=1)
 
-    # Check k-axis: should point in +Z direction
-    dz_k = np.mean(Z[:, :, 1] - Z[:, :, 0])
+    # Check k-direction
+    dz_k = Z[i_center, j_center, -1] - Z[i_center, j_center, 0]
     if dz_k < 0:
         X = np.flip(X, axis=2)
         Y = np.flip(Y, axis=2)
@@ -366,81 +380,20 @@ def standardize_block_orientation(block: Block) -> Block:
 
     return Block(X, Y, Z)
 
-# Detect geometric direction mismatch and fix by flipping the sliced block2 region
-def fix_physical_direction(block1, X2s, Y2s, Z2s, axis):
-    # Determine which physical direction (X, Y, or Z) changes the most across axis
-    grads = []
-    for arr in [block1.X, block1.Y, block1.Z]:
-        grad = np.abs(np.mean(np.gradient(arr, axis=axis)))
-        grads.append(grad)
-    max_dim = np.argmax(grads)  # 0 = X, 1 = Y, 2 = Z
+def fix_physical_direction(block1: Block, axis: int) -> Block:
+    """Ensures that the dominant physical direction (X, Y, or Z) along the given index axis (i, j, or k)
+    increases from the start to the end of the block. If it decreases, the block is flipped along
+    the specified axis to maintain consistent stacking and orientation.
 
-    # Pick center line through the shared face
-    shape = block1.X.shape
-    imid, jmid, kmid = shape[0] // 2, shape[1] // 2, shape[2] // 2
+    This is useful when merging blocks where one block may be geometrically flipped (e.g., Z increases
+    as j decreases), causing discontinuities or 'jumps' at the interface.
 
-    # Extract 1D profile along stacking axis
-    if axis == 0:
-        p1 = [block1.X[:, jmid, kmid], block1.Y[:, jmid, kmid], block1.Z[:, jmid, kmid]]
-        p2 = [X2s[:, jmid, kmid], Y2s[:, jmid, kmid], Z2s[:, jmid, kmid]]
-    elif axis == 1:
-        p1 = [block1.X[imid, :, kmid], block1.Y[imid, :, kmid], block1.Z[imid, :, kmid]]
-        p2 = [X2s[imid, :, kmid], Y2s[imid, :, kmid], Z2s[imid, :, kmid]]
-    else:  # axis == 2
-        p1 = [block1.X[imid, jmid, :], block1.Y[imid, jmid, :], block1.Z[imid, jmid, :]]
-        p2 = [X2s[imid, jmid, :], Y2s[imid, jmid, :], Z2s[imid, jmid, :]]
+    Parameters:
+        block (Block): The input block whose orientation should be checked and potentially flipped.
+        axis (int): The index axis (0 for i, 1 for j, 2 for k) used for stacking and physical direction check.
 
-    v1 = np.gradient(p1[max_dim])
-    v2 = np.gradient(p2[max_dim])
-
-    if np.mean(v1) * np.mean(v2) < 0:
-        print(f"Detected physical reversal along axis {axis}, flipping block2 face region")
-        X2s = np.flip(X2s, axis=axis)
-        Y2s = np.flip(Y2s, axis=axis)
-        Z2s = np.flip(Z2s, axis=axis)
-
-    return X2s, Y2s, Z2s
-
-
-def fix_physical_direction(block1, X2s, Y2s, Z2s, axis):
-    """
-    Detects physical direction reversal (e.g., z decreasing in one block and increasing in the other).
-    Flips X2s, Y2s, Z2s along axis if needed to maintain continuity.
-    """
-    grads = []
-    for arr in [block1.X, block1.Y, block1.Z]:
-        grad = np.abs(np.mean(np.gradient(arr, axis=axis)))
-        grads.append(grad)
-    max_dim = np.argmax(grads)  # 0 = X, 1 = Y, 2 = Z
-
-    shape = block1.X.shape
-    imid, jmid, kmid = shape[0] // 2, shape[1] // 2, shape[2] // 2
-
-    if axis == 0:
-        p1 = [block1.X[:, jmid, kmid], block1.Y[:, jmid, kmid], block1.Z[:, jmid, kmid]]
-        p2 = [X2s[:, jmid, kmid], Y2s[:, jmid, kmid], Z2s[:, jmid, kmid]]
-    elif axis == 1:
-        p1 = [block1.X[imid, :, kmid], block1.Y[imid, :, kmid], block1.Z[imid, :, kmid]]
-        p2 = [X2s[imid, :, kmid], Y2s[imid, :, kmid], Z2s[imid, :, kmid]]
-    else:  # axis == 2
-        p1 = [block1.X[imid, jmid, :], block1.Y[imid, jmid, :], block1.Z[imid, jmid, :]]
-        p2 = [X2s[imid, jmid, :], Y2s[imid, jmid, :], Z2s[imid, jmid, :]]
-
-    v1 = np.gradient(p1[max_dim])
-    v2 = np.gradient(p2[max_dim])
-
-    if np.mean(v1) * np.mean(v2) < 0:
-        print(f"Detected physical reversal along axis {axis}, flipping block2 face region")
-        X2s = np.flip(X2s, axis=axis)
-        Y2s = np.flip(Y2s, axis=axis)
-        Z2s = np.flip(Z2s, axis=axis)
-
-    return X2s, Y2s, Z2s
-
-def fix_block1_physical_direction(block1: Block, axis: int) -> Block:
-    """
-    Flip block1 along the specified axis if the dominant spatial dimension
-    decreases from index min to index max (i.e., physically upside down).
+    Returns:
+        Block: A new Block instance with corrected orientation along the specified axis if needed.
     """
     X, Y, Z = block1.X.copy(), block1.Y.copy(), block1.Z.copy()
     shape = X.shape
@@ -464,7 +417,7 @@ def fix_block1_physical_direction(block1: Block, axis: int) -> Block:
     dominant_delta = deltas[dominant_axis]
 
     if dominant_delta < 0:
-        print(f"Flipping block1 along axis {axis} to align dominant direction (axis {dominant_axis})")
+        # print(f"Flipping block1 along axis {axis} to align dominant direction (axis {dominant_axis})")
         X = np.flip(X, axis=axis)
         Y = np.flip(Y, axis=axis)
         Z = np.flip(Z, axis=axis)
@@ -483,7 +436,7 @@ def combine_2_blocks(block1, block2, tol=1e-8):
         print("No matching faces or face mismatch.")
         return block1
 
-    print(f"Blocks connected: block1.{face1} matches block2.{face2}")
+    # print(f"Blocks connected: block1.{face1} matches block2.{face2}")
     flip_ud, flip_lr = flip_flags
     X2, Y2, Z2 = block2.X.copy(), block2.Y.copy(), block2.Z.copy()
 
@@ -499,7 +452,8 @@ def combine_2_blocks(block1, block2, tol=1e-8):
     axis = axis_map[key]
 
     # Flip block1 for correct stacking direction
-    block1 = fix_block1_physical_direction(block1, axis)
+    block1 = fix_physical_direction(block1, axis)
+    block2 = fix_physical_direction(block2, axis)
 
     # Step 1: Flip block2 for face alignment
     if face2 in ['imin', 'imax']:
