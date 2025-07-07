@@ -1,10 +1,59 @@
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 from .listfunctions import unique_pairs
 from .block import Block, reduce_blocks
 from .face import Face 
 from copy import deepcopy
-import math
+import numpy.typing as npt
 import numpy as np
+import math
+
+def faces_match(face1: Tuple[npt.NDArray, npt.NDArray, npt.NDArray],face2: Tuple[npt.NDArray, npt.NDArray, npt.NDArray],tol: float = 1e-12) -> Tuple[bool, Optional[Tuple[bool, bool]]]:
+    """
+    Compare two block faces and return whether they match and the flip required on face2 to match face1.
+    Returns (True, (flip_ud, flip_lr)) if matching, otherwise (False, None).
+    """
+    def get_corners(X, Y, Z):
+        return np.array([
+            [X[0, 0], Y[0, 0], Z[0, 0]],
+            [X[0, -1], Y[0, -1], Z[0, -1]],
+            [X[-1, 0], Y[-1, 0], Z[-1, 0]],
+            [X[-1, -1], Y[-1, -1], Z[-1, -1]],
+        ])
+
+    X1, Y1, Z1 = face1
+    X2, Y2, Z2 = face2
+
+    if X1.shape != X2.shape:
+        return False, None
+
+    corners1 = get_corners(X1, Y1, Z1)
+    for flip_ud in [False, True]:
+        for flip_lr in [False, True]:
+            X2f, Y2f, Z2f = X2.copy(), Y2.copy(), Z2.copy()
+            if flip_ud:
+                X2f, Y2f, Z2f = np.flip(X2f, axis=0), np.flip(Y2f, axis=0), np.flip(Z2f, axis=0)
+            if flip_lr:
+                X2f, Y2f, Z2f = np.flip(X2f, axis=1), np.flip(Y2f, axis=1), np.flip(Z2f, axis=1)
+
+            corners2 = get_corners(X2f, Y2f, Z2f)
+            diffs = np.linalg.norm(corners1 - corners2, axis=1)
+            if np.all(diffs <= tol):
+                return True, (flip_ud, flip_lr)
+
+    return False, None
+def find_matching_faces(block1, block2, tol=1e-8):
+    """
+    Returns a tuple (face1_name, face2_name, flip_flags) if a matching face is found.
+    Otherwise returns (None, None, None).
+    """
+    faces1 = block1.get_faces()
+    faces2 = block2.get_faces()
+    for face1_name, face1_data in faces1.items():
+        for face2_name, face2_data in faces2.items():
+            match, flip_flags = faces_match(face1_data, face2_data, tol=tol)
+            if match:
+                return face1_name, face2_name, flip_flags
+    return None, None, None
 
 
 def get_outer_faces(block1:Block):
@@ -168,7 +217,6 @@ def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity
         matching_faces.clear()
     all_matching_faces = list(set(all_matching_faces))  
     return all_matching_faces
-
 
 def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray,centroid:np.ndarray,translational_direction:str="x",minvalue:bool=True):
     """Find the closest block to an extreme in the x,y, or z direction and returns the targetting point. 

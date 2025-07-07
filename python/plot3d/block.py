@@ -2,17 +2,25 @@ import numpy as np
 import math 
 from tqdm import trange
 from typing import List
+from copy import deepcopy
+import numpy.typing as npt 
 
 class Block:
     """Plot3D Block definition
     """
-    def __init__(self, X:np.ndarray,Y:np.ndarray,Z:np.ndarray):
+    X: npt.NDArray
+    Y: npt.NDArray
+    Z: npt.NDArray
+    IMAX:int
+    JMAX:int
+    KMAX:int
+    def __init__(self, X:npt.NDArray,Y:npt.NDArray,Z:npt.NDArray):
         """Initializes the block using all the X,Y,Z coordinates of the block
 
         Args:
-            X (np.ndarray): All the X coordinates (i,j,k)
-            Y (np.ndarray): All the Y coordinates (i,j,k)
-            Z (np.ndarray): All the Z coordinates (i,j,k)
+            X (npt.NDArray): All the X coordinates (i,j,k)
+            Y (npt.NDArray): All the Y coordinates (i,j,k)
+            Z (npt.NDArray): All the Z coordinates (i,j,k)
 
         """
         self.IMAX,self.JMAX,self.KMAX = X.shape; 
@@ -24,6 +32,8 @@ class Block:
         self.cy = np.mean(Y)
         self.cz = np.mean(Z)
         
+    def __repr__(self):
+        return f"({self.IMAX},{self.JMAX},{self.KMAX})"
     
     def scale(self,factor:float):
         """Scales a mesh by a certain factor 
@@ -164,6 +174,20 @@ class Block:
                     v[i,j,k]= vol12/12
         return v
     
+    def get_faces(self):
+        """
+        Returns a dictionary of the six faces of the block.
+        Each face is a tuple of (X_face, Y_face, Z_face).
+        """
+        return {
+            'imin': (self.X[0,:,:], self.Y[0,:,:], self.Z[0,:,:]),
+            'imax': (self.X[-1,:,:], self.Y[-1,:,:], self.Z[-1,:,:]),
+            'jmin': (self.X[:,0,:], self.Y[:,0,:], self.Z[:,0,:]),
+            'jmax': (self.X[:,-1,:], self.Y[:,-1,:], self.Z[:,-1,:]),
+            'kmin': (self.X[:,:,0], self.Y[:,:,0], self.Z[:,:,0]),
+            'kmax': (self.X[:,:,-1], self.Y[:,:,-1], self.Z[:,:,-1]),
+        }
+        
     @property
     def size(self)->int:
         """returns the total number of nodes 
@@ -173,77 +197,6 @@ class Block:
         """
         return self.IMAX*self.JMAX*self.KMAX
 
-def checkCollinearity(v1:np.ndarray, v2:np.ndarray):
-    # Calculate their cross product
-    cross_P = np.cross(v1,v2) 
- 
-    # Check if their cross product
-    # is a NULL Vector or not
-    if (cross_P[0] == 0 and
-        cross_P[1] == 0 and
-        cross_P[2] == 0):
-        return True
-    else:
-        return False
-
-def calculate_outward_normals(block:Block):
-    # Calculate Normals
-    X = block.X
-    Y = block.Y
-    Z = block.Z
-    imax = block.IMAX
-    jmax = block.JMAX
-    kmax = block.KMAX 
-    # IMAX - Normal should be out of the page        
-    # Normals I direction: IMIN https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
-    x = [X[0,0,0],X[0,jmax,0],X[0,0,kmax]] 
-    y = [Y[0,0,0],Y[0,jmax,0],Y[0,0,kmax]]
-    z = [Z[0,0,0],Z[0,jmax,0],Z[0,0,kmax]]
-    u = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]]) 
-    v = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
-    n_imin = np.cross(v1,v2)
-    
-    # Normals I direction: IMAX
-    x = [X[imax,0,0],X[imax,jmax,0],X[imax,0,kmax]] 
-    y = [Y[imax,0,0],Y[imax,jmax,0],Y[imax,0,kmax]]
-    z = [Z[imax,0,0],Z[imax,jmax,0],Z[imax,0,kmax]]
-    v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
-    v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
-    n_imax = np.cross(v1,v2)
-
-    # Normals J direction: JMIN
-    x = [X[0,0,0],X[imax,0,0],X[0,0,kmax]] 
-    y = [Y[0,0,0],Y[imax,0,0],Y[0,0,kmax]]
-    z = [Z[0,0,0],Z[imax,0,0],Z[0,0,kmax]]
-    v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
-    v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
-    n_jmin = np.cross(v1,v2)
-
-    # Normals J direction: JMAX
-    x = [X[0,jmax,0],X[imax,jmax,0],X[0,jmax,kmax]] 
-    y = [Y[0,jmax,0],Y[imax,jmax,0],Y[0,jmax,kmax]]
-    z = [Z[0,jmax,0],Z[imax,jmax,0],Z[0,jmax,kmax]]
-    v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
-    v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
-    n_jmax = np.cross(v1,v2)
-
-    # Normals K direction: KMIN
-    x = [X[imax,0,0],X[0,jmax,0],X[0,0,0]] 
-    y = [Y[imax,0,0],Y[0,jmax,0],Y[0,0,0]]
-    z = [Z[imax,0,0],Z[0,jmax,0],Z[0,0,0]]
-    v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
-    v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
-    n_kmin = np.cross(v1,v2)
-
-    # Normals K direction: KMAX
-    x = [X[imax,0,kmax],X[0,jmax,kmax],X[0,0,kmax]] 
-    y = [Y[imax,0,kmax],Y[0,jmax,kmax],Y[0,0,kmax]]
-    z = [Z[imax,0,kmax],Z[0,jmax,kmax],Z[0,0,kmax]]
-    v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
-    v2 = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
-    n_kmax = np.cross(v1,v2)
-
-    return n_imin,n_jmin,n_kmin,n_imax,n_jmax,n_kmax
 
 def reduce_blocks(blocks:List[Block],factor:int):
     """reduce the blocks by a factor of (factor)

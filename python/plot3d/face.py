@@ -1,8 +1,21 @@
 from typing import Dict, List, Tuple
 import numpy as np
+import numpy.typing as npt
 import math
 
 class Face:
+    x:npt.NDArray
+    y:npt.NDArray
+    z:npt.NDArray
+    I:npt.NDArray
+    J:npt.NDArray
+    K:npt.NDArray
+    cx:float = 0
+    cy:float = 0 
+    cz:float = 0 
+    nvertex:int = 0 
+    blockIndex:int = 0 # not really needed except in periodicity 
+    id:int = 0 
     """Defines a Face of a block for example IMIN,JMIN,JMIN to IMAX,JMIN,JMIN
     """
     def __init__(self,nvertex:int=4):
@@ -18,12 +31,6 @@ class Face:
         self.I = np.zeros(4,dtype=np.int64)
         self.J = np.zeros(4,dtype=np.int64)
         self.K = np.zeros(4,dtype=np.int64)
-        self.cx = 0         # centroid 
-        self.cy = 0
-        self.cz = 0
-        self.nvertex=0
-        self.blockIndex = 0 # not really needed except in periodicity 
-        self.id = 0
         
     def to_dict(self):
         """Returns a dictionary representaon of a face
@@ -115,11 +122,6 @@ class Face:
 
         indx = list(set([indx_i]))[0] # Get the common one through a union
         return self.x[indx], self.y[indx], self.z[indx]
-
-    def scale(self,gcd:int):
-        self.I = int(self.I*gcd)
-        self.J = int(self.J*gcd)
-        self.K = int(self.K*gcd)
 
     def add_vertex(self, x:float,y:float,z:float, i:int, j:int, k:int):
         """Add vertex to define a face
