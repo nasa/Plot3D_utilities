@@ -1,6 +1,5 @@
 #%% Import Scripts 
 import sys, os
-sys.path.insert(0,'../../')
 # sys.path.insert(1,'/mnt/c/GitHub/metis-python')
 from plot3d import read_plot3D, write_plot3D, connectivity_fast, periodicity_fast, match_faces_dict_to_list, outer_face_dict_to_list
 from plot3d.graph import block_to_graph, get_face_vertex_indices, add_connectivity_to_graph, block_connectivity_to_graph
