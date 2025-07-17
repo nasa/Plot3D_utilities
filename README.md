@@ -37,6 +37,8 @@ For Mac. install homebrew and do `brew install metis` then add this to your ~/.z
 
 [Translated periodicity](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_TranslatedPeriodicity.ipynb)
 
+[Merging Blocks](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/merge_block_test.ipynb)
+
 [Learning Python with VSCode](https://www.youtube.com/watch?v=lZiK9e8b21M) 
 
 [Learning Bash for Automating Tasks](https://www.youtube.com/watch?v=oxuRxtrO2Ag) 
