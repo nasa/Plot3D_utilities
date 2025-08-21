@@ -509,164 +509,241 @@ def translational_periodicity(
     outer_faces: List[Dict[str,int]],
     delta: float = None,
     translational_direction: str = "z",
-    node_tol_xyz: Optional[float] = None,
+    node_tol_xyz: float = None,        # global override; if None we compute per-pair adaptively
     min_shared_frac: float = 0.02,
     min_shared_abs: int = 4,
     stride_u: int = 1,
     stride_v: int = 1,
-) -> Tuple[List[Dict[str, Dict[str, int]]], List[Tuple[Face, Face, Dict[str, str]]], List[Dict[str,int]]]:
+    ) -> Tuple[ 
+               List[Dict[str, Dict[str, int]]], 
+               List[Tuple[Face, Face, Dict[str, str]]], 
+               List[Dict[str,int]]
+            ]:
     """
-    Detect translationally periodic face pairs between lower and upper boundary faces of a Plot3D mesh.
+    Detect translational periodicity between block faces along a given axis.
 
-    This routine is designed for multi-block structured grids where periodicity occurs along
-    a single Cartesian axis (x, y, or z). It works by:
+    This function takes a set of outer block faces and attempts to identify 
+    periodic counterparts across the domain in the specified translational 
+    direction ('x', 'y', or 'z'). It works by:
 
-        1. Reducing blocks to a common grid resolution (using the greatest common divisor of I, J, K).
-        2. Shifting reduced copies of the mesh by ±Δ along the chosen axis.
-        3. Testing faces from the lower boundary set against those from the upper set
-           using node-based overlap (with adaptive floating-point tolerance).
-        4. Recording face pairs that overlap after the shift, along with their index mappings
-           (I/J/K min→min or min→max).
+      1. **Bounding faces:** Uses `find_bounding_faces` to identify candidate 
+         lower/upper faces for the given axis.
+      2. **Grid reduction:** Reduces blocks to their greatest common divisor 
+         (GCD) resolution to make indexing consistent across blocks.
+      3. **Shifting:** Creates shifted copies of all blocks in both positive 
+         and negative directions along the periodic axis.
+      4. **Precheck in orthogonal plane:** Uses a fast projection test 
+         (orthogonal to the periodic axis) to determine whether two faces 
+         could possibly match. This greatly reduces false negatives when 
+         spacing/tolerances differ slightly.
+      5. **Node-based match:** Calls `Face.touches_by_nodes` on candidate 
+         pairs to check shared node positions, with an adaptive tolerance 
+         based on the in-plane spacing of each face.
+      6. **Pairing:** Records each valid pair of periodic faces, their 
+         IJK index mappings (min→min or min→max), and removes matched faces 
+         from the outer-face list.
+      7. **Scaling back:** Rescales reduced indices back to the original grid 
+         spacing so results are consistent with input block resolution.
 
     Args:
-        blocks (List[Block]): Full list of mesh blocks.
-        outer_faces (List[Dict[str,int]]): List of outer faces in dictionary format
-        delta (float, optional): Translation distance along the periodic axis. If None, uses the
-            mesh span in that direction.
-        translational_direction (str, optional): Periodic axis: 'x', 'y', or 'z'. Defaults to 'z'.
-        node_tol_xyz (float, optional): Absolute tolerance for node matching. If None, chosen
-            adaptively from average face size.
-        min_shared_frac (float, optional): Minimum fraction of nodes that must overlap to count
-            as a periodic match. Defaults to 0.02.
-        min_shared_abs (int, optional): Minimum absolute number of overlapping nodes. Defaults to 4.
-        stride_u (int, optional): Stride in parametric u when checking nodes. Defaults to 1.
-        stride_v (int, optional): Stride in parametric v when checking nodes. Defaults to 1.
+        blocks (List[Block]): List of blocks.
+        outer_faces (List[Dict[str,int]]): Outer faces represented as 
+            dictionaries (with IMIN, JMIN, KMIN, IMAX, JMAX, KMAX).
+        delta (float, optional): Periodicity spacing along the chosen axis. 
+            If None, it is inferred from the global block min/max extent.
+        translational_direction (str, optional): Axis to check ('x','y','z'). 
+            Default is 'z'.
+        node_tol_xyz (float, optional): Absolute coordinate tolerance for 
+            node-matching. If None, tolerance is computed adaptively based 
+            on median in-plane spacing of candidate faces.
+        min_shared_frac (float, optional): Minimum fraction of nodes that must 
+            overlap for two faces to be considered periodic. Default 0.02.
+        min_shared_abs (int, optional): Minimum absolute number of shared nodes. 
+            Default 4.
+        stride_u (int, optional): Subsampling stride along the first face index 
+            direction. Default 1 (no skipping).
+        stride_v (int, optional): Subsampling stride along the second face index 
+            direction. Default 1 (no skipping).
 
     Returns:
-        Tuple:
-            - periodic_faces_export (List[Dict]): Exportable metadata for periodic face pairs,
-              including block indices, bounding indices (I/J/K), mapping, and shift mode.
-            - periodic_pairs (List[Tuple[Face, Face, Dict[str,str]]]): Matched face objects
-              from the original mesh resolution, with their I/J/K index mapping.
-            - outer_faces (List[Dict[str,int]]): List of outer faces e.g. {'block_index':0,'IMIN':0,'JMIN':0,'KMIN':0,'IMAX':32,'JMAX':32,'KMAX':0}
+        Tuple[
+            List[Dict[str, Dict[str,int]]], 
+            List[Tuple[Face, Face, Dict[str,str]]], 
+            List[Dict[str,int]]
+        ]:
+            - **periodic_faces_export**: Export-ready dictionaries describing 
+              each periodic pair (block indices, face extents, index mapping, 
+              and match mode).
+            - **periodic_pairs**: Matched periodic face pairs as `Face` objects 
+              with IJK mapping.
+            - **outer_faces_remaining**: Updated list of outer faces with 
+              periodic ones removed (preserving any existing `id` fields).
+
+    Notes:
+        - Works for periodicity in **x**, **y**, or **z** directions.
+        - The adaptive tolerance makes the method robust to small spacing 
+          differences between blocks.
+        - The orthogonal-plane precheck avoids expensive node comparisons 
+          when faces clearly do not align.
     """
-    
-    lower_connected_faces, upper_connected_faces,_,_ = find_bounding_faces(blocks,outer_faces,translational_direction,"both")
+    # 0) lower/upper via your finder (dicts at original scale)
+    lower_connected_faces, upper_connected_faces, _, _ = find_bounding_faces(
+        blocks, outer_faces, translational_direction, "both"
+    )
 
     axis = translational_direction.lower().strip()
-    assert axis in ("x", "y", "z"), "translational_direction must be 'x','y', or 'z'"
+    assert axis in ("x","y","z")
 
-    # ---- 1) Reduce by minimum GCD so index grids align ----
-    gcd_array = [math.gcd(b.IMAX - 1, math.gcd(b.JMAX - 1, b.KMAX - 1)) for b in blocks]
+    # 1) GCD reduce
+    gcd_array = [math.gcd(b.IMAX-1, math.gcd(b.JMAX-1, b.KMAX-1)) for b in blocks]
     gcd_to_use = min(gcd_array)
 
-    # Convert face dicts -> Face (at reduced resolution) then reduce blocks
     lower_faces_r = outer_face_dict_to_list(blocks, lower_connected_faces, gcd_to_use)
     upper_faces_r = outer_face_dict_to_list(blocks, upper_connected_faces, gcd_to_use)
     blocks_r = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
-    # ---- 2) Determine shift delta if not provided ----
+    # 2) Δ along axis (if not provided)
     if axis == "x":
-        a_min = min(b.X.min() for b in blocks_r)
-        a_max = max(b.X.max() for b in blocks_r)
+        a_min = min(b.X.min() for b in blocks_r); a_max = max(b.X.max() for b in blocks_r)
     elif axis == "y":
-        a_min = min(b.Y.min() for b in blocks_r)
-        a_max = max(b.Y.max() for b in blocks_r)
+        a_min = min(b.Y.min() for b in blocks_r); a_max = max(b.Y.max() for b in blocks_r)
     else:
-        a_min = min(b.Z.min() for b in blocks_r)
-        a_max = max(b.Z.max() for b in blocks_r)
+        a_min = min(b.Z.min() for b in blocks_r); a_max = max(b.Z.max() for b in blocks_r)
     d_axis = (a_max - a_min) if (delta is None) else float(delta)
 
-    # ---- 3) Prepare shifted copies (one up, one down) ----
-    def shift_blocks(blocks_in: List[Block], amount: float) -> List[Block]:
-        cp = deepcopy(blocks_in)
+    # 3) Shifted copies
+    def shift_blocks(bb: List[Block], amount: float) -> List[Block]:
+        cp = deepcopy(bb)
         for b in cp:
-            b.shift(amount, axis)  # your Block.shift(amount, axis)
+            b.shift(amount, axis)
         return cp
 
     blocks_up = shift_blocks(blocks_r, +d_axis)
     blocks_dn = shift_blocks(blocks_r, -d_axis)
 
     def B(which: str, idx: int) -> Block:
-        if which == "orig":
-            return blocks_r[idx]
-        elif which == "up":
-            return blocks_up[idx]
-        elif which == "dn":
-            return blocks_dn[idx]
-        else:
-            raise ValueError(which)
+        return {"orig": blocks_r, "up": blocks_up, "dn": blocks_dn}[which][idx]
 
-    # ---- 4) Adaptive node tolerance (Option 1) ----
-    def _char_len_face(f: Face) -> float:
-        # Average edge length from the four stored vertices
-        q = np.array([[f.x[0], f.y[0], f.z[0]],
-                      [f.x[1], f.y[1], f.z[1]],
-                      [f.x[2], f.y[2], f.z[2]],
-                      [f.x[3], f.y[3], f.z[3]]], dtype=float)
-        e = np.linalg.norm(np.roll(q, -1, axis=0) - q, axis=1)
-        L = float(np.mean(e)) if e.size else 1.0
-        return L if L > 0 else 1.0
+    # 4) Helpers for adaptive tolerance
+    def _median_inplane_spacing(face: Face, block: Block) -> float:
+        """Median edge length on the face (in-plane)."""
+        I0,I1,J0,J1,K0,K1 = face.IMIN,face.IMAX,face.JMIN,face.JMAX,face.KMIN,face.KMAX
+        X,Y,Z = block.X, block.Y, block.Z
+        if face.const_type == 0:  # I const → vary (J,K)
+            i = I0
+            x = X[i,J0:J1+1,K0:K1+1]; y = Y[i,J0:J1+1,K0:K1+1]; z = Z[i,J0:J1+1,K0:K1+1]
+        elif face.const_type == 1:  # J const → vary (I,K)
+            j = J0
+            x = X[I0:I1+1,j,K0:K1+1]; y = Y[I0:I1+1,j,K0:K1+1]; z = Z[I0:I1+1,j,K0:K1+1]
+        else:  # K const → vary (I,J)
+            k = K0
+            x = X[I0:I1+1,J0:J1+1,k]; y = Y[I0:I1+1,J0:J1+1,k]; z = Z[I0:I1+1,J0:J1+1,k]
+        s = []
+        if x.shape[0] > 1:
+            dx = np.diff(x, axis=0); dy = np.diff(y, axis=0); dz = np.diff(z, axis=0)
+            s.append(np.sqrt(dx*dx + dy*dy + dz*dz))
+        if x.shape[1] > 1:
+            dx = np.diff(x, axis=1); dy = np.diff(y, axis=1); dz = np.diff(z, axis=1)
+            s.append(np.sqrt(dx*dx + dy*dy + dz*dz))
+        if not s: return 1.0
+        return float(np.median(np.concatenate([v.ravel() for v in s])))
 
-    if node_tol_xyz is None:
-        # Compute a mesh-wide characteristic length from all boundary faces
-        all_faces_r = lower_faces_r + upper_faces_r
-        Lc_mesh = np.mean([_char_len_face(f) for f in all_faces_r]) if all_faces_r else 1.0
-        # Absolute tolerance floor ~1e-4 (relaxed enough for mild floating error),
-        # with a relative component scaled to mesh size
-        node_tol_xyz = max(1e-8 * Lc_mesh, 1e-4)
+    def _pair_tol(fA: Face, fB: Face) -> float:
+        """Adaptive absolute tolerance per pair (use global override if provided)."""
+        if node_tol_xyz is not None:
+            return float(node_tol_xyz)
+        sA = _median_inplane_spacing(fA, B("orig", fA.BlockIndex))
+        sB = _median_inplane_spacing(fB, B("orig", fB.BlockIndex))
+        # ~3% of local in-plane spacing; floor at 1e-4 (tune if needed)
+        return max(0.03 * max(sA, sB), 1e-4)
 
-    # ---- 5) Matching routine using node sharing on shifted/original combos ----
+    # 5) General orthogonal-plane precheck (works for x/y/z periodicity)
+    def _orthogonal_precheck(fA: Face, fB: Face, bA: Block, bB: Block,
+                             d_axis_local: float, tol: float, axis_local: str) -> bool:
+        """
+        Shift face A along 'axis_local' by d_axis_local, then compare projections onto the
+        orthogonal plane within tolerance. Requires both absolute and fractional overlap.
+        """
+        PA = fA.grid_points(bA, stride_u=1, stride_v=1)
+        PB = fB.grid_points(bB, stride_u=1, stride_v=1)
+        if PA.size == 0 or PB.size == 0:
+            return False
+
+        if axis_local == "x":
+            PA[:,0] += d_axis_local
+            projA, projB = PA[:,1:], PB[:,1:]          # (y,z)
+        elif axis_local == "y":
+            PA[:,1] += d_axis_local
+            projA, projB = PA[:,[0,2]], PB[:,[0,2]]    # (x,z)
+        else:  # "z"
+            PA[:,2] += d_axis_local
+            projA, projB = PA[:,:2], PB[:,:2]          # (x,y)
+
+        QA = np.round(projA / tol).astype(np.int64)
+        QB = np.round(projB / tol).astype(np.int64)
+        if not QA.flags["C_CONTIGUOUS"]: QA = np.ascontiguousarray(QA)
+        if not QB.flags["C_CONTIGUOUS"]: QB = np.ascontiguousarray(QB)
+        vA = QA.view([('', QA.dtype)] * QA.shape[1]).reshape(-1)
+        vB = QB.view([('', QB.dtype)] * QB.shape[1]).reshape(-1)
+        inter = np.intersect1d(vA, vB, assume_unique=False)
+        return inter.size >= max(min_shared_abs, int(min_shared_frac * min(len(vA), len(vB))))
+
+    # 6) Node-sharing matcher using per-pair tol + precheck
     def faces_match(fL: Face, fU: Face) -> Tuple[bool, str]:
-        """Try four combos: lower-up vs upper-orig, lower-orig vs upper-dn, plus symmetric guards."""
         bl, bu = fL.BlockIndex, fU.BlockIndex
-        # Lower side moved up to meet upper
+        tol_pair = _pair_tol(fL, fU)
+
+        # Fast precheck on orthogonal plane (lower up vs upper orig)
+        if _orthogonal_precheck(fL, fU, B("orig", bl), B("orig", bu), d_axis, tol_pair, axis):
+            return True, f"{axis}_precheck_lower_up"
+
+        # lower moved up vs upper orig
         if fL.touches_by_nodes(fU, B("up", bl), B("orig", bu),
-                               tol_xyz=node_tol_xyz, min_shared_frac=min_shared_frac,
+                               tol_xyz=tol_pair, min_shared_frac=min_shared_frac,
                                min_shared_abs=min_shared_abs, stride_u=stride_u, stride_v=stride_v):
             return True, "lower_up_vs_upper_orig"
-        # Upper side moved down to meet lower
+
+        # lower orig vs upper moved down
         if fL.touches_by_nodes(fU, B("orig", bl), B("dn", bu),
-                               tol_xyz=node_tol_xyz, min_shared_frac=min_shared_frac,
+                               tol_xyz=tol_pair, min_shared_frac=min_shared_frac,
                                min_shared_abs=min_shared_abs, stride_u=stride_u, stride_v=stride_v):
             return True, "lower_orig_vs_upper_dn"
-        # Symmetric guards (rarely needed, but safe)
+
+        # Symmetric guards
+        if _orthogonal_precheck(fU, fL, B("orig", bu), B("orig", bl), d_axis, tol_pair, axis):
+            return True, f"{axis}_precheck_upper_up"
         if fU.touches_by_nodes(fL, B("up", bu), B("orig", bl),
-                               tol_xyz=node_tol_xyz, min_shared_frac=min_shared_frac,
+                               tol_xyz=tol_pair, min_shared_frac=min_shared_frac,
                                min_shared_abs=min_shared_abs, stride_u=stride_u, stride_v=stride_v):
             return True, "upper_up_vs_lower_orig"
         if fU.touches_by_nodes(fL, B("orig", bu), B("dn", bl),
-                               tol_xyz=node_tol_xyz, min_shared_frac=min_shared_frac,
+                               tol_xyz=tol_pair, min_shared_frac=min_shared_frac,
                                min_shared_abs=min_shared_abs, stride_u=stride_u, stride_v=stride_v):
             return True, "upper_orig_vs_lower_dn"
+
         return False, ""
 
-    # ---- 6) Per-axis index mapping (I/J/K min->min or min->max) ----
+    # 7) Index mapping
     def mapping_minmax(fA: Face, fB: Face) -> Dict[str, str]:
         out = {}
-        for ax in ("I", "J", "K"):
-            Amin = getattr(fA, ax + "MIN"); Amax = getattr(fA, ax + "MAX")
-            Bmin = getattr(fB, ax + "MIN"); Bmax = getattr(fB, ax + "MAX")
-            if (Amin == Bmin) and (Amax == Bmax):
-                out[ax] = "min->min"
-            elif (Amin == Bmax) and (Amax == Bmin):
-                out[ax] = "min->max"
+        for ax in ("I","J","K"):
+            Amin, Amax = getattr(fA, ax+"MIN"), getattr(fA, ax+"MAX")
+            Bmin, Bmax = getattr(fB, ax+"MIN"), getattr(fB, ax+"MAX")
+            if (Amin == Bmin) and (Amax == Bmax): out[ax] = "min->min"
+            elif (Amin == Bmax) and (Amax == Bmin): out[ax] = "min->max"
             else:
-                d_mm = abs(Amin - Bmin) + abs(Amax - Bmax)
-                d_mM = abs(Amin - Bmax) + abs(Amax - Bmin)
+                d_mm = abs(Amin-Bmin)+abs(Amax-Bmax)
+                d_mM = abs(Amin-Bmax)+abs(Amax-Bmin)
                 out[ax] = "min->min" if d_mm <= d_mM else "min->max"
         return out
 
-    # ---- 7) Greedy pairing (lower ↔ upper) with removal ----
-    lower_pool = list(dict.fromkeys(lower_faces_r))  # dedupe, preserve order
+    # 8) Greedy pairing and export
+    lower_pool = list(dict.fromkeys(lower_faces_r))
     upper_pool = list(dict.fromkeys(upper_faces_r))
+    periodic_pairs_r: List[Tuple[Face, Face, Dict[str,str]]] = []
+    periodic_export: List[Dict[str, Dict[str,int]]] = []
 
-    periodic_pairs_r: List[Tuple[Face, Face, Dict[str, str]]] = []
-    periodic_export: List[Dict[str, Dict[str, int]]] = []
-
-    pb = tqdm(total=len(lower_pool), desc="Translational periodicity")
-    while lower_pool:
-        fL = lower_pool.pop(0)
+    for fL in list(lower_pool):
         for j, fU in enumerate(upper_pool):
             ok, mode = faces_match(fL, fU)
             if ok:
@@ -680,49 +757,41 @@ def translational_periodicity(
                                "IMIN": fU.IMIN, "JMIN": fU.JMIN, "KMIN": fU.KMIN,
                                "IMAX": fU.IMAX, "JMAX": fU.JMAX, "KMAX": fU.KMAX},
                     "mapping": m,
-                    "mode": mode,
-                })
+                    "mode": mode
+                    }) # type: ignore  
                 upper_pool.pop(j)
-                pb.update(1)
-                break
-        # Unmatched lower faces are simply skipped (or collect separately if you want).
+                break  # move to next fL
 
-    # ---- 8) Scale indices back up to the original resolution ----
+    # 9) scale back up
     for rec in periodic_export:
-        for side in ("block1", "block2"):
-            for key in ("IMIN", "JMIN", "KMIN", "IMAX", "JMAX", "KMAX"):
-                rec[side][key] = int(rec[side][key] * gcd_to_use)
+        for side in ("block1","block2"):
+            for k in ("IMIN","JMIN","KMIN","IMAX","JMAX","KMAX"):
+                rec[side][k] = int(rec[side][k] * gcd_to_use)
 
-    periodic_pairs: List[Tuple[Face, Face, Dict[str, str]]] = []
+    periodic_pairs: List[Tuple[Face, Face, Dict[str,str]]] = []
     for (fL, fU, m) in periodic_pairs_r:
         gL = deepcopy(fL); gU = deepcopy(fU)
         gL.I *= gcd_to_use; gL.J *= gcd_to_use; gL.K *= gcd_to_use
         gU.I *= gcd_to_use; gU.J *= gcd_to_use; gU.K *= gcd_to_use
         periodic_pairs.append((gL, gU, m))
-        
+
+    # 10) remove periodic from outer_faces (keep 'id' on remaining)
     periodic_keys = set()
     for rec in periodic_export:
-        for side in ("block1", "block2"):
+        for side in ("block1","block2"):
             bi = rec[side]["block_index"]
-            key = (
-                bi,
-                rec[side]["IMIN"], rec[side]["JMIN"], rec[side]["KMIN"],
-                rec[side]["IMAX"], rec[side]["JMAX"], rec[side]["KMAX"],
-            )
+            key = (bi, rec[side]["IMIN"], rec[side]["JMIN"], rec[side]["KMIN"],
+                        rec[side]["IMAX"], rec[side]["JMAX"], rec[side]["KMAX"])
             periodic_keys.add(key)
 
     outer_faces_remaining = []
     for o in outer_faces:
-        key = (
-            o["block_index"],
-            o["IMIN"], o["JMIN"], o["KMIN"],
-            o["IMAX"], o["JMAX"], o["KMAX"],
-        )
+        key = (o["block_index"], o["IMIN"], o["JMIN"], o["KMIN"],
+                               o["IMAX"], o["JMAX"], o["KMAX"])
         if key not in periodic_keys:
             outer_faces_remaining.append(o)
 
     return periodic_export, periodic_pairs, outer_faces_remaining
-
 
 def linear_real_transform(face1:Face,face2:Face) -> Tuple:
     """Computes the rotation angle from Face1 to Face2. This can be used to check if the faces are periodic 
