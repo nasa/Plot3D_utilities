@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from itertools import combinations_with_replacement, permutations, product
 import numpy as np
 from .block import Block
@@ -504,182 +504,227 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         outer_faces_all[j].K *= gcd_to_use
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
-def translational_periodicity(blocks:List[Block], lower_connected_faces:List[Dict[str,int]], upper_connected_faces:List[Dict[str,int]],delta:float=None, translational_direction:str = "z"):
-    """Find periodicity using translated blocks. Simple example: if you have a rectangle and the top and bottom surfaces are periodic, this will copy the rectangle and shift it up to find which surfaces match. 
+def translational_periodicity(
+    blocks: List[Block],
+    outer_faces: List[Dict[str,int]],
+    delta: float = None,
+    translational_direction: str = "z",
+    node_tol_xyz: float = None,
+    min_shared_frac: float = 0.02,
+    min_shared_abs: int = 4,
+    stride_u: int = 1,
+    stride_v: int = 1,
+) -> Tuple[List[Dict[str, Dict[str, int]]], List[Tuple[Face, Face, Dict[str, str]]], List[Dict[str,int]]]:
+    """
+    Detect translationally periodic face pairs between lower and upper boundary faces of a Plot3D mesh.
+
+    This routine is designed for multi-block structured grids where periodicity occurs along
+    a single Cartesian axis (x, y, or z). It works by:
+
+        1. Reducing blocks to a common grid resolution (using the greatest common divisor of I, J, K).
+        2. Shifting reduced copies of the mesh by ±Δ along the chosen axis.
+        3. Testing faces from the lower boundary set against those from the upper set
+           using node-based overlap (with adaptive floating-point tolerance).
+        4. Recording face pairs that overlap after the shift, along with their index mappings
+           (I/J/K min→min or min→max).
 
     Args:
-        blocks (List[Block]): List of blocks for a particular geometry. Do not duplicate the geometry and pass it in
-        lower_connected_faces (List[Dict[str,int]]): List of faces in the lower or left bound of the mesh
-        upper_connected_faces (List[Dict[str,int]]): List of faces in the upper or right bound of the mesh
-        delta (float): if specified the delta will be used to shift the blocks. Defaults to None
-        translational_direction (str, Optional): "x", "y", or "z" 
-    
-    Example:
-        y_periodic_faces_export, periodic_faces = translational_periodicity(blocks,left_bound,right_bound,translational_direction='y')
+        blocks (List[Block]): Full list of mesh blocks.
+        outer_faces (List[Dict[str,int]]): List of outer faces in dictionary format
+        delta (float, optional): Translation distance along the periodic axis. If None, uses the
+            mesh span in that direction.
+        translational_direction (str, optional): Periodic axis: 'x', 'y', or 'z'. Defaults to 'z'.
+        node_tol_xyz (float, optional): Absolute tolerance for node matching. If None, chosen
+            adaptively from average face size.
+        min_shared_frac (float, optional): Minimum fraction of nodes that must overlap to count
+            as a periodic match. Defaults to 0.02.
+        min_shared_abs (int, optional): Minimum absolute number of overlapping nodes. Defaults to 4.
+        stride_u (int, optional): Stride in parametric u when checking nodes. Defaults to 1.
+        stride_v (int, optional): Stride in parametric v when checking nodes. Defaults to 1.
 
     Returns:
-        (Tuple): containing
-            
-            - **periodic_faces_export** (List[Dict[str,int]]):  This is list of all the surfaces/faces that match when rotated by an angle formatted as a dictionary.
-            - **outer_faces_export** (List[Dict[str,int]]): These are the list of outer faces that are not periodic formatted as a dictionary.
-            - **periodic_faces** (List[Tuple[Face,Face]]): - This is a list of Face objects that are connected to each other organized as a list of tuples: [Face1, Face2] where Face 1 will contain the block number and the diagonals [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]. Example: blk: 1 [168,0,0,268,100,0].
-            - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
+        Tuple:
+            - periodic_faces_export (List[Dict]): Exportable metadata for periodic face pairs,
+              including block indices, bounding indices (I/J/K), mapping, and shift mode.
+            - periodic_pairs (List[Tuple[Face, Face, Dict[str,str]]]): Matched face objects
+              from the original mesh resolution, with their I/J/K index mapping.
+            - outer_faces (List[Dict[str,int]]): List of outer faces e.g. {'block_index':0,'IMIN':0,'JMIN':0,'KMIN':0,'IMAX':32,'JMAX':32,'KMAX':0}
     """
-    gcd_array = list()
-    # Find the gcd of all the blocks
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
-    lower_connected_faces = outer_face_dict_to_list(blocks,lower_connected_faces,gcd_to_use)
-    upper_connected_faces = outer_face_dict_to_list(blocks,upper_connected_faces,gcd_to_use)
-    blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)    
     
-    # Now for the periodicity part
-    
-    def shift_blocks(sign:int=1):
-        blocks_shifted = deepcopy(blocks)
-        if translational_direction.lower().strip() == "x":
-            xmin = min([b.X.min() for b in blocks])
-            xmax = max([b.X.max() for b in blocks])
-            dx = xmax-xmin if not delta else delta
-            [b.shift(sign*dx,translational_direction) for b in blocks_shifted]
-        elif translational_direction.lower().strip() == "y":
-            ymin = np.array([(b.X.min(), b.Y.min(), b.Z.min()) for b in blocks]) # Look at the front face 
-            ymax = np.array([(b.X.min(), b.Y.max(), b.Z.min()) for b in blocks])
-            xmin = min([b.X.min() for b in blocks])
-            zmin = min([b.Z.min() for b in blocks])
+    lower_connected_faces, upper_connected_faces,_,_ = find_bounding_faces(blocks,outer_faces,translational_direction,"both")
 
-            ymin = ymin[ymin[:,0] == xmin,:]
-            ymax = ymax[ymax[:,0] == xmin,:]
+    axis = translational_direction.lower().strip()
+    assert axis in ("x", "y", "z"), "translational_direction must be 'x','y', or 'z'"
 
-            ymin = ymin[ymin[:,2] == zmin,:]
-            ymax = ymax[ymax[:,2] == zmin,:]
-            
-            dy = ymax[:,1].max() - ymin[:,1].min() if not delta else delta
-            [b.shift(sign*dy,translational_direction) for b in blocks_shifted]
-        else: #  direction.lower().strip() == "z"
-            zmin = min([b.Z.min() for b in blocks])
-            zmax = max([b.Z.max() for b in blocks])
-            dz = zmax-zmin if not delta else delta
-            [b.shift(sign*dz,translational_direction) for b in blocks_shifted]
-        return blocks_shifted
+    # ---- 1) Reduce by minimum GCD so index grids align ----
+    gcd_array = [math.gcd(b.IMAX - 1, math.gcd(b.JMAX - 1, b.KMAX - 1)) for b in blocks]
+    gcd_to_use = min(gcd_array)
 
-    blocks_shifted = shift_blocks()
-    periodic_found = True # start of the loop 
-    
-    # Here we make a list of all the outer faces
-    times_failed = 0 
-    periodic_faces = list()      # This is the output of the code 
-    periodic_faces_export = list()
-    non_matching = list()
-    lower_connected_faces = list(set(lower_connected_faces))
-    upper_connected_faces = list(set(upper_connected_faces))
-    lower_blocks = [l.BlockIndex for l in lower_connected_faces]
-    upper_blocks = [u.BlockIndex for u in upper_connected_faces]
-    pbar = tqdm(total = len(lower_connected_faces))
-    
-    periodicity_tol = 1E-6 
-    while len(lower_connected_faces)>0:
-        periodic_found = False
-        face1 = lower_connected_faces[0]
-        for indx in range(len(upper_connected_faces)):
-            face2 = upper_connected_faces[indx]
-            # Check if surfaces are periodic with each other
-            pbar.set_description(f"Checking connections block {face1.blockIndex} with {face2.blockIndex}")
-            # Shift block 1 -> Check periodicity -> if not periodic -> shift Block 1 opposite direction -> Check periodicity
-            #   Rotate Block 1
-            block1 = blocks[face1.blockIndex]
-            block1_shifted = blocks_shifted[face1.blockIndex]
-            block2 = blocks[face2.blockIndex]
-            block2_shifted = blocks_shifted[face2.blockIndex]
+    # Convert face dicts -> Face (at reduced resolution) then reduce blocks
+    lower_faces_r = outer_face_dict_to_list(blocks, lower_connected_faces, gcd_to_use)
+    upper_faces_r = outer_face_dict_to_list(blocks, upper_connected_faces, gcd_to_use)
+    blocks_r = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
-            #   Check periodicity
-            _, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_shifted, block2,periodicity_tol)                           
-
-            if len(periodic_faces_temp) > 0:
-                lower_connected_faces.pop(0)
-                upper_connected_faces.pop(indx)
-                periodic_faces.append(periodic_faces_temp)
-                periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1_shifted,block2))
-                lower_split_faces = [s for s in split_faces_temp if s.BlockIndex in lower_blocks]
-                upper_split_faces = [s for s in split_faces_temp if s.BlockIndex in upper_blocks]
-                lower_connected_faces.extend(lower_split_faces)
-                upper_connected_faces.extend(upper_split_faces)
-                periodic_found = True
-                pbar.update(1)
-                break
-            else:
-                # Try the other way 
-                _, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1,block2_shifted,periodicity_tol)
-                if len(periodic_faces_temp) > 0:
-                    lower_connected_faces.pop(0)
-                    upper_connected_faces.pop(indx)
-                    periodic_faces.append(periodic_faces_temp)
-                    periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1, block2_shifted))
-                    lower_split_faces = [s for s in split_faces_temp if s.BlockIndex in lower_blocks]
-                    upper_split_faces = [s for s in split_faces_temp if s.BlockIndex in upper_blocks]
-                    lower_connected_faces.extend(lower_split_faces)
-                    upper_connected_faces.extend(upper_split_faces)
-                    periodic_found = True
-                    pbar.update(1)
-                    break
-    
-        if periodic_found == False:
-            # Lets switch the order 
-            non_matching.append(deepcopy(face1))
-            lower_connected_faces.pop(0)
-            # periodicity_tol *=10
-            times_failed+=1
-
-    if len(non_matching)>0:
-        print(f"\nNot periodic {translational_direction}")
+    # ---- 2) Determine shift delta if not provided ----
+    if axis == "x":
+        a_min = min(b.X.min() for b in blocks_r)
+        a_max = max(b.X.max() for b in blocks_r)
+    elif axis == "y":
+        a_min = min(b.Y.min() for b in blocks_r)
+        a_max = max(b.Y.max() for b in blocks_r)
     else:
-        print(f"\nPeriodic {translational_direction}")
+        a_min = min(b.Z.min() for b in blocks_r)
+        a_max = max(b.Z.max() for b in blocks_r)
+    d_axis = (a_max - a_min) if (delta is None) else float(delta)
+
+    # ---- 3) Prepare shifted copies (one up, one down) ----
+    def shift_blocks(blocks_in: List[Block], amount: float) -> List[Block]:
+        cp = deepcopy(blocks_in)
+        for b in cp:
+            b.shift(amount, axis)  # your Block.shift(amount, axis)
+        return cp
+
+    blocks_up = shift_blocks(blocks_r, +d_axis)
+    blocks_dn = shift_blocks(blocks_r, -d_axis)
+
+    def B(which: str, idx: int) -> Block:
+        if which == "orig":
+            return blocks_r[idx]
+        elif which == "up":
+            return blocks_up[idx]
+        elif which == "dn":
+            return blocks_dn[idx]
+        else:
+            raise ValueError(which)
+
+    # ---- 4) Adaptive node tolerance (Option 1) ----
+    def _char_len_face(f: Face) -> float:
+        # Average edge length from the four stored vertices
+        q = np.array([[f.x[0], f.y[0], f.z[0]],
+                      [f.x[1], f.y[1], f.z[1]],
+                      [f.x[2], f.y[2], f.z[2]],
+                      [f.x[3], f.y[3], f.z[3]]], dtype=float)
+        e = np.linalg.norm(np.roll(q, -1, axis=0) - q, axis=1)
+        L = float(np.mean(e)) if e.size else 1.0
+        return L if L > 0 else 1.0
+
+    if node_tol_xyz is None:
+        # Compute a mesh-wide characteristic length from all boundary faces
+        all_faces_r = lower_faces_r + upper_faces_r
+        Lc_mesh = np.mean([_char_len_face(f) for f in all_faces_r]) if all_faces_r else 1.0
+        # Absolute tolerance floor ~1e-4 (relaxed enough for mild floating error),
+        # with a relative component scaled to mesh size
+        node_tol_xyz = max(1e-8 * Lc_mesh, 1e-4)
+
+    # ---- 5) Matching routine using node sharing on shifted/original combos ----
+    def faces_match(fL: Face, fU: Face) -> Tuple[bool, str]:
+        """Try four combos: lower-up vs upper-orig, lower-orig vs upper-dn, plus symmetric guards."""
+        bl, bu = fL.BlockIndex, fU.BlockIndex
+        # Lower side moved up to meet upper
+        if fL.touches_by_nodes(fU, B("up", bl), B("orig", bu),
+                               tol_xyz=node_tol_xyz, min_shared_frac=min_shared_frac,
+                               min_shared_abs=min_shared_abs, stride_u=stride_u, stride_v=stride_v):
+            return True, "lower_up_vs_upper_orig"
+        # Upper side moved down to meet lower
+        if fL.touches_by_nodes(fU, B("orig", bl), B("dn", bu),
+                               tol_xyz=node_tol_xyz, min_shared_frac=min_shared_frac,
+                               min_shared_abs=min_shared_abs, stride_u=stride_u, stride_v=stride_v):
+            return True, "lower_orig_vs_upper_dn"
+        # Symmetric guards (rarely needed, but safe)
+        if fU.touches_by_nodes(fL, B("up", bu), B("orig", bl),
+                               tol_xyz=node_tol_xyz, min_shared_frac=min_shared_frac,
+                               min_shared_abs=min_shared_abs, stride_u=stride_u, stride_v=stride_v):
+            return True, "upper_up_vs_lower_orig"
+        if fU.touches_by_nodes(fL, B("orig", bu), B("dn", bl),
+                               tol_xyz=node_tol_xyz, min_shared_frac=min_shared_frac,
+                               min_shared_abs=min_shared_abs, stride_u=stride_u, stride_v=stride_v):
+            return True, "upper_orig_vs_lower_dn"
+        return False, ""
+
+    # ---- 6) Per-axis index mapping (I/J/K min->min or min->max) ----
+    def mapping_minmax(fA: Face, fB: Face) -> Dict[str, str]:
+        out = {}
+        for ax in ("I", "J", "K"):
+            Amin = getattr(fA, ax + "MIN"); Amax = getattr(fA, ax + "MAX")
+            Bmin = getattr(fB, ax + "MIN"); Bmax = getattr(fB, ax + "MAX")
+            if (Amin == Bmin) and (Amax == Bmax):
+                out[ax] = "min->min"
+            elif (Amin == Bmax) and (Amax == Bmin):
+                out[ax] = "min->max"
+            else:
+                d_mm = abs(Amin - Bmin) + abs(Amax - Bmax)
+                d_mM = abs(Amin - Bmax) + abs(Amax - Bmin)
+                out[ax] = "min->min" if d_mm <= d_mM else "min->max"
+        return out
+
+    # ---- 7) Greedy pairing (lower ↔ upper) with removal ----
+    lower_pool = list(dict.fromkeys(lower_faces_r))  # dedupe, preserve order
+    upper_pool = list(dict.fromkeys(upper_faces_r))
+
+    periodic_pairs_r: List[Tuple[Face, Face, Dict[str, str]]] = []
+    periodic_export: List[Dict[str, Dict[str, int]]] = []
+
+    pb = tqdm(total=len(lower_pool), desc="Translational periodicity")
+    while lower_pool:
+        fL = lower_pool.pop(0)
+        matched = False
+        for j, fU in enumerate(upper_pool):
+            ok, mode = faces_match(fL, fU)
+            if ok:
+                m = mapping_minmax(fL, fU)
+                periodic_pairs_r.append((fL, fU, m))
+                periodic_export.append({
+                    "block1": {"block_index": fL.BlockIndex,
+                               "IMIN": fL.IMIN, "JMIN": fL.JMIN, "KMIN": fL.KMIN,
+                               "IMAX": fL.IMAX, "JMAX": fL.JMAX, "KMAX": fL.KMAX},
+                    "block2": {"block_index": fU.BlockIndex,
+                               "IMIN": fU.IMIN, "JMIN": fU.JMIN, "KMIN": fU.KMIN,
+                               "IMAX": fU.IMAX, "JMAX": fU.JMAX, "KMAX": fU.KMAX},
+                    "mapping": m,
+                    "mode": mode,
+                })
+                upper_pool.pop(j)
+                matched = True
+                pb.update(1)
+                break
+        # Unmatched lower faces are simply skipped (or collect separately if you want).
+    pb.close()
+
+    # ---- 8) Scale indices back up to the original resolution ----
+    for rec in periodic_export:
+        for side in ("block1", "block2"):
+            for key in ("IMIN", "JMIN", "KMIN", "IMAX", "JMAX", "KMAX"):
+                rec[side][key] = int(rec[side][key] * gcd_to_use)
+
+    periodic_pairs: List[Tuple[Face, Face, Dict[str, str]]] = []
+    for (fL, fU, m) in periodic_pairs_r:
+        gL = deepcopy(fL); gU = deepcopy(fU)
+        gL.I *= gcd_to_use; gL.J *= gcd_to_use; gL.K *= gcd_to_use
+        gU.I *= gcd_to_use; gU.J *= gcd_to_use; gU.K *= gcd_to_use
+        periodic_pairs.append((gL, gU, m))
         
-    # remove any duplicate periodic face pairs 
-    indx_to_remove = list()
-    for i in range(len(periodic_faces)):
-        for j in range(i+1,len(periodic_faces)):
-            if periodic_faces[i][0] == periodic_faces[j][0]:
-                if periodic_faces[i][1] == periodic_faces[j][1]:
-                    indx_to_remove.append(j)
-            if periodic_faces[i][1] == periodic_faces[j][0]:
-                if periodic_faces[i][0] == periodic_faces[j][1]:
-                    indx_to_remove.append(j)
-    
+    periodic_keys = set()
+    for rec in periodic_export:
+        for side in ("block1", "block2"):
+            bi = rec[side]["block_index"]
+            key = (
+                bi,
+                rec[side]["IMIN"], rec[side]["JMIN"], rec[side]["KMIN"],
+                rec[side]["IMAX"], rec[side]["JMAX"], rec[side]["KMAX"],
+            )
+            periodic_keys.add(key)
 
-    periodic_faces_export = [periodic_faces_export[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
-    periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
+    outer_faces_remaining = []
+    for o in outer_faces:
+        key = (
+            o["block_index"],
+            o["IMIN"], o["JMIN"], o["KMIN"],
+            o["IMAX"], o["JMAX"], o["KMAX"],
+        )
+        if key not in periodic_keys:
+            outer_faces_remaining.append(o)
 
-    # scale it up
-    for i in range(len(periodic_faces_export)):
-        periodic_faces_export[i]['block1']['IMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['JMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['KMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['IMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['JMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['KMAX'] *= gcd_to_use
-
-        if (periodic_faces_export[i]['block2']['IMIN'] == 168):
-            print("check")
-        periodic_faces_export[i]['block2']['IMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['JMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['KMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['IMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['JMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['KMAX'] *= gcd_to_use
-    
-    for i in range(len(periodic_faces)):
-        periodic_faces[i][0].I *= gcd_to_use
-        periodic_faces[i][0].J *= gcd_to_use
-        periodic_faces[i][0].K *= gcd_to_use
-
-        periodic_faces[i][1].I *= gcd_to_use
-        periodic_faces[i][1].J *= gcd_to_use
-        periodic_faces[i][1].K *= gcd_to_use
-
-    return periodic_faces_export, periodic_faces
+    return periodic_export, periodic_pairs, outer_faces_remaining
 
 
 def linear_real_transform(face1:Face,face2:Face) -> Tuple:
