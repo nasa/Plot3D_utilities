@@ -509,7 +509,7 @@ def translational_periodicity(
     outer_faces: List[Dict[str,int]],
     delta: float = None,
     translational_direction: str = "z",
-    node_tol_xyz: float = None,
+    node_tol_xyz: Optional[float] = None,
     min_shared_frac: float = 0.02,
     min_shared_abs: int = 4,
     stride_u: int = 1,
@@ -667,7 +667,6 @@ def translational_periodicity(
     pb = tqdm(total=len(lower_pool), desc="Translational periodicity")
     while lower_pool:
         fL = lower_pool.pop(0)
-        matched = False
         for j, fU in enumerate(upper_pool):
             ok, mode = faces_match(fL, fU)
             if ok:
@@ -684,11 +683,9 @@ def translational_periodicity(
                     "mode": mode,
                 })
                 upper_pool.pop(j)
-                matched = True
                 pb.update(1)
                 break
         # Unmatched lower faces are simply skipped (or collect separately if you want).
-    pb.close()
 
     # ---- 8) Scale indices back up to the original resolution ----
     for rec in periodic_export:
