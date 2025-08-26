@@ -179,7 +179,7 @@ def _write_vzconditions(w, vz: Dict[str, Any]) -> None:
       {"block_index": 1, "zone_type": "fluid"|"solid", "contiguous_id": 1}
     to the GHT namelist you showed (defaults baked in).
     """
-    vzid = int(vz.get("block_index", 0))
+    vzid = int(vz.get("contiguous_id", 0))
     ztype = str(vz.get("zone_type", "fluid")).strip().lower()
     vztype = 1 if ztype == "fluid" else 2
 
@@ -399,7 +399,8 @@ def export_to_boundary_condition(
                 w.write(f" &GIF_Spec\nSurfID_1={g.GIFSurface1}, SurfID2={g.GIFSurface2}\n &END\n\n")
 
         # VZConditions (dict templates)
-        for vz in volume_zones:
+        volume_zone_unique = {d["contiguous_id"]: d for d in volume_zones}.values()
+        for vz in volume_zone_unique:
             if isinstance(vz, dict):
                 _write_vzconditions(w, vz)
             else:

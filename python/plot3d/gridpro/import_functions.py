@@ -244,12 +244,12 @@ def read_gridpro_connectivity(
     volume_zones: List[Dict[str, object]] = []
     prevZoneType = ""
     cid = 0
-    for v in superblock_ptys:
+    for id,v in enumerate(superblock_ptys):
         zone = "fluid" if (v % 2 != 0) else "solid"
         if zone is not prevZoneType:
             cid += 1
             prevZoneType = zone
-        volume_zones.append({"block_index": v, "zone_type": zone, "contiguous_id": cid})
+        volume_zones.append({"block_index": id, "zone_type": zone, "contiguous_id": cid})
         
 
     return {
