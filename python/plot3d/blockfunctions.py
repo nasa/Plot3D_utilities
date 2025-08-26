@@ -134,7 +134,7 @@ def block_connection_matrix(
         if "id" in o:
             face.id = o["id"]
         outer_faces_all.append(face)
-    outer_faces = outer_faces_all
+    outer_faces = outer_faces_all # type: ignore
 
     n = len(blocks)
     connectivity   = np.eye(n, dtype=np.int8)
