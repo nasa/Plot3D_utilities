@@ -16,10 +16,4 @@ from .point_match import point_match
 from .split_block import split_blocks, Direction
 from .listfunctions import unique_pairs
 
-# Try importing metis
-if os.getenv('METIS_DLL') is not None:
-    if import_module('metis') is not None:
-        import metis
-        from .graph import block_to_graph,get_face_vertex_indices,get_starting_vertex,add_connectivity_to_graph, block_connectivity_to_graph
-else:
-    print("METIS_DLL is not set. metis may not be configured. plot3D will function without metis")
+from .graph import write_ddcmp, build_weighted_graph_from_face_matches,csr_from_adj_and_weights,partition_from_face_matches

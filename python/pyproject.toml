@@ -11,6 +11,7 @@ scipy = "*"
 pandas = "*"
 tqdm = "*"
 networkx = "*"
+pymetis = "*"
 
 [tool.poetry.group.deve.dependencies]
 

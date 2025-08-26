@@ -201,9 +201,3 @@ if __name__=="__main__":
     create_ddcmp("python/examples/metis-block-graph/CMC9/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/CMC9/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/CMC9/CMC009_blocksizes.pickle')
 
     create_ddcmp("python/examples/metis-block-graph/EEE-Stator/conn.ght_conn",ddcmp_file='python/examples/metis-block-graph/EEE-Stator/ddcmp.dat',nprocessors=5,pkl_file_blocksizes='python/examples/metis-block-graph/EEE-Stator/Combust_diced_blocksizes.pickle')
-
-
-
-
-       
-
