@@ -155,10 +155,10 @@ def _metis_part_graph_compat(
         elif "adjwgt" in sig_params and eweights is not None:
             kwargs["adjwgt"] = eweights  # alternate name
 
-        return pymetis.part_graph(nparts, **kwargs)
+        return pymetis.part_graph(nparts, **kwargs) # type: ignore
 
     # Fallback: positional signature (older builds)
-    return pymetis.part_graph(nparts, xadj, adjncy, vwgt, None, eweights)
+    return pymetis.part_graph(nparts, xadj, adjncy, vwgt, None, eweights) # type: ignore
 
 
 # ---------------------------------------------------------------------------
