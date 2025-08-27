@@ -91,81 +91,124 @@ def get_outer_bounds(blocks:List[Block]):
     
     return tuple(xbounds),tuple(ybounds),tuple(zbounds)
 
-def block_connection_matrix(blocks:List[Block],outer_faces:List[Dict[str,int]]=[],tol:float=1E-8):
-    """Creates a matrix representing how block edges are connected to each other 
 
-    Args:
-        blocks (List[Block]): List of blocks that describe the Plot3D mesh
-        outer_faces (List[Dict[str,int]], optional): List of outer faces remaining from connectivity. Useful if you are interested in finding faces that are exterior to the block. Also useful if you combine outerfaces with match faces, this will help identify connections by looking at split faces. Defaults to [].
-        tol (float, optional): Matching tolerance to look for when comparing face centroids.
-    
-    Returns:
-        (Tuple): containing
-
-            *connectivity* (np.ndarray): integer matrix defining how the blocks are connected to each other
-            *connectivity_i* (np.ndarray): integer matrix defining connectivity of all blocks where IMAX=IMIN
-            *connectivity_j* (np.ndarray): integer matrix defining connectivity of all blocks where JMAX=JMIN
-            *connectivity_k* (np.ndarray): integer matrix defining connectivity of all blocks where KMAX=KMIN
-            
+def block_connection_matrix(
+    blocks: List[Block],
+    outer_faces: List[Dict[str, int]] = [],
+    tol: float = 1e-8,
+    *,
+    node_tol_xyz: float = 1e-7,
+    min_shared_frac: float = 0.02,
+    min_shared_abs: int = 4,
+    stride_u: int = 1,
+    stride_v: int = 1,
+    use_area_fallback: bool = True,
+    area_min_overlap_frac: float = 0.01
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    # Reduce the size of the blocks by the GCD 
-    gcd_array = list()    
+    Creates matrices representing how blocks are connected.
+
+    Returns:
+        connectivity     : (n,n) overall connectivity (1 = connected, -1 = not)
+        connectivity_i   : (n,n) connections where both faces are I-constant
+        connectivity_j   : (n,n) connections where both faces are J-constant
+        connectivity_k   : (n,n) connections where both faces are K-constant
+    """
+    # Reduce the size of the blocks by the minimum GCD so index grids line up
+    gcd_array = []
     for block_indx in range(len(blocks)):
         block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
-    blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
+        gcd_array.append(math.gcd(block.IMAX - 1, math.gcd(block.JMAX - 1, block.KMAX - 1)))
+    gcd_to_use = min(gcd_array)
+    blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
-    # Face to List 
-    outer_faces_all = list()
+    # Convert dict outer faces (if provided) to Face objects at the reduced resolution
+    outer_faces_all: List[Face] = []
     for o in outer_faces:
-        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd_to_use), int(o['JMIN']/gcd_to_use), 
-            int(o['KMIN']/gcd_to_use), int(o['IMAX']/gcd_to_use), int(o['JMAX']/gcd_to_use), int(o['KMAX']/gcd_to_use))
-        face.set_block_index(o['block_index'])
+        face = create_face_from_diagonals(
+            blocks[o["block_index"]],
+            int(o["IMIN"] / gcd_to_use), int(o["JMIN"] / gcd_to_use), int(o["KMIN"] / gcd_to_use),
+            int(o["IMAX"] / gcd_to_use), int(o["JMAX"] / gcd_to_use), int(o["KMAX"] / gcd_to_use)
+        )
+        face.set_block_index(o["block_index"])
         if "id" in o:
-            face.id = o['id']
+            face.id = o["id"]
         outer_faces_all.append(face)
-
-    outer_faces = outer_faces_all
+    outer_faces = outer_faces_all # type: ignore
 
     n = len(blocks)
-    connectivity = np.eye(n,dtype=np.int8)
-    combos = list(combinations(range(n),2))    
-    for indx in (pbar:=trange(len(combos))):
-        i,j = combos[indx]
-        pbar.set_description(f"Building block to block connectivity matrix: checking {i}")
+    connectivity   = np.eye(n, dtype=np.int8)
+    connectivity_i = np.eye(n, dtype=np.int8)
+    connectivity_j = np.eye(n, dtype=np.int8)
+    connectivity_k = np.eye(n, dtype=np.int8)
+
+    combos = list(combinations(range(n), 2))
+    for idx in (pbar := trange(len(combos))):
+        i, j = combos[idx]
+        pbar.set_description(f"Building connectivity: checking block {i}")
         b1 = blocks[i]
 
-        if len(outer_faces)==0:                     # Get the outerfaces to search
-            b1_outer_faces,_ = get_outer_faces(b1)
+        # Gather outer faces for block i
+        if len(outer_faces) == 0:
+            b1_outer_faces, _ = get_outer_faces(b1)
         else:
-            b1_outer_faces = [o for o in outer_faces if o.BlockIndex == i] # type: ignore
-        
-        if i != j and connectivity[i,j]!=-1:
+            b1_outer_faces = [o for o in outer_faces if o.BlockIndex == i]
+
+        if i != j and connectivity[i, j] != -1:
             b2 = blocks[j]
-
-            if len(outer_faces)==0:                 # Get the outerfaces to search
-                b2_outer_faces,_ = get_outer_faces(b2)
+            if len(outer_faces) == 0:
+                b2_outer_faces, _ = get_outer_faces(b2)
             else:
-                b2_outer_faces = [o for o in outer_faces if o.BlockIndex == j]                 # type: ignore
+                b2_outer_faces = [o for o in outer_faces if o.BlockIndex == j]
 
-            # Check to see if any of the outer faces of the blocks match   
-            connection_found=False             
+            connection_found = False
+
             for f1 in b1_outer_faces:
                 for f2 in b2_outer_faces:
-                    if (f1.is_connected(f2,tol)):   # type: ignore # Check if face centroid is the same
-                        connectivity[i,j] = 1       # Default block to block connection matrix 
-                        connectivity[j,i] = 1
-                        connection_found=True
-                        # c = np.sum(connectivity[i,:]==1)
-                        # print(f"block {i} connections {c}")
+                    # 1) Primary: node-sharing (exact common grid nodes)
+                    if f1.touches_by_nodes(
+                        f2, b1, b2,
+                        tol_xyz=node_tol_xyz,
+                        min_shared_frac=min_shared_frac,
+                        min_shared_abs=min_shared_abs,
+                        stride_u=stride_u,
+                        stride_v=stride_v
+                    ):
+                        connectivity[i, j] = connectivity[j, i] = 1
+                        if f1.const_type == 0 and f2.const_type == 0:
+                            connectivity_i[i, j] = connectivity_i[j, i] = 1
+                        if f1.const_type == 1 and f2.const_type == 1:
+                            connectivity_j[i, j] = connectivity_j[j, i] = 1
+                        if f1.const_type == 2 and f2.const_type == 2:
+                            connectivity_k[i, j] = connectivity_k[j, i] = 1
+
+                        # Debug message to see what matched
+                        print(f"[nodes] blocks {i} and {j} connected via {f1} <-> {f2}")
+                        connection_found = True
                         break
+
+                    # 2) Optional fallback: polygon overlap for non-conforming interfaces
+                    if (not connection_found) and use_area_fallback:
+                        if f1.touches(f2, min_overlap_frac=area_min_overlap_frac):
+                            connectivity[i, j] = connectivity[j, i] = 1
+                            if f1.const_type == 0 and f2.const_type == 0:
+                                connectivity_i[i, j] = connectivity_i[j, i] = 1
+                            if f1.const_type == 1 and f2.const_type == 1:
+                                connectivity_j[i, j] = connectivity_j[j, i] = 1
+                            if f1.const_type == 2 and f2.const_type == 2:
+                                connectivity_k[i, j] = connectivity_k[j, i] = 1
+
+                            print(f"[area ] blocks {i} and {j} connected via {f1} <-> {f2}")
+                            connection_found = True
+                            break
+
                 if connection_found:
                     break
+
             if not connection_found:
-                connectivity[i,j] = -1
-                connectivity[j,i] = -1      
-    return connectivity
+                connectivity[i, j] = connectivity[j, i] = -1
+
+    return connectivity, connectivity_i, connectivity_j, connectivity_k
 
 def plot_blocks(blocks):
     gcd_array = list()    

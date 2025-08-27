@@ -1,189 +1,280 @@
-import numpy as np
-import numpy.typing as npt
-import networkx as nx 
-import itertools as it
-from typing import Dict, Tuple, List
-import tqdm 
+# graph.py  (inside plot3d package)
+from __future__ import annotations
 
-def block_to_graph(IMAX:int,JMAX:int,KMAX:int,offset:int = 0) -> nx.graph.Graph:
-    """Converts a block to a graph
+from pathlib import Path
+from typing import Dict, List, Sequence, Tuple, Optional
+import inspect
 
-    Args:
-        IMAX (int): block.IMAX
-        JMAX (int): block.JMAX
-        KMAX (int): block.KMAX
-        offset (int): IMAX*JMAX*KMAX of previous block 
+import pymetis  # pip install pymetis
+from .block import Block  # <-- use your existing Block
 
-    Returns:
-        nx.graph.Graph: networkx graph object 
+
+# ---------------------------------------------------------------------------
+# Build weighted graph from connectivity_fast face_matches
+# ---------------------------------------------------------------------------
+def build_weighted_graph_from_face_matches(
+    face_matches: List[dict],
+    n_blocks: int,
+    aggregate: str = "sum",
+    ignore_self_matches: bool = True,
+) -> Tuple[Dict[int, List[int]], Dict[int, Dict[int, int]]]:
     """
-    G = nx.Graph()
-    irange = np.arange(IMAX)
-    jrange = np.arange(JMAX)
-    krange = np.arange(KMAX)
-    kshift = 0 
-    for k in range(KMAX): # K slices 
-        kshift = IMAX*JMAX*k
-
-        for j in range(JMAX):
-            nx.add_star(G, offset+ kshift + IMAX*j + irange,weight=1)
-
-        for i in range(IMAX):
-            nx.add_star(G, offset+kshift + i + IMAX*jrange,weight=1)
-
-    for p in range(IMAX*JMAX):
-        nx.add_star(G, offset + p + IMAX*JMAX*krange)
-    return G
-
-def get_face_vertex_indices(IMIN:int,JMIN:int,KMIN:int,IMAX:int,JMAX:int,KMAX:int,block_size:Tuple[int,int,int]) -> npt.NDArray:
-    """Returns an array containing the vertex number of a given face 
-
-    Args:
-        IMIN (int): starting I index
-        JMIN (int): starting J index
-        KMIN (int): starting K index
-        IMAX (int): ending I index
-        JMAX (int): ending J index
-        KMAX (int): ending K index
-        block_size (Tuple[int,int,int]): This is the actual IMAX,JMAX,KMAX of the block
+    Convert connectivity_fast face_matches into adjacency + weights.
     
-    Returns:
-        npt.NDArray: an array containing all the vertices 
-    """
+    Note:
+        Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.
+    
+    Why this matters:
+        connectivity_fast can return more than one face between the same pair of blocks 
+        (e.g. a block is split and has two non-contiguous interfaces with its neighbor).
+        Each face gives a weight = dI * dJ * dK (number of shared nodes).
+        METIS expects one edge per block-pair, with a single weight.
+        So if there are multiple faces, we must decide how to merge them. That’s what aggregate does.
+        
+    Args:
+        face_matches (List[dict]): Output from connectivity_fast
+        n_blocks (int): number of blocks in a mesh 
+        aggregate (str, optional): 'sum'|'max'|'min'. Controls how weights are combined. Defaults to "sum".
+        ignore_self_matches (bool, optional): ignores self matching (i==j). Defaults to True.
 
-    def create_range(indx1,indx2):
-        if indx1<indx2:
-            return np.arange(indx1,indx2)
+    Raises:
+        ValueError: if aggregate is not one of 'sum','max','min'
+
+    Returns:
+        Tuple[Dict[int, List[int]], Dict[int, Dict[int, int]]]: 
+            * adj_list (Dict[int, List[int]]): Neighbors for each block.
+            * edge_w   (Dict[int, Dict[int, int]]): Edge weights (u->v).
+    """
+    if aggregate not in {"sum", "max", "min"}:
+        raise ValueError("aggregate must be one of {'sum','max','min'}")
+
+    pair_weight: Dict[Tuple[int, int], int] = {}
+
+    for m in face_matches:
+        i = int(m["block1"]["block_index"])
+        j = int(m["block2"]["block_index"])
+        if ignore_self_matches and i == j:
+            continue
+
+        IMIN = int(m["block1"]["IMIN"]); JMIN = int(m["block1"]["JMIN"]); KMIN = int(m["block1"]["KMIN"])
+        IMAX = int(m["block1"]["IMAX"]); JMAX = int(m["block1"]["JMAX"]); KMAX = int(m["block1"]["KMAX"])
+        dI = max(abs(IMAX - IMIN), 1)
+        dJ = max(abs(JMAX - JMIN), 1)
+        dK = max(abs(KMAX - KMIN), 1)
+        w = dI * dJ * dK  # Edge weight = communication cost (number of face nodes)
+
+        a, b = (i, j) if i < j else (j, i)
+        if (a, b) not in pair_weight:
+            pair_weight[(a, b)] = w
         else:
-            return np.arange(indx1-1,indx2-1,-1)
-        
-    indices = list()
-    if IMIN==IMAX:
-        jrange = create_range(JMIN,JMAX)
-        krange = create_range(KMIN,KMAX)
-        if IMIN==block_size[0]: # IMIN is really IMAX
-            for j in jrange:
-                j_offset = j*block_size[0]    # IMAX * JMAX
-                indices.append(j_offset + block_size[0]*block_size[1]*krange + IMAX-1)
-        else:
-            for j in jrange:
-                j_offset = j*block_size[0]
-                indices.append(j_offset + block_size[0]*block_size[1]*krange)
-        
-    elif JMIN == JMAX:
-        irange = create_range(IMIN,IMAX)
-        krange = create_range(KMIN,KMAX)
-        if JMIN==block_size[1]: # JMIN is really JMAX
-            for k in krange:
-                k_offset = k*block_size[0]*block_size[1] 
-                indices.append(k_offset + block_size[0]*(block_size[1]-1)+irange)
-        else:                   # JMIN
-            for k in krange:
-                k_offset = k*block_size[0]*block_size[1]
-                indices.append(k_offset + irange)
-    else:
-        irange = create_range(IMIN,IMAX)
-        jrange = create_range(JMIN,JMAX)
-        if KMIN == block_size[2]: # KMIN is really KMAX
-            offset = (KMIN-1)*block_size[0]*block_size[1] 
-        else:
-            offset = 0 
-        for j in jrange:
-            indices.append(offset+block_size[0]*j + irange)
-    return np.array(indices).flatten()
+            if aggregate == "sum":
+                pair_weight[(a, b)] += w
+            elif aggregate == "max":
+                pair_weight[(a, b)] = max(pair_weight[(a, b)], w)
+            else:  # "min"
+                pair_weight[(a, b)] = min(pair_weight[(a, b)], w)
 
-def get_starting_vertex(blockIndex:int,block_sizes:List[Tuple[int,int,int]]) -> int:
-    """Gets the starting vertex index of the block
+    # adjacency list and edge weights
+    adj_list: Dict[int, List[int]] = {u: [] for u in range(n_blocks)}
+    edge_w: Dict[int, Dict[int, int]] = {u: {} for u in range(n_blocks)}
 
-    Args:
-        blockIndex (int): index of block
-        block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] 
+    for (a, b), w in pair_weight.items():
+        adj_list[a].append(b)
+        adj_list[b].append(a)
+        edge_w[a][b] = w
+        edge_w[b][a] = w
+
+    for u in range(n_blocks):
+        adj_list[u] = sorted(set(adj_list[u]))
+
+    return adj_list, edge_w
+
+
+def csr_from_adj_and_weights(
+    adj_list: Dict[int, List[int]],
+    edge_w: Dict[int, Dict[int, int]],
+) -> Tuple[List[int], List[int], List[int]]:
+    """
+    Build CSR arrays (xadj, adjncy, eweights) from adjacency + weights.
 
     Returns:
-        int: offset
+        xadj (List[int]): prefix sum of neighbors
+        adjncy (List[int]): flattened neighbor list
+        eweights (List[int]): edge weights aligned with adjncy
     """
-    offset = 0 
-    for i in range(blockIndex):
-        offset+=block_sizes[i][0]*block_sizes[i][1]*block_sizes[i][2]
-    return offset
+    xadj: List[int] = [0]
+    adjncy: List[int] = []
+    eweights: List[int] = []
+    count = 0
+    for u in sorted(adj_list.keys()):
+        for v in adj_list[u]:
+            adjncy.append(v)
+            eweights.append(edge_w[u].get(v, 1))
+            count += 1
+        xadj.append(count)
+    return xadj, adjncy, eweights
 
-def add_connectivity_to_graph(G:nx.classes.graph.Graph,block_sizes:List[Tuple[int,int,int]],connectivities:List[Dict[str,int]]) -> nx.graph.Graph:
-    """Convert plot3d defined connectivity into additional graph edges 
+
+# ---------------------------------------------------------------------------
+# pymetis compatibility wrapper
+# ---------------------------------------------------------------------------
+def _metis_part_graph_compat(
+    nparts: int,
+    xadj: List[int],
+    adjncy: List[int],
+    vwgt: Optional[List[int]] = None,
+    eweights: Optional[List[int]] = None,
+):
+    """
+    Call pymetis.part_graph in a way that's compatible with multiple pymetis versions.
+    Tries keyword names first, then falls back to positional args.
 
     Args:
-        G (nx.classes.graph.Graph): Giant graph 
-        block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] 
-        connectivity (List[Dict[str,int]]): _description_
-    
-    Returns:
-        nx.graph.Graph: networkx graph object with added edges 
-    """
-    
-    for con in tqdm.tqdm(connectivities,"Adding connectivity to Graph"):
-        block1_index = con['block1']['block_index']
-        block2_index = con['block2']['block_index']
-        IMIN1,IMAX1 = con['block1']['IMIN'], con['block1']['IMAX']
-        JMIN1,JMAX1 = con['block1']['JMIN'], con['block1']['JMAX']
-        KMIN1,KMAX1 = con['block1']['KMIN'], con['block1']['KMAX']
-        
-        IMIN2,IMAX2 = con['block2']['IMIN'], con['block2']['IMAX']
-        JMIN2,JMAX2 = con['block2']['JMIN'], con['block2']['JMAX']
-        KMIN2,KMAX2 = con['block2']['KMIN'], con['block2']['KMAX']
-        
-        # Number of connectivities should match
-        face1 = get_face_vertex_indices(IMIN1,JMIN1,KMIN1,IMAX1,JMAX1,KMAX1,block_sizes[block1_index]) + get_starting_vertex(block1_index, block_sizes)    
-        face2 = get_face_vertex_indices(IMIN2,JMIN2,KMIN2,IMAX2,JMAX2,KMAX2,block_sizes[block2_index]) + get_starting_vertex(block2_index, block_sizes)
-        
-        if block1_index!= block2_index:
-            nodes_to_add = face1
-            nodes_to_replace = face2
-            for node_to_add,node_to_replace in tqdm.tqdm(zip(nodes_to_add,nodes_to_replace)):
-                G.add_edges_from(
-                    it.product(
-                        G.neighbors(node_to_add),
-                        G.neighbors(node_to_replace)
-                        )
-                )
-                G.remove_node(node_to_replace)
-                
-        assert len(face1) == len(face2), f"Number of connections from {block1_index} I[{IMIN1},{IMAX1}], J[{JMIN1},{JMAX1}], K[{KMIN1},{KMAX1}] to {block2_index} I[{IMIN2},{IMAX2}], J[{JMIN2},{JMAX2}], K[{KMIN2},{KMAX2}] should match."
-        
-        for i in range(len(face1)):
-            G.add_edge(face1[i],face2[i])
-            
-    return G
+        nparts (int): number of partitions
+        xadj (List[int]): CSR row pointer
+        adjncy (List[int]): CSR neighbor list
+        vwgt (Optional[List[int]]): vertex weights
+        eweights (Optional[List[int]]): edge weights
 
-def block_connectivity_to_graph(connectivities:List[Dict[str,int]],block_sizes:List[int],connectivity_multiplier:float=1,block_size_multiplier:float=1) -> nx.graph.Graph:
-    """Models the blocks at vertices connected to each other 
-
-    Args:
-        connectivities (List[Dict[str,int]]): List of connectivities 
-        block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] 
-        connectivity_multiplier (float): amount to weight the block connections by. Defaults to 1.
-        block_size_multiplier (float): amount to weight the size of the blocks by. Defaults to 1 
-        
     Returns:
-        nx.graph.Graph: Graph object 
+        (edgecut, parts)
     """
-    block_to_block = list()
-    G = nx.Graph()
-    for con in tqdm.tqdm(connectivities,"Adding connectivity to Graph"):
-        block1_index = con['block1']['block_index']
-        block2_index = con['block2']['block_index']
-        dI = max(con['block1']['IMAX']-con['block1']['IMIN'],1)
-        dJ = max(con['block1']['JMAX']-con['block1']['JMIN'],1)
-        dK = max(con['block1']['KMAX']-con['block1']['KMIN'],1)
-        edge_weight = dI * dJ * dK *connectivity_multiplier
-        # Weight the edges based on number of connections
-        block_to_block.append((block1_index,block2_index,{"weight": int(edge_weight)}))
+    sig_params = set(inspect.signature(pymetis.part_graph).parameters.keys())
+
+    # Prefer keyword args when supported
+    if {"xadj", "adjncy"}.issubset(sig_params):
+        kwargs = {"xadj": xadj, "adjncy": adjncy}
+        # Vertex weights
+        if "vwgt" in sig_params and vwgt is not None:
+            kwargs["vwgt"] = vwgt
+        elif "vweights" in sig_params and vwgt is not None:
+            kwargs["vweights"] = vwgt  # alternate name
+        # Edge weights
+        if "eweights" in sig_params and eweights is not None:
+            kwargs["eweights"] = eweights
+        elif "adjwgt" in sig_params and eweights is not None:
+            kwargs["adjwgt"] = eweights  # alternate name
+
+        return pymetis.part_graph(nparts, **kwargs) # type: ignore
+
+    # Fallback: positional signature (older builds)
+    return pymetis.part_graph(nparts, xadj, adjncy, vwgt, None, eweights) # type: ignore
+
+
+# ---------------------------------------------------------------------------
+# Partition entrypoint (takes face_matches directly)
+# ---------------------------------------------------------------------------
+def partition_from_face_matches(
+    face_matches: List[dict],
+    blocks: Sequence[Block],
+    nparts: int,
+    favor_blocksize: bool = True,
+    aggregate: str = "sum",
+    ignore_self_matches: bool = True,
+) -> Tuple[List[int], Dict[int, List[int]], Dict[int, Dict[int, int]]]:
+    """
+    Partition a graph derived from `face_matches` using pymetis.
     
-    # Adds the nodes and node weights
-    for i in range(len(block_sizes)):
-        G.add_node(i, weight=block_sizes[i]*block_size_multiplier)
+    Note:
+        Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.
     
-    # Adds the connectivity information 
-    G.add_edges_from(block_to_block)
-    
-    return G
-    
-    
+    Why this matters:
+        connectivity_fast can return more than one face between the same pair of blocks 
+        (e.g. a block is split and has two non-contiguous interfaces with its neighbor).
+        Each face gives a weight = dI * dJ * dK (number of shared nodes).
+        METIS expects one edge per block-pair, with a single weight.
+        So if there are multiple faces, we must decide how to merge them. That’s what aggregate does.
+
+    Returns
+    -------
+    parts : List[int]
+        Partition id (0-based) for each block.
+    adj_list : Dict[int, List[int]]
+        Adjacency list used for the partitioning.
+    edge_w : Dict[int, Dict[int, int]]
+        Edge weights.
+    """
+    n_blocks = len(blocks)
+    adj_list, edge_w = build_weighted_graph_from_face_matches(
+        face_matches, n_blocks,
+        aggregate=aggregate,
+        ignore_self_matches=ignore_self_matches,
+    )
+    xadj, adjncy, eweights = csr_from_adj_and_weights(adj_list, edge_w)
+
+    vwgt: Optional[List[int]] = None
+    if favor_blocksize:
+        vwgt = [b.size for b in blocks]
+
+    _edgecut, parts = _metis_part_graph_compat(
+        nparts=nparts,
+        xadj=xadj,
+        adjncy=adjncy,
+        vwgt=vwgt,
+        eweights=eweights,
+    )
+    return parts, adj_list, edge_w
+
+
+# ---------------------------------------------------------------------------
+# DDCMP writer
+# ---------------------------------------------------------------------------
+def write_ddcmp(
+    parts: Sequence[int],
+    blocks: Sequence[Block],
+    adj_list: Dict[int, List[int]],
+    edge_weights: Optional[Dict[int, Dict[int, int]]] = None,
+    filename: str = "ddcmp.dat",
+) -> None:
+    """
+    Writes ddcmp.dat and ddcmp_info.txt.
+
+    Notes:
+        * parts are 0-based in memory, but written 1-based in the file (to match your C#).
+        * edge_weights affects the per-partition 'edge_work' if provided.
+    """
+    n_proc = (max(parts) + 1) if parts else 0
+    n_isp = n_proc
+    n_blocks = len(parts)
+
+    out = Path(filename)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("w", encoding="utf-8") as f:
+        f.write(f"{n_proc}\n{n_isp}\n{n_blocks}\n")
+        for b_idx in range(n_blocks):
+            f.write(f"{b_idx + 1} {parts[b_idx] + 1}\n")
+        for isp in range(n_isp):
+            f.write(f"{isp + 1} {isp}\n")
+
+    communication_work = [0] * n_proc
+    partition_edge_weights = [0] * n_proc
+    volume_nodes = [0] * n_proc
+
+    for b, blk in enumerate(blocks):
+        pid = parts[b]
+        volume_nodes[pid] += blk.size
+
+    ew = edge_weights or {}
+    for b in range(len(blocks)):
+        pid = parts[b]
+        for nbr in adj_list.get(b, []):
+            nbr_pid = parts[nbr]
+            if nbr_pid != pid:
+                communication_work[pid] += 1
+                partition_edge_weights[pid] += int(ew.get(b, {}).get(nbr, 1))
+
+    info_path = out.parent / "ddcmp_info.txt"
+    with info_path.open("w", encoding="utf-8") as f:
+        for i in range(n_proc):
+            block_count = sum(1 for p in parts if p == i)
+            f.write(f"Parition {i:d} has {block_count} blocks\n")
+        f.write(f"Number of partitions/processors {n_proc}\n")
+        for i in range(n_proc):
+            f.write(
+                f"Parition or processor {i:d} has communication work {communication_work[i]:d} "
+                f"edge_work {partition_edge_weights[i]:d} volume_nodes {volume_nodes[i]:d}\n"
+            )
+        f.write(
+            f"Total communication work {sum(communication_work):d} "
+            f"Total edge_work {sum(partition_edge_weights):d}\n"
+        )

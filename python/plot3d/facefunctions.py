@@ -131,7 +131,7 @@ def get_outer_faces(block1:Block):
     # block_center_to_face_center =  block1.cx
     return non_matching, matching # these should be the outer faces
     
-def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int):
+def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int) -> Face:
     """Creates a face on a block given a the diagonals defined as (IMIN,JMIN,KMIN), (IMAX, JMAX, KMAX)
 
     Args:
@@ -173,53 +173,215 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
                 newFace.add_vertex(x,y,z,i,j,k)
     return newFace
 
-def find_connected_faces(face_to_search:Face,outer_faces:List[Face],connectivity_matrix:np.ndarray,blocks:List[Block]):
-    """Recursive program to return all the matching faces. Note faces must have the same I,J,K definition so faces will be matching if for example: Face1 IMIN=IMAX and Face2 IMIN=IMAX and they share a common edge (2 vertices)
+
+AxisMap = {"x": 0, "y": 1, "z": 2}
+
+def _face_axis_extreme(face: Face, axis: str) -> Tuple[float, float]:
+    """Return (vmin, vmax) of the face along axis ∈ {'x','y','z'} using stored vertices."""
+    if axis == "x":
+        arr = face.x[:face.nvertex]
+    elif axis == "y":
+        arr = face.y[:face.nvertex]
+    else:
+        arr = face.z[:face.nvertex]
+    return float(np.min(arr)), float(np.max(arr))
+
+def _global_axis_extreme(blocks: List[Block], axis: str) -> Tuple[float, float]:
+    """Global (min, max) along axis across all blocks."""
+    vals = []
+    idx = AxisMap[axis]
+    for b in blocks:
+        if idx == 0: vals.append(b.X.reshape(-1))
+        elif idx == 1: vals.append(b.Y.reshape(-1))
+        else: vals.append(b.Z.reshape(-1))
+    cat = np.concatenate(vals, axis=0)
+    return float(cat.min()), float(cat.max())
+
+def _select_seed_faces(outer_faces: List[Face], blocks: List[Block],
+                       axis: str, side: str, tol_abs: float) -> List[Face]:
+    """Pick all outer faces whose face extreme equals the global extreme within tol."""
+    gmin, gmax = _global_axis_extreme(blocks, axis)
+    target = gmin if side == "min" else gmax
+    seeds: List[Face] = []
+    for f in outer_faces:
+        fmin, fmax = _face_axis_extreme(f, axis)
+        face_ext = fmin if side == "min" else fmax
+        if abs(face_ext - target) <= tol_abs:
+            seeds.append(f)
+    return seeds
+
+def _bfs_collect_boundary(seed_faces: List[Face],
+                          all_outer_faces: List[Face],
+                          blocks: List[Block],
+                          axis: str,
+                          side: str,
+                          tol_abs: float,
+                          node_tol_xyz: float,
+                          min_shared_abs: int = 2,
+                          min_shared_frac: float = 0.005) -> List[Face]:
+    """
+    Flood-fill over outer faces: neighbors share nodes (not just centroids)
+    and lie on the same extreme plane (within tol_abs).
+    """
+    # index faces by (block, IMIN..KMAX) for visited bookkeeping
+    def key(f: Face) -> Tuple[int,int,int,int,int,int,int]:
+        return (f.BlockIndex, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX)
+
+    # all faces that lie on the extreme plane
+    on_plane = []
+    for f in all_outer_faces:
+        fmin, fmax = _face_axis_extreme(f, axis)
+        v = fmin if side == "min" else fmax
+        # Require the *entire* face to be on/above(below) the plane within tol to avoid picking X side
+        gmin, gmax = _global_axis_extreme(blocks, axis)
+        plane = gmin if side == "min" else gmax
+        # Face must touch the plane and not protrude past it more than tol_abs
+        touch_plane = abs(v - plane) <= tol_abs
+        # The opposite extreme should not "cross" the plane the wrong way
+        opp = fmax if side == "min" else fmin
+        not_past = (opp - plane <= tol_abs) if side == "min" else (plane - opp <= tol_abs)
+        if touch_plane and not_past:
+            on_plane.append(f)
+
+    pool = {key(f): f for f in on_plane}
+    q = [f for f in seed_faces if key(f) in pool]
+    visited = set()
+    result: List[Face] = []
+
+    while q:
+        cur = q.pop()
+        kcur = key(cur)
+        if kcur in visited:
+            continue
+        visited.add(kcur)
+        result.append(cur)
+
+        # find neighbors by node-sharing (fast and reliable for structured grids)
+        for k2, cand in list(pool.items()):
+            if k2 in visited or k2 == kcur:
+                continue
+            if cur.touches_by_nodes(cand,
+                                    blocks[cur.BlockIndex], blocks[cand.BlockIndex],
+                                    tol_xyz=node_tol_xyz,
+                                    min_shared_abs=min_shared_abs,
+                                    min_shared_frac=min_shared_frac,
+                                    stride_u=1, stride_v=1):
+                q.append(cand)
+
+    return result
+
+def find_bounding_faces(blocks: List[Block],
+                        outer_faces: List[Dict[str,int]],
+                        direction: str = "z",
+                        side: str = "both",
+                        tol_rel: float = 1e-8,
+                        node_tol_xyz: float = 1e-6) -> Tuple[List[Dict[str,int]], List[Dict[str,int]],List[Face], List[Face]]:
+    """
+    Find *outer* bounding faces at the global min/max of a given direction ('x','y','z').
+    Uses node-sharing BFS to gather continuous boundary patches across blocks.
 
     Args:
-        face_to_search (Face): This is the face to search for 
-        outer_faces (List[Face]): List of outer faces 
-        connectivity_matrix (np.ndarray): block connectivity matrix
-        searched_faces (List[Face]): Leave this as blank
+        blocks: list of Block
+        outer_faces: optional precomputed outer faces (dict form)
+        direction: 'x','y','z'
+        side: 'both' | 'min' | 'max'
+        tol_rel: relative tolerance against global extreme value
+        node_tol_xyz: absolute node matching tolerance (geometry units)
 
     Returns:
-        List[Face]: list of all faces that connect with face_to_search and it's neighbors. Beware of duplicates.
+        lower_connected_faces_export, upper_connected_faces_export, lower_connected_faces, upper_connected_faces
     """
-    connectivity_matrix = connectivity_matrix.copy()
-    all_matching_faces = [face_to_search]
-    faces_to_search = [face_to_search]
-    faces_searched = []
-    while len(faces_to_search)>0:
-        matching_faces = list()
-        for face_to_search in faces_to_search:
-            n1 = face_to_search.normal(blocks[face_to_search.BlockIndex])
-            selected_block_indx = face_to_search.BlockIndex    
-            connected_block_indices = np.where(connectivity_matrix[selected_block_indx,:]==1)[0]
-            faces_to_check = [o for o in outer_faces if o.BlockIndex in connected_block_indices.tolist()]
-            
-            for f in faces_to_check:
-                if (len(face_to_search.match_indices(f))==2):
-                    n2 = f.normal(blocks[f.BlockIndex])
-                    angle = abs(math.degrees(math.acos(np.dot(n1,n2)/(np.linalg.norm(n1)*np.linalg.norm(n2)))))
-                    if angle>90:
-                        angle = 180-angle
+    # 1) Reduce by GCD so grids line up
+    gcd_array = [math.gcd(b.IMAX-1, math.gcd(b.JMAX-1, b.KMAX-1)) for b in blocks]
+    gcd_to_use = min(gcd_array)
+    blocks_r = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
-                    if angle<30:
-                        connectivity_matrix[selected_block_indx, f.BlockIndex] = 0
-                        connectivity_matrix[f.BlockIndex, selected_block_indx] = 0
-                        matching_faces.append(f)        
-              
-        faces_searched.extend(faces_to_search)
-        matching_faces = [m for m in matching_faces if m not in all_matching_faces]
-        faces_to_search.clear()
-        faces_to_search.extend(matching_faces)
-        all_matching_faces.extend(matching_faces)        
-        matching_faces.clear()
-    all_matching_faces = list(set(all_matching_faces))  
-    return all_matching_faces
+    # 2) Build outer face list at reduced resolution
+    if len(outer_faces) == 0:
+        outer_faces_all: List[Face] = []
+        for bi, b in enumerate(blocks_r):
+            outs, _ = get_outer_faces(b)
+            for o in outs:
+                o.set_block_index(bi)
+            outer_faces_all.extend(outs)
+    else:
+        outer_faces_all = outer_face_dict_to_list(blocks_r, outer_faces, gcd_to_use)
+
+    # 3) Absolute tolerance for plane selection
+    gmin, gmax = _global_axis_extreme(blocks_r, direction)
+    # scale tolerance by magnitude so meshes near origin work too
+    tol_abs = max(1.0, abs(gmin) + abs(gmax)) * tol_rel
+
+    # 4) Seeds on min/max planes
+    want_min = (side in ("min", "both"))
+    want_max = (side in ("max", "both"))
+
+    lower_connected_faces: List[Face] = []
+    upper_connected_faces: List[Face] = []
+
+    if want_min:
+        seeds_min = _select_seed_faces(outer_faces_all, blocks_r, direction, "min", tol_abs)
+        lower_connected_faces = _bfs_collect_boundary(
+            seed_faces=seeds_min,
+            all_outer_faces=outer_faces_all,
+            blocks=blocks_r,
+            axis=direction,
+            side="min",
+            tol_abs=tol_abs,
+            node_tol_xyz=node_tol_xyz,
+            min_shared_abs=2,          # edge-wise continuity OK
+            min_shared_frac=0.005      # small overlap fraction enough to chain
+        )
+
+    if want_max:
+        seeds_max = _select_seed_faces(outer_faces_all, blocks_r, direction, "max", tol_abs)
+        upper_connected_faces = _bfs_collect_boundary(
+            seed_faces=seeds_max,
+            all_outer_faces=outer_faces_all,
+            blocks=blocks_r,
+            axis=direction,
+            side="max",
+            tol_abs=tol_abs,
+            node_tol_xyz=node_tol_xyz,
+            min_shared_abs=2,
+            min_shared_frac=0.005
+        )
+
+    # 5) Scale indices back up to the original grid
+    #    (Make copies so we don't mutate faces held elsewhere.)
+    def _rescale_faces(faces: List[Face]) -> List[Face]:
+        out: List[Face] = []
+        for f in faces:
+            g = Face()
+            g.x = f.x.copy(); g.y = f.y.copy(); g.z = f.z.copy()
+            g.I = (f.I * gcd_to_use).astype(f.I.dtype)
+            g.J = (f.J * gcd_to_use).astype(f.J.dtype)
+            g.K = (f.K * gcd_to_use).astype(f.K.dtype)
+            g.nvertex = f.nvertex
+            g.cx, g.cy, g.cz = f.cx, f.cy, f.cz
+            g.blockIndex = f.blockIndex
+            g.id = f.id
+            out.append(g)
+        # de-duplicate by index ranges
+        uniq = {}
+        for f in out:
+            k = (f.BlockIndex, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX)
+            uniq[k] = f
+        return list(uniq.values())
+
+    lower_connected_faces = _rescale_faces(lower_connected_faces)
+    upper_connected_faces = _rescale_faces(upper_connected_faces)
+
+    lower_connected_faces_export = [f.to_dict() for f in lower_connected_faces]
+    upper_connected_faces_export = [f.to_dict() for f in upper_connected_faces]
+
+    return (lower_connected_faces_export,
+            upper_connected_faces_export,
+            lower_connected_faces,
+            upper_connected_faces)
 
 def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray,centroid:np.ndarray,translational_direction:str="x",minvalue:bool=True):
-    """Find the closest block to an extreme in the x,y, or z direction and returns the targetting point. 
+    """Find the closest block to an extreme in the x,y, or z direction and returns the targeting point. 
     Target point is the reference point where we want the closest block and the closest face 
 
     Args:
@@ -285,86 +447,6 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
 
     return selected_block_indx,target_x,target_y,target_z 
 
-def find_bounding_faces(blocks:List[Block],connectivity_matrix:np.ndarray,outer_faces:List[Dict[str,int]], direction:str="z"):
-    """Finds bounding faces in x,y,z direction so think of this as the xmin and xmax faces of a block.
-    This is useful for translational periodicity where you want the bounds to check
-
-    Args:
-        blocks (List[Block]): List of blocks
-        outer_faces (List[Dict[str,int]]): outer faces as a list of dictionaries 
-        direction (str, optional): Direction to search for. Defaults to "z".
-
-    Returns:
-        (tuple) containing:
-        
-            *lower_connected_faces_export* (List[Dict[str,int]]): Export ready version of lower/left connected faces
-            *upper_connected_faces_export* (List[Dict[str,int]]): Export ready version of upper/right connected faces
-            *lower_connected_faces* (List[face]): List of lower/left connected faces
-            *upper_connected_faces* (List[face]): List of upper/right connected faces
-    """
-    gcd_array = list()
-    # Find the gcd of all the blocks
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
-    blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)    
-    
-    xyz_array = np.array([(b.cx, b.cy, b.cz) for b in blocks]); 
-    
-    cx = np.mean(xyz_array[:,0]) # Centroid 
-    cy = np.mean(xyz_array[:,1])
-    cz = np.mean(xyz_array[:,2])
-    x = xyz_array[:,0]; y = xyz_array[:,1]; z = xyz_array[:,2]
-
-    if len(outer_faces) == 0:
-        for i,b in enumerate(blocks):
-            outer,_ = get_outer_faces(b)
-            [o.set_block_index(i) for o in outer]
-            outer_faces.extend(outer)
-        outer_faces_all = outer_faces
-    else:
-        outer_faces_all = outer_face_dict_to_list(blocks,outer_faces,gcd_to_use)
-
-    # Find closest face to the min value 
-    selected_block_index,tx,ty,tz = find_closest_block(blocks,x,y,z,np.array([cx,cy,cz]),direction,minvalue=True)
-    faces = [f for f in outer_faces_all if f.BlockIndex == selected_block_index]    # Pick all the faces for the selected block 
-    min_face_indx = np.argmin(np.array([np.sqrt((f.cx-tx)**2+(f.cy-ty)**2+(f.cz-tz)**2) for f in faces]))
-    min_face = faces[min_face_indx]     # Just need this
-    
-    selected_block_index,tx,ty,tz = find_closest_block(blocks,x,y,z,np.array([cx,cy,cz]),direction,minvalue=False)
-    faces = [f for f in outer_faces_all if f.BlockIndex == selected_block_index]    # Pick all the faces for the selected block 
-    max_face_indx = np.argmin(np.array([np.sqrt((f.cx-tx)**2+(f.cy-ty)**2+(f.cz-tz)**2) for f in faces]))
-    max_face = faces[max_face_indx]     # Also need this
-
-    # Search face connectivity in block connectivity matrix 
-    connectivity_matrix = connectivity_matrix - np.eye(connectivity_matrix.shape[0],dtype=np.int8) # turn off connections with itself 
-
-    outer_faces_all = [o for o in outer_faces_all if o.BlockIndex != min_face.BlockIndex]
-    outer_faces_all = [o for o in outer_faces_all if o.BlockIndex != max_face.BlockIndex]
-    
-    # !print("Recursively searching for connected faces")
-    lower_connected_faces = find_connected_faces(min_face,outer_faces_all,connectivity_matrix,blocks)
-    upper_connected_faces = find_connected_faces(max_face,outer_faces_all,connectivity_matrix,blocks)
-    
-    lower_connected_faces.append(min_face)
-    upper_connected_faces.append(max_face)
-    # Unscale faces
-    lower_connected_faces = list(set(lower_connected_faces))
-    upper_connected_faces = list(set(upper_connected_faces))
-
-    for l in lower_connected_faces:
-        l.I*=gcd_to_use
-        l.J*=gcd_to_use
-        l.K*=gcd_to_use
-    for u in upper_connected_faces:
-        u.I*=gcd_to_use
-        u.J*=gcd_to_use
-        u.K*=gcd_to_use
-
-    lower_connected_faces_export = [l.to_dict() for l in lower_connected_faces]
-    upper_connected_faces_export = [u.to_dict() for u in upper_connected_faces]
-    return lower_connected_faces_export,upper_connected_faces_export, lower_connected_faces, upper_connected_faces
 
 def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int):
     """Splits a face with another face within the same block 
