@@ -8,15 +8,12 @@ import pickle
 import json
 from pathlib import Path
 
-def dump_data(data):
-    with open('connectivity.pickle','wb') as f:
-        pickle.dump(data,f)
-
-if __name__ == "__main__":        
+if __name__ == "__main__":      
+    root_path = "[path to gridpro export]"  
     folders = [ 
-                "[path_to_mesh]/Quartermillion",
-                "[path_to_mesh]/Halfmillion",
-                "[path_to_mesh]/OneMillion",
+                f"{root_path}/Quartermillion",
+                f"{root_path}/Halfmillion",
+                f"{root_path}/OneMillion",
             ]
     # Loop through the folders 
     for folder in folders:
@@ -47,31 +44,34 @@ if __name__ == "__main__":
         for i,inlet in enumerate(connectivity['bc_group']['inlet']): # type: ignore
             inlets.append(InletBC(
                 BCType=BoundaryConditionType.Inlet, SurfaceID=inlet['id'], Name=f"Inlet-{i}",
-                P0_const=60.0, P0_const_unit="bar", T0_const=300.0
-            ))
+                P0_const=60.0, P0_const_unit="bar", T0_const=300.0, inlet_subType=inlet['id'],
+            ))          # Use absolute conditions, code will automatically normalize
         outlets = []
         for i,outlet in enumerate(connectivity['bc_group']['outlet']): # type: ignore
             outlets.append(OutletBC(
                 BCType=BoundaryConditionType.Outlet, SurfaceID=outlet['id'], Name=f"Outlet-{i}",
-                Pback_const=1.0, Pback_const_unit="bar"
-            ))
+                Pback_const=1.0, Pback_const_unit="bar", outlet_subType=outlet['id']
+            ))          # Use absolute conditions, code will automatically normalize
         walls = [] 
         for i,wall in enumerate(connectivity['bc_group']['wall']): # type: ignore
-            outlets.append(WallBC(
-                BCType=BoundaryConditionType.Wall, SurfaceID=wall['id'], Name=f"Wall-{i}",
+            walls.append(WallBC(
+                BCType=BoundaryConditionType.Wall, SurfaceID=wall['id'], Name=f"Wall-{i}", wall_subType=wall['id']
             ))
             
         bcg = BCGroup(Inlets=inlets, Outlets=outlets, SymmetricSlips=[], Walls=walls)
 
         job = Job()
-        job.JobFiles.ConnFILE = "connectivity.ght_conn"
-        job.JobFiles.DcmpFILE = "ddcmp.dat"
-        job.JobFiles.GridFile = "blk.xyz"
-        job.JobFiles.BCSpecFILE = 'boundary_conditions.bcs'
-        job.ReferenceCondFull.reflen = 5.119 # inches
+        job.JobFiles.ConnFILE = "connectivity.ght_conn" # Name of connectivity file
+        job.JobFiles.DcmpFILE = "ddcmp.dat"             # Name of ddcmp file
+        job.JobFiles.GridFile = "blk.xyz"               # Name of grid pro mesh file to plot3d mesh file
+        job.JobFiles.BCSpecFILE = 'boundary_conditions.bcs' # Name of boundary condition file
+        job.ReferenceCondFull.reflen = 5.119                # inches, used to calculate the reynolds number should be same scale as mesh
         
-        # Export GlennHT connectivity file
+        outer_faces = []
+        for k,v in connectivity['bc_group'].items():
+            outer_faces.extend(v)        # Export GlennHT connectivity file
         export_to_glennht_conn(connectivity['face_matches'], outer_faces, osp.join(folder, job.JobFiles.ConnFILE),connectivity['gif_faces'],connectivity['volume_zones']) # type: ignore
+        
         # Export GlennHT boundary conditions file
         export_to_boundary_condition(file_path_to_write=osp.join(folder, job.JobFiles.BCSpecFILE),
                                      job_settings= job, 
@@ -85,9 +85,10 @@ if __name__ == "__main__":
         export_to_job_file(job,osp.join(folder,'job'),title=last_folder)
         
         # Export DDCMP
-        nprocessors = 4 
+        nprocessors = 10
         parts, adj_list, edge_w = partition_from_face_matches(connectivity['face_matches'],blocks,nprocessors,favor_blocksize=True) # type: ignore
         write_ddcmp(parts,blocks,adj_list,edge_w,osp.join(folder,job.JobFiles.DcmpFILE))
         
         # Export the plot3d
         write_plot3D(osp.join(folder,job.JobFiles.GridFile),blocks,binary=False)
+        

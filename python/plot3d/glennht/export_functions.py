@@ -406,15 +406,34 @@ def export_to_boundary_condition(
             else:
                 w.write(_export_namelist_block("VZConditions", vz)); w.write("\n")
 
+        # keep the *first* object for each unique obj.subtype
+        def first_by_subtype(objs: Iterable[T], subtype_attr: str, *, include_none=False) -> List[T]:
+            seen = set()
+            out: List[T] = []
+            for o in objs:
+                # works for both objects and dicts
+                st = getattr(o, subtype_attr, None) if not isinstance(o, dict) else o.get(subtype_attr)
+                if st is None and not include_none:
+                    continue
+                if st not in seen:
+                    seen.add(st)
+                    out.append(o)
+            return out
+        
+        inlet_bc = first_by_subtype(bc_group.Inlets,'inlet_subType')
+        outlet_bc = first_by_subtype(bc_group.Outlets,'outlet_subType')
+        slip_bc = first_by_subtype(bc_group.SymmetricSlips,'slip_subType')
+        wall_bc = first_by_subtype(bc_group.Walls,'wall_subType')
+        
         # Detailed BC blocks (skip meta + *_unit)
         exclude = {"Name", "SurfaceID", "BCType"}
-        for inlet in bc_group.Inlets:
+        for inlet in inlet_bc:
             w.write(_export_namelist_block("INLET_BC", inlet, exclude_names=exclude)); w.write("\n")
-        for outlet in bc_group.Outlets:
+        for outlet in outlet_bc:
             w.write(_export_namelist_block("OUTLET_BC", outlet, exclude_names=exclude)); w.write("\n")
-        for slip in bc_group.SymmetricSlips:
+        for slip in slip_bc:
             w.write(_export_namelist_block("SLIP_BC", slip, exclude_names=exclude)); w.write("\n")
-        for wall in bc_group.Walls:
+        for wall in wall_bc:
             w.write(_export_namelist_block("WALL_BC", wall, exclude_names=exclude)); w.write("\n")
 
 # ============================================================
@@ -526,10 +545,11 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
         if v['zone_type'] != prevType:
             lines.append(f"{zonetype_map[v['zone_type']]} ")
         prevType = v['zone_type']
+    lines.append("\n")
     # Print Zone Groups
     columns_to_print = 5
     for i,v in enumerate(volume_zones):
-        if i % columns_to_print:
+        if i % columns_to_print==0:
             lines.append(f"{v["contiguous_id"]}\n")
         else:
             lines.append(f"{v["contiguous_id"]} ")
