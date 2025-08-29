@@ -114,12 +114,12 @@ class OutletBC(BoundaryCondition):
 
 @dataclass
 class SymmetricSlipBC(BoundaryCondition):
-    slip_subtype: Optional[SymmetricSlipSubtype] = None
+    slip_subType: Optional[SymmetricSlipSubtype] = None
     slip_omega: Optional[float] = None
 
 @dataclass
 class WallBC(BoundaryCondition):
-    wall_subtype: Optional[int] = None
+    wall_subType: Optional[int] = None
     Twall_const: Optional[float] = None
     have_Twall_prof: bool = False
     filen_Twall_prof: Optional[str] = None
