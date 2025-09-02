@@ -1,5 +1,6 @@
 # glennht_export_functions.py
 from __future__ import annotations
+from collections import defaultdict
 import math
 import json
 import pathlib
@@ -491,6 +492,31 @@ def export_to_job_file(
         if exec_mpi:
             w.write(f'execFILE="{exec_mpi}"\n')
 
+def summarize_contiguous(records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Given a list of dicts with keys: 'block_index', 'zone_type', 'contiguous_id',
+    return:
+      - num_unique_contiguous_ids: int
+      - zone_types_by_id: {contiguous_id: [unique zone types]}
+      - ids_with_multiple_zone_types: [ids that have >1 zone type]
+    """
+    id_to_zone_types = defaultdict(set)
+
+    for r in records:
+        # will raise KeyError if required keys are missing (helpful fail)
+        cid = r["contiguous_id"]
+        zt = r["zone_type"]
+        id_to_zone_types[cid].add(zt)
+
+    zone_types_by_id = {cid: sorted(zts) for cid, zts in id_to_zone_types.items()}
+    ids_with_multiple = [cid for cid, zts in zone_types_by_id.items() if len(zts) > 1]
+
+    return {
+        "num_unique_contiguous_ids": len(zone_types_by_id),
+        "zone_types_by_id": zone_types_by_id,
+        "ids_with_multiple_zone_types": sorted(ids_with_multiple),
+    }
+
 
 def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:List[Dict[str,int]],filename:str, gifs:List[List[Dict[str, int]]],volume_zones:List[Dict[str,Any]]):
     """Exports the connectivity to GlennHT format 
@@ -536,18 +562,16 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
     for gif in gifs:
         lines.append(f"{gif['id1']} {gif['id2']} -2 1\n") # type: ignore
     
+    summary = summarize_contiguous(volume_zones)
     # Print volume zones
-    zonetype_map = {'fluid':1,'solid':2}
-    lines.append(f"{len(volume_zones)}\n")
+    
+    lines.append(f"{summary['num_unique_contiguous_ids']}\n")
     # Print what types of zones are there 
-    prevType = ""
-    for v in volume_zones:
-        if v['zone_type'] != prevType:
-            lines.append(f"{zonetype_map[v['zone_type']]} ")
-        prevType = v['zone_type']
+    for k,v in summary['zone_types_by_id'].items():
+        lines.append(f"{k} ")
     lines.append("\n")
     # Print Zone Groups
-    columns_to_print = 5
+    columns_to_print = 10
     for i,v in enumerate(volume_zones):
         if i % columns_to_print==0:
             lines.append(f"{v["contiguous_id"]}\n")
