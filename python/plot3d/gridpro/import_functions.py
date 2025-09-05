@@ -1,7 +1,7 @@
 from typing import Dict, List, Tuple, Optional
 import numpy as np
 from tqdm import tqdm
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Any
 from plot3d import Block
 from collections import defaultdict
 
@@ -97,7 +97,7 @@ def read_gridpro_connectivity(
             "bc_group":       {"inlet":[...], "outlet":[...], "symm_slip":[...], "wall":[...]},
             "gifs":      List[List[face_dict]],  # grouped by sf1
             "periodic_faces": List[{"block1":{...}, "block2":{...}}],
-            "volume_zones":   List[{"pty":int, "zone":str, "contiguous_id":int}],
+            "volume_zones":   List[{"pty":int, "zone":str, "contiguous_index":int}],
         }
     """
     # ---------------------------- parsing ----------------------------
@@ -219,16 +219,7 @@ def read_gridpro_connectivity(
         "symm_slip": bc_faces_for(4),
         "wall":      bc_faces_for(2),
     }
-    # GIF faces grouped by sf1 for pty in 12..21 or == 1000
-    gif_faces: List[Dict[str, int]] = []
-    for p in patches:
-        if (12 <= p["pty"] <= 21) or (p["pty"] == 1000): # type: ignore
-            face_temp = face_dict(p["sb1"], p["L1i"], p["L1j"], p["L1k"], p["H1i"], p["H1j"], p["H1k"]) # type: ignore
-            face_temp["id1"] = int(p["sf1"]) # type: ignore
-            face_temp["id2"] = int(p["sf2"]) # type: ignore
-            face_temp["pty"] = int(p["pty"]) # type: ignore
-            gif_faces.append(face_temp)
-            
+    
     # Periodic faces: pty == 3 (explicit pairs)
     periodic_faces: List[Dict[str, Dict[str, int]]] = []
     for p in patches:
@@ -239,6 +230,14 @@ def read_gridpro_connectivity(
                     p["sb2"], (p["L2i"], p["L2j"], p["L2k"], p["H2i"], p["H2j"], p["H2k"]), # type: ignore
                 )
             )
+            
+    # GIF faces grouped by sf1 for pty in 12..21 or == 1000
+    gif_faces: List[Dict[str, int]] = []
+    for p in patches:
+        if (12 <= p["pty"] <= 21) or (p["pty"] == 1000): # type: ignore
+            face_temp = face_dict(p["sb1"], p["L1i"], p["L1j"], p["L1k"], p["H1i"], p["H1j"], p["H1k"]) # type: ignore
+            face_temp["id"] = p["pty"] # type: ignore
+            gif_faces.append(face_temp)
 
     # Volume zones (unique superblock ptys; odd→fluid, even→solid) with contiguous ids
     volume_zones: List[Dict[str, object]] = []
@@ -249,7 +248,7 @@ def read_gridpro_connectivity(
         if zone is not prevZoneType:
             cid += 1
             prevZoneType = zone
-        volume_zones.append({"block_index": id, "zone_type": zone, "contiguous_id": cid})
+        volume_zones.append({"block_index": id, "zone_type": zone, "contiguous_index": cid})
         
 
     return {
