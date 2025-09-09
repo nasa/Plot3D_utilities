@@ -234,6 +234,8 @@ def read_gridpro_connectivity(
     # GIF faces grouped by sf1 for pty in 12..21 or == 1000
     gif_faces: List[Dict[str, int]] = []
     for p in patches:
+#? This is how we identify gifs inside of a grid pro connectivity file. 
+#? If the PTY is between 12 and 21 these are gifs
         if (12 <= p["pty"] <= 21) or (p["pty"] == 1000): # type: ignore
             face_temp = face_dict(p["sb1"], p["L1i"], p["L1j"], p["L1k"], p["H1i"], p["H1j"], p["H1k"]) # type: ignore
             face_temp["id"] = p["pty"] # type: ignore

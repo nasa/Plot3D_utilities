@@ -161,8 +161,8 @@ def _write_bsurf_spec(w, bc):
 # GIF + Volume Zone writers (dict inputs supported)
 # ============================================================
 def _write_gif_from_dict(w, gdict: Dict[str, Any]) -> None:
-    sid1 = int(gdict.get("id1", 0))
-    sid2 = int(gdict.get("id2", 0))
+    sid1 = int(gdict.get("a", 0))
+    sid2 = int(gdict.get("b", 0))
     name1 = f"surface {sid1}"
     name2 = f"surface {sid2}"
     bctype = 4  # GIF
@@ -312,7 +312,7 @@ def export_to_boundary_condition(
     file_path_to_write: str,
     job_settings: Job,
     bc_group: BCGroup,
-    gifs: List[GIF] | List[Dict[str,Any]],
+    gif_pairs: List[GIF] | List[Dict[str,Any]],
     volume_zones: List[VolumeZone] | List[Dict[str,Any]],
 ):
     file_path_to_write = ensure_extension(file_path_to_write, '.bcs')
@@ -326,10 +326,10 @@ def export_to_boundary_condition(
         "slips": [_asdict_soft(x) for x in bc_group.SymmetricSlips],
         "walls": [_asdict_soft(x) for x in bc_group.Walls],
         "volume_zones": [x for x in volume_zones],
-        "gifs": [_asdict_soft(x) for x in gifs],
+        "gif_pairs": [_asdict_soft(x) for x in gif_pairs],
         "job_settings": _asdict_soft(job_settings),
     }
-    json_path.write_text(json.dumps(json_payload, indent=2))
+    json_path.write_text(json.dumps(json_payload, indent=4))
 
     # ---- Robust reference defaults (use inlet values if missing)
     ref = job_settings.ReferenceCondFull
@@ -383,21 +383,21 @@ def export_to_boundary_condition(
             _write_bsurf_spec(w, wall)
 
         # GIFS (dicts or dataclasses)
-        for g in gifs:
-            if isinstance(g, dict):
-                _write_gif_from_dict(w, g)
+        for pair in gif_pairs:
+            if isinstance(pair, dict):
+                _write_gif_from_dict(w, pair)
             else:
-                name1 = getattr(g, "Name1", f"surface {g.GIFSurface1}")
-                name2 = getattr(g, "Name2", f"surface {g.GIFSurface2}")
+                name1 = getattr(pair, "Name1", f"surface {pair.GIFSurface1}")
+                name2 = getattr(pair, "Name2", f"surface {pair.GIFSurface2}")
                 w.write(
-                    f" &BSurf_Spec\nBSurfID={g.GIFSurface1}, BCType={int(g.BCType)}, "
+                    f" &BSurf_Spec\nBSurfID={pair.GIFSurface1}, BCType={int(pair.BCType)}, "
                     f"BSurfName='{name1}'\n &END\n\n"
                 )
                 w.write(
-                    f" &BSurf_Spec\nBSurfID={g.GIFSurface2}, BCType={int(g.BCType)}, "
+                    f" &BSurf_Spec\nBSurfID={pair.GIFSurface2}, BCType={int(pair.BCType)}, "
                     f"BSurfName='{name2}'\n &END\n\n"
                 )
-                w.write(f" &GIF_Spec\nSurfID_1={g.GIFSurface1}, SurfID2={g.GIFSurface2}\n &END\n\n")
+                w.write(f" &GIF_Spec\nSurfID_1={pair.GIFSurface1}, SurfID2={pair.GIFSurface2}\n &END\n\n")
 
         # VZConditions (dict templates)
         volume_zone_unique = {d["contiguous_index"]: d for d in volume_zones}.values()
