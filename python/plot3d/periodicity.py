@@ -365,7 +365,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
     """
     gcd_array = list()
     # Find the gcd of all the blocks 
-    if ReduceMesh==True:
+    if ReduceMesh:
         for block_indx in range(len(blocks)):
             block = blocks[block_indx]
             gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))

@@ -12,6 +12,7 @@ pandas = "*"
 tqdm = "*"
 networkx = "*"
 pymetis = "*"
+matplotlib = "*"
 
 [tool.poetry.group.deve.dependencies]
 

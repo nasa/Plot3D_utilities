@@ -1,32 +1,42 @@
 import os, sys
 from copy import deepcopy
-from math import *  
+from math import radians
 import numpy as np
 sys.path.insert(0,'../../')
 from plot3d import write_plot3D, read_plot3D, rotated_periodicity,connectivity_fast, rotate_block, create_rotation_matrix
 from glennht_con import export_to_glennht_conn
 import pickle
 
-blocks = read_plot3D('PahtCascade-ASCII.xyz', binary = False)
+blocks = read_plot3D('VSPT_ASCII.xyz', binary = False)
 number_of_blades = 55
 rotation_angle = 360.0/number_of_blades
 
-# Lets find the connectivity and periodicity of the rotated blocks
+#%% This section shows how to create copies and rotate them 
 copies = 3 # Lets use the example with 3 copies 
 
-if not os.path.exists('connectivity.pickle'):
-    blocks = read_plot3D('PahtCascade-ASCII.xyz', binary = False)
-    # Block 1 is the blade O-Mesh k=0
-    # outer_faces, _ = get_outer_faces(blocks[0]) # lets check
-    face_matches, outer_faces_formatted = connectivity_fast(blocks)
-    with open('connectivity.pickle','wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
-        pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_formatted},f)
+rotated_blocks = list()
+rotated_blocks.extend(blocks)
 
-with open('connectivity.pickle','rb') as f:
-    data = pickle.load(f)
-    face_matches = data['face_matches']
-    outer_faces = data['outer_faces']
+for i in range(1,copies):
+    # Rotation matrix can be found on https://en.wikipedia.org/wiki/Rotation_matrix
+    rotation_matrix = create_rotation_matrix(radians(rotation_angle*i),"x")
+    for i in range(len(blocks)):
+        rotated_blocks.append(deepcopy(rotate_block(blocks[i],rotation_matrix)))
+
+write_plot3D("VSPT_ASCII_3.xyz",blocks=rotated_blocks,binary=True)
+#%% This section shows how to do basic rotational periodicity on a mesh that isn't rotated and copied
+blocks = read_plot3D('VSPT_ASCII.xyz', binary = False)
+# Block 1 is the blade O-Mesh k=0
+# outer_faces, _ = get_outer_faces(blocks[0]) # lets check
+face_matches, outer_faces = connectivity_fast(blocks)
+with open('connectivity.pickle','wb') as f:
+    [m.pop('match',None) for m in face_matches] # Remove the dataframe
+    pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces},f)
+
+# with open('connectivity.pickle','rb') as f:
+#     data = pickle.load(f)
+#     face_matches = data['face_matches']
+#     outer_faces = data['outer_faces']
 
 
 # Find Neighbor Connectivity / Interblock-to-block matching
