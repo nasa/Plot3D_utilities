@@ -4,8 +4,18 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, List, Sequence, Tuple, Optional
 import inspect
+import sys
 
-import pymetis  # pip install pymetis
+if sys.platform != "win32":
+    try:
+        import pymetis  # type: ignore
+        HAS_PYMETIS = True
+    except Exception:  # pragma: no cover - optional dependency
+        pymetis = None  # type: ignore
+        HAS_PYMETIS = False
+else:
+    pymetis = None  # type: ignore
+    HAS_PYMETIS = False
 from .block import Block  # <-- use your existing Block
 
 
@@ -139,7 +149,13 @@ def _metis_part_graph_compat(
     Returns:
         (edgecut, parts)
     """
-    sig_params = set(inspect.signature(pymetis.part_graph).parameters.keys())
+    if not HAS_PYMETIS:
+        raise RuntimeError(
+            "pymetis is not available. On Windows it is skipped during install; "
+            "use Linux/macOS to enable METIS-based partitioning."
+        )
+
+    sig_params = set(inspect.signature(pymetis.part_graph).parameters.keys())  # type: ignore[attr-defined]
 
     # Prefer keyword args when supported
     if {"xadj", "adjncy"}.issubset(sig_params):
@@ -194,6 +210,12 @@ def partition_from_face_matches(
     edge_w : Dict[int, Dict[int, int]]
         Edge weights.
     """
+    if not HAS_PYMETIS:
+        raise RuntimeError(
+            "METIS partitioning is disabled because pymetis is unavailable. "
+            "Install pymetis (Linux/macOS) or run on a platform where it is supported."
+        )
+
     n_blocks = len(blocks)
     adj_list, edge_w = build_weighted_graph_from_face_matches(
         face_matches, n_blocks,

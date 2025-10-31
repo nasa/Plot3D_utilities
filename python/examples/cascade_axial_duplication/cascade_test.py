@@ -2,7 +2,6 @@ import os, sys
 from copy import deepcopy
 from math import radians
 import numpy as np
-sys.path.insert(0,'../../')
 from plot3d import write_plot3D, read_plot3D, rotated_periodicity,connectivity_fast, rotate_block, create_rotation_matrix
 from glennht_con import export_to_glennht_conn
 import pickle

@@ -11,7 +11,7 @@ scipy = "*"
 pandas = "*"
 tqdm = "*"
 networkx = "*"
-pymetis = "*"
+pymetis = { version = "*", markers = "platform_system != 'Windows'" }
 matplotlib = "*"
 
 [tool.poetry.group.deve.dependencies]
