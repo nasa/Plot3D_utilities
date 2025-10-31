@@ -6,11 +6,25 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+from pathlib import Path
+
+try:  # Python 3.11+
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - fallback for older runtimes
+    import tomli as tomllib  # type: ignore
+
 import plot3d
 project = 'Plot3D'
 copyright = '2025, Paht Juangphanich'
 author = 'Paht Juangphanich <paht.juangphanich@nasa.gov>'
-release = '1.6.8'
+_pyproject_path = Path(__file__).resolve().parents[1] / 'python' / 'pyproject.toml'
+try:
+    _pyproject = tomllib.loads(_pyproject_path.read_text(encoding='utf-8'))
+    release = _pyproject['tool']['poetry']['version']
+except Exception:  # pragma: no cover - fallback if file missing/unreadable
+    release = getattr(plot3d, '__version__', 'dev')
+
+version = release
 
 rst_context = {'plot3d': plot3d}
 
