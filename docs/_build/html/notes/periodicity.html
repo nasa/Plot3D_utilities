@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Periodicity &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     
     <script src="../_static/documentation_options.js?v=514bbfa0"></script>
@@ -18,7 +18,7 @@
     <link rel="next" title="Exporting to GlennHT Connectivity Files" href="exporting.html" />
     <link rel="prev" title="Block to Block Connectivity" href="connectivity.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -47,7 +47,7 @@
 <h1>Periodicity<a class="headerlink" href="#periodicity" title="Link to this heading">¶</a></h1>
 <p>The domain above has a periodicity on the side walls and from block 1 to block 2 on the suction side. Plot3D library can find periodic surfaces. Periodic surfaces can only be found by rotation about the x-axis. The user also needs to specify which direction is periodic either <em>i</em>, <em>j</em>, or <em>k</em>. Combinations of outer faces are searched to find the ones that are periodic when rotated about the x-axis and in the “k” direction (default option). Below is an example on how to find periodic surfaces.</p>
 <p>In this example we will use the file  <a class="reference external" href="https://nasa-public-data.s3.amazonaws.com/plot3d_utilities/PahtCascade-ASCII.xyz">PahtCascade-ASCII</a></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">periodicity</span><span class="p">,</span> <span class="n">connectivity</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span><span class="w"> </span><span class="nn">plot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">periodicity</span><span class="p">,</span> <span class="n">connectivity</span>
 <span class="linenos">2</span>
 <span class="linenos">3</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;PahtCascade-ASCII.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
 <span class="linenos">4</span><span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
@@ -57,16 +57,13 @@
 </pre></div>
 </div>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block1-2.png"><img alt="periodic surface from block 1 to block 2" src="../_images/turbine_domain-periodic-block1-2.png" style="width: 800px;" />
-</a>
+<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block1-2.png"><img alt="periodic surface from block 1 to block 2" src="../_images/turbine_domain-periodic-block1-2.png" style="width: 800px;" /></a>
 </figure>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block2-inlet.png"><img alt="periodic surface block 2 entrance of the domain" src="../_images/turbine_domain-periodic-block2-inlet.png" style="width: 800px;" />
-</a>
+<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block2-inlet.png"><img alt="periodic surface block 2 entrance of the domain" src="../_images/turbine_domain-periodic-block2-inlet.png" style="width: 800px;" /></a>
 </figure>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block2-outlet.png"><img alt="periodic surface block 2 exit of the domain" src="../_images/turbine_domain-periodic-block2-outlet.png" style="width: 800px;" />
-</a>
+<a class="reference internal image-reference" href="../_images/turbine_domain-periodic-block2-outlet.png"><img alt="periodic surface block 2 exit of the domain" src="../_images/turbine_domain-periodic-block2-outlet.png" style="width: 800px;" /></a>
 </figure>
 </section>
 
@@ -75,7 +72,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h4>Previous topic</h4>
@@ -108,7 +105,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -129,7 +126,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

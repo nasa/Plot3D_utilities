@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Graph &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     
     <script src="../_static/documentation_options.js?v=514bbfa0"></script>
@@ -18,7 +18,7 @@
     <link rel="next" title="Read" href="read.html" />
     <link rel="prev" title="Face Functions" href="facefunctions.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -46,91 +46,99 @@
   <section id="module-plot3d.graph">
 <span id="graph"></span><h1>Graph<a class="headerlink" href="#module-plot3d.graph" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="plot3d.graph.add_connectivity_to_graph">
-<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">add_connectivity_to_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectivities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Graph</span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#add_connectivity_to_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.add_connectivity_to_graph" title="Link to this definition">¶</a></dt>
-<dd><p>Convert plot3d defined connectivity into additional graph edges</p>
+<dt class="sig sig-object py" id="plot3d.graph.build_weighted_graph_from_face_matches">
+<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">build_weighted_graph_from_face_matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_self_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#build_weighted_graph_from_face_matches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.build_weighted_graph_from_face_matches" title="Link to this definition">¶</a></dt>
+<dd><p>Convert connectivity_fast face_matches into adjacency + weights.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.</p>
+</div>
+<dl class="simple">
+<dt>Why this matters:</dt><dd><p>connectivity_fast can return more than one face between the same pair of blocks
+(e.g. a block is split and has two non-contiguous interfaces with its neighbor).
+Each face gives a weight = dI * dJ * dK (number of shared nodes).
+METIS expects one edge per block-pair, with a single weight.
+So if there are multiple faces, we must decide how to merge them. That’s what aggregate does.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>G</strong> (<em>nx.classes.graph.Graph</em>) – Giant graph</p></li>
-<li><p><strong>block_sizes</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>,</em><em>int</em><em>,</em><em>int</em><em>]</em><em>]</em>) – _description_</p></li>
-<li><p><strong>connectivity</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>,</em><em>int</em><em>]</em><em>]</em>) – _description_</p></li>
+<li><p><strong>face_matches</strong> (<em>List</em><em>[</em><em>dict</em><em>]</em>) – Output from connectivity_fast</p></li>
+<li><p><strong>n_blocks</strong> (<em>int</em>) – number of blocks in a mesh</p></li>
+<li><p><strong>aggregate</strong> (<em>str</em><em>, </em><em>optional</em>) – ‘sum’|’max’|’min’. Controls how weights are combined. Defaults to “sum”.</p></li>
+<li><p><strong>ignore_self_matches</strong> (<em>bool</em><em>, </em><em>optional</em>) – ignores self matching (i==j). Defaults to True.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>networkx graph object with added edges</p>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if aggregate is not one of ‘sum’,’max’,’min’</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>nx.graph.Graph</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>adj_list (Dict[int, List[int]]): Neighbors for each block.</p></li>
+<li><p>edge_w   (Dict[int, Dict[int, int]]): Edge weights (u-&gt;v).</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple[Dict[int, List[int]], Dict[int, Dict[int, int]]]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="plot3d.graph.block_to_graph">
-<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">block_to_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">IMAX</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JMAX</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">KMAX</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Graph</span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#block_to_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.block_to_graph" title="Link to this definition">¶</a></dt>
-<dd><p>Converts a block to a graph</p>
+<dt class="sig sig-object py" id="plot3d.graph.csr_from_adj_and_weights">
+<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">csr_from_adj_and_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adj_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#csr_from_adj_and_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.csr_from_adj_and_weights" title="Link to this definition">¶</a></dt>
+<dd><p>Build CSR arrays (xadj, adjncy, eweights) from adjacency + weights.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>IMAX</strong> (<em>int</em>) – block.IMAX</p></li>
-<li><p><strong>JMAX</strong> (<em>int</em>) – block.JMAX</p></li>
-<li><p><strong>KMAX</strong> (<em>int</em>) – block.KMAX</p></li>
-<li><p><strong>offset</strong> (<em>int</em>) – IMAX*JMAX*KMAX of previous block</p></li>
-</ul>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>prefix sum of neighbors
+adjncy (List[int]): flattened neighbor list
+eweights (List[int]): edge weights aligned with adjncy</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>networkx graph object</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>nx.graph.Graph</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>xadj (List[int])</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="plot3d.graph.get_face_vertex_indices">
-<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">get_face_vertex_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">IMIN</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JMIN</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">KMIN</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IMAX</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JMAX</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">KMAX</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#get_face_vertex_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.get_face_vertex_indices" title="Link to this definition">¶</a></dt>
-<dd><p>Returns an array containing the vertex number of a given face</p>
+<dt class="sig sig-object py" id="plot3d.graph.partition_from_face_matches">
+<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">partition_from_face_matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nparts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">favor_blocksize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_self_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#partition_from_face_matches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.partition_from_face_matches" title="Link to this definition">¶</a></dt>
+<dd><p>Partition a graph derived from <cite>face_matches</cite> using pymetis.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.</p>
+</div>
+<dl class="simple">
+<dt>Why this matters:</dt><dd><p>connectivity_fast can return more than one face between the same pair of blocks
+(e.g. a block is split and has two non-contiguous interfaces with its neighbor).
+Each face gives a weight = dI * dJ * dK (number of shared nodes).
+METIS expects one edge per block-pair, with a single weight.
+So if there are multiple faces, we must decide how to merge them. That’s what aggregate does.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>IMIN</strong> (<em>int</em>) – starting I index</p></li>
-<li><p><strong>JMIN</strong> (<em>int</em>) – starting J index</p></li>
-<li><p><strong>KMIN</strong> (<em>int</em>) – starting K index</p></li>
-<li><p><strong>IMAX</strong> (<em>int</em>) – ending I index</p></li>
-<li><p><strong>JMAX</strong> (<em>int</em>) – ending J index</p></li>
-<li><p><strong>KMAX</strong> (<em>int</em>) – ending K index</p></li>
-<li><p><strong>block_size</strong> (<em>Tuple</em><em>[</em><em>int</em><em>,</em><em>int</em><em>,</em><em>int</em><em>]</em>) – This is the actual IMAX,JMAX,KMAX of the block</p></li>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>parts</strong> (<em>List[int]</em>) – Partition id (0-based) for each block.</p></li>
+<li><p><strong>adj_list</strong> (<em>Dict[int, List[int]]</em>) – Adjacency list used for the partitioning.</p></li>
+<li><p><strong>edge_w</strong> (<em>Dict[int, Dict[int, int]]</em>) – Edge weights.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>an array containing all the vertices</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>npt.NDArray</p>
+</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="plot3d.graph.get_starting_vertex">
-<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">get_starting_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blockIndex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#get_starting_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.get_starting_vertex" title="Link to this definition">¶</a></dt>
-<dd><p>Gets the starting vertex index of the block</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>blockIndex</strong> (<em>int</em>) – index of block</p></li>
-<li><p><strong>block_sizes</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>,</em><em>int</em><em>,</em><em>int</em><em>]</em><em>]</em>) – List of all the [[IMAX,JMAX,KMAX]]</p></li>
+<dt class="sig sig-object py" id="plot3d.graph.write_ddcmp">
+<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">write_ddcmp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ddcmp.dat'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#write_ddcmp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.write_ddcmp" title="Link to this definition">¶</a></dt>
+<dd><p>Writes ddcmp.dat and ddcmp_info.txt.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>parts are 0-based in memory, but written 1-based in the file (to match your C#).</p></li>
+<li><p>edge_weights affects the per-partition ‘edge_work’ if provided.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>offset</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
 </dd></dl>
 
 </section>
@@ -140,16 +148,16 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Graph</a><ul>
-<li><a class="reference internal" href="#plot3d.graph.add_connectivity_to_graph"><code class="docutils literal notranslate"><span class="pre">add_connectivity_to_graph()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.graph.block_to_graph"><code class="docutils literal notranslate"><span class="pre">block_to_graph()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.graph.get_face_vertex_indices"><code class="docutils literal notranslate"><span class="pre">get_face_vertex_indices()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.graph.get_starting_vertex"><code class="docutils literal notranslate"><span class="pre">get_starting_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#plot3d.graph.build_weighted_graph_from_face_matches"><code class="docutils literal notranslate"><span class="pre">build_weighted_graph_from_face_matches()</span></code></a></li>
+<li><a class="reference internal" href="#plot3d.graph.csr_from_adj_and_weights"><code class="docutils literal notranslate"><span class="pre">csr_from_adj_and_weights()</span></code></a></li>
+<li><a class="reference internal" href="#plot3d.graph.partition_from_face_matches"><code class="docutils literal notranslate"><span class="pre">partition_from_face_matches()</span></code></a></li>
+<li><a class="reference internal" href="#plot3d.graph.write_ddcmp"><code class="docutils literal notranslate"><span class="pre">write_ddcmp()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -186,7 +194,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -207,7 +215,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Exporting to GlennHT Connectivity Files &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     
     <script src="../_static/documentation_options.js?v=514bbfa0"></script>
@@ -18,7 +18,7 @@
     <link rel="next" title="Split Blocks" href="split-blocks.html" />
     <link rel="prev" title="Periodicity" href="periodicity.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -47,13 +47,13 @@
 <h1>Exporting to GlennHT Connectivity Files<a class="headerlink" href="#exporting-to-glennht-connectivity-files" title="Link to this heading">¶</a></h1>
 <p>This is an example of how I read a mesh, convert it to ascii, save it, find connectivity, find periodicty and export to glennht format.
 In this example we will use the file <a class="reference external" href="https://nasa-public-data.s3.amazonaws.com/plot3d_utilities/PahtCascade-ASCII.xyz">PahtCascade-ASCII</a></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
-<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">combinations</span>
+<span class="linenos"> 2</span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 <span class="linenos"> 3</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;../../&#39;</span><span class="p">)</span>
-<span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">find_periodicity</span>
-<span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">plot3d</span> <span class="kn">import</span> <span class="n">find_matching_blocks</span><span class="p">,</span> <span class="n">get_outer_faces</span><span class="p">,</span> <span class="n">connectivity</span>
-<span class="linenos"> 6</span><span class="kn">from</span> <span class="nn">glennht_con</span> <span class="kn">import</span> <span class="n">export_to_glennht_conn</span>
-<span class="linenos"> 7</span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="linenos"> 4</span><span class="kn">from</span><span class="w"> </span><span class="nn">plot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">find_periodicity</span>
+<span class="linenos"> 5</span><span class="kn">from</span><span class="w"> </span><span class="nn">plot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_matching_blocks</span><span class="p">,</span> <span class="n">get_outer_faces</span><span class="p">,</span> <span class="n">connectivity</span>
+<span class="linenos"> 6</span><span class="kn">from</span><span class="w"> </span><span class="nn">glennht_con</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_to_glennht_conn</span>
+<span class="linenos"> 7</span><span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 <span class="linenos"> 8</span>
 <span class="linenos"> 9</span><span class="c1"># Convert to binary because of size</span>
 <span class="linenos">10</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;PahtCascade-ASCII.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
@@ -82,8 +82,8 @@ In this example we will use the file <a class="reference external" href="https:/
 <span class="linenos">33</span><span class="n">export_to_glennht_conn</span><span class="p">(</span><span class="n">face_matches</span><span class="p">,</span><span class="n">outer_faces_to_keep</span><span class="p">,</span><span class="s1">&#39;finalmesh&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
-<span class="linenos">  2</span><span class="k">def</span> <span class="nf">export_to_glennht_conn</span><span class="p">(</span><span class="n">nblocks</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">matches</span><span class="p">:</span><span class="n">List</span><span class="p">,</span><span class="n">block_surfaces</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">other_settings</span><span class="p">:</span><span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="linenos">  2</span><span class="k">def</span><span class="w"> </span><span class="nf">export_to_glennht_conn</span><span class="p">(</span><span class="n">nblocks</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">matches</span><span class="p">:</span><span class="n">List</span><span class="p">,</span><span class="n">block_surfaces</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">other_settings</span><span class="p">:</span><span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="linenos">  3</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Exports the connectivity to GlennHT format</span>
 <span class="linenos">  4</span>
 <span class="linenos">  5</span><span class="sd">    Args:</span>
@@ -146,13 +146,13 @@ In this example we will use the file <a class="reference external" href="https:/
 <span class="linenos"> 62</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_settings</span><span class="p">[</span><span class="s1">&#39;general_interfaces&#39;</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
 <span class="linenos"> 63</span>            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 <span class="linenos"> 64</span>
-<span class="linenos"> 65</span>        <span class="k">def</span> <span class="nf">zonetype_to_glennht</span><span class="p">(</span><span class="nb">type</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="linenos"> 65</span>        <span class="k">def</span><span class="w"> </span><span class="nf">zonetype_to_glennht</span><span class="p">(</span><span class="nb">type</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="linenos"> 66</span>            <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;fluid&#39;</span><span class="p">:</span>
 <span class="linenos"> 67</span>                <span class="k">return</span> <span class="s1">&#39;1&#39;</span>
 <span class="linenos"> 68</span>            <span class="k">else</span><span class="p">:</span>                   <span class="c1"># Second zone is solid</span>
 <span class="linenos"> 69</span>                <span class="k">return</span> <span class="s1">&#39;2&#39;</span>
 <span class="linenos"> 70</span>
-<span class="linenos"> 71</span>        <span class="k">def</span> <span class="nf">lookup_zone_index</span><span class="p">(</span><span class="n">block_indx</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="linenos"> 71</span>        <span class="k">def</span><span class="w"> </span><span class="nf">lookup_zone_index</span><span class="p">(</span><span class="n">block_indx</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="linenos"> 72</span><span class="w">            </span><span class="sd">&quot;&quot;&quot;Searches through all the zones for the block_index</span>
 <span class="linenos"> 73</span>
 <span class="linenos"> 74</span><span class="sd">            Args:</span>
@@ -192,7 +192,7 @@ In this example we will use the file <a class="reference external" href="https:/
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h4>Previous topic</h4>
@@ -225,7 +225,7 @@ In this example we will use the file <a class="reference external" href="https:/
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -246,7 +246,7 @@ In this example we will use the file <a class="reference external" href="https:/
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

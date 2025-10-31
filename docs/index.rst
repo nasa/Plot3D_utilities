@@ -12,11 +12,15 @@ A python library for reading, writing, finding connectivity for plot3d files.
 
 - `GitHub page <https://github.com/nasa/plot3d_utilities>`_
 
+This site is built with Sphinx using autodoc so that API reference pages stay sync'd with
+docstrings and type hints from the ``plot3d`` package.
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Information:
 
+   notes/getting_started
    notes/installation
    notes/plot3d
    notes/reading_writing
@@ -24,6 +28,7 @@ A python library for reading, writing, finding connectivity for plot3d files.
    notes/periodicity
    notes/exporting
    notes/split-blocks
+   notes/changelog
 
 .. toctree::
    :glob:

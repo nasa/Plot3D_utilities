@@ -4,18 +4,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plot3d.connectivity &#8212; Plot3D 1.6.5 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <title>plot3d.connectivity &#8212; Plot3D 1.6.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     
-    <script src="../../_static/documentation_options.js?v=2ad11211"></script>
+    <script src="../../_static/documentation_options.js?v=514bbfa0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -24,7 +24,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.connectivity</a></li> 
       </ul>
@@ -36,24 +36,24 @@
           <div class="body" role="main">
             
   <h1>Source code for plot3d.connectivity</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
-<span class="kn">from</span> <span class="nn">.blockfunctions</span> <span class="kn">import</span> <span class="n">reduce_blocks</span>
-<span class="kn">from</span> <span class="nn">.face</span> <span class="kn">import</span> <span class="n">Face</span>
-<span class="kn">from</span> <span class="nn">.facefunctions</span> <span class="kn">import</span> <span class="n">create_face_from_diagonals</span><span class="p">,</span> <span class="n">split_face</span><span class="p">,</span> <span class="n">get_outer_faces</span>
-<span class="kn">import</span> <span class="nn">math</span> 
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span><span class="p">,</span> <span class="n">combinations</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">.point_match</span> <span class="kn">import</span> <span class="n">point_match</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.blockfunctions</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduce_blocks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.face</span><span class="w"> </span><span class="kn">import</span> <span class="n">Face</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.facefunctions</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_face_from_diagonals</span><span class="p">,</span> <span class="n">split_face</span><span class="p">,</span> <span class="n">get_outer_faces</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span><span class="p">,</span> <span class="n">combinations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">trange</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span> 
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.point_match</span><span class="w"> </span><span class="kn">import</span> <span class="n">point_match</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 
 
 <div class="viewcode-block" id="find_matching_blocks">
 <a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.find_matching_blocks">[docs]</a>
-<span class="k">def</span> <span class="nf">find_matching_blocks</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block1_outer</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">block2_outer</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>  
+<span class="k">def</span><span class="w"> </span><span class="nf">find_matching_blocks</span><span class="p">(</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block1_outer</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">block2_outer</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>  
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes two blocks and finds all matching pairs</span>
 
 <span class="sd">    Args:</span>
@@ -98,8 +98,8 @@
             <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
                 <span class="k">break</span>
         <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-            <span class="n">block1_outer</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-            <span class="n">block2_outer</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+            <span class="n">block1_outer</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="c1"># type: ignore</span>
+            <span class="n">block2_outer</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="c1"># type: ignore</span>
             <span class="n">block1_outer</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">block1_split_faces</span><span class="p">)</span>
             <span class="n">block2_outer</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">block2_split_faces</span><span class="p">)</span>
             <span class="n">block1_split_faces</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
@@ -110,7 +110,7 @@
 
 <div class="viewcode-block" id="select_multi_dimensional">
 <a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.select_multi_dimensional">[docs]</a>
-<span class="k">def</span> <span class="nf">select_multi_dimensional</span><span class="p">(</span><span class="n">T</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">dim1</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span><span class="n">dim2</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">dim3</span><span class="p">:</span><span class="nb">tuple</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">select_multi_dimensional</span><span class="p">(</span><span class="n">T</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">dim1</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span><span class="n">dim2</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">dim3</span><span class="p">:</span><span class="nb">tuple</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes a block (T) and selects X,Y,Z from the block given a face&#39;s dimensions</span>
 <span class="sd">        theres really no good way to do this in python </span>
 <span class="sd">        </span>
@@ -136,7 +136,7 @@
 
 <div class="viewcode-block" id="get_face_intersection">
 <a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.get_face_intersection">[docs]</a>
-<span class="k">def</span> <span class="nf">get_face_intersection</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_face_intersection</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the index of the intersection between two faces located on two different blocks </span>
 <span class="sd">        Face1 needs to be the smaller face. </span>
 
@@ -290,7 +290,7 @@
     <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">split_faces1</span><span class="p">,</span> <span class="n">split_faces2</span></div>
 
 
-<span class="k">def</span> <span class="nf">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span><span class="n">key1</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__filter_block_increasing</span><span class="p">(</span><span class="n">df</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span><span class="n">key1</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filters dataframe results of get_face_intersection to make sure both key1 is increasing. </span>
 <span class="sd">        When searching through a plot3D we check based on the planes e.g. const i, j, or k </span>
 <span class="sd">        values will be removed if they are not</span>
@@ -327,7 +327,7 @@
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">key1_vals_to_use</span><span class="p">)]</span>        
     <span class="k">return</span> <span class="n">df</span>
 
-<span class="k">def</span> <span class="nf">__check_edge</span><span class="p">(</span><span class="n">df</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__check_edge</span><span class="p">(</span><span class="n">df</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Check if the results of get_face_intersection is an edge instead of a face.  </span>
 <span class="sd">        if it&#39;s an edge then both intersecting blocks are connected by an edge on both blocks </span>
 
@@ -352,7 +352,7 @@
     
 <div class="viewcode-block" id="combinations_of_nearest_blocks">
 <a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.combinations_of_nearest_blocks">[docs]</a>
-<span class="k">def</span> <span class="nf">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">nearest_nblocks</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">nearest_nblocks</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the indices of the nearest 6 blocks based on their centroid</span>
 
 <span class="sd">    Args:</span>
@@ -386,7 +386,7 @@
     
 <div class="viewcode-block" id="connectivity_fast">
 <a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity_fast">[docs]</a>
-<span class="k">def</span> <span class="nf">connectivity_fast</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">connectivity_fast</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity </span>
 
 <span class="sd">    Args:</span>
@@ -435,7 +435,7 @@
 
 <div class="viewcode-block" id="connectivity">
 <a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.connectivity">[docs]</a>
-<span class="k">def</span> <span class="nf">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces </span>
 
 <span class="sd">    Args:</span>
@@ -450,10 +450,10 @@
     <span class="n">outer_faces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>      
     <span class="n">face_matches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">matches_to_remove</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="c1"># df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[4],blocks[7],1E-12)    # This function finds partial matches between blocks</span>
     <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_outer_faces</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
     <span class="n">block_outer_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">temp</span><span class="p">]</span>
     <span class="n">combos</span> <span class="o">=</span> <span class="n">combinations_of_nearest_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span> <span class="c1"># Find the 6 nearest Blocks and search through all that. </span>
+    <span class="c1"># df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[0],blocks[1],[block_outer_faces[0][0],block_outer_faces[0][1]],[block_outer_faces[1][0],block_outer_faces[1][1]],1E-12)    # This function finds partial matches between blocks</span>
 
     <span class="n">t</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combos</span><span class="p">))</span>    
     <span class="k">for</span> <span class="n">indx</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>     <span class="c1"># block i        </span>
@@ -541,7 +541,7 @@
 
 <div class="viewcode-block" id="face_matches_to_dict">
 <a class="viewcode-back" href="../../modules/connectivity.html#plot3d.connectivity.face_matches_to_dict">[docs]</a>
-<span class="k">def</span> <span class="nf">face_matches_to_dict</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">face_matches_to_dict</span><span class="p">(</span><span class="n">face1</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span> <span class="n">face2</span><span class="p">:</span><span class="n">Face</span><span class="p">,</span><span class="n">block1</span><span class="p">:</span><span class="n">Block</span><span class="p">,</span><span class="n">block2</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Makes sure the diagonal of face 1 match the diagonal of face 2</span>
 
 <span class="sd">    Args:</span>
@@ -630,7 +630,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -646,7 +646,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -655,14 +655,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.connectivity</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    &#169; Copyright 2025, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

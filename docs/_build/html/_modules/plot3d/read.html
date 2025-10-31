@@ -4,18 +4,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plot3d.read &#8212; Plot3D 1.6.5 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <title>plot3d.read &#8212; Plot3D 1.6.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     
-    <script src="../../_static/documentation_options.js?v=2ad11211"></script>
+    <script src="../../_static/documentation_options.js?v=514bbfa0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -24,7 +24,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.read</a></li> 
       </ul>
@@ -36,15 +36,15 @@
           <div class="body" role="main">
             
   <h1>Source code for plot3d.read</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
-<span class="kn">import</span> <span class="nn">struct</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
-<span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
-<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">FortranFile</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span> 
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">osp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">FortranFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">trange</span>
 
-<span class="k">def</span> <span class="nf">__read_plot3D_chunk_binary</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">read_double</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__read_plot3D_chunk_binary</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">read_double</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads and formats a binary chunk of data into a plot3D block</span>
 
 <span class="sd">    Args:</span>
@@ -69,7 +69,7 @@
 
 <div class="viewcode-block" id="read_word">
 <a class="viewcode-back" href="../../modules/read.html#plot3d.read.read_word">[docs]</a>
-<span class="k">def</span> <span class="nf">read_word</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_word</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Continously read a word from an ascii file</span>
 
 <span class="sd">    Args:</span>
@@ -85,7 +85,7 @@
             <span class="k">yield</span> <span class="n">token</span></div>
 
 
-<span class="k">def</span> <span class="nf">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads and formats a binary chunk of data into a plot3D block</span>
 
 <span class="sd">    Args:</span>
@@ -112,7 +112,7 @@
 
 <div class="viewcode-block" id="read_ap_nasa">
 <a class="viewcode-back" href="../../modules/read.html#plot3d.read.read_ap_nasa">[docs]</a>
-<span class="k">def</span> <span class="nf">read_ap_nasa</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_ap_nasa</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads an AP NASA File and converts it to Block format which can be exported to a plot3d file</span>
 <span class="sd">        AP NASA file represents a single block. The first 7 integers are il,jl,kl,ile,ite,jtip,nbld</span>
 <span class="sd">    </span>
@@ -169,7 +169,7 @@
 
 <div class="viewcode-block" id="read_plot3D">
 <a class="viewcode-back" href="../../modules/read.html#plot3d.read.read_plot3D">[docs]</a>
-<span class="k">def</span> <span class="nf">read_plot3D</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">binary</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">read_double</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_plot3D</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">binary</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">read_double</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads a plot3d file and returns Blocks</span>
 
 <span class="sd">    Args:</span>
@@ -232,7 +232,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -248,7 +248,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -257,14 +257,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.read</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    &#169; Copyright 2025, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

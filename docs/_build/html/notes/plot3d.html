@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Plot3D Data Format &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     
     <script src="../_static/documentation_options.js?v=514bbfa0"></script>
@@ -18,7 +18,7 @@
     <link rel="next" title="Reading and Writing Plot3D Files" href="reading_writing.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -65,13 +65,13 @@
 </pre></div>
 </div>
 <p>Knowing this, reading the files is fairly simple to do in python. The following code blocks demonstrate how to read a simple ASCII or binary file. Calling the function <code class="docutils literal notranslate"><span class="pre">read_plot3D(filename:str,</span> <span class="pre">binary:bool=True,big_endian:bool=False)</span></code></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="linenos">  2</span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
-<span class="linenos">  3</span><span class="kn">import</span> <span class="nn">struct</span>
-<span class="linenos">  4</span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
-<span class="linenos">  5</span><span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="linenos">  2</span><span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">osp</span>
+<span class="linenos">  3</span><span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="linenos">  4</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="linenos">  5</span><span class="kn">from</span><span class="w"> </span><span class="nn">.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span>
 <span class="linenos">  6</span>
-<span class="linenos">  7</span><span class="k">def</span> <span class="nf">__read_plot3D_chunk_binary</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="linenos">  7</span><span class="k">def</span><span class="w"> </span><span class="nf">__read_plot3D_chunk_binary</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="linenos">  8</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads and formats a binary chunk of data into a plot3D block</span>
 <span class="linenos">  9</span>
 <span class="linenos"> 10</span><span class="sd">    Args:</span>
@@ -91,7 +91,7 @@
 <span class="linenos"> 24</span>                <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;f&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">big_endian</span> <span class="k">else</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
 <span class="linenos"> 25</span>    <span class="k">return</span> <span class="n">A</span>
 <span class="linenos"> 26</span>
-<span class="linenos"> 27</span><span class="k">def</span> <span class="nf">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span><span class="n">offset</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<span class="linenos"> 27</span><span class="k">def</span><span class="w"> </span><span class="nf">__read_plot3D_chunk_ASCII</span><span class="p">(</span><span class="n">tokenArray</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span><span class="n">offset</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
 <span class="linenos"> 28</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads an ascii chunk of plot3D data into a block</span>
 <span class="linenos"> 29</span>
 <span class="linenos"> 30</span><span class="sd">    Args:</span>
@@ -115,7 +115,7 @@
 <span class="linenos"> 48</span>
 <span class="linenos"> 49</span>    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">offset</span>
 <span class="linenos"> 50</span>
-<span class="linenos"> 51</span><span class="k">def</span> <span class="nf">read_plot3D</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">binary</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="linenos"> 51</span><span class="k">def</span><span class="w"> </span><span class="nf">read_plot3D</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">binary</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">big_endian</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="linenos"> 52</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads a plot3d file and returns Blocks</span>
 <span class="linenos"> 53</span>
 <span class="linenos"> 54</span><span class="sd">    Args:</span>
@@ -181,7 +181,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h4>Previous topic</h4>
@@ -214,7 +214,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -235,7 +235,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

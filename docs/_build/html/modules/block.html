@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Block &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     
     <script src="../_static/documentation_options.js?v=514bbfa0"></script>
@@ -16,9 +16,9 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Block Functions" href="blockfunctions.html" />
-    <link rel="prev" title="Split Blocks" href="../notes/split-blocks.html" /> 
+    <link rel="prev" title="Changelog" href="../notes/changelog.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -31,7 +31,7 @@
           <a href="blockfunctions.html" title="Block Functions"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../notes/split-blocks.html" title="Split Blocks"
+          <a href="../notes/changelog.html" title="Changelog"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Block</a></li> 
@@ -47,7 +47,7 @@
 <span id="block"></span><h1>Block<a class="headerlink" href="#module-plot3d.block" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="plot3d.block.Block">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block" title="Link to this definition">¶</a></dt>
 <dd><p>Plot3D Block definition</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.block.Block.cell_volumes">
@@ -74,6 +74,13 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="plot3d.block.Block.get_faces">
+<span class="sig-name descname"><span class="pre">get_faces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.get_faces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.get_faces" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of the six faces of the block.
+Each face is a tuple of (X_face, Y_face, Z_face).</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="plot3d.block.Block.scale">
 <span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.scale" title="Link to this definition">¶</a></dt>
 <dd><p>Scales a mesh by a certain factor</p>
@@ -94,6 +101,20 @@
 <li><p><strong>shift_amount</strong> (<em>float</em>) – _description_</p></li>
 <li><p><strong>direction</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_. Defaults to “z”.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.block.Block.size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#plot3d.block.Block.size" title="Link to this definition">¶</a></dt>
+<dd><p>returns the total number of nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>number of nodes</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -127,7 +148,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
@@ -136,8 +157,10 @@
 <li><a class="reference internal" href="#plot3d.block.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a><ul>
 <li><a class="reference internal" href="#plot3d.block.Block.cell_volumes"><code class="docutils literal notranslate"><span class="pre">Block.cell_volumes()</span></code></a></li>
 <li><a class="reference internal" href="#plot3d.block.Block.cylindrical"><code class="docutils literal notranslate"><span class="pre">Block.cylindrical()</span></code></a></li>
+<li><a class="reference internal" href="#plot3d.block.Block.get_faces"><code class="docutils literal notranslate"><span class="pre">Block.get_faces()</span></code></a></li>
 <li><a class="reference internal" href="#plot3d.block.Block.scale"><code class="docutils literal notranslate"><span class="pre">Block.scale()</span></code></a></li>
 <li><a class="reference internal" href="#plot3d.block.Block.shift"><code class="docutils literal notranslate"><span class="pre">Block.shift()</span></code></a></li>
+<li><a class="reference internal" href="#plot3d.block.Block.size"><code class="docutils literal notranslate"><span class="pre">Block.size</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#plot3d.block.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
@@ -148,8 +171,8 @@
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="../notes/split-blocks.html"
-                          title="previous chapter">Split Blocks</a></p>
+    <p class="topless"><a href="../notes/changelog.html"
+                          title="previous chapter">Changelog</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -177,7 +200,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -190,7 +213,7 @@
           <a href="blockfunctions.html" title="Block Functions"
              >next</a> |</li>
         <li class="right" >
-          <a href="../notes/split-blocks.html" title="Split Blocks"
+          <a href="../notes/changelog.html" title="Changelog"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Block</a></li> 
@@ -198,7 +221,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

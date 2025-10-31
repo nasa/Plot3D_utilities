@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Block Functions &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     
     <script src="../_static/documentation_options.js?v=514bbfa0"></script>
@@ -18,7 +18,7 @@
     <link rel="next" title="Connectivity" href="connectivity.html" />
     <link rel="prev" title="Block" href="block.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -47,30 +47,32 @@
 <span id="block-functions"></span><h1>Block Functions<a class="headerlink" href="#module-plot3d.blockfunctions" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.blockfunctions.block_connection_matrix">
-<span class="sig-prename descclassname"><span class="pre">plot3d.blockfunctions.</span></span><span class="sig-name descname"><span class="pre">block_connection_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_faces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/blockfunctions.html#block_connection_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.blockfunctions.block_connection_matrix" title="Link to this definition">¶</a></dt>
-<dd><p>Creates a matrix representing how block edges are connected to each other</p>
+<span class="sig-prename descclassname"><span class="pre">plot3d.blockfunctions.</span></span><span class="sig-name descname"><span class="pre">block_connection_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_faces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_tol_xyz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_shared_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_shared_abs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride_u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride_v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_area_fallback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area_min_overlap_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/blockfunctions.html#block_connection_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.blockfunctions.block_connection_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Creates matrices representing how blocks are connected.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – List of blocks that describe the Plot3D mesh</p></li>
-<li><p><strong>outer_faces</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>,</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – List of outer faces remaining from connectivity. Useful if you are interested in finding faces that are exterior to the block. Also useful if you combine outerfaces with match faces, this will help identify connections by looking at split faces. Defaults to [].</p></li>
-<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Matching tolerance to look for when comparing face centroids.</p></li>
-</ul>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(n,n) overall connectivity (1 = connected, -1 = not)
+connectivity_i   : (n,n) connections where both faces are I-constant
+connectivity_j   : (n,n) connections where both faces are J-constant
+connectivity_k   : (n,n) connections where both faces are K-constant</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>containing</p>
-<blockquote>
-<div><p><em>connectivity</em> (np.ndarray): integer matrix defining how the blocks are connected to each other
-<em>connectivity_i</em> (np.ndarray): integer matrix defining connectivity of all blocks where IMAX=IMIN
-<em>connectivity_j</em> (np.ndarray): integer matrix defining connectivity of all blocks where JMAX=JMIN
-<em>connectivity_k</em> (np.ndarray): integer matrix defining connectivity of all blocks where KMAX=KMIN</p>
-</div></blockquote>
-</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(Tuple)</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>connectivity</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.blockfunctions.build_connectivity_graph">
+<span class="sig-prename descclassname"><span class="pre">plot3d.blockfunctions.</span></span><span class="sig-name descname"><span class="pre">build_connectivity_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connectivities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Graph</span></span></span><a class="reference internal" href="../_modules/plot3d/blockfunctions.html#build_connectivity_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.blockfunctions.build_connectivity_graph" title="Link to this definition">¶</a></dt>
+<dd><p>Build an undirected graph from a list of face-to-face block connectivities.
+Each edge connects two block indices.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.blockfunctions.common_neighbor">
+<span class="sig-prename descclassname"><span class="pre">plot3d.blockfunctions.</span></span><span class="sig-name descname"><span class="pre">common_neighbor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/plot3d/blockfunctions.html#common_neighbor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.blockfunctions.common_neighbor" title="Link to this definition">¶</a></dt>
+<dd><p>Return a node that is connected to both <cite>a</cite> and <cite>b</cite> and not in <cite>exclude</cite>.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -93,26 +95,6 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="plot3d.blockfunctions.reduce_blocks">
-<span class="sig-prename descclassname"><span class="pre">plot3d.blockfunctions.</span></span><span class="sig-name descname"><span class="pre">reduce_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/blockfunctions.html#reduce_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.blockfunctions.reduce_blocks" title="Link to this definition">¶</a></dt>
-<dd><p>reduce the blocks by a factor of (factor)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – list of blocks to reduce in size</p></li>
-<li><p><strong>factor</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of indicies to skip . Defaults to 2.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>[description]</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>[type]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="plot3d.blockfunctions.rotate_block">
 <span class="sig-prename descclassname"><span class="pre">plot3d.blockfunctions.</span></span><span class="sig-name descname"><span class="pre">rotate_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></span><a class="reference internal" href="../_modules/plot3d/blockfunctions.html#rotate_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.blockfunctions.rotate_block" title="Link to this definition">¶</a></dt>
 <dd><p>Rotates a block by a rotation matrix</p>
@@ -129,6 +111,49 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.blockfunctions.split_blocks">
+<span class="sig-prename descclassname"><span class="pre">plot3d.blockfunctions.</span></span><span class="sig-name descname"><span class="pre">split_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/blockfunctions.html#split_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.blockfunctions.split_blocks" title="Link to this definition">¶</a></dt>
+<dd><p>Split blocks but also keep greatest common divisor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blocks</strong> (<em>List</em><em>[</em><em>]</em>) – _description_</p></li>
+<li><p><strong>gcd</strong> (<em>int</em><em>, </em><em>optional</em>) – _description_. Defaults to 4.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.blockfunctions.standardize_block_orientation">
+<span class="sig-prename descclassname"><span class="pre">plot3d.blockfunctions.</span></span><span class="sig-name descname"><span class="pre">standardize_block_orientation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/blockfunctions.html#standardize_block_orientation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.blockfunctions.standardize_block_orientation" title="Link to this definition">¶</a></dt>
+<dd><p>Standardizes the orientation of a block so that its physical coordinates increase
+consistently along each of the indexing axes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>X increases along the i-axis</p></li>
+<li><p>Y increases along the j-axis</p></li>
+<li><p>Z increases along the k-axis</p></li>
+</ul>
+</div></blockquote>
+<p>This ensures consistent face orientation and alignment across multiple blocks,
+especially useful when merging, visualizing, or exporting grids. The function
+checks the dominant physical component (X, Y, or Z) along each axis, and flips
+the block along that axis if the component decreases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>block</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – The input block to be standardized.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new block instance with all three axes oriented consistently.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block">Block</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -136,16 +161,19 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Block Functions</a><ul>
 <li><a class="reference internal" href="#plot3d.blockfunctions.block_connection_matrix"><code class="docutils literal notranslate"><span class="pre">block_connection_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#plot3d.blockfunctions.build_connectivity_graph"><code class="docutils literal notranslate"><span class="pre">build_connectivity_graph()</span></code></a></li>
+<li><a class="reference internal" href="#plot3d.blockfunctions.common_neighbor"><code class="docutils literal notranslate"><span class="pre">common_neighbor()</span></code></a></li>
 <li><a class="reference internal" href="#plot3d.blockfunctions.get_outer_bounds"><code class="docutils literal notranslate"><span class="pre">get_outer_bounds()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.blockfunctions.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
 <li><a class="reference internal" href="#plot3d.blockfunctions.rotate_block"><code class="docutils literal notranslate"><span class="pre">rotate_block()</span></code></a></li>
+<li><a class="reference internal" href="#plot3d.blockfunctions.split_blocks"><code class="docutils literal notranslate"><span class="pre">split_blocks()</span></code></a></li>
+<li><a class="reference internal" href="#plot3d.blockfunctions.standardize_block_orientation"><code class="docutils literal notranslate"><span class="pre">standardize_block_orientation()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -182,7 +210,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -203,7 +231,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

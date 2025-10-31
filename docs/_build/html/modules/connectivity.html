@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Connectivity &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     
     <script src="../_static/documentation_options.js?v=514bbfa0"></script>
@@ -18,7 +18,7 @@
     <link rel="next" title="Differencing" href="differencing.html" />
     <link rel="prev" title="Block Functions" href="blockfunctions.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -103,13 +103,13 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.connectivity.face_matches_to_dict">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">face_matches_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#face_matches_to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.face_matches_to_dict" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">face_matches_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#face_matches_to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.face_matches_to_dict" title="Link to this definition">¶</a></dt>
 <dd><p>Makes sure the diagonal of face 1 match the diagonal of face 2</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>face1</strong> (<a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – Face 1 with block index</p></li>
-<li><p><strong>face2</strong> (<a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – Face 2 with block index</p></li>
+<li><p><strong>face1</strong> (<em>Face</em>) – Face 1 with block index</p></li>
+<li><p><strong>face2</strong> (<em>Face</em>) – Face 2 with block index</p></li>
 <li><p><strong>block1</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block 1</p></li>
 <li><p><strong>block2</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block 2</p></li>
 </ul>
@@ -125,15 +125,15 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.connectivity.find_matching_blocks">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">find_matching_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#find_matching_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.find_matching_blocks" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">find_matching_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Face</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Face</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#find_matching_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.find_matching_blocks" title="Link to this definition">¶</a></dt>
 <dd><p>Takes two blocks and finds all matching pairs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>block1</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Any plot3d Block that is not the same as block2</p></li>
 <li><p><strong>block2</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Any plot3d Block that is not the same as block1</p></li>
-<li><p><strong>block1_outer</strong> (<em>List</em><em>[</em><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a><em>]</em>) – outer faces for block 1.</p></li>
-<li><p><strong>block2_outer</strong> (<em>List</em><em>[</em><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a><em>]</em>) – Outer faces for block 2</p></li>
+<li><p><strong>block1_outer</strong> (<em>List</em><em>[</em><em>Face</em><em>]</em>) – outer faces for block 1.</p></li>
+<li><p><strong>block2_outer</strong> (<em>List</em><em>[</em><em>Face</em><em>]</em>) – Outer faces for block 2</p></li>
 <li><p><strong>tol</strong> (<em>float</em><em>, </em><em>Optional</em>) – tolerance to use. Defaults to 1E-6</p></li>
 </ul>
 </dd>
@@ -162,7 +162,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.connectivity.get_face_intersection">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">get_face_intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#get_face_intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.get_face_intersection" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">get_face_intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#get_face_intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.get_face_intersection" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Get the index of the intersection between two faces located on two different blocks</dt><dd><p>Face1 needs to be the smaller face.</p>
 </dd>
@@ -170,8 +170,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>face1</strong> (<a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – An exterior face</p></li>
-<li><p><strong>face2</strong> (<a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – An exterior face from a different block</p></li>
+<li><p><strong>face1</strong> (<em>Face</em>) – An exterior face</p></li>
+<li><p><strong>face2</strong> (<em>Face</em>) – An exterior face from a different block</p></li>
 <li><p><strong>block1</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – block containing face1</p></li>
 <li><p><strong>block2</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – block containing face2</p></li>
 <li><p><strong>tol</strong> (<em>float</em>) – matching tolerance</p></li>
@@ -226,7 +226,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
@@ -275,7 +275,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -296,7 +296,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

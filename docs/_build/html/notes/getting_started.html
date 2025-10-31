@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installation &#8212; Plot3D 1.6.8 documentation</title>
+    <title>Getting Started &#8212; Plot3D 1.6.8 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     
@@ -15,8 +15,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Plot3D Data Format" href="plot3d.html" />
-    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="Welcome to Plot3D’s documentation!" href="../index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -28,13 +28,13 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="plot3d.html" title="Plot3D Data Format"
+          <a href="installation.html" title="Installation"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="getting_started.html" title="Getting Started"
+          <a href="../index.html" title="Welcome to Plot3D’s documentation!"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Installation</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Getting Started</a></li> 
       </ul>
     </div>  
 
@@ -43,21 +43,37 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
-<p>Please follow the steps below for a successful installation.</p>
-<section id="installation-via-pip">
-<h2>Installation via Pip<a class="headerlink" href="#installation-via-pip" title="Link to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p>Install the relevant packages:</p></li>
-</ol>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pip install plot3d
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>python
+poetry<span class="w"> </span>install<span class="w"> </span>--with<span class="w"> </span>docs
 </pre></div>
 </div>
 </section>
-<section id="installation-from-source">
-<h2>Installation from Source<a class="headerlink" href="#installation-from-source" title="Link to this heading">¶</a></h2>
-<p>Download the git repository and navigate to the python folder where you see setup.py. Run the following command <cite>python setup.py install</cite> and that should install the library in your python environment.</p>
+<section id="local-build">
+<h2>Local Build<a class="headerlink" href="#local-build" title="Link to this heading">¶</a></h2>
+<p>Generate static HTML locally before publishing:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>python
+poetry<span class="w"> </span>run<span class="w"> </span>sphinx-build<span class="w"> </span>-b<span class="w"> </span>html<span class="w"> </span>../docs<span class="w"> </span>../docs/_build/html
+</pre></div>
+</div>
+<p>The output is written to <code class="docutils literal notranslate"><span class="pre">docs/_build/html</span></code>.</p>
+</section>
+<section id="live-preview">
+<h2>Live Preview<a class="headerlink" href="#live-preview" title="Link to this heading">¶</a></h2>
+<p>Install the optional live-reload server and preview the docs as you edit them:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>python
+poetry<span class="w"> </span>run<span class="w"> </span>sphinx-autobuild<span class="w"> </span>../docs<span class="w"> </span>../docs/_build/html
+</pre></div>
+</div>
+<p>Open <code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:8000</span></code> in your browser to view the live site.</p>
+</section>
+<section id="publishing">
+<h2>Publishing<a class="headerlink" href="#publishing" title="Link to this heading">¶</a></h2>
+<p>Pushing to the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch triggers the GitHub Pages workflow, which installs the
+project, builds the Sphinx documentation, and deploys it automatically.</p>
 </section>
 </section>
 
@@ -71,9 +87,11 @@
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#installation-via-pip">Installation via Pip</a></li>
-<li><a class="reference internal" href="#installation-from-source">Installation from Source</a></li>
+<li><a class="reference internal" href="#">Getting Started</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#local-build">Local Build</a></li>
+<li><a class="reference internal" href="#live-preview">Live Preview</a></li>
+<li><a class="reference internal" href="#publishing">Publishing</a></li>
 </ul>
 </li>
 </ul>
@@ -81,18 +99,18 @@
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="getting_started.html"
-                          title="previous chapter">Getting Started</a></p>
+    <p class="topless"><a href="../index.html"
+                          title="previous chapter">Welcome to Plot3D’s documentation!</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="plot3d.html"
-                          title="next chapter">Plot3D Data Format</a></p>
+    <p class="topless"><a href="installation.html"
+                          title="next chapter">Installation</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/notes/installation.rst.txt"
+      <li><a href="../_sources/notes/getting_started.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -120,13 +138,13 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="plot3d.html" title="Plot3D Data Format"
+          <a href="installation.html" title="Installation"
              >next</a> |</li>
         <li class="right" >
-          <a href="getting_started.html" title="Getting Started"
+          <a href="../index.html" title="Welcome to Plot3D’s documentation!"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Installation</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Getting Started</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -410,6 +410,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
                 #   Rotate Block 1
                 block1_rotated = blocks_rotated[face1.blockIndex]
                 block2 = blocks[face2.blockIndex]
+                print(f'evaluating working blocks: a={face1.blockIndex} b={face2.blockIndex}')
                 #   Check periodicity
                 df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
                 

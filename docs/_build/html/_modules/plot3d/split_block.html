@@ -4,18 +4,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plot3d.split_block &#8212; Plot3D 1.6.5 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <title>plot3d.split_block &#8212; Plot3D 1.6.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     
-    <script src="../../_static/documentation_options.js?v=2ad11211"></script>
+    <script src="../../_static/documentation_options.js?v=514bbfa0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -24,7 +24,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.split_block</a></li> 
       </ul>
@@ -40,16 +40,16 @@
 <span class="sd">Split blocks is combination of help from Dave Rigby and Tim Beach </span>
 <span class="sd">&#39;&#39;&#39;</span>
 
-<span class="kn">from</span> <span class="nn">.face</span> <span class="kn">import</span> <span class="n">Face</span>
-<span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">sqrt</span> 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">.face</span><span class="w"> </span><span class="kn">import</span> <span class="n">Face</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">sqrt</span> 
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span> 
 
 <div class="viewcode-block" id="Direction">
 <a class="viewcode-back" href="../../modules/split_block.html#plot3d.split_block.Direction">[docs]</a>
-<span class="k">class</span> <span class="nc">Direction</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Direction</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">k</span> <span class="o">=</span> <span class="mi">2</span></div>
@@ -57,7 +57,7 @@
 
 <div class="viewcode-block" id="max_aspect_ratio">
 <a class="viewcode-back" href="../../modules/split_block.html#plot3d.split_block.max_aspect_ratio">[docs]</a>
-<span class="k">def</span> <span class="nf">max_aspect_ratio</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">ix</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jx</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kx</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">max_aspect_ratio</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">ix</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jx</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kx</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds the maximum cell aspect ratio</span>
 
 <span class="sd">    Args:</span>
@@ -117,7 +117,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">denominator</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">denominator</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Searches for the right step size that leads to block splits with the same greatest common divisor. Same greatest common denominator means you will always have the same multi-grid when you solve. </span>
 
 <span class="sd">    Args:</span>
@@ -154,7 +154,7 @@
 
 <div class="viewcode-block" id="split_blocks">
 <a class="viewcode-back" href="../../modules/split_block.html#plot3d.split_block.split_blocks">[docs]</a>
-<span class="k">def</span> <span class="nf">split_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">ncells_per_block</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="n">Direction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">split_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">ncells_per_block</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="n">Direction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Split blocks is used to divide an array of blocks based on number of cells per block. This code maintains the greatest common denominator of the parent block. Number of cells per block is simply an estimate of how many you want. The actual number will change to meet the greatest common denominator (GCD). GCD of 4 means multigrid of 3 e.g. grid/4 (coarse), 2 (fine), and 1 (finest). If a direction is not specified then for each block the longest index either i,j, or k is used. </span>
 <span class="sd">    </span>
 
@@ -281,7 +281,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -297,7 +297,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -306,14 +306,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.split_block</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    &#169; Copyright 2025, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

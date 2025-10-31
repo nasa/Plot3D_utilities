@@ -4,18 +4,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plot3d.blockfunctions &#8212; Plot3D 1.6.5 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <title>plot3d.blockfunctions &#8212; Plot3D 1.6.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     
-    <script src="../../_static/documentation_options.js?v=2ad11211"></script>
+    <script src="../../_static/documentation_options.js?v=514bbfa0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -24,7 +24,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.blockfunctions</a></li> 
       </ul>
@@ -36,19 +36,25 @@
           <div class="body" role="main">
             
   <h1>Source code for plot3d.blockfunctions</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
-<span class="kn">from</span> <span class="nn">.facefunctions</span> <span class="kn">import</span> <span class="n">create_face_from_diagonals</span><span class="p">,</span> <span class="n">get_outer_faces</span>
-<span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">Block</span>
-<span class="kn">from</span> <span class="nn">.face</span> <span class="kn">import</span> <span class="n">Face</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">combinations</span><span class="p">,</span> <span class="n">product</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">trange</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.facefunctions</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_face_from_diagonals</span><span class="p">,</span> <span class="n">get_outer_faces</span><span class="p">,</span> <span class="n">find_matching_faces</span><span class="p">,</span><span class="n">faces_match</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">reduce_blocks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.write</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_plot3D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.face</span><span class="w"> </span><span class="kn">import</span> <span class="n">Face</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tqdm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.mplot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes3D</span>  
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span> 
 
 <div class="viewcode-block" id="rotate_block">
 <a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.rotate_block">[docs]</a>
-<span class="k">def</span> <span class="nf">rotate_block</span><span class="p">(</span><span class="n">block</span><span class="p">,</span><span class="n">rotation_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rotate_block</span><span class="p">(</span><span class="n">block</span><span class="p">,</span><span class="n">rotation_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotates a block by a rotation matrix </span>
 
 <span class="sd">    Args:</span>
@@ -82,29 +88,9 @@
     <span class="k">return</span> <span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="reduce_blocks">
-<a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.reduce_blocks">[docs]</a>
-<span class="k">def</span> <span class="nf">reduce_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">factor</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;reduce the blocks by a factor of (factor)</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        blocks (List[Block]): list of blocks to reduce in size</span>
-<span class="sd">        factor (int, optional): Number of indicies to skip . Defaults to 2.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        [type]: [description]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
-        <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="p">[::</span><span class="n">factor</span><span class="p">,::</span><span class="n">factor</span><span class="p">,::</span><span class="n">factor</span><span class="p">]</span>
-        <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Y</span><span class="p">[::</span><span class="n">factor</span><span class="p">,::</span><span class="n">factor</span><span class="p">,::</span><span class="n">factor</span><span class="p">]</span>
-        <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Z</span><span class="p">[::</span><span class="n">factor</span><span class="p">,::</span><span class="n">factor</span><span class="p">,::</span><span class="n">factor</span><span class="p">]</span>
-        <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">KMAX</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span>
-    <span class="k">return</span> <span class="n">blocks</span></div>
-
-
 <div class="viewcode-block" id="get_outer_bounds">
 <a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.get_outer_bounds">[docs]</a>
-<span class="k">def</span> <span class="nf">get_outer_bounds</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_outer_bounds</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get outer bounds for a set of blocks</span>
 
 <span class="sd">    Args:</span>
@@ -149,83 +135,331 @@
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">xbounds</span><span class="p">),</span><span class="nb">tuple</span><span class="p">(</span><span class="n">ybounds</span><span class="p">),</span><span class="nb">tuple</span><span class="p">(</span><span class="n">zbounds</span><span class="p">)</span></div>
 
 
+
 <div class="viewcode-block" id="block_connection_matrix">
 <a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.block_connection_matrix">[docs]</a>
-<span class="k">def</span> <span class="nf">block_connection_matrix</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="p">[],</span><span class="n">tol</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1E-8</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a matrix representing how block edges are connected to each other </span>
+<span class="k">def</span><span class="w"> </span><span class="nf">block_connection_matrix</span><span class="p">(</span>
+    <span class="n">blocks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span>
+    <span class="n">outer_faces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">node_tol_xyz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">min_shared_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span>
+    <span class="n">min_shared_abs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">stride_u</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">stride_v</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">use_area_fallback</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">area_min_overlap_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates matrices representing how blocks are connected.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        blocks (List[Block]): List of blocks that describe the Plot3D mesh</span>
-<span class="sd">        outer_faces (List[Dict[str,int]], optional): List of outer faces remaining from connectivity. Useful if you are interested in finding faces that are exterior to the block. Also useful if you combine outerfaces with match faces, this will help identify connections by looking at split faces. Defaults to [].</span>
-<span class="sd">        tol (float, optional): Matching tolerance to look for when comparing face centroids.</span>
-<span class="sd">    </span>
 <span class="sd">    Returns:</span>
-<span class="sd">        (Tuple): containing</span>
-
-<span class="sd">            *connectivity* (np.ndarray): integer matrix defining how the blocks are connected to each other</span>
-<span class="sd">            *connectivity_i* (np.ndarray): integer matrix defining connectivity of all blocks where IMAX=IMIN</span>
-<span class="sd">            *connectivity_j* (np.ndarray): integer matrix defining connectivity of all blocks where JMAX=JMIN</span>
-<span class="sd">            *connectivity_k* (np.ndarray): integer matrix defining connectivity of all blocks where KMAX=KMIN</span>
-<span class="sd">            </span>
+<span class="sd">        connectivity     : (n,n) overall connectivity (1 = connected, -1 = not)</span>
+<span class="sd">        connectivity_i   : (n,n) connections where both faces are I-constant</span>
+<span class="sd">        connectivity_j   : (n,n) connections where both faces are J-constant</span>
+<span class="sd">        connectivity_k   : (n,n) connections where both faces are K-constant</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Reduce the size of the blocks by the GCD </span>
+    <span class="c1"># Reduce the size of the blocks by the minimum GCD so index grids line up</span>
+    <span class="n">gcd_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">block_indx</span><span class="p">]</span>
+        <span class="n">gcd_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
+    <span class="n">gcd_to_use</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">gcd_array</span><span class="p">)</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">reduce_blocks</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span> <span class="n">gcd_to_use</span><span class="p">)</span>
+
+    <span class="c1"># Convert dict outer faces (if provided) to Face objects at the reduced resolution</span>
+    <span class="n">outer_faces_all</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span><span class="p">:</span>
+        <span class="n">face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span>
+            <span class="n">blocks</span><span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;block_index&quot;</span><span class="p">]],</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;IMIN&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;JMIN&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;KMIN&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">gcd_to_use</span><span class="p">),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;IMAX&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;JMAX&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;KMAX&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">gcd_to_use</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">face</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;block_index&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;id&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">face</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="n">outer_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="n">outer_faces</span> <span class="o">=</span> <span class="n">outer_faces_all</span> <span class="c1"># type: ignore</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+    <span class="n">connectivity</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+    <span class="n">connectivity_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+    <span class="n">connectivity_j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+    <span class="n">connectivity_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+
+    <span class="n">combos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="p">(</span><span class="n">pbar</span> <span class="o">:=</span> <span class="n">trange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combos</span><span class="p">))):</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">combos</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Building connectivity: checking block </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">b1</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># Gather outer faces for block i</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">b1_outer_faces</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">b1_outer_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span> <span class="ow">and</span> <span class="n">connectivity</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">b2</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">b2_outer_faces</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">b2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">b2_outer_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="o">==</span> <span class="n">j</span><span class="p">]</span>
+
+            <span class="n">connection_found</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">for</span> <span class="n">f1</span> <span class="ow">in</span> <span class="n">b1_outer_faces</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">f2</span> <span class="ow">in</span> <span class="n">b2_outer_faces</span><span class="p">:</span>
+                    <span class="c1"># 1) Primary: node-sharing (exact common grid nodes)</span>
+                    <span class="k">if</span> <span class="n">f1</span><span class="o">.</span><span class="n">touches_by_nodes</span><span class="p">(</span>
+                        <span class="n">f2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span>
+                        <span class="n">tol_xyz</span><span class="o">=</span><span class="n">node_tol_xyz</span><span class="p">,</span>
+                        <span class="n">min_shared_frac</span><span class="o">=</span><span class="n">min_shared_frac</span><span class="p">,</span>
+                        <span class="n">min_shared_abs</span><span class="o">=</span><span class="n">min_shared_abs</span><span class="p">,</span>
+                        <span class="n">stride_u</span><span class="o">=</span><span class="n">stride_u</span><span class="p">,</span>
+                        <span class="n">stride_v</span><span class="o">=</span><span class="n">stride_v</span>
+                    <span class="p">):</span>
+                        <span class="n">connectivity</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">f1</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">f2</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">connectivity_i</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">connectivity_i</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">f1</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">f2</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">connectivity_j</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">connectivity_j</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">f1</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">f2</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                            <span class="n">connectivity_k</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">connectivity_k</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+                        <span class="c1"># Debug message to see what matched</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[nodes] blocks </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2"> connected via </span><span class="si">{</span><span class="n">f1</span><span class="si">}</span><span class="s2"> &lt;-&gt; </span><span class="si">{</span><span class="n">f2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">connection_found</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+
+                    <span class="c1"># 2) Optional fallback: polygon overlap for non-conforming interfaces</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">connection_found</span><span class="p">)</span> <span class="ow">and</span> <span class="n">use_area_fallback</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">f1</span><span class="o">.</span><span class="n">touches</span><span class="p">(</span><span class="n">f2</span><span class="p">,</span> <span class="n">min_overlap_frac</span><span class="o">=</span><span class="n">area_min_overlap_frac</span><span class="p">):</span>
+                            <span class="n">connectivity</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                            <span class="k">if</span> <span class="n">f1</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">f2</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">connectivity_i</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">connectivity_i</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                            <span class="k">if</span> <span class="n">f1</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">f2</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                                <span class="n">connectivity_j</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">connectivity_j</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                            <span class="k">if</span> <span class="n">f1</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">f2</span><span class="o">.</span><span class="n">const_type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                                <span class="n">connectivity_k</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">connectivity_k</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[area ] blocks </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2"> connected via </span><span class="si">{</span><span class="n">f1</span><span class="si">}</span><span class="s2"> &lt;-&gt; </span><span class="si">{</span><span class="n">f2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="n">connection_found</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="k">break</span>
+
+                <span class="k">if</span> <span class="n">connection_found</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">connection_found</span><span class="p">:</span>
+                <span class="n">connectivity</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">connectivity_i</span><span class="p">,</span> <span class="n">connectivity_j</span><span class="p">,</span> <span class="n">connectivity_k</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">):</span>
     <span class="n">gcd_array</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>    
     <span class="k">for</span> <span class="n">block_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
         <span class="n">block</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">block_indx</span><span class="p">]</span>
         <span class="n">gcd_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
     <span class="n">gcd_to_use</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">gcd_array</span><span class="p">)</span> <span class="c1"># You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.</span>
-    <span class="n">blocks</span> <span class="o">=</span> <span class="n">reduce_blocks</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span><span class="n">gcd_to_use</span><span class="p">)</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">reduce_blocks</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span><span class="mi">4</span><span class="p">)</span>
+    
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+    <span class="n">markers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">]</span>  <span class="c1"># alternate between circle and square</span>
 
-    <span class="c1"># Face to List </span>
-    <span class="n">outer_faces_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span><span class="p">:</span>
-        <span class="n">face</span> <span class="o">=</span> <span class="n">create_face_from_diagonals</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;block_index&#39;</span><span class="p">]],</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> 
-            <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">gcd_to_use</span><span class="p">))</span>
-        <span class="n">face</span><span class="o">.</span><span class="n">set_block_index</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;block_index&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="s2">&quot;id&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
-            <span class="n">face</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
-        <span class="n">outer_faces_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">blocks</span><span class="p">):</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;C</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">10</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">Z</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">Z</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="c1"># type: ignore</span>
+                   <span class="n">marker</span><span class="o">=</span><span class="n">markers</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">markers</span><span class="p">)],</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Block </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
 
-    <span class="n">outer_faces</span> <span class="o">=</span> <span class="n">outer_faces_all</span>
+        <span class="c1"># Draw lines along i-direction (axis 0)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">Y</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">Z</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
 
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
-    <span class="n">connectivity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
-    <span class="n">combos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="mi">2</span><span class="p">))</span>    
-    <span class="k">for</span> <span class="n">indx</span> <span class="ow">in</span> <span class="p">(</span><span class="n">pbar</span><span class="o">:=</span><span class="n">trange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combos</span><span class="p">))):</span>
-        <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="o">=</span> <span class="n">combos</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
-        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Building block to block connectivity matrix: checking </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">b1</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># Draw lines along j-direction (axis 1)</span>
+        <span class="k">for</span> <span class="n">i_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i_</span><span class="p">,</span> <span class="p">:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">Y</span><span class="p">[</span><span class="n">i_</span><span class="p">,</span> <span class="p">:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">Z</span><span class="p">[</span><span class="n">i_</span><span class="p">,</span> <span class="p">:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>                     <span class="c1"># Get the outerfaces to search</span>
-            <span class="n">b1_outer_faces</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">b1_outer_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span> <span class="ow">and</span> <span class="n">connectivity</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">!=-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="n">b2</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="c1"># Draw lines along k-direction (axis 2)</span>
+        <span class="k">for</span> <span class="n">i_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">j_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i_</span><span class="p">,</span> <span class="n">j_</span><span class="p">,</span> <span class="p">:],</span> <span class="n">Y</span><span class="p">[</span><span class="n">i_</span><span class="p">,</span> <span class="n">j_</span><span class="p">,</span> <span class="p">:],</span> <span class="n">Z</span><span class="p">[</span><span class="n">i_</span><span class="p">,</span> <span class="n">j_</span><span class="p">,</span> <span class="p">:],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>                 <span class="c1"># Get the outerfaces to search</span>
-                <span class="n">b2_outer_faces</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">get_outer_faces</span><span class="p">(</span><span class="n">b2</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">b2_outer_faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outer_faces</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">BlockIndex</span> <span class="o">==</span> <span class="n">j</span><span class="p">]</span>                
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">)</span> <span class="c1"># type: ignore</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;3D Block Grid with Connected Lines&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="standardize_block_orientation">
+<a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.standardize_block_orientation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">standardize_block_orientation</span><span class="p">(</span><span class="n">block</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standardizes the orientation of a block so that its physical coordinates increase</span>
+<span class="sd">    consistently along each of the indexing axes:</span>
 
-            <span class="c1"># Check to see if any of the outer faces of the blocks match   </span>
-            <span class="n">connection_found</span><span class="o">=</span><span class="kc">False</span>             
-            <span class="k">for</span> <span class="n">f1</span> <span class="ow">in</span> <span class="n">b1_outer_faces</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">f2</span> <span class="ow">in</span> <span class="n">b2_outer_faces</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">f2</span><span class="p">,</span><span class="n">tol</span><span class="p">)):</span>   <span class="c1"># Check if face centroid is the same</span>
-                        <span class="n">connectivity</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>       <span class="c1"># Default block to block connection matrix </span>
-                        <span class="n">connectivity</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-                        <span class="n">connection_found</span><span class="o">=</span><span class="kc">True</span>
-                        <span class="c1"># c = np.sum(connectivity[i,:]==1)</span>
-                        <span class="c1"># print(f&quot;block {i} connections {c}&quot;)</span>
-                        <span class="k">break</span>
-                <span class="k">if</span> <span class="n">connection_found</span><span class="p">:</span>
-                    <span class="k">break</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">connection_found</span><span class="p">:</span>
-                <span class="n">connectivity</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-                <span class="n">connectivity</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>      
-    <span class="k">return</span> <span class="n">connectivity</span></div>
+<span class="sd">        - X increases along the i-axis</span>
+<span class="sd">        - Y increases along the j-axis</span>
+<span class="sd">        - Z increases along the k-axis</span>
+
+<span class="sd">    This ensures consistent face orientation and alignment across multiple blocks,</span>
+<span class="sd">    especially useful when merging, visualizing, or exporting grids. The function</span>
+<span class="sd">    checks the dominant physical component (X, Y, or Z) along each axis, and flips</span>
+<span class="sd">    the block along that axis if the component decreases.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        block (Block): The input block to be standardized.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Block: A new block instance with all three axes oriented consistently.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">i_center</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">j_center</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">k_center</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
+
+    <span class="c1"># Check i-direction</span>
+    <span class="n">dx_i</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j_center</span><span class="p">,</span> <span class="n">k_center</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">j_center</span><span class="p">,</span> <span class="n">k_center</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">dx_i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Check j-direction</span>
+    <span class="n">dy_j</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">i_center</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">k_center</span><span class="p">]</span> <span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">i_center</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">k_center</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">dy_j</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Check k-direction</span>
+    <span class="n">dz_k</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">i_center</span><span class="p">,</span> <span class="n">j_center</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">Z</span><span class="p">[</span><span class="n">i_center</span><span class="p">,</span> <span class="n">j_center</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">dz_k</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">checkCollinearity</span><span class="p">(</span><span class="n">v1</span><span class="p">:</span><span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">v2</span><span class="p">:</span><span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">):</span>
+    <span class="c1"># Calculate their cross product</span>
+    <span class="n">cross_P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">)</span> 
+ 
+    <span class="c1"># Check if their cross product</span>
+    <span class="c1"># is a NULL Vector or not</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">cross_P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span>
+        <span class="n">cross_P</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span>
+        <span class="n">cross_P</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_outward_normals</span><span class="p">(</span><span class="n">block</span><span class="p">:</span><span class="n">Block</span><span class="p">):</span>
+    <span class="c1"># Calculate Normals</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Z</span>
+    <span class="n">imax</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">IMAX</span>
+    <span class="n">jmax</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">JMAX</span>
+    <span class="n">kmax</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span> 
+    <span class="c1"># IMAX - Normal should be out of the page        </span>
+    <span class="c1"># Normals I direction: IMIN https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span> 
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> 
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">n_imin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">)</span> <span class="c1"># type: ignore</span>
+    
+    <span class="c1"># Normals I direction: IMAX</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span> 
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">Y</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="n">Z</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">n_imax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">)</span>
+
+    <span class="c1"># Normals J direction: JMIN</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span> 
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">n_jmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">)</span>
+
+    <span class="c1"># Normals J direction: JMAX</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span> 
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">n_jmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">)</span>
+
+    <span class="c1"># Normals K direction: KMIN</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]]</span> 
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">Y</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="n">Z</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">n_kmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">)</span>
+
+    <span class="c1"># Normals K direction: KMAX</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="n">kmax</span><span class="p">],</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span> 
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">Y</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="n">kmax</span><span class="p">],</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="n">Z</span><span class="p">[</span><span class="n">imax</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">jmax</span><span class="p">,</span><span class="n">kmax</span><span class="p">],</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">kmax</span><span class="p">]]</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">z</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">n_kmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">n_imin</span><span class="p">,</span><span class="n">n_jmin</span><span class="p">,</span><span class="n">n_kmin</span><span class="p">,</span><span class="n">n_imax</span><span class="p">,</span><span class="n">n_jmax</span><span class="p">,</span><span class="n">n_kmax</span>
+
+<div class="viewcode-block" id="split_blocks">
+<a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.split_blocks">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">split_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span><span class="n">gcd</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split blocks but also keep greatest common divisor</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blocks (List[]): _description_</span>
+<span class="sd">        gcd (int, optional): _description_. Defaults to 4.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="common_neighbor">
+<a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.common_neighbor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">common_neighbor</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a node that is connected to both `a` and `b` and not in `exclude`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">G</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="kc">None</span> </div>
+
+
+<div class="viewcode-block" id="build_connectivity_graph">
+<a class="viewcode-back" href="../../modules/blockfunctions.html#plot3d.blockfunctions.build_connectivity_graph">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_connectivity_graph</span><span class="p">(</span><span class="n">connectivities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build an undirected graph from a list of face-to-face block connectivities.</span>
+<span class="sd">    Each edge connects two block indices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">connectivities</span><span class="p">:</span>
+        <span class="n">block1</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="c1"># type: ignore</span>
+        <span class="n">block2</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span> <span class="c1"># type: ignore</span>
+        <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">block1</span><span class="p">,</span> <span class="n">block2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">G</span></div>
 
 </pre></div>
 
@@ -233,7 +467,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -249,7 +483,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -258,14 +492,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.blockfunctions</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    &#169; Copyright 2025, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

@@ -16,6 +16,14 @@ matplotlib = "*"
 
 [tool.poetry.group.deve.dependencies]
 
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^7.4"
+sphinx-rtd-theme = "^2.0"
+sphinx-autobuild = "^2024.4"
+
 [build-system]
 requires = ["poetry>=1.1.2"]
 build-backend = "poetry.masonry.api"    

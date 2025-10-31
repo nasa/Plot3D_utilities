@@ -4,18 +4,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plot3d.graph &#8212; Plot3D 1.6.5 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <title>plot3d.graph &#8212; Plot3D 1.6.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     
-    <script src="../../_static/documentation_options.js?v=2ad11211"></script>
+    <script src="../../_static/documentation_options.js?v=514bbfa0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -24,7 +24,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.graph</a></li> 
       </ul>
@@ -36,171 +36,319 @@
           <div class="body" role="main">
             
   <h1>Source code for plot3d.graph</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
-<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span> 
-<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+<span></span><span class="c1"># graph.py  (inside plot3d package)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pymetis</span>  <span class="c1"># type: ignore</span>
+        <span class="n">HAS_PYMETIS</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pragma: no cover - optional dependency</span>
+        <span class="n">pymetis</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore</span>
+        <span class="n">HAS_PYMETIS</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">pymetis</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore</span>
+    <span class="n">HAS_PYMETIS</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span>  <span class="c1"># &lt;-- use your existing Block</span>
 
 
-<div class="viewcode-block" id="block_to_graph">
-<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.block_to_graph">[docs]</a>
-<span class="k">def</span> <span class="nf">block_to_graph</span><span class="p">(</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">offset</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a block to a graph</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        IMAX (int): block.IMAX</span>
-<span class="sd">        JMAX (int): block.JMAX</span>
-<span class="sd">        KMAX (int): block.KMAX</span>
-<span class="sd">        offset (int): IMAX*JMAX*KMAX of previous block </span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        nx.graph.Graph: networkx graph object </span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-    <span class="n">irange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">IMAX</span><span class="p">)</span>
-    <span class="n">jrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">JMAX</span><span class="p">)</span>
-    <span class="n">krange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">KMAX</span><span class="p">)</span>
-    <span class="n">kshift</span> <span class="o">=</span> <span class="mi">0</span> 
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KMAX</span><span class="p">):</span> <span class="c1"># K slices </span>
-        <span class="n">kshift</span> <span class="o">=</span> <span class="n">IMAX</span><span class="o">*</span><span class="n">JMAX</span><span class="o">*</span><span class="n">k</span>
-
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">JMAX</span><span class="p">):</span>
-            <span class="n">nx</span><span class="o">.</span><span class="n">add_star</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">offset</span><span class="o">+</span> <span class="n">kshift</span> <span class="o">+</span> <span class="n">IMAX</span><span class="o">*</span><span class="n">j</span> <span class="o">+</span> <span class="n">irange</span><span class="p">,</span><span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">IMAX</span><span class="p">):</span>
-            <span class="n">nx</span><span class="o">.</span><span class="n">add_star</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">offset</span><span class="o">+</span><span class="n">kshift</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="n">IMAX</span><span class="o">*</span><span class="n">jrange</span><span class="p">,</span><span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">IMAX</span><span class="o">*</span><span class="n">JMAX</span><span class="p">):</span>
-        <span class="n">nx</span><span class="o">.</span><span class="n">add_star</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">p</span> <span class="o">+</span> <span class="n">IMAX</span><span class="o">*</span><span class="n">JMAX</span><span class="o">*</span><span class="n">krange</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">G</span></div>
-
-
-<div class="viewcode-block" id="get_face_vertex_indices">
-<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.get_face_vertex_indices">[docs]</a>
-<span class="k">def</span> <span class="nf">get_face_vertex_indices</span><span class="p">(</span><span class="n">IMIN</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMIN</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMIN</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">IMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">JMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">KMAX</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">block_size</span><span class="p">:</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns an array containing the vertex number of a given face </span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        IMIN (int): starting I index</span>
-<span class="sd">        JMIN (int): starting J index</span>
-<span class="sd">        KMIN (int): starting K index</span>
-<span class="sd">        IMAX (int): ending I index</span>
-<span class="sd">        JMAX (int): ending J index</span>
-<span class="sd">        KMAX (int): ending K index</span>
-<span class="sd">        block_size (Tuple[int,int,int]): This is the actual IMAX,JMAX,KMAX of the block</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Build weighted graph from connectivity_fast face_matches</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="build_weighted_graph_from_face_matches">
+<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.build_weighted_graph_from_face_matches">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_weighted_graph_from_face_matches</span><span class="p">(</span>
+    <span class="n">face_matches</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">aggregate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+    <span class="n">ignore_self_matches</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert connectivity_fast face_matches into adjacency + weights.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">        npt.NDArray: an array containing all the vertices </span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">create_range</span><span class="p">(</span><span class="n">indx1</span><span class="p">,</span><span class="n">indx2</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">indx1</span><span class="o">&lt;</span><span class="n">indx2</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">indx1</span><span class="p">,</span><span class="n">indx2</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">indx1</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">indx2</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        
-    <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">IMIN</span><span class="o">==</span><span class="n">IMAX</span><span class="p">:</span>
-        <span class="n">jrange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">JMIN</span><span class="p">,</span><span class="n">JMAX</span><span class="p">)</span>
-        <span class="n">krange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">KMIN</span><span class="p">,</span><span class="n">KMAX</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">IMIN</span><span class="o">==</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="c1"># IMIN is really IMAX</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jrange</span><span class="p">:</span>
-                <span class="n">j_offset</span> <span class="o">=</span> <span class="n">j</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="c1"># IMAX * JMAX</span>
-                <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j_offset</span> <span class="o">+</span> <span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">krange</span> <span class="o">+</span> <span class="n">IMAX</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jrange</span><span class="p">:</span>
-                <span class="n">j_offset</span> <span class="o">=</span> <span class="n">j</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j_offset</span> <span class="o">+</span> <span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">krange</span><span class="p">)</span>
-        
-    <span class="k">elif</span> <span class="n">JMIN</span> <span class="o">==</span> <span class="n">JMAX</span><span class="p">:</span>
-        <span class="n">irange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">IMIN</span><span class="p">,</span><span class="n">IMAX</span><span class="p">)</span>
-        <span class="n">krange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">KMIN</span><span class="p">,</span><span class="n">KMAX</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">JMIN</span><span class="o">==</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># JMIN is really JMAX</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">krange</span><span class="p">:</span>
-                <span class="n">k_offset</span> <span class="o">=</span> <span class="n">k</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> 
-                <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k_offset</span> <span class="o">+</span> <span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">irange</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>                   <span class="c1"># JMIN</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">krange</span><span class="p">:</span>
-                <span class="n">k_offset</span> <span class="o">=</span> <span class="n">k</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k_offset</span> <span class="o">+</span> <span class="n">irange</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">irange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">IMIN</span><span class="p">,</span><span class="n">IMAX</span><span class="p">)</span>
-        <span class="n">jrange</span> <span class="o">=</span> <span class="n">create_range</span><span class="p">(</span><span class="n">JMIN</span><span class="p">,</span><span class="n">JMAX</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">KMIN</span> <span class="o">==</span> <span class="n">block_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="c1"># KMIN is really KMAX</span>
-            <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">KMIN</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> 
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span> 
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jrange</span><span class="p">:</span>
-            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">offset</span><span class="o">+</span><span class="n">block_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">j</span> <span class="o">+</span> <span class="n">irange</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="get_starting_vertex">
-<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.get_starting_vertex">[docs]</a>
-<span class="k">def</span> <span class="nf">get_starting_vertex</span><span class="p">(</span><span class="n">blockIndex</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">block_sizes</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the starting vertex index of the block</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        blockIndex (int): index of block</span>
-<span class="sd">        block_sizes (List[Tuple[int,int,int]]): List of all the [[IMAX,JMAX,KMAX]] </span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        int: offset</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span> 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">blockIndex</span><span class="p">):</span>
-        <span class="n">offset</span><span class="o">+=</span><span class="n">block_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">block_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">block_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">offset</span></div>
-
-
-<div class="viewcode-block" id="add_connectivity_to_graph">
-<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.add_connectivity_to_graph">[docs]</a>
-<span class="k">def</span> <span class="nf">add_connectivity_to_graph</span><span class="p">(</span><span class="n">G</span><span class="p">:</span><span class="n">nx</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span><span class="n">block_sizes</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">connectivities</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert plot3d defined connectivity into additional graph edges </span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        G (nx.classes.graph.Graph): Giant graph </span>
-<span class="sd">        block_sizes (List[Tuple[int,int,int]]): _description_</span>
-<span class="sd">        connectivity (List[Dict[str,int]]): _description_</span>
+<span class="sd">    Note:</span>
+<span class="sd">        Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.</span>
 <span class="sd">    </span>
+<span class="sd">    Why this matters:</span>
+<span class="sd">        connectivity_fast can return more than one face between the same pair of blocks </span>
+<span class="sd">        (e.g. a block is split and has two non-contiguous interfaces with its neighbor).</span>
+<span class="sd">        Each face gives a weight = dI * dJ * dK (number of shared nodes).</span>
+<span class="sd">        METIS expects one edge per block-pair, with a single weight.</span>
+<span class="sd">        So if there are multiple faces, we must decide how to merge them. That’s what aggregate does.</span>
+<span class="sd">        </span>
+<span class="sd">    Args:</span>
+<span class="sd">        face_matches (List[dict]): Output from connectivity_fast</span>
+<span class="sd">        n_blocks (int): number of blocks in a mesh </span>
+<span class="sd">        aggregate (str, optional): &#39;sum&#39;|&#39;max&#39;|&#39;min&#39;. Controls how weights are combined. Defaults to &quot;sum&quot;.</span>
+<span class="sd">        ignore_self_matches (bool, optional): ignores self matching (i==j). Defaults to True.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if aggregate is not one of &#39;sum&#39;,&#39;max&#39;,&#39;min&#39;</span>
+
 <span class="sd">    Returns:</span>
-<span class="sd">        nx.graph.Graph: networkx graph object with added edges </span>
+<span class="sd">        Tuple[Dict[int, List[int]], Dict[int, Dict[int, int]]]: </span>
+<span class="sd">            * adj_list (Dict[int, List[int]]): Neighbors for each block.</span>
+<span class="sd">            * edge_w   (Dict[int, Dict[int, int]]): Edge weights (u-&gt;v).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">connectivities</span><span class="p">:</span> 
-        <span class="n">block1_index</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
-        <span class="n">block2_index</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
-        <span class="n">IMIN1</span><span class="p">,</span><span class="n">IMAX1</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span>
-        <span class="n">JMIN1</span><span class="p">,</span><span class="n">JMAX1</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span>
-        <span class="n">KMIN1</span><span class="p">,</span><span class="n">KMAX1</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span>
-        
-        <span class="n">IMIN2</span><span class="p">,</span><span class="n">IMAX2</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span>
-        <span class="n">JMIN2</span><span class="p">,</span><span class="n">JMAX2</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span>
-        <span class="n">KMIN2</span><span class="p">,</span><span class="n">KMAX2</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">],</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span>
-        
-        <span class="c1"># Number of connectivities should match</span>
-        <span class="n">face1</span> <span class="o">=</span> <span class="n">get_face_vertex_indices</span><span class="p">(</span><span class="n">IMIN1</span><span class="p">,</span><span class="n">IMAX1</span><span class="p">,</span><span class="n">JMIN1</span><span class="p">,</span><span class="n">JMAX1</span><span class="p">,</span><span class="n">KMIN1</span><span class="p">,</span><span class="n">KMAX1</span><span class="p">,</span><span class="n">block_sizes</span><span class="p">[</span><span class="n">block1_index</span><span class="p">])</span> <span class="o">+</span> <span class="n">get_starting_vertex</span><span class="p">(</span><span class="n">block1_index</span><span class="p">,</span> <span class="n">block_sizes</span><span class="p">)</span>    
-        <span class="n">face2</span> <span class="o">=</span> <span class="n">get_face_vertex_indices</span><span class="p">(</span><span class="n">IMIN2</span><span class="p">,</span><span class="n">IMAX2</span><span class="p">,</span><span class="n">JMIN2</span><span class="p">,</span><span class="n">JMAX2</span><span class="p">,</span><span class="n">KMIN2</span><span class="p">,</span><span class="n">KMAX2</span><span class="p">,</span><span class="n">block_sizes</span><span class="p">[</span><span class="n">block2_index</span><span class="p">])</span> <span class="o">+</span> <span class="n">get_starting_vertex</span><span class="p">(</span><span class="n">block2_index</span><span class="p">,</span> <span class="n">block_sizes</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">block1_index</span><span class="o">!=</span> <span class="n">block2_index</span><span class="p">:</span>
-            <span class="n">nodes_to_add</span> <span class="o">=</span> <span class="n">face1</span>
-            <span class="n">nodes_to_replace</span> <span class="o">=</span> <span class="n">face2</span>
-            <span class="k">for</span> <span class="n">node_to_add</span><span class="p">,</span><span class="n">node_to_replace</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nodes_to_add</span><span class="p">,</span><span class="n">nodes_to_replace</span><span class="p">):</span>
-                <span class="n">G</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span>
-                    <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
-                        <span class="n">G</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">node_to_add</span><span class="p">),</span>
-                        <span class="n">G</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">node_to_replace</span><span class="p">)</span>
-                        <span class="p">)</span>
-                <span class="p">)</span>
-                <span class="n">G</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">node_to_replace</span><span class="p">)</span>
-                
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">face1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">face2</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Number of connections from </span><span class="si">{</span><span class="n">block1_index</span><span class="si">}</span><span class="s2"> I[</span><span class="si">{</span><span class="n">IMIN1</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">IMAX1</span><span class="si">}</span><span class="s2">], J[</span><span class="si">{</span><span class="n">JMIN1</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">JMAX1</span><span class="si">}</span><span class="s2">], K[</span><span class="si">{</span><span class="n">KMIN1</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">KMAX1</span><span class="si">}</span><span class="s2">] to </span><span class="si">{</span><span class="n">block2_index</span><span class="si">}</span><span class="s2"> I[</span><span class="si">{</span><span class="n">IMIN2</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">IMAX2</span><span class="si">}</span><span class="s2">], J[</span><span class="si">{</span><span class="n">JMIN2</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">JMAX2</span><span class="si">}</span><span class="s2">], K[</span><span class="si">{</span><span class="n">KMIN2</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">KMAX2</span><span class="si">}</span><span class="s2">] should match.&quot;</span>
-        
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">face1</span><span class="p">)):</span>
-            <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">face1</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">face2</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-            
-    <span class="k">return</span> <span class="n">G</span></div>
+    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;aggregate must be one of {&#39;sum&#39;,&#39;max&#39;,&#39;min&#39;}&quot;</span><span class="p">)</span>
+
+    <span class="n">pair_weight</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">face_matches</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;block1&quot;</span><span class="p">][</span><span class="s2">&quot;block_index&quot;</span><span class="p">])</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;block2&quot;</span><span class="p">][</span><span class="s2">&quot;block_index&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">ignore_self_matches</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">IMIN</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;block1&quot;</span><span class="p">][</span><span class="s2">&quot;IMIN&quot;</span><span class="p">]);</span> <span class="n">JMIN</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;block1&quot;</span><span class="p">][</span><span class="s2">&quot;JMIN&quot;</span><span class="p">]);</span> <span class="n">KMIN</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;block1&quot;</span><span class="p">][</span><span class="s2">&quot;KMIN&quot;</span><span class="p">])</span>
+        <span class="n">IMAX</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;block1&quot;</span><span class="p">][</span><span class="s2">&quot;IMAX&quot;</span><span class="p">]);</span> <span class="n">JMAX</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;block1&quot;</span><span class="p">][</span><span class="s2">&quot;JMAX&quot;</span><span class="p">]);</span> <span class="n">KMAX</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;block1&quot;</span><span class="p">][</span><span class="s2">&quot;KMAX&quot;</span><span class="p">])</span>
+        <span class="n">dI</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">IMAX</span> <span class="o">-</span> <span class="n">IMIN</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">dJ</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">JMAX</span> <span class="o">-</span> <span class="n">JMIN</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">dK</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">KMAX</span> <span class="o">-</span> <span class="n">KMIN</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">dI</span> <span class="o">*</span> <span class="n">dJ</span> <span class="o">*</span> <span class="n">dK</span>  <span class="c1"># Edge weight = communication cost (number of face nodes)</span>
+
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">j</span> <span class="k">else</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pair_weight</span><span class="p">:</span>
+            <span class="n">pair_weight</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)]</span> <span class="o">=</span> <span class="n">w</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">aggregate</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
+                <span class="n">pair_weight</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)]</span> <span class="o">+=</span> <span class="n">w</span>
+            <span class="k">elif</span> <span class="n">aggregate</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
+                <span class="n">pair_weight</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">pair_weight</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)],</span> <span class="n">w</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># &quot;min&quot;</span>
+                <span class="n">pair_weight</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">pair_weight</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)],</span> <span class="n">w</span><span class="p">)</span>
+
+    <span class="c1"># adjacency list and edge weights</span>
+    <span class="n">adj_list</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">u</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">)}</span>
+    <span class="n">edge_w</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">u</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">)}</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">pair_weight</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">adj_list</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">adj_list</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">edge_w</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span>
+        <span class="n">edge_w</span><span class="p">[</span><span class="n">b</span><span class="p">][</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span>
+
+    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">):</span>
+        <span class="n">adj_list</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">adj_list</span><span class="p">[</span><span class="n">u</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">adj_list</span><span class="p">,</span> <span class="n">edge_w</span></div>
+
+
+
+<div class="viewcode-block" id="csr_from_adj_and_weights">
+<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.csr_from_adj_and_weights">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">csr_from_adj_and_weights</span><span class="p">(</span>
+    <span class="n">adj_list</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+    <span class="n">edge_w</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build CSR arrays (xadj, adjncy, eweights) from adjacency + weights.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        xadj (List[int]): prefix sum of neighbors</span>
+<span class="sd">        adjncy (List[int]): flattened neighbor list</span>
+<span class="sd">        eweights (List[int]): edge weights aligned with adjncy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xadj</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">adjncy</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">eweights</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">adj_list</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">adj_list</span><span class="p">[</span><span class="n">u</span><span class="p">]:</span>
+            <span class="n">adjncy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">eweights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge_w</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">xadj</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xadj</span><span class="p">,</span> <span class="n">adjncy</span><span class="p">,</span> <span class="n">eweights</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># pymetis compatibility wrapper</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_metis_part_graph_compat</span><span class="p">(</span>
+    <span class="n">nparts</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">xadj</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">adjncy</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">vwgt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">eweights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Call pymetis.part_graph in a way that&#39;s compatible with multiple pymetis versions.</span>
+<span class="sd">    Tries keyword names first, then falls back to positional args.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        nparts (int): number of partitions</span>
+<span class="sd">        xadj (List[int]): CSR row pointer</span>
+<span class="sd">        adjncy (List[int]): CSR neighbor list</span>
+<span class="sd">        vwgt (Optional[List[int]]): vertex weights</span>
+<span class="sd">        eweights (Optional[List[int]]): edge weights</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (edgecut, parts)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_PYMETIS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;pymetis is not available. On Windows it is skipped during install; &quot;</span>
+            <span class="s2">&quot;use Linux/macOS to enable METIS-based partitioning.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">sig_params</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">pymetis</span><span class="o">.</span><span class="n">part_graph</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
+    <span class="c1"># Prefer keyword args when supported</span>
+    <span class="k">if</span> <span class="p">{</span><span class="s2">&quot;xadj&quot;</span><span class="p">,</span> <span class="s2">&quot;adjncy&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">sig_params</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;xadj&quot;</span><span class="p">:</span> <span class="n">xadj</span><span class="p">,</span> <span class="s2">&quot;adjncy&quot;</span><span class="p">:</span> <span class="n">adjncy</span><span class="p">}</span>
+        <span class="c1"># Vertex weights</span>
+        <span class="k">if</span> <span class="s2">&quot;vwgt&quot;</span> <span class="ow">in</span> <span class="n">sig_params</span> <span class="ow">and</span> <span class="n">vwgt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;vwgt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vwgt</span>
+        <span class="k">elif</span> <span class="s2">&quot;vweights&quot;</span> <span class="ow">in</span> <span class="n">sig_params</span> <span class="ow">and</span> <span class="n">vwgt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;vweights&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vwgt</span>  <span class="c1"># alternate name</span>
+        <span class="c1"># Edge weights</span>
+        <span class="k">if</span> <span class="s2">&quot;eweights&quot;</span> <span class="ow">in</span> <span class="n">sig_params</span> <span class="ow">and</span> <span class="n">eweights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;eweights&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eweights</span>
+        <span class="k">elif</span> <span class="s2">&quot;adjwgt&quot;</span> <span class="ow">in</span> <span class="n">sig_params</span> <span class="ow">and</span> <span class="n">eweights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;adjwgt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eweights</span>  <span class="c1"># alternate name</span>
+
+        <span class="k">return</span> <span class="n">pymetis</span><span class="o">.</span><span class="n">part_graph</span><span class="p">(</span><span class="n">nparts</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="c1"># type: ignore</span>
+
+    <span class="c1"># Fallback: positional signature (older builds)</span>
+    <span class="k">return</span> <span class="n">pymetis</span><span class="o">.</span><span class="n">part_graph</span><span class="p">(</span><span class="n">nparts</span><span class="p">,</span> <span class="n">xadj</span><span class="p">,</span> <span class="n">adjncy</span><span class="p">,</span> <span class="n">vwgt</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">eweights</span><span class="p">)</span> <span class="c1"># type: ignore</span>
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Partition entrypoint (takes face_matches directly)</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="partition_from_face_matches">
+<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.partition_from_face_matches">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">partition_from_face_matches</span><span class="p">(</span>
+    <span class="n">face_matches</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="n">blocks</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span>
+    <span class="n">nparts</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">favor_blocksize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">aggregate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+    <span class="n">ignore_self_matches</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Partition a graph derived from `face_matches` using pymetis.</span>
+<span class="sd">    </span>
+<span class="sd">    Note:</span>
+<span class="sd">        Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.</span>
+<span class="sd">    </span>
+<span class="sd">    Why this matters:</span>
+<span class="sd">        connectivity_fast can return more than one face between the same pair of blocks </span>
+<span class="sd">        (e.g. a block is split and has two non-contiguous interfaces with its neighbor).</span>
+<span class="sd">        Each face gives a weight = dI * dJ * dK (number of shared nodes).</span>
+<span class="sd">        METIS expects one edge per block-pair, with a single weight.</span>
+<span class="sd">        So if there are multiple faces, we must decide how to merge them. That’s what aggregate does.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    parts : List[int]</span>
+<span class="sd">        Partition id (0-based) for each block.</span>
+<span class="sd">    adj_list : Dict[int, List[int]]</span>
+<span class="sd">        Adjacency list used for the partitioning.</span>
+<span class="sd">    edge_w : Dict[int, Dict[int, int]]</span>
+<span class="sd">        Edge weights.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_PYMETIS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;METIS partitioning is disabled because pymetis is unavailable. &quot;</span>
+            <span class="s2">&quot;Install pymetis (Linux/macOS) or run on a platform where it is supported.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">n_blocks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+    <span class="n">adj_list</span><span class="p">,</span> <span class="n">edge_w</span> <span class="o">=</span> <span class="n">build_weighted_graph_from_face_matches</span><span class="p">(</span>
+        <span class="n">face_matches</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">,</span>
+        <span class="n">aggregate</span><span class="o">=</span><span class="n">aggregate</span><span class="p">,</span>
+        <span class="n">ignore_self_matches</span><span class="o">=</span><span class="n">ignore_self_matches</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">xadj</span><span class="p">,</span> <span class="n">adjncy</span><span class="p">,</span> <span class="n">eweights</span> <span class="o">=</span> <span class="n">csr_from_adj_and_weights</span><span class="p">(</span><span class="n">adj_list</span><span class="p">,</span> <span class="n">edge_w</span><span class="p">)</span>
+
+    <span class="n">vwgt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">favor_blocksize</span><span class="p">:</span>
+        <span class="n">vwgt</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
+
+    <span class="n">_edgecut</span><span class="p">,</span> <span class="n">parts</span> <span class="o">=</span> <span class="n">_metis_part_graph_compat</span><span class="p">(</span>
+        <span class="n">nparts</span><span class="o">=</span><span class="n">nparts</span><span class="p">,</span>
+        <span class="n">xadj</span><span class="o">=</span><span class="n">xadj</span><span class="p">,</span>
+        <span class="n">adjncy</span><span class="o">=</span><span class="n">adjncy</span><span class="p">,</span>
+        <span class="n">vwgt</span><span class="o">=</span><span class="n">vwgt</span><span class="p">,</span>
+        <span class="n">eweights</span><span class="o">=</span><span class="n">eweights</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">parts</span><span class="p">,</span> <span class="n">adj_list</span><span class="p">,</span> <span class="n">edge_w</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># DDCMP writer</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="write_ddcmp">
+<a class="viewcode-back" href="../../modules/graph.html#plot3d.graph.write_ddcmp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_ddcmp</span><span class="p">(</span>
+    <span class="n">parts</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">blocks</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span>
+    <span class="n">adj_list</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+    <span class="n">edge_weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ddcmp.dat&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Writes ddcmp.dat and ddcmp_info.txt.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        * parts are 0-based in memory, but written 1-based in the file (to match your C#).</span>
+<span class="sd">        * edge_weights affects the per-partition &#39;edge_work&#39; if provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_proc</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">parts</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">n_isp</span> <span class="o">=</span> <span class="n">n_proc</span>
+    <span class="n">n_blocks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">out</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_proc</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">n_isp</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">n_blocks</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">b_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">):</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">b_idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">parts</span><span class="p">[</span><span class="n">b_idx</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">isp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_isp</span><span class="p">):</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">isp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">isp</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">communication_work</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_proc</span>
+    <span class="n">partition_edge_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_proc</span>
+    <span class="n">volume_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_proc</span>
+
+    <span class="k">for</span> <span class="n">b</span><span class="p">,</span> <span class="n">blk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">blocks</span><span class="p">):</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+        <span class="n">volume_nodes</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">+=</span> <span class="n">blk</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="n">ew</span> <span class="o">=</span> <span class="n">edge_weights</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)):</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">adj_list</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">nbr_pid</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="n">nbr</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">nbr_pid</span> <span class="o">!=</span> <span class="n">pid</span><span class="p">:</span>
+                <span class="n">communication_work</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">partition_edge_weights</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ew</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">nbr</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">info_path</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;ddcmp_info.txt&quot;</span>
+    <span class="k">with</span> <span class="n">info_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_proc</span><span class="p">):</span>
+            <span class="n">block_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parts</span> <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parition </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">block_count</span><span class="si">}</span><span class="s2"> blocks</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of partitions/processors </span><span class="si">{</span><span class="n">n_proc</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_proc</span><span class="p">):</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Parition or processor </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> has communication work </span><span class="si">{</span><span class="n">communication_work</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;edge_work </span><span class="si">{</span><span class="n">partition_edge_weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> volume_nodes </span><span class="si">{</span><span class="n">volume_nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Total communication work </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">communication_work</span><span class="p">)</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Total edge_work </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">partition_edge_weights</span><span class="p">)</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
 
 </pre></div>
 
@@ -208,7 +356,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -224,7 +372,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -233,14 +381,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">plot3d.graph</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2024, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    &#169; Copyright 2025, Paht Juangphanich.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>
