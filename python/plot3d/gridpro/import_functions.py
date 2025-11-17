@@ -82,23 +82,54 @@ def read_gridpro_connectivity(
     file_path: str,
     sb_zero_based_in_file: bool = True,     # False if sb1/sb2 are 1-based in file
     index_zero_based_in_file: bool = True,  # False if IMIN..KMAX are 1-based in file
+    inlet_ids: Optional[List[int]] = None,
+    outlet_ids: Optional[List[int]] = None,
+    wall_ids: Optional[List[int]] = None,
+    symm_slip_ids: Optional[List[int]] = None,
+    custom_bc_ids: Optional[Dict[str, List[int]]] = None,
 ) -> Dict[str, object]:
-    """
-        Parse a GridPro connectivity file and return dictionaries compatible with
-        plot3d.connectivity_fast-style shapes.
+    """Parse a GridPro connectivity file into plot3d.connectivity_fast-like structures.
 
-        Expected P-line layout (as provided):
-        P pid sb1 sf1 sb2 sf2 fmap L1i L1j L1k H1i H1j H1k L2i L2j L2k H2i H2j H2k pty lbid
+    Expected P-line layout (as provided):
+    ``P pid sb1 sf1 sb2 sf2 fmap L1i L1j L1k H1i H1j H1k L2i L2j L2k H2i H2j H2k pty lbid``
 
-        Returns:
-        {
-            "face_matches":    List[{"block1":{...}, "block2":{...}}],
-            "outer_faces":    List[{... face dict ...}],
-            "bc_group":       {"inlet":[...], "outlet":[...], "symm_slip":[...], "wall":[...]},
-            "gifs":      List[List[face_dict]],  # grouped by sf1
-            "periodic_faces": List[{"block1":{...}, "block2":{...}}],
-            "volume_zones":   List[{"pty":int, "zone":str, "contiguous_index":int}],
-        }
+    Boundary-condition IDs default to GridPro's PTY values but can be overridden
+    via the provided *_ids lists or extended via ``custom_bc_ids={"name": [ids]}``.
+
+    Args:
+        file_path: Path to the GridPro connectivity file.
+        sb_zero_based_in_file: Set False if ``sb1/sb2`` are 1-based in the file.
+        index_zero_based_in_file: Set False if IMIN..KMAX are 1-based in the file.
+        inlet_ids: PTY ids to treat as inlet; defaults to ``[5]``.
+        outlet_ids: PTY ids to treat as outlet; defaults to ``[6]``.
+        wall_ids: PTY ids to treat as wall; defaults to ``[2]``.
+        symm_slip_ids: PTY ids to treat as symmetry/slip; defaults to ``[4]``.
+        custom_bc_ids: Optional mapping of ``group_name -> [pty ids]`` for any
+            additional boundary-condition groupings (e.g., ``{"cooling": [500]}``).
+
+    Returns:
+        Dict[str, object]: A dictionary with keys:
+            - ``face_matches``: list of face-pair dictionaries for connected blocks.
+            - ``outer_faces``: list of faces on the exterior (no neighbor).
+            - ``bc_group``: mapping of bc name to list of faces (inlet/outlet/etc.).
+            - ``gif_faces``: list of faces tagged as GIF (pty 12..21 or 1000).
+            - ``periodic_faces``: list of paired periodic faces (pty 3).
+            - ``volume_zones``: list describing volume zone type per superblock.
+
+    Examples:
+        Basic usage with defaults::
+
+            data = read_gridpro_connectivity("connectivity.dat")
+            inlet_faces = data["bc_group"]["inlet"]
+
+        Override built-in BC ids and add a custom group::
+
+            data = read_gridpro_connectivity(
+                "connectivity.dat",
+                inlet_ids=[5, 105],
+                custom_bc_ids={"cooling_hole1": [500]},
+            )
+            cooling_faces = data["bc_group"]["cooling_hole1"]
     """
     # ---------------------------- parsing ----------------------------
     superblock_ptys: List[int] = []
@@ -207,18 +238,25 @@ def read_gridpro_connectivity(
             )
 
     # Boundary-condition groups (by pty)
-    def bc_faces_for(pty_val: int) -> List[Dict[str, int]]:
+    def bc_faces_for(pty_vals: List[int]) -> List[Dict[str, int]]:
+        targets = set(pty_vals)
         return [
             face_dict(p["sb1"], p["L1i"], p["L1j"], p["L1k"], p["H1i"], p["H1j"], p["H1k"], p["pty"]) # type: ignore
-            for p in patches if p["pty"] == pty_val
+            for p in patches if p["pty"] in targets
         ]
 
     bc_group = {
-        "inlet":     bc_faces_for(5),
-        "outlet":    bc_faces_for(6),
-        "symm_slip": bc_faces_for(4),
-        "wall":      bc_faces_for(2),
+        "inlet":     bc_faces_for(inlet_ids or [5]),
+        "outlet":    bc_faces_for(outlet_ids or [6]),
+        "symm_slip": bc_faces_for(symm_slip_ids or [4]),
+        "wall":      bc_faces_for(wall_ids or [2]),
     }
+
+    # add any user-defined boundary groups keyed by name -> list of pty ids
+    if custom_bc_ids:
+        for name, ids in custom_bc_ids.items():
+            if ids:
+                bc_group[name] = bc_faces_for(ids)
     
     # Periodic faces: pty == 3 (explicit pairs)
     periodic_faces: List[Dict[str, Dict[str, int]]] = []
