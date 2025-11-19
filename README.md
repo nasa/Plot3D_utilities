@@ -65,6 +65,9 @@ Never use jupyter notebook unless you are done with your .py file and want to de
 | Christopher Keokot 	| Intern   	| Fall 2021 	| Plot3D ReactJS GUI                         	|                             	|
 | Tim Beach          	| Advisor  	| Fall 2021 	| Block splitting help             	|                             	|
 
+# Rust Version
+The rust version is available here. This version of the code is useful for creating CFD solvers in rust [Plot3D-RS](https://github.com/pjuangph/plot3d-rs) It has most of the functionality of the python version except for some of the GlennHT pre-processing code. 
+
 
 # Funding
 The development of this library was supported by NASA AATT (Advance Air Transport Technology). The development is supported by NASA Glenn LTE Branch. Anyone is welcome to contribute by submitting a pull request. 
