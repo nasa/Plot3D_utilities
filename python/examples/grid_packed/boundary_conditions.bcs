@@ -1,0 +1,126 @@
+ &BSurf_Spec
+BSurfID=1005, BCType=1, BSurfName='Inlet'
+ &END
+
+ &BSurf_Spec
+BSurfID=1015, BCType=1, BSurfName='Pressure Plenum Inlet'
+ &END
+
+ &BSurf_Spec
+BSurfID=1016, BCType=1, BSurfName='Cavity Inflow'
+ &END
+
+ &BSurf_Spec
+BSurfID=1017, BCType=1, BSurfName='Suction Plenum Inlet'
+ &END
+
+ &BSurf_Spec
+BSurfID=1006, BCType=2, BSurfName='Outlet'
+ &END
+
+ &BSurf_Spec
+BSurfID=1008, BCType=4, BSurfName='Downstream Cavity'
+ &END
+
+ &BSurf_Spec
+BSurfID=1007, BCType=4, BSurfName='Downstream Cavity'
+ &END
+
+ &BSurf_Spec
+BSurfID=2008, BCType=4, BSurfName='Pressure Plenum Back'
+ &END
+
+ &BSurf_Spec
+BSurfID=2007, BCType=4, BSurfName='Casing'
+ &END
+
+ &BSurf_Spec
+BSurfID=3008, BCType=4, BSurfName='Blade'
+ &END
+
+ &BSurf_Spec
+BSurfID=4008, BCType=4, BSurfName='Blade Top'
+ &END
+
+ &BSurf_Spec
+BSurfID=5008, BCType=4, BSurfName='Downstream Hub'
+ &END
+
+ &BSurf_Spec
+BSurfID=3007, BCType=4, BSurfName='Upstream Hub'
+ &END
+
+ &BSurf_Spec
+BSurfID=4007, BCType=4, BSurfName='Upstream Cavity A'
+ &END
+
+ &BSurf_Spec
+BSurfID=5007, BCType=4, BSurfName='Upstream Cavity B'
+ &END
+
+ &VZConditions
+VZid=0, VZtype=1, OmegaVZ=0., VZMaterialName=Air,
+Fluid_Tref_prop=0., Fluid_k_Tref=285., Fluid_amu_Tref=285., Fluid_expnt=.7,UseDryAir=.TRUE.,
+!Fluid_cp=1002., Fluid_Pr=.7, Fluid_MW=28.964
+ &END
+
+ &INLET_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., inlet_subType=1005, inlet_ref_Mach_Nr=0.2, T0_const=1.0, P0_const=1.0, annular_inlet=.FALSE., have_inlet_prof=.FALSE.
+ &END
+
+ &INLET_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., inlet_subType=1015, inlet_ref_Mach_Nr=0.2, T0_const=1.0, P0_const=1.0, annular_inlet=.FALSE., have_inlet_prof=.FALSE.
+ &END
+
+ &INLET_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., inlet_subType=1016, inlet_ref_Mach_Nr=0.2, T0_const=1.0, P0_const=1.0, annular_inlet=.FALSE., have_inlet_prof=.FALSE.
+ &END
+
+ &INLET_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., inlet_subType=1017, inlet_ref_Mach_Nr=0.2, T0_const=1.0, P0_const=1.0, annular_inlet=.FALSE., have_inlet_prof=.FALSE.
+ &END
+
+ &OUTLET_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., outlet_subType=1006, Pback_extrapolate_profile=.FALSE., Pback_const=0.016666666666666666, have_Pback_prof=.FALSE., annular_outlet=.FALSE.
+ &END
+
+ &WALL_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., wall_subType=1008, have_Twall_prof=.FALSE., Qwall_const=0.0, have_Qwall_prof=.FALSE., BEM_coupled_surf=.FALSE.
+ &END
+
+ &WALL_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., wall_subType=1007, have_Twall_prof=.FALSE., Qwall_const=0.0, have_Qwall_prof=.FALSE., BEM_coupled_surf=.FALSE.
+ &END
+
+ &WALL_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., wall_subType=2008, have_Twall_prof=.FALSE., Qwall_const=0.0, have_Qwall_prof=.FALSE., BEM_coupled_surf=.FALSE.
+ &END
+
+ &WALL_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., wall_subType=2007, have_Twall_prof=.FALSE., Qwall_const=0.0, have_Qwall_prof=.FALSE., BEM_coupled_surf=.FALSE.
+ &END
+
+ &WALL_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., wall_subType=3008, have_Twall_prof=.FALSE., Qwall_const=0.0, have_Qwall_prof=.FALSE., BEM_coupled_surf=.FALSE.
+ &END
+
+ &WALL_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., wall_subType=4008, have_Twall_prof=.FALSE., Qwall_const=0.0, have_Qwall_prof=.FALSE., BEM_coupled_surf=.FALSE.
+ &END
+
+ &WALL_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., wall_subType=5008, have_Twall_prof=.FALSE., Qwall_const=0.0, have_Qwall_prof=.FALSE., BEM_coupled_surf=.FALSE.
+ &END
+
+ &WALL_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., wall_subType=3007, have_Twall_prof=.FALSE., Qwall_const=0.0, have_Qwall_prof=.FALSE., BEM_coupled_surf=.FALSE.
+ &END
+
+ &WALL_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., wall_subType=4007, have_Twall_prof=.FALSE., Qwall_const=0.0, have_Qwall_prof=.FALSE., BEM_coupled_surf=.FALSE.
+ &END
+
+ &WALL_BC
+IsPostProcessing=.FALSE., IsCalculateMassFlow=.FALSE., ToggleProcessSurface=.FALSE., wall_subType=5007, have_Twall_prof=.FALSE., Qwall_const=0.0, have_Qwall_prof=.FALSE., BEM_coupled_surf=.FALSE.
+ &END
+

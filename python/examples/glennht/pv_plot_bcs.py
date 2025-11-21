@@ -13,6 +13,7 @@ sys.path.insert(0,os.getcwd()) # This allows you to select files locally
 from pv_library import Load, ExtractBlocks, CreateSubset, plot_faces_for_block
 from paraview.simple import *
 import random
+from plot3d.gridpro import bc_faces_by_type
 
 
 plot_face_matches = False
@@ -27,10 +28,10 @@ with open('test.json','r') as f:
     volume_zones = data['volume_zones']
     
     # Boundary Conditions
-    inlets = data['bc_group']['inlet']
-    outlets = data['bc_group']['outlet']
-    symm_slip = data['bc_group']['symm_slip']
-    walls = data['bc_group']['wall']
+    inlets = bc_faces_by_type(data['bc_group'], 'inlet')
+    outlets = bc_faces_by_type(data['bc_group'], 'outlet')
+    symm_slip = bc_faces_by_type(data['bc_group'], 'symm_slip')
+    walls = bc_faces_by_type(data['bc_group'], 'wall')
 
 blocks_to_extract = [f['block1']['block_index'] for f in periodic_faces]
 blocks_to_extract.extend([f['block2']['block_index'] for f in periodic_faces])

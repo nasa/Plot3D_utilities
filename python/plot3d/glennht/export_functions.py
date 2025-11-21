@@ -350,10 +350,21 @@ def export_to_boundary_condition(
         if first_inlet and getattr(first_inlet, "T0_const", None) is not None:
             ref.refT0 = first_inlet.T0_const  # type: ignore
 
+    def _dedupe_by_bc_id(objs: Iterable[Any]) -> List[Any]:
+        seen: set[int] = set()
+        unique: List[Any] = []
+        for obj in objs:
+            sid = obj.get("id") if isinstance(obj, dict) else getattr(obj, "SurfaceID", None)
+            if sid is None or sid in seen:
+                continue
+            seen.add(sid)
+            unique.append(obj)
+        return unique
+
     # ---- Write .bcs file
     with path.open("w", encoding="utf-8") as w:
         # INLETS (normalize to refP0, refT0, refLen)
-        for inlet in bc_group.Inlets:
+        for inlet in _dedupe_by_bc_id(bc_group.Inlets):
             if getattr(inlet, "P0_const", None) is not None:
                 phys_pa = to_pa(inlet.P0_const, getattr(inlet, "P0_const_unit", "Pa"))
                 if phys_pa is not None and ref.refP0 not in (None, 0):
@@ -369,7 +380,7 @@ def export_to_boundary_condition(
             _write_bsurf_spec(w, inlet)
 
         # OUTLETS (normalize back-pressure by refP0)
-        for outlet in bc_group.Outlets:
+        for outlet in _dedupe_by_bc_id(bc_group.Outlets):
             if getattr(outlet, "Pback_const", None) is not None and ref.refP0 not in (None, 0):
                 phys_pa = to_pa(outlet.Pback_const, getattr(outlet, "Pback_const_unit", "Pa"))
                 if phys_pa is not None:
@@ -377,9 +388,9 @@ def export_to_boundary_condition(
             _write_bsurf_spec(w, outlet)
 
         # SLIPS / WALLS
-        for slip in bc_group.SymmetricSlips:
+        for slip in _dedupe_by_bc_id(bc_group.SymmetricSlips):
             _write_bsurf_spec(w, slip)
-        for wall in bc_group.Walls:
+        for wall in _dedupe_by_bc_id(bc_group.Walls):
             _write_bsurf_spec(w, wall)
 
         # GIFS (dicts or dataclasses)
@@ -636,5 +647,3 @@ if __name__ == "__main__":
 
     export_to_boundary_condition("boundary_conditions.bcs", job, bcg, gifs=gifs, volume_zones=volume_zones)
     export_to_job_file(job, "jobfile", title="SingleBlade")
-
-

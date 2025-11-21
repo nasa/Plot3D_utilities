@@ -1,0 +1,22 @@
+Parition 0 has 579 blocks
+Parition 1 has 557 blocks
+Parition 2 has 501 blocks
+Parition 3 has 579 blocks
+Parition 4 has 491 blocks
+Parition 5 has 606 blocks
+Parition 6 has 579 blocks
+Parition 7 has 571 blocks
+Parition 8 has 617 blocks
+Parition 9 has 601 blocks
+Number of partitions/processors 10
+Parition or processor 0 has communication work 0 edge_work 0 volume_nodes 89055639
+Parition or processor 1 has communication work 41 edge_work 78192 volume_nodes 86224241
+Parition or processor 2 has communication work 331 edge_work 623088 volume_nodes 87440417
+Parition or processor 3 has communication work 472 edge_work 553248 volume_nodes 91840235
+Parition or processor 4 has communication work 760 edge_work 1059744 volume_nodes 87765775
+Parition or processor 5 has communication work 49 edge_work 166928 volume_nodes 90042938
+Parition or processor 6 has communication work 45 edge_work 252192 volume_nodes 91478227
+Parition or processor 7 has communication work 23 edge_work 125712 volume_nodes 91935299
+Parition or processor 8 has communication work 73 edge_work 336416 volume_nodes 91638693
+Parition or processor 9 has communication work 38 edge_work 160512 volume_nodes 92674545
+Total communication work 1832 Total edge_work 3356032

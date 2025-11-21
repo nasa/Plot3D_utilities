@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple, Optional, Union
+from typing import Dict, List, Tuple, Optional, Union, Set
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -108,19 +108,25 @@ def read_gridpro_connectivity(
         sb_zero_based_in_file: Set False if ``sb1/sb2`` are 1-based in the file.
         index_zero_based_in_file: Set False if IMIN..KMAX are 1-based in the file.
         inlet_ids: PTY ids to treat as inlet; defaults to ``[5]``.
-            Pass a dict ``{"name": "...", "ids": [...]}`` to rename the group.
-        outlet_ids: PTY ids to treat as outlet; defaults to ``[6]``.
-        wall_ids: PTY ids to treat as wall; defaults to ``[2]``.
-        symm_slip_ids: PTY ids to treat as symmetry/slip; defaults to ``[4]``.
+            Pass a dict ``{"name": "...", "ids": [...]}`` to rename the group, or
+            provide a mapping like ``{"Inlet": [...], "Pressure Inlet": [...]}``
+            to emit multiple named inlet groups. Each named group remembers its
+            base type in the returned ``bc_group`` mapping.
+        outlet_ids: PTY ids to treat as outlet; defaults to ``[6]`` (same dict
+            options as ``inlet_ids``).
+        wall_ids: PTY ids to treat as wall; defaults to ``[2]`` (same dict options).
+        symm_slip_ids: PTY ids to treat as symmetry/slip; defaults to ``[4]`` (same dict options).
         custom_bc_ids: Optional mapping of ``group_name -> [pty ids]`` for any
             additional boundary-condition groupings (e.g., ``{"cooling": [500]}``).
 
     Returns:
         Dict[str, object]: A dictionary with keys:
             - ``face_matches``: list of face-pair dictionaries for connected blocks.
-            - ``outer_faces``: list of faces on the exterior (no neighbor).
-            - ``bc_group``: mapping of bc name to list of faces (each face dict
-              also includes ``bc_name`` pointing back to the group label).
+            - ``all_surfaces``: list of faces on the exterior (no neighbor).
+            - ``ungrouped_surfaces``: exterior faces whose PTY does not belong to any BC group.
+            - ``bc_group``: mapping of bc name to a metadata dict
+              ``{"type": base_type, "pty_ids": [...], "faces": [...]}``. Each
+              face dict also includes ``bc_name`` (group label) and ``bc_type``.
             - ``gif_faces``: list of faces tagged as GIF (pty 12..21 or 1000).
             - ``periodic_faces``: list of paired periodic faces (pty 3).
             - ``volume_zones``: list describing volume zone type per superblock.
@@ -131,7 +137,7 @@ def read_gridpro_connectivity(
         Basic usage with defaults::
 
             data = read_gridpro_connectivity("connectivity.dat")
-            inlet_faces = data["bc_group"]["inlet"]
+            inlet_faces = data["bc_group"]["inlet"]["faces"]
 
         Override built-in BC ids and add a custom group::
 
@@ -140,7 +146,7 @@ def read_gridpro_connectivity(
                 inlet_ids=[5, 105],
                 custom_bc_ids={"cooling_hole1": [500]},
             )
-            cooling_faces = data["bc_group"]["cooling_hole1"]
+            cooling_faces = data["bc_group"]["cooling_hole1"]["faces"]
     """
     # ---------------------------- parsing ----------------------------
     superblock_ptys: List[int] = []
@@ -247,77 +253,95 @@ def read_gridpro_connectivity(
                 )
             )
 
-    # Outer faces: sb2 == -1 (means '0' in file when sb_zero_based_in_file=False; or literal 0 if already zero-based)
-    # To cover both cases, treat original token value 0 as "no neighbor".
-    # Since we already applied sb_offset, "no neighbor" now appears as -1.
-    outer_faces: List[Dict[str, int]] = []
-    pty_exclude = [6,5,4,2]
-    for p in patches_df.itertuples(index=False):
-        if p.sb2 == -1 and (p.pty not in pty_exclude):
-            outer_faces.append(
-                face_dict(p.sb1, p.L1i, p.L1j, p.L1k, p.H1i, p.H1j, p.H1k, p.pty)
-            )
-
     # Boundary-condition groups (by pty)
-    def bc_faces_for(name: str, pty_vals: List[int]) -> List[Dict[str, int]]:
+    def bc_faces_for(name: str, pty_vals: List[int], bc_type: str) -> List[Dict[str, int]]:
         targets = set(pty_vals)
         faces: List[Dict[str, int]] = []
         for p in patches_df.itertuples(index=False):
             if p.pty in targets:
                 face = face_dict(p.sb1, p.L1i, p.L1j, p.L1k, p.H1i, p.H1j, p.H1k, p.pty)
                 face["bc_name"] = name  # type: ignore
+                face["bc_type"] = bc_type  # type: ignore
                 faces.append(face)
         return faces
 
-    def normalize_bc_arg(arg: Optional[Union[List[int], Dict[str, Any]]],
-                         default_name: str,
-                         default_ids: List[int]) -> Tuple[str, List[int]]:
+    def normalize_bc_arg(
+        arg: Optional[Union[List[int], Dict[str, Any]]],
+        bc_type: str,
+        default_ids: List[int],
+    ) -> List[Tuple[str, List[int]]]:
+        def coerce_ids(values: Any) -> List[int]:
+            if values is None:
+                return []
+            # Allow nested {"ids": [...]} dictionaries to be passed directly
+            if isinstance(values, dict):
+                return coerce_ids(values.get("ids"))
+            if isinstance(values, (list, tuple, set)):
+                return [int(v) for v in values if v is not None]
+            return [int(values)]
+
         if arg is None:
-            return default_name, default_ids
+            return [(bc_type, coerce_ids(default_ids))]
+
         if isinstance(arg, dict):
-            ids = arg.get("ids")
-            if not ids:
-                ids = [v for k,v in arg.items()]
-                ids = [item for sublist in ids for item in sublist]
-                return default_name, ids
-            name = arg.get("name", default_name)
-            return name, ids
-        return default_name, arg
+            # Support legacy {"name": str, "ids": [...]} as well as
+            # {"CustomName": [...], "AnotherName": [...]} mappings.
+            if "ids" in arg or "name" in arg:
+                ids = coerce_ids(arg.get("ids", default_ids))
+                name = str(arg.get("name", bc_type) or bc_type)
+                return [(name, ids)]
 
-    bc_group: Dict[str, List[Dict[str, int]]] = {}
+            normalized: List[Tuple[str, List[int]]] = []
+            for name, ids_val in arg.items():
+                ids_list = coerce_ids(ids_val)
+                if ids_list:
+                    normalized.append((str(name), ids_list))
+            return normalized
 
-    for name, ids in [
-        normalize_bc_arg(inlet_ids, "inlet", [5]),
-        normalize_bc_arg(outlet_ids, "outlet", [6]),
-        normalize_bc_arg(symm_slip_ids, "symm_slip", [4]),
-        normalize_bc_arg(wall_ids, "wall", [2]),
+        ids = coerce_ids(arg)
+        return [(bc_type, ids)]
+
+    bc_group: Dict[str, Dict[str, Any]] = {}
+    grouped_bc_ids: Set[int] = set()
+
+    def add_bc_group(name: str, ids: List[int], bc_type: str) -> None:
+        normalized_ids = sorted({int(i) for i in ids if i is not None})
+        faces = bc_faces_for(name, normalized_ids, bc_type) if normalized_ids else []
+        if not faces:
+            return
+        bc_group[name] = {
+            "type": bc_type,
+            "pty_ids": normalized_ids,
+            "faces": faces,
+        }
+        grouped_bc_ids.update(normalized_ids)
+
+    for bc_type, group in [
+        ("inlet", normalize_bc_arg(inlet_ids, "inlet", [5])),
+        ("outlet", normalize_bc_arg(outlet_ids, "outlet", [6])),
+        ("symm_slip", normalize_bc_arg(symm_slip_ids, "symm_slip", [4])),
+        ("wall", normalize_bc_arg(wall_ids, "wall", [2])),
     ]:
-        if ids:
-            bc_group[name] = bc_faces_for(name, ids)
+        for name, ids in group:
+            add_bc_group(name, ids, bc_type)
 
     # add any user-defined boundary groups keyed by name -> list of pty ids
     if custom_bc_ids:
         for name, ids in custom_bc_ids.items():
-            if ids:
-                bc_group[name] = bc_faces_for(name, ids)
+            add_bc_group(name, ids or [], name)
 
-    def face_signature(face: Dict[str, int]) -> Tuple[int, int, int, int, int, int, int, int]:
-        return (
-            face["block_index"],
-            face["IMIN"], face["JMIN"], face["KMIN"],
-            face["IMAX"], face["JMAX"], face["KMAX"],
-            face["id"],
-        )
+    # Outer faces: sb2 == -1 (means '0' in file when sb_zero_based_in_file=False; or literal 0 if already zero-based)
+    # To cover both cases, treat original token value 0 as "no neighbor".
+    # Since we already applied sb_offset, "no neighbor" now appears as -1.
+    all_surfaces: List[Dict[str, int]] = []
+    ungrouped_surfaces: List[Dict[str, int]] = []
+    for p in patches_df.itertuples(index=False):
+        if p.sb2 == -1:
+            face = face_dict(p.sb1, p.L1i, p.L1j, p.L1k, p.H1i, p.H1j, p.H1k, p.pty)
+            all_surfaces.append(face)
+            if p.pty not in grouped_bc_ids:
+                ungrouped_surfaces.append(face.copy())
 
-    bc_signatures = {
-        face_signature(face)
-        for faces in bc_group.values()
-        for face in faces
-    }
-
-    if bc_signatures:
-        outer_faces = [face for face in outer_faces if face_signature(face) not in bc_signatures]
-    
     # Periodic faces: pty == 3 (explicit pairs)
     periodic_faces: List[Dict[str, Dict[str, int]]] = []
     for p in patches_df.itertuples(index=False):
@@ -353,7 +377,8 @@ def read_gridpro_connectivity(
 
     return {
         "face_matches": connections,
-        "outer_faces": outer_faces,
+        "all_surfaces": all_surfaces,
+        "ungrouped_surfaces": ungrouped_surfaces,
         "bc_group": bc_group,
         "gif_faces": gif_faces,
         "periodic_faces": periodic_faces,
@@ -361,3 +386,50 @@ def read_gridpro_connectivity(
         "blocksizes": superblock_sizes,
         "patches": patches_df,
     }
+
+
+def bc_faces_by_type(
+    bc_group: Dict[str, Any],
+    bc_type: str,
+    *,
+    unique: bool = False,
+) -> List[Dict[str, int]]:
+    """Collect faces for a specific boundary-condition type across all named groups.
+
+    Args:
+        bc_group: Mapping returned by :func:`read_gridpro_connectivity` (supports
+            both the legacy ``{name: [faces]}`` and the new
+            ``{name: {"type": ..., "faces": [...]}}`` shapes).
+        bc_type: Base BC type (``"inlet"``, ``"outlet"``, ``"wall"``, ``"symm_slip"``).
+        unique: When True, keep only the first face per unique ``id``.
+
+    Returns:
+        List of face dictionaries belonging to the requested base type.
+    """
+    faces: List[Dict[str, int]] = []
+    seen: Set[int] = set()
+    target = (bc_type or "").lower()
+
+    for entry in bc_group.values():
+        entry_type = None
+        entry_faces: List[Dict[str, int]] = []
+
+        if isinstance(entry, dict) and "faces" in entry:
+            entry_faces = entry.get("faces", []) or []
+            entry_type = entry.get("type") or entry.get("bc_type")
+        elif isinstance(entry, list):
+            entry_faces = entry
+        else:
+            continue
+
+        for face in entry_faces:
+            ftype = entry_type or face.get("bc_type") or face.get("bc_name")
+            if not isinstance(ftype, str) or ftype.lower() != target:
+                continue
+            fid = face.get("id")
+            if unique and isinstance(fid, int):
+                if fid in seen:
+                    continue
+                seen.add(fid)
+            faces.append(face)
+    return faces

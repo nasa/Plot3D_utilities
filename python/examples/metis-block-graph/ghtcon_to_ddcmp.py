@@ -148,7 +148,7 @@ def create_ddcmp(ght_conn:str,ddcmp_file:str='ddcmp.dat',nprocessors:int=3,pkl_f
            
     max_block_index, face_matches,connections,nZones,zone_types,Zones,GIFs = read_ght_conn(ght_conn)
         
-    assert (nZones!=1,"Code is configured to only use single zone (Fluid) or (Solid) not both")
+    assert nZones!=1,"Code is configured to only use single zone (Fluid) or (Solid) not both"
 
     G = block_connectivity_to_graph(face_matches,connections[:,1])
     
