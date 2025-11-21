@@ -182,7 +182,7 @@ def _metis_part_graph_compat(
 # ---------------------------------------------------------------------------
 def partition_from_face_matches(
     face_matches: List[dict],
-    blocks: Sequence[Block],
+    block_sizes: List[int],
     nparts: int,
     favor_blocksize: bool = True,
     aggregate: str = "sum",
@@ -216,7 +216,7 @@ def partition_from_face_matches(
             "Install pymetis (Linux/macOS) or run on a platform where it is supported."
         )
 
-    n_blocks = len(blocks)
+    n_blocks = len(block_sizes)
     adj_list, edge_w = build_weighted_graph_from_face_matches(
         face_matches, n_blocks,
         aggregate=aggregate,
@@ -226,7 +226,7 @@ def partition_from_face_matches(
 
     vwgt: Optional[List[int]] = None
     if favor_blocksize:
-        vwgt = [b.size for b in blocks]
+        vwgt = block_sizes
 
     _edgecut, parts = _metis_part_graph_compat(
         nparts=nparts,
@@ -243,7 +243,7 @@ def partition_from_face_matches(
 # ---------------------------------------------------------------------------
 def write_ddcmp(
     parts: Sequence[int],
-    blocks: Sequence[Block],
+    blocksizes: List[int],
     adj_list: Dict[int, List[int]],
     edge_weights: Optional[Dict[int, Dict[int, int]]] = None,
     filename: str = "ddcmp.dat",
@@ -272,12 +272,12 @@ def write_ddcmp(
     partition_edge_weights = [0] * n_proc
     volume_nodes = [0] * n_proc
 
-    for b, blk in enumerate(blocks):
+    for b, bsize in enumerate(blocksizes):
         pid = parts[b]
-        volume_nodes[pid] += blk.size
+        volume_nodes[pid] += bsize
 
     ew = edge_weights or {}
-    for b in range(len(blocks)):
+    for b in range(len(blocksizes)):
         pid = parts[b]
         for nbr in adj_list.get(b, []):
             nbr_pid = parts[nbr]

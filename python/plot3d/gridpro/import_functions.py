@@ -1,5 +1,6 @@
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Union
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 from typing import List, Tuple, Optional, Any
 from plot3d import Block
@@ -15,19 +16,23 @@ def _parse_header(line: str) -> Optional[Tuple[int,int,int]]:
     except ValueError:
         return None
 
-def read_gridpro_to_blocks(filename: str,encoding: str = "utf-8", comment_prefixes: Tuple[str, ...] = ("#", "//")) -> List[Block]:
-    """_summary_
+def read_gridpro_to_blocks(
+    filename: str,
+    encoding: str = "utf-8",
+    comment_prefixes: Tuple[str, ...] = ("#", "//"),
+) -> List[Block]:
+    """Read a structured GridPro text grid into Plot3D Block objects.
 
     Args:
-        filename (str): _description_
-        encoding (str, optional): _description_. Defaults to "utf-8".
-        comment_prefixes (Tuple[str, ...], optional): _description_. Defaults to ("#", "//").
+        filename: Path to the GridPro grid file.
+        encoding: Encoding to use while reading the text file.
+        comment_prefixes: Line prefixes that should be treated as comments.
 
     Raises:
-        ValueError: _description_
+        ValueError: If a block does not contain the expected number of floats.
 
     Returns:
-        List[Block]: _description_
+        List[Block]: A list of Block objects representing each GridPro block.
     """
     blocks = []
 
@@ -82,10 +87,10 @@ def read_gridpro_connectivity(
     file_path: str,
     sb_zero_based_in_file: bool = True,     # False if sb1/sb2 are 1-based in file
     index_zero_based_in_file: bool = True,  # False if IMIN..KMAX are 1-based in file
-    inlet_ids: Optional[List[int]] = None,
-    outlet_ids: Optional[List[int]] = None,
-    wall_ids: Optional[List[int]] = None,
-    symm_slip_ids: Optional[List[int]] = None,
+    inlet_ids: Optional[Union[List[int], Dict[str, Any]]] = None,
+    outlet_ids: Optional[Union[List[int], Dict[str, Any]]] = None,
+    wall_ids: Optional[Union[List[int], Dict[str, Any]]] = None,
+    symm_slip_ids: Optional[Union[List[int], Dict[str, Any]]] = None,
     custom_bc_ids: Optional[Dict[str, List[int]]] = None,
 ) -> Dict[str, object]:
     """Parse a GridPro connectivity file into plot3d.connectivity_fast-like structures.
@@ -94,13 +99,16 @@ def read_gridpro_connectivity(
     ``P pid sb1 sf1 sb2 sf2 fmap L1i L1j L1k H1i H1j H1k L2i L2j L2k H2i H2j H2k pty lbid``
 
     Boundary-condition IDs default to GridPro's PTY values but can be overridden
-    via the provided *_ids lists or extended via ``custom_bc_ids={"name": [ids]}``.
+    via the provided *_ids arguments (either a list of PTY ints or
+    ``{"name": str, "ids": [...]}``) or extended via
+    ``custom_bc_ids={"name": [ids]}``.
 
     Args:
         file_path: Path to the GridPro connectivity file.
         sb_zero_based_in_file: Set False if ``sb1/sb2`` are 1-based in the file.
         index_zero_based_in_file: Set False if IMIN..KMAX are 1-based in the file.
         inlet_ids: PTY ids to treat as inlet; defaults to ``[5]``.
+            Pass a dict ``{"name": "...", "ids": [...]}`` to rename the group.
         outlet_ids: PTY ids to treat as outlet; defaults to ``[6]``.
         wall_ids: PTY ids to treat as wall; defaults to ``[2]``.
         symm_slip_ids: PTY ids to treat as symmetry/slip; defaults to ``[4]``.
@@ -111,10 +119,13 @@ def read_gridpro_connectivity(
         Dict[str, object]: A dictionary with keys:
             - ``face_matches``: list of face-pair dictionaries for connected blocks.
             - ``outer_faces``: list of faces on the exterior (no neighbor).
-            - ``bc_group``: mapping of bc name to list of faces (inlet/outlet/etc.).
+            - ``bc_group``: mapping of bc name to list of faces (each face dict
+              also includes ``bc_name`` pointing back to the group label).
             - ``gif_faces``: list of faces tagged as GIF (pty 12..21 or 1000).
             - ``periodic_faces``: list of paired periodic faces (pty 3).
             - ``volume_zones``: list describing volume zone type per superblock.
+            - ``blocksizes``: list of per-superblock cell counts (I*J*K).
+            - ``patches``: pandas DataFrame of raw patch records.
 
     Examples:
         Basic usage with defaults::
@@ -133,7 +144,8 @@ def read_gridpro_connectivity(
     """
     # ---------------------------- parsing ----------------------------
     superblock_ptys: List[int] = []
-    patches: List[Dict[str, object]] = []
+    superblock_sizes: List[int] = []
+    patch_rows: List[Dict[str, object]] = []
 
     sb_offset = 0 if sb_zero_based_in_file else -1
     idx_offset = 0 if index_zero_based_in_file else -1  # convert to 0-based if file is 1-based
@@ -175,7 +187,7 @@ def read_gridpro_connectivity(
         except Exception as e:
             raise ValueError(f"Failed to parse patch line: {' '.join(tokens)}") from e
 
-        patches.append({
+        patch_rows.append({
             "pid": pid, "sb1": sb1, "sf1": sf1, "sb2": sb2, "sf2": sf2,
             "fmap": fmap,
             "L1i": L1i, "L1j": L1j, "L1k": L1k, "H1i": H1i, "H1j": H1j, "H1k": H1k,
@@ -192,8 +204,17 @@ def read_gridpro_connectivity(
             tag = toks[0]
             if tag == "SB":
                 superblock_ptys.append(int(toks[-2]))
+                try:
+                    I_dim = int(toks[2])
+                    J_dim = int(toks[3])
+                    K_dim = int(toks[4])
+                    superblock_sizes.append(I_dim * J_dim * K_dim)
+                except (IndexError, ValueError):
+                    superblock_sizes.append(0)
             elif tag == "P":
                 parse_patch(toks)
+
+    patches_df = pd.DataFrame(patch_rows)
 
     # ---------------------------- helpers ----------------------------
     def face_dict(sb: int, imin: int, jmin: int, kmin: int, imax: int, jmax: int, kmax: int, pty:int=-1) -> Dict[str, int]:
@@ -217,12 +238,12 @@ def read_gridpro_connectivity(
     # ------------------------- build outputs -------------------------
     # Connections: sb2 != -1 (i.e., not "none") and pty in {1,3}
     connections: List[Dict[str, Dict[str, int]]] = []
-    for p in patches:
-        if p["sb2"] != -1 and (p["pty"] in (1, 3)):
+    for p in patches_df.itertuples(index=False):
+        if p.sb2 != -1 and (p.pty in (1, 3)):
             connections.append(
                 pair_dict(
-                    p["sb1"], (p["L1i"], p["L1j"], p["L1k"], p["H1i"], p["H1j"], p["H1k"]), # type: ignore
-                    p["sb2"], (p["L2i"], p["L2j"], p["L2k"], p["H2i"], p["H2j"], p["H2k"]), # type: ignore
+                    p.sb1, (p.L1i, p.L1j, p.L1k, p.H1i, p.H1j, p.H1k),
+                    p.sb2, (p.L2i, p.L2j, p.L2k, p.H2i, p.H2j, p.H2k),
                 )
             )
 
@@ -231,52 +252,91 @@ def read_gridpro_connectivity(
     # Since we already applied sb_offset, "no neighbor" now appears as -1.
     outer_faces: List[Dict[str, int]] = []
     pty_exclude = [6,5,4,2]
-    for p in patches:
-        if p["sb2"] == -1 and (p["pty"] not in pty_exclude):
+    for p in patches_df.itertuples(index=False):
+        if p.sb2 == -1 and (p.pty not in pty_exclude):
             outer_faces.append(
-                face_dict(p["sb1"], p["L1i"], p["L1j"], p["L1k"], p["H1i"], p["H1j"], p["H1k"], p["pty"]) # type: ignore
+                face_dict(p.sb1, p.L1i, p.L1j, p.L1k, p.H1i, p.H1j, p.H1k, p.pty)
             )
 
     # Boundary-condition groups (by pty)
-    def bc_faces_for(pty_vals: List[int]) -> List[Dict[str, int]]:
+    def bc_faces_for(name: str, pty_vals: List[int]) -> List[Dict[str, int]]:
         targets = set(pty_vals)
-        return [
-            face_dict(p["sb1"], p["L1i"], p["L1j"], p["L1k"], p["H1i"], p["H1j"], p["H1k"], p["pty"]) # type: ignore
-            for p in patches if p["pty"] in targets
-        ]
+        faces: List[Dict[str, int]] = []
+        for p in patches_df.itertuples(index=False):
+            if p.pty in targets:
+                face = face_dict(p.sb1, p.L1i, p.L1j, p.L1k, p.H1i, p.H1j, p.H1k, p.pty)
+                face["bc_name"] = name  # type: ignore
+                faces.append(face)
+        return faces
 
-    bc_group = {
-        "inlet":     bc_faces_for(inlet_ids or [5]),
-        "outlet":    bc_faces_for(outlet_ids or [6]),
-        "symm_slip": bc_faces_for(symm_slip_ids or [4]),
-        "wall":      bc_faces_for(wall_ids or [2]),
-    }
+    def normalize_bc_arg(arg: Optional[Union[List[int], Dict[str, Any]]],
+                         default_name: str,
+                         default_ids: List[int]) -> Tuple[str, List[int]]:
+        if arg is None:
+            return default_name, default_ids
+        if isinstance(arg, dict):
+            ids = arg.get("ids")
+            if not ids:
+                ids = [v for k,v in arg.items()]
+                ids = [item for sublist in ids for item in sublist]
+                return default_name, ids
+            name = arg.get("name", default_name)
+            return name, ids
+        return default_name, arg
+
+    bc_group: Dict[str, List[Dict[str, int]]] = {}
+
+    for name, ids in [
+        normalize_bc_arg(inlet_ids, "inlet", [5]),
+        normalize_bc_arg(outlet_ids, "outlet", [6]),
+        normalize_bc_arg(symm_slip_ids, "symm_slip", [4]),
+        normalize_bc_arg(wall_ids, "wall", [2]),
+    ]:
+        if ids:
+            bc_group[name] = bc_faces_for(name, ids)
 
     # add any user-defined boundary groups keyed by name -> list of pty ids
     if custom_bc_ids:
         for name, ids in custom_bc_ids.items():
             if ids:
-                bc_group[name] = bc_faces_for(ids)
+                bc_group[name] = bc_faces_for(name, ids)
+
+    def face_signature(face: Dict[str, int]) -> Tuple[int, int, int, int, int, int, int, int]:
+        return (
+            face["block_index"],
+            face["IMIN"], face["JMIN"], face["KMIN"],
+            face["IMAX"], face["JMAX"], face["KMAX"],
+            face["id"],
+        )
+
+    bc_signatures = {
+        face_signature(face)
+        for faces in bc_group.values()
+        for face in faces
+    }
+
+    if bc_signatures:
+        outer_faces = [face for face in outer_faces if face_signature(face) not in bc_signatures]
     
     # Periodic faces: pty == 3 (explicit pairs)
     periodic_faces: List[Dict[str, Dict[str, int]]] = []
-    for p in patches:
-        if p["pty"] == 3 and p["sb2"] != -1:
+    for p in patches_df.itertuples(index=False):
+        if p.pty == 3 and p.sb2 != -1:
             periodic_faces.append(
                 pair_dict(
-                    p["sb1"], (p["L1i"], p["L1j"], p["L1k"], p["H1i"], p["H1j"], p["H1k"]), # type: ignore
-                    p["sb2"], (p["L2i"], p["L2j"], p["L2k"], p["H2i"], p["H2j"], p["H2k"]), # type: ignore
+                    p.sb1, (p.L1i, p.L1j, p.L1k, p.H1i, p.H1j, p.H1k),
+                    p.sb2, (p.L2i, p.L2j, p.L2k, p.H2i, p.H2j, p.H2k),
                 )
             )
             
     # GIF faces grouped by sf1 for pty in 12..21 or == 1000
     gif_faces: List[Dict[str, int]] = []
-    for p in patches:
+    for p in patches_df.itertuples(index=False):
 #? This is how we identify gifs inside of a grid pro connectivity file. 
 #? If the PTY is between 12 and 21 these are gifs
-        if (12 <= p["pty"] <= 21) or (p["pty"] == 1000): # type: ignore
-            face_temp = face_dict(p["sb1"], p["L1i"], p["L1j"], p["L1k"], p["H1i"], p["H1j"], p["H1k"]) # type: ignore
-            face_temp["id"] = p["pty"] # type: ignore
+        if (12 <= p.pty <= 21) or (p.pty == 1000):
+            face_temp = face_dict(p.sb1, p.L1i, p.L1j, p.L1k, p.H1i, p.H1j, p.H1k)
+            face_temp["id"] = p.pty  # type: ignore
             gif_faces.append(face_temp)
 
     # Volume zones (unique superblock ptys; odd→fluid, even→solid) with contiguous ids
@@ -298,4 +358,6 @@ def read_gridpro_connectivity(
         "gif_faces": gif_faces,
         "periodic_faces": periodic_faces,
         "volume_zones": volume_zones,
+        "blocksizes": superblock_sizes,
+        "patches": patches_df,
     }
