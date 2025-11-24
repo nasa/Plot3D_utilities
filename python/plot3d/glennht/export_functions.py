@@ -331,29 +331,57 @@ def export_to_boundary_condition(
     }
     json_path.write_text(json.dumps(json_payload, indent=4))
 
-    # ---- Robust reference defaults (use inlet values if missing)
+    # ---- Robust reference defaults (use highest-pressure inlet if available)
     ref = job_settings.ReferenceCondFull
-    first_inlet = bc_group.Inlets[0] if bc_group.Inlets else None
+
+    def _reference_inlet(inlets: List[Any]) -> Tuple[Any | None, float | None]:
+        best = None
+        best_pa: float | None = None
+        for inlet in inlets:
+            p0 = getattr(inlet, "P0_const", None)
+            if p0 is None:
+                continue
+            phys_pa = to_pa(p0, getattr(inlet, "P0_const_unit", "Pa"))
+            if phys_pa is None:
+                continue
+            if best_pa is None or phys_pa > best_pa:
+                best = inlet
+                best_pa = phys_pa
+        if best is None and inlets:
+            return inlets[0], None
+        return best, best_pa
+
+    ref_inlet, ref_inlet_pa = _reference_inlet(bc_group.Inlets)
 
     # refLen: default 1.0 if missing
     if getattr(ref, "reflen", None) in (None, 0):
         ref.reflen = 1.0  # type: ignore
 
-    # refP0: from first inlet (convert to Pa) if missing
+    # refP0: from highest-pressure inlet (convert to Pa) if missing
     if getattr(ref, "refP0", None) in (None, 0):
-        if first_inlet and getattr(first_inlet, "P0_const", None) is not None:
-            phys_pa = to_pa(first_inlet.P0_const, getattr(first_inlet, "P0_const_unit", "Pa"))
-            ref.refP0 = phys_pa  # type: ignore
+        if ref_inlet_pa not in (None, 0):
+            ref.refP0 = ref_inlet_pa  # type: ignore
 
     # refT0: from first inlet if missing
     if getattr(ref, "refT0", None) in (None, 0):
-        if first_inlet and getattr(first_inlet, "T0_const", None) is not None:
-            ref.refT0 = first_inlet.T0_const  # type: ignore
+        if ref_inlet and getattr(ref_inlet, "T0_const", None) is not None:
+            ref.refT0 = ref_inlet.T0_const  # type: ignore
+
+    def _dedupe_by_bc_id(objs: Iterable[Any]) -> List[Any]:
+        seen: set[int] = set()
+        unique: List[Any] = []
+        for obj in objs:
+            sid = obj.get("id") if isinstance(obj, dict) else getattr(obj, "SurfaceID", None)
+            if sid is None or sid in seen:
+                continue
+            seen.add(sid)
+            unique.append(obj)
+        return unique
 
     # ---- Write .bcs file
     with path.open("w", encoding="utf-8") as w:
         # INLETS (normalize to refP0, refT0, refLen)
-        for inlet in bc_group.Inlets:
+        for inlet in _dedupe_by_bc_id(bc_group.Inlets):
             if getattr(inlet, "P0_const", None) is not None:
                 phys_pa = to_pa(inlet.P0_const, getattr(inlet, "P0_const_unit", "Pa"))
                 if phys_pa is not None and ref.refP0 not in (None, 0):
@@ -369,7 +397,7 @@ def export_to_boundary_condition(
             _write_bsurf_spec(w, inlet)
 
         # OUTLETS (normalize back-pressure by refP0)
-        for outlet in bc_group.Outlets:
+        for outlet in _dedupe_by_bc_id(bc_group.Outlets):
             if getattr(outlet, "Pback_const", None) is not None and ref.refP0 not in (None, 0):
                 phys_pa = to_pa(outlet.Pback_const, getattr(outlet, "Pback_const_unit", "Pa"))
                 if phys_pa is not None:
@@ -377,9 +405,9 @@ def export_to_boundary_condition(
             _write_bsurf_spec(w, outlet)
 
         # SLIPS / WALLS
-        for slip in bc_group.SymmetricSlips:
+        for slip in _dedupe_by_bc_id(bc_group.SymmetricSlips):
             _write_bsurf_spec(w, slip)
-        for wall in bc_group.Walls:
+        for wall in _dedupe_by_bc_id(bc_group.Walls):
             _write_bsurf_spec(w, wall)
 
         # GIFS (dicts or dataclasses)
@@ -636,5 +664,3 @@ if __name__ == "__main__":
 
     export_to_boundary_condition("boundary_conditions.bcs", job, bcg, gifs=gifs, volume_zones=volume_zones)
     export_to_job_file(job, "jobfile", title="SingleBlade")
-
-
