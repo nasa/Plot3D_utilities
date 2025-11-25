@@ -1,6 +1,6 @@
 from plot3d.glennht.export_functions import export_to_glennht_conn, export_to_boundary_condition, export_to_job_file
 from plot3d.glennht.class_definitions import *
-from plot3d.gridpro import read_gridpro_to_blocks, read_gridpro_connectivity
+from plot3d.gridpro import read_gridpro_to_blocks, read_gridpro_connectivity, bc_faces_by_type
 import glob
 import os.path as osp
 from plot3d import translational_periodicity, write_plot3D, write_ddcmp,partition_from_face_matches
@@ -23,11 +23,31 @@ if __name__ == "__main__":
         # Grid Grid Pro to Blocks 
         blocks = read_gridpro_to_blocks(gridpro_file)
         connectivity = read_gridpro_connectivity(connectivity_file)
-        outer_faces = connectivity['bc_group']['symm_slip'] # type: ignore
+        outer_faces = bc_faces_by_type(connectivity['bc_group'], 'symm_slip')
         
         # Add Translational Periodicity: symmetric slip faces should be periodic to each other now. 
         z_periodic_faces_export, periodic_faces, outer_faces = translational_periodicity(blocks,outer_faces,translational_direction='z') # type: ignore
-        connectivity['bc_group']['symm_slip'] = outer_faces # type: ignore # Add unmatched faces to symmetric slip
+        # Replace existing slip groups with the updated periodic faces so we avoid duplicates
+        slip_keys = []
+        for name, entry in connectivity['bc_group'].items():
+            if isinstance(entry, dict):
+                entry_type = (entry.get('type') or '').lower()
+                entry_faces = entry.get('faces', []) or []
+            else:
+                entry_faces = entry
+                entry_type = ''
+            if not entry_type and entry_faces:
+                ftype = entry_faces[0].get('bc_type')
+                entry_type = ftype.lower() if isinstance(ftype, str) else ''
+            if entry_type == 'symm_slip':
+                slip_keys.append(name)
+        for key in slip_keys:
+            del connectivity['bc_group'][key]
+        connectivity['bc_group']['symm_slip'] = {
+            'type': 'symm_slip',
+            'pty_ids': [],
+            'faces': outer_faces,
+        }
 
         # Write connectivity.json for debugging purposes
         with open(osp.join(folder,"connectivity.json"), "w") as json_file:
@@ -41,19 +61,19 @@ if __name__ == "__main__":
         
         # Define the boundary conditions 
         inlets = []
-        for i,inlet in enumerate(connectivity['bc_group']['inlet']): # type: ignore
+        for i,inlet in enumerate(bc_faces_by_type(connectivity['bc_group'], 'inlet')):
             inlets.append(InletBC(
                 BCType=BoundaryConditionType.Inlet, SurfaceID=inlet['id'], Name=f"Inlet-{i}",
                 P0_const=60.0, P0_const_unit="bar", T0_const=300.0, inlet_subType=inlet['id'],
             ))          # Use absolute conditions, code will automatically normalize
         outlets = []
-        for i,outlet in enumerate(connectivity['bc_group']['outlet']): # type: ignore
+        for i,outlet in enumerate(bc_faces_by_type(connectivity['bc_group'], 'outlet')):
             outlets.append(OutletBC(
                 BCType=BoundaryConditionType.Outlet, SurfaceID=outlet['id'], Name=f"Outlet-{i}",
                 Pback_const=1.0, Pback_const_unit="bar", outlet_subType=outlet['id']
             ))          # Use absolute conditions, code will automatically normalize
         walls = [] 
-        for i,wall in enumerate(connectivity['bc_group']['wall']): # type: ignore
+        for i,wall in enumerate(bc_faces_by_type(connectivity['bc_group'], 'wall')):
             walls.append(WallBC(
                 BCType=BoundaryConditionType.Wall, SurfaceID=wall['id'], Name=f"Wall-{i}", wall_subType=wall['id']
             ))
@@ -68,8 +88,9 @@ if __name__ == "__main__":
         job.ReferenceCondFull.reflen = 5.119                # inches, used to calculate the reynolds number should be same scale as mesh
         
         outer_faces = []
-        for k,v in connectivity['bc_group'].items():
-            outer_faces.extend(v)        # Export GlennHT connectivity file
+        for entry in connectivity['bc_group'].values():
+            faces = entry.get('faces', []) if isinstance(entry, dict) else entry
+            outer_faces.extend(faces)        # Export GlennHT connectivity file
         export_to_glennht_conn(connectivity['face_matches'], outer_faces, osp.join(folder, job.JobFiles.ConnFILE),connectivity['gif_faces'],connectivity['volume_zones']) # type: ignore
         
         # Export GlennHT boundary conditions file

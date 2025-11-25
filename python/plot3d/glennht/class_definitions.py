@@ -8,11 +8,11 @@ from typing import Any, Dict, List, Optional
 # Enums (mirror your C#)
 # ----------------------------
 class BoundaryConditionType(IntEnum):
-    Inlet = 0
-    Outlet = 1
-    SymmetryOrSlip = 2
-    Wall = 3
-    GIF = 4
+    Inlet = 1
+    Outlet = 2
+    SymmetryOrSlip = 3
+    Wall = 4
+    GIF = 1000
 
 class InletBC_Subtype(IntEnum):
     Normal = 0
