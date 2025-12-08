@@ -7,14 +7,15 @@ from scipy.io import FortranFile
 from tqdm import tqdm
 
 def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=False,read_double:bool=True):
-    """Reads and formats a binary chunk of data into a plot3D block
+    """Reads and formats a binary chunk of data into a plot3D block.
 
     Args:
         f (io): file handle
         IMAX (int): maximum I index
         JMAX (int): maximum J index
         KMAX (int): maximum K index
-        big_endian (bool, Optional): Use big endian format for reading binary files. Defaults False.
+        big_endian (bool, optional): Use big endian format for reading binary files. Defaults False.
+        read_double (bool, optional): When ``True`` read 8-byte doubles, otherwise read 4-byte floats.
 
     Returns:
         numpy.ndarray: Plot3D variable either X,Y, or Z 
@@ -45,14 +46,13 @@ def read_word(f):
             yield token
 
 def __read_plot3D_chunk_ASCII(f,IMAX:int,JMAX:int,KMAX:int):
-    """Reads and formats a binary chunk of data into a plot3D block
+    """Reads and formats an ASCII chunk of data into a plot3D block.
 
     Args:
         f (io): file handle
         IMAX (int): maximum I index
         JMAX (int): maximum J index
         KMAX (int): maximum K index
-        big_endian (bool, Optional): Use big endian format for reading binary files. Defaults False.
 
     Returns:
         numpy.ndarray: Plot3D variable either X,Y, or Z 
@@ -124,16 +124,16 @@ def read_ap_nasa(filename:str):
 
 
 def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False,read_double:bool=True):
-    """Reads a plot3d file and returns Blocks
+    """Reads a Plot3D file and returns blocks.
 
     Args:
-        filename (str): name of the file to read, .p3d, .xyz, .pdc, .plot3d? 
-        binary (bool, optional): indicates if the file is binary. Defaults to True.
-        big_endian (bool, optional): use big endian format for reading binary files
-        read_float (bool, optional): read floating point. Only affects binary files
+        filename (str): Name of the file to read, e.g. ``.p3d``, ``.xyz`` or ``.plot3d``.
+        binary (bool, optional): Indicates if the file is binary. Defaults to True.
+        big_endian (bool, optional): Use big endian format when reading binary files. Defaults to False.
+        read_double (bool, optional): Read 8-byte doubles when ``True`` and 4-byte floats otherwise.
 
     Returns:
-        List[Block]: List of blocks insdie the plot3d file
+        List[Block]: List of blocks inside the Plot3D file.
     """
     
     blocks = list()
@@ -177,4 +177,3 @@ def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False,read_double
                     b_temp = Block(X,Y,Z)                    
                     blocks.append(b_temp)
     return blocks
-
