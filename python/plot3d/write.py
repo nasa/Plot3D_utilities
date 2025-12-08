@@ -3,6 +3,7 @@ import numpy as np
 import os.path as osp
 import struct
 from typing import List
+from tqdm import tqdm
 from .block import Block
 
 def __write_plot3D_block_binary(f,B:Block,double_precision:bool=True,batch_size:int=100):
@@ -93,7 +94,7 @@ def write_plot3D(filename:str,blocks:List[Block],binary:bool=True,double_precisi
                 f.write(struct.pack('I',IMAX))
                 f.write(struct.pack('I',JMAX))
                 f.write(struct.pack('I',KMAX))
-            for b in blocks:
+            for b in tqdm(blocks, desc="Writing binary blocks", unit="block"):
                 __write_plot3D_block_binary(f,b,double_precision,batch_size)
     else:
         with open(filename,'w') as f:
@@ -101,5 +102,5 @@ def write_plot3D(filename:str,blocks:List[Block],binary:bool=True,double_precisi
             for b in blocks:
                 IMAX,JMAX,KMAX = b.X.shape
                 f.write('{0:d} {1:d} {2:d}\n'.format(IMAX,JMAX,KMAX))            
-            for b in blocks:
+            for b in tqdm(blocks, desc="Writing ASCII blocks", unit="block"):
                 __write_plot3D_block_ASCII(f,b,batch_size=batch_size)

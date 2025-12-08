@@ -4,7 +4,7 @@ import struct
 from typing import List
 from .block import Block
 from scipy.io import FortranFile
-from tqdm import trange
+from tqdm import tqdm
 
 def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=False,read_double:bool=True):
     """Reads and formats a binary chunk of data into a plot3D block
@@ -152,7 +152,7 @@ def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False,read_double
                         JMAX.append(struct.unpack("I",f.read(4))[0]) # Read bytes
                         KMAX.append(struct.unpack("I",f.read(4))[0]) # Read bytes
 
-                for b in range(nblocks):
+                for b in tqdm(range(nblocks), desc="Reading binary blocks", unit="block"):
                     X = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
                     Y = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
                     Z = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
@@ -170,12 +170,11 @@ def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False,read_double
                     JMAX.append(tokens[1])
                     KMAX.append(tokens[2])            
 
-                for b in trange(nblocks):
+                for b in tqdm(range(nblocks), desc="Reading ASCII blocks", unit="block"):
                     X = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
                     Y = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
                     Z = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
                     b_temp = Block(X,Y,Z)                    
                     blocks.append(b_temp)
     return blocks
-
 
