@@ -445,24 +445,6 @@ def export_to_boundary_condition(
                 _write_vzconditions(w, vz)
             else:
                 w.write(_export_namelist_block("VZConditions", vz)); w.write("\n")
-
-        # keep the *first* object for each unique obj.subtype
-        def first_by_subtype(objs: Iterable[T], subtype_attr: str, *, include_none=False) -> List[T]:
-            seen = set()
-            out: List[T] = []
-            for o in objs:
-                st = _get_field(o, subtype_attr)
-                if st is None and not include_none:
-                    continue
-                if st not in seen:
-                    seen.add(st)
-                    out.append(o)
-            return out
-        
-        inlet_bc = first_by_subtype(bc_group.Inlets,'inlet_subType')
-        outlet_bc = first_by_subtype(bc_group.Outlets,'outlet_subType')
-        slip_bc = first_by_subtype(bc_group.SymmetricSlips,'slip_subType')
-        wall_bc = first_by_subtype(bc_group.Walls,'wall_subType')
         
         def _sync_detail_surface_id(obj: Any, field_name: str) -> None:
             sid = _get_field(obj, "SurfaceID")
@@ -471,16 +453,16 @@ def export_to_boundary_condition(
 
         # Detailed BC blocks (skip meta + *_unit)
         exclude = {"Name", "SurfaceID", "BCType"}
-        for inlet in inlet_bc:
+        for inlet in bc_group.Inlets:
             _sync_detail_surface_id(inlet, "surfID_inlet")
             w.write(_export_namelist_block("INLET_BC", inlet, exclude_names=exclude)); w.write("\n")
-        for outlet in outlet_bc:
+        for outlet in bc_group.Outlets:
             _sync_detail_surface_id(outlet, "surfID_outlet")
             w.write(_export_namelist_block("OUTLET_BC", outlet, exclude_names=exclude)); w.write("\n")
-        for slip in slip_bc:
+        for slip in bc_group.SymmetricSlips:
             _sync_detail_surface_id(slip, "surfID_symmetricSlip")
             w.write(_export_namelist_block("SLIP_BC", slip, exclude_names=exclude)); w.write("\n")
-        for wall in wall_bc:
+        for wall in bc_group.Walls:
             _sync_detail_surface_id(wall, "surfID_wall")
             w.write(_export_namelist_block("WALL_BC", wall, exclude_names=exclude)); w.write("\n")
 
