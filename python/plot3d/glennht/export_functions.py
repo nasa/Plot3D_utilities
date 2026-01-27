@@ -455,15 +455,19 @@ def export_to_boundary_condition(
         exclude = {"Name", "SurfaceID", "BCType"}
         for inlet in bc_group.Inlets:
             _sync_detail_surface_id(inlet, "surfID_inlet")
+            w.write(f"! {inlet.Name}\n")
             w.write(_export_namelist_block("INLET_BC", inlet, exclude_names=exclude)); w.write("\n")
         for outlet in bc_group.Outlets:
             _sync_detail_surface_id(outlet, "surfID_outlet")
+            w.write(f"! {outlet.Name}\n")
             w.write(_export_namelist_block("OUTLET_BC", outlet, exclude_names=exclude)); w.write("\n")
         for slip in bc_group.SymmetricSlips:
             _sync_detail_surface_id(slip, "surfID_symmetricSlip")
+            w.write(f"! {slip.Name}\n")
             w.write(_export_namelist_block("SLIP_BC", slip, exclude_names=exclude)); w.write("\n")
         for wall in bc_group.Walls:
             _sync_detail_surface_id(wall, "surfID_wall")
+            w.write(f"! {wall.Name}\n")
             w.write(_export_namelist_block("WALL_BC", wall, exclude_names=exclude)); w.write("\n")
 
 # ============================================================
