@@ -15,9 +15,9 @@ class BoundaryConditionType(IntEnum):
     GIF = 1000
 
 class InletBC_Subtype(IntEnum):
-    Normal = 0
-    AngleSpecified = 1
-    AngleAndProfileSpecified = 2
+    Normal = 1
+    AngleSpecified = 2
+    AngleAndProfileSpecified = 3
 
 class InletBC_Direction(IntEnum):
     Something = 1
@@ -76,7 +76,8 @@ class BoundaryCondition:
 
 @dataclass
 class InletBC(BoundaryCondition):
-    inlet_subType: Optional[InletBC_Subtype] = InletBC_Subtype.Normal
+    inlet_subType: InletBC_Subtype = InletBC_Subtype.Normal
+    surfID_inlet:int = 1
     inlet_ref_Mach_Nr: Optional[float] = 0.2
 
     T0_const: Optional[float] = None      # K (will be normalized by refT0)
@@ -99,7 +100,8 @@ class InletBC(BoundaryCondition):
 
 @dataclass
 class OutletBC(BoundaryCondition):
-    outlet_subType: Optional[OutletSubtype] = None
+    outlet_subType: OutletSubtype = OutletSubtype.UniformPressure
+    surfID_outlet:int = 2 
     extrapolation_order: Optional[int] = None
     Pback_extrapolate_profile: bool = False
     Pback_const: Optional[float] = None
@@ -114,12 +116,14 @@ class OutletBC(BoundaryCondition):
 
 @dataclass
 class SymmetricSlipBC(BoundaryCondition):
-    slip_subType: Optional[SymmetricSlipSubtype] = None
+    surfID_symmetricSlip:int = 3
+    slip_subType: SymmetricSlipSubtype = SymmetricSlipSubtype.Slip
     slip_omega: Optional[float] = None
 
 @dataclass
 class WallBC(BoundaryCondition):
-    wall_subType: Optional[int] = None
+    wall_subType: WallSubtype = WallSubtype.SpecifiedWallHeatFlux
+    surfID_wall:int = 3
     Twall_const: Optional[float] = None
     have_Twall_prof: bool = False
     filen_Twall_prof: Optional[str] = None

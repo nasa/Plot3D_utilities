@@ -10,6 +10,7 @@
 *.lock
 python/mesh.pickle
 python/examples/WELD/weld_ascii.bxyz
-python/connectivity.pickle
+python/connectivity*.pickle
 python/connectivity_2x2x2.pickle
 python/examples/pointwise/saved_state.pickle
+mesh.pickle

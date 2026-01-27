@@ -6,7 +6,6 @@ import json
 import pathlib
 from dataclasses import asdict, is_dataclass
 from typing import Any, Iterable, Tuple, Dict, List
-import os 
 
 from .class_definitions import (
     Job, BCGroup, GIF, VolumeZone,
@@ -83,7 +82,9 @@ def rpm_to_omegab(rpm: float | None) -> float:
 # ============================================================
 def ensure_extension(path: str | pathlib.Path, ext: str) -> str:
     p = pathlib.Path(path)
-    return str(p if p.suffix.lower() == ext.lower() else p.with_suffix(ext))
+    if p.suffix:
+        return str(p)
+    return str(p.with_suffix(ext))
 
 def _asdict_soft(x):
     if is_dataclass(x):
@@ -146,26 +147,46 @@ def _export_namelist_block(header: str, obj: Any, *, exclude_names=()) -> str:
     inner = ", ".join(pairs)
     return f" &{header}\n{inner}\n &END\n"
 
+# ============================================================
+# GIF + Volume Zone writers (dict/object inputs supported)
+# ============================================================
+def _get_field(obj: Any, name: str, default: Any = None) -> Any:
+    if isinstance(obj, dict):
+        return obj.get(name, default)
+    return getattr(obj, name, default)
+
+def _set_field(obj: Any, name: str, value: Any) -> None:
+    if isinstance(obj, dict):
+        obj[name] = value
+    else:
+        setattr(obj, name, value)
+
+def _first_field(obj: Any, names: Iterable[str], default: Any = None) -> Any:
+    for name in names:
+        value = _get_field(obj, name)
+        if value is not None:
+            return value
+    return default
+
 def _write_bsurf_spec(w, bc):
     line = (
         f" &BSurf_Spec\n"
-        f"BSurfID={bc.SurfaceID}, BCType={int(bc.BCType)}, BSurfName='{bc.Name}'"
+        f"BSurfID={_get_field(bc, 'SurfaceID')}, "
+        f"BCType={int(_get_field(bc, 'BCType'))}, "
+        f"BSurfName='{_get_field(bc, 'Name')}'"
     )
-    if getattr(bc, "IsPostProcessing", False):
+    if _get_field(bc, "IsPostProcessing", False):
         line += ", BRefCond=T"
-    if getattr(bc, "IsCalculateMassFlow", False) or getattr(bc, "ToggleProcessSurface", False):
+    if _get_field(bc, "IsCalculateMassFlow", False) or _get_field(bc, "ToggleProcessSurface", False):
         line += ", BCalc=T"
     w.write(line + "\n &END\n\n")
 
-# ============================================================
-# GIF + Volume Zone writers (dict inputs supported)
-# ============================================================
-def _write_gif_from_dict(w, gdict: Dict[str, Any]) -> None:
-    sid1 = int(gdict.get("a", 0))
-    sid2 = int(gdict.get("b", 0))
-    name1 = f"surface {sid1}"
-    name2 = f"surface {sid2}"
-    bctype = 4  # GIF
+def _write_gif_pair(w, pair: Any) -> None:
+    sid1 = int(_first_field(pair, ("GIFSurface1", "id1", "a"), 0))
+    sid2 = int(_first_field(pair, ("GIFSurface2", "id2", "b"), 0))
+    name1 = _first_field(pair, ("Name1", "name1"), f"surface {sid1}")
+    name2 = _first_field(pair, ("Name2", "name2"), f"surface {sid2}")
+    bctype = int(_first_field(pair, ("BCType", "bctype"), 4))
     w.write(
         f" &BSurf_Spec\nBSurfID={sid1}, BCType={bctype}, BSurfName='{name1}'\n &END\n\n"
     )
@@ -174,14 +195,14 @@ def _write_gif_from_dict(w, gdict: Dict[str, Any]) -> None:
     )
     w.write(f" &GIF_Spec\nSurfID_1={sid1}, SurfID2={sid2}\n &END\n\n")
 
-def _write_vzconditions(w, vz: Dict[str, Any]) -> None:
+def _write_vzconditions(w, vz: Any) -> None:
     """
-    Convert your dict style:
-      {"block_index": 1, "zone_type": "fluid"|"solid", "contiguous_id": 1}
+    Convert inputs like:
+      {"block_index": 1, "zone_type": "fluid"|"solid", "contiguous_index": 1}
     to the GHT namelist you showed (defaults baked in).
     """
-    vzid = int(vz.get("contiguous_id", 0))
-    ztype = str(vz.get("zone_type", "fluid")).strip().lower()
+    vzid = int(_first_field(vz, ("contiguous_index", "contiguous_id"), 0))
+    ztype = str(_get_field(vz, "zone_type", "fluid")).strip().lower()
     vztype = 1 if ztype == "fluid" else 2
 
     if vztype == 1:
@@ -312,8 +333,8 @@ def export_to_boundary_condition(
     file_path_to_write: str,
     job_settings: Job,
     bc_group: BCGroup,
-    gif_pairs: List[GIF] | List[Dict[str,Any]],
-    volume_zones: List[VolumeZone] | List[Dict[str,Any]],
+    gif_pairs: List[Any],
+    volume_zones: List[Any],
 ):
     file_path_to_write = ensure_extension(file_path_to_write, '.bcs')
     path = pathlib.Path(file_path_to_write)
@@ -325,7 +346,7 @@ def export_to_boundary_condition(
         "outlets": [_asdict_soft(x) for x in bc_group.Outlets],
         "slips": [_asdict_soft(x) for x in bc_group.SymmetricSlips],
         "walls": [_asdict_soft(x) for x in bc_group.Walls],
-        "volume_zones": [x for x in volume_zones],
+        "volume_zones": [_asdict_soft(x) for x in volume_zones],
         "gif_pairs": [_asdict_soft(x) for x in gif_pairs],
         "job_settings": _asdict_soft(job_settings),
     }
@@ -338,10 +359,10 @@ def export_to_boundary_condition(
         best = None
         best_pa: float | None = None
         for inlet in inlets:
-            p0 = getattr(inlet, "P0_const", None)
+            p0 = _get_field(inlet, "P0_const")
             if p0 is None:
                 continue
-            phys_pa = to_pa(p0, getattr(inlet, "P0_const_unit", "Pa"))
+            phys_pa = to_pa(p0, _get_field(inlet, "P0_const_unit", "Pa"))
             if phys_pa is None:
                 continue
             if best_pa is None or phys_pa > best_pa:
@@ -364,14 +385,14 @@ def export_to_boundary_condition(
 
     # refT0: from first inlet if missing
     if getattr(ref, "refT0", None) in (None, 0):
-        if ref_inlet and getattr(ref_inlet, "T0_const", None) is not None:
-            ref.refT0 = ref_inlet.T0_const  # type: ignore
+        if ref_inlet and _get_field(ref_inlet, "T0_const") is not None:
+            ref.refT0 = _get_field(ref_inlet, "T0_const")  # type: ignore
 
     def _dedupe_by_bc_id(objs: Iterable[Any]) -> List[Any]:
         seen: set[int] = set()
         unique: List[Any] = []
         for obj in objs:
-            sid = obj.get("id") if isinstance(obj, dict) else getattr(obj, "SurfaceID", None)
+            sid = _get_field(obj, "id", _get_field(obj, "SurfaceID"))
             if sid is None or sid in seen:
                 continue
             seen.add(sid)
@@ -382,26 +403,26 @@ def export_to_boundary_condition(
     with path.open("w", encoding="utf-8") as w:
         # INLETS (normalize to refP0, refT0, refLen)
         for inlet in _dedupe_by_bc_id(bc_group.Inlets):
-            if getattr(inlet, "P0_const", None) is not None:
-                phys_pa = to_pa(inlet.P0_const, getattr(inlet, "P0_const_unit", "Pa"))
+            if _get_field(inlet, "P0_const") is not None:
+                phys_pa = to_pa(_get_field(inlet, "P0_const"), _get_field(inlet, "P0_const_unit", "Pa"))
                 if phys_pa is not None and ref.refP0 not in (None, 0):
-                    inlet.P0_const = phys_pa / ref.refP0
-            if getattr(inlet, "T0_const", None) is not None and ref.refT0 not in (None, 0):
-                inlet.T0_const = inlet.T0_const / ref.refT0  # type: ignore
-            if getattr(inlet, "twall_hub", None) is not None and ref.refT0 not in (None, 0):
-                inlet.twall_hub = inlet.twall_hub / ref.refT0  # type: ignore
-            if getattr(inlet, "twall_case", None) is not None and ref.refT0 not in (None, 0):
-                inlet.twall_case = inlet.twall_case / ref.refT0  # type: ignore
-            if getattr(inlet, "Ts_const", None) is not None and ref.reflen not in (None, 0):
-                inlet.Ts_const = inlet.Ts_const / ref.reflen  # type: ignore
+                    _set_field(inlet, "P0_const", phys_pa / ref.refP0)
+            if _get_field(inlet, "T0_const") is not None and ref.refT0 not in (None, 0):
+                _set_field(inlet, "T0_const", _get_field(inlet, "T0_const") / ref.refT0)
+            if _get_field(inlet, "twall_hub") is not None and ref.refT0 not in (None, 0):
+                _set_field(inlet, "twall_hub", _get_field(inlet, "twall_hub") / ref.refT0)
+            if _get_field(inlet, "twall_case") is not None and ref.refT0 not in (None, 0):
+                _set_field(inlet, "twall_case", _get_field(inlet, "twall_case") / ref.refT0)
+            if _get_field(inlet, "Ts_const") is not None and ref.reflen not in (None, 0):
+                _set_field(inlet, "Ts_const", _get_field(inlet, "Ts_const") / ref.reflen)
             _write_bsurf_spec(w, inlet)
 
         # OUTLETS (normalize back-pressure by refP0)
         for outlet in _dedupe_by_bc_id(bc_group.Outlets):
-            if getattr(outlet, "Pback_const", None) is not None and ref.refP0 not in (None, 0):
-                phys_pa = to_pa(outlet.Pback_const, getattr(outlet, "Pback_const_unit", "Pa"))
+            if _get_field(outlet, "Pback_const") is not None and ref.refP0 not in (None, 0):
+                phys_pa = to_pa(_get_field(outlet, "Pback_const"), _get_field(outlet, "Pback_const_unit", "Pa"))
                 if phys_pa is not None:
-                    outlet.Pback_const = phys_pa / ref.refP0
+                    _set_field(outlet, "Pback_const", phys_pa / ref.refP0)
             _write_bsurf_spec(w, outlet)
 
         # SLIPS / WALLS
@@ -412,57 +433,41 @@ def export_to_boundary_condition(
 
         # GIFS (dicts or dataclasses)
         for pair in gif_pairs:
-            if isinstance(pair, dict):
-                _write_gif_from_dict(w, pair)
-            else:
-                name1 = getattr(pair, "Name1", f"surface {pair.GIFSurface1}")
-                name2 = getattr(pair, "Name2", f"surface {pair.GIFSurface2}")
-                w.write(
-                    f" &BSurf_Spec\nBSurfID={pair.GIFSurface1}, BCType={int(pair.BCType)}, "
-                    f"BSurfName='{name1}'\n &END\n\n"
-                )
-                w.write(
-                    f" &BSurf_Spec\nBSurfID={pair.GIFSurface2}, BCType={int(pair.BCType)}, "
-                    f"BSurfName='{name2}'\n &END\n\n"
-                )
-                w.write(f" &GIF_Spec\nSurfID_1={pair.GIFSurface1}, SurfID2={pair.GIFSurface2}\n &END\n\n")
+            _write_gif_pair(w, pair)
 
         # VZConditions (dict templates)
-        volume_zone_unique = {d["contiguous_index"]: d for d in volume_zones}.values()
-        for vz in volume_zone_unique:
-            if isinstance(vz, dict):
+        volume_zone_unique: Dict[Any, Any] = {}
+        for vz in volume_zones:
+            key = _first_field(vz, ("contiguous_index", "contiguous_id"))
+            volume_zone_unique[key] = vz
+        for vz in volume_zone_unique.values():
+            if _get_field(vz, "zone_type") is not None:
                 _write_vzconditions(w, vz)
             else:
                 w.write(_export_namelist_block("VZConditions", vz)); w.write("\n")
+        
+        def _sync_detail_surface_id(obj: Any, field_name: str) -> None:
+            sid = _get_field(obj, "SurfaceID")
+            if sid is not None:
+                _set_field(obj, field_name, sid)
 
-        # keep the *first* object for each unique obj.subtype
-        def first_by_subtype(objs: Iterable[T], subtype_attr: str, *, include_none=False) -> List[T]:
-            seen = set()
-            out: List[T] = []
-            for o in objs:
-                # works for both objects and dicts
-                st = getattr(o, subtype_attr, None) if not isinstance(o, dict) else o.get(subtype_attr)
-                if st is None and not include_none:
-                    continue
-                if st not in seen:
-                    seen.add(st)
-                    out.append(o)
-            return out
-        
-        inlet_bc = first_by_subtype(bc_group.Inlets,'inlet_subType')
-        outlet_bc = first_by_subtype(bc_group.Outlets,'outlet_subType')
-        slip_bc = first_by_subtype(bc_group.SymmetricSlips,'slip_subType')
-        wall_bc = first_by_subtype(bc_group.Walls,'wall_subType')
-        
         # Detailed BC blocks (skip meta + *_unit)
         exclude = {"Name", "SurfaceID", "BCType"}
-        for inlet in inlet_bc:
+        for inlet in bc_group.Inlets:
+            _sync_detail_surface_id(inlet, "surfID_inlet")
+            w.write(f"! {inlet.Name}\n")
             w.write(_export_namelist_block("INLET_BC", inlet, exclude_names=exclude)); w.write("\n")
-        for outlet in outlet_bc:
+        for outlet in bc_group.Outlets:
+            _sync_detail_surface_id(outlet, "surfID_outlet")
+            w.write(f"! {outlet.Name}\n")
             w.write(_export_namelist_block("OUTLET_BC", outlet, exclude_names=exclude)); w.write("\n")
-        for slip in slip_bc:
+        for slip in bc_group.SymmetricSlips:
+            _sync_detail_surface_id(slip, "surfID_symmetricSlip")
+            w.write(f"! {slip.Name}\n")
             w.write(_export_namelist_block("SLIP_BC", slip, exclude_names=exclude)); w.write("\n")
-        for wall in wall_bc:
+        for wall in bc_group.Walls:
+            _sync_detail_surface_id(wall, "surfID_wall")
+            w.write(f"! {wall.Name}\n")
             w.write(_export_namelist_block("WALL_BC", wall, exclude_names=exclude)); w.write("\n")
 
 # ============================================================
@@ -616,11 +621,6 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
     with open(f'{filename}','w') as fp:
         fp.writelines(lines)
 
-def ensure_extension(filename, default_ext=".txt"):
-    base, ext = os.path.splitext(filename)
-    if not ext:  # no extension present
-        return filename + default_ext
-    return filename
 # ============================================================
 # ---- Quick self-test / example usage -----------------------
 # ============================================================
