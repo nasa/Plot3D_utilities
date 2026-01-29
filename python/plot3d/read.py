@@ -123,7 +123,7 @@ def read_ap_nasa(filename:str):
     return Block(X=meshx,Y=y,Z=z), nbld
 
 
-def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False,read_double:bool=True):
+def read_plot3D(filename:str, binary:bool=True, big_endian:bool=False, read_double:bool=True, fortran:bool=False):
     """Reads a Plot3D file and returns blocks.
 
     Args:
@@ -131,16 +131,34 @@ def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False,read_double
         binary (bool, optional): Indicates if the file is binary. Defaults to True.
         big_endian (bool, optional): Use big endian format when reading binary files. Defaults to False.
         read_double (bool, optional): Read 8-byte doubles when ``True`` and 4-byte floats otherwise.
+        fortran (bool, optional): Read Fortran unformatted binary with record markers. Defaults to False.
 
     Returns:
         List[Block]: List of blocks inside the Plot3D file.
     """
-    
+
     blocks = list()
     if osp.isfile(filename):
-        if binary:
+        if fortran:
+            # Fortran unformatted binary with record markers
+            dtype = 'f8' if read_double else 'f4'
+            with FortranFile(filename, 'r') as f:
+                # Read nblocks
+                nblocks = f.read_ints('i4')[0]
+                # Read all dimensions
+                dims = f.read_ints('i4')
+                IMAX = dims[0::3]  # Every 3rd starting at 0
+                JMAX = dims[1::3]  # Every 3rd starting at 1
+                KMAX = dims[2::3]  # Every 3rd starting at 2
+                # Read coordinate arrays
+                for b in tqdm(range(nblocks), desc="Reading Fortran blocks", unit="block"):
+                    X = f.read_reals(dtype).reshape((IMAX[b], JMAX[b], KMAX[b]), order='F')
+                    Y = f.read_reals(dtype).reshape((IMAX[b], JMAX[b], KMAX[b]), order='F')
+                    Z = f.read_reals(dtype).reshape((IMAX[b], JMAX[b], KMAX[b]), order='F')
+                    blocks.append(Block(X, Y, Z))
+        elif binary:
             with open(filename,'rb') as f:
-                nblocks = struct.unpack(">I",f.read(4))[0] if big_endian else struct.unpack("I",f.read(4))[0] # Read bytes            
+                nblocks = struct.unpack(">I",f.read(4))[0] if big_endian else struct.unpack("I",f.read(4))[0] # Read bytes
                 IMAX = list(); JMAX = list(); KMAX = list()
                 for b in range(nblocks):
                     if big_endian:
@@ -156,24 +174,24 @@ def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False,read_double
                     X = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
                     Y = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
                     Z = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
-                    b_temp = Block(X,Y,Z)                    
+                    b_temp = Block(X,Y,Z)
                     blocks.append(b_temp)
         else:
-            with open(filename,'r') as f: 
+            with open(filename,'r') as f:
                 nblocks = int(f.readline())
                 IMAX = list(); JMAX = list(); KMAX = list()
-                
+
                 for b in range(nblocks):
                     IJK = f.readline().replace('\n','').split(' ')
                     tokens = [int(w) for w in IJK if w]
                     IMAX.append(tokens[0])
                     JMAX.append(tokens[1])
-                    KMAX.append(tokens[2])            
+                    KMAX.append(tokens[2])
 
                 for b in tqdm(range(nblocks), desc="Reading ASCII blocks", unit="block"):
                     X = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
                     Y = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
                     Z = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
-                    b_temp = Block(X,Y,Z)                    
+                    b_temp = Block(X,Y,Z)
                     blocks.append(b_temp)
     return blocks
