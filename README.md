@@ -38,6 +38,8 @@ For Mac. install homebrew and do `brew install metis` then add this to your ~/.z
 # Tutorials
 [Reading Writing and Viewing Plot3D files](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_SplitBlocksExample.ipynb)
 
+[Read/Write File Formats (Binary, ASCII, Fortran, Endianness)](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_ReadWriteFormats.ipynb)
+
 [Periodicity with axially rotated and copied blocks](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_AxialDuplication.ipynb)
 
 [Translated periodicity](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_TranslatedPeriodicity.ipynb)
