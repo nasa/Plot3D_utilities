@@ -1,8 +1,7 @@
-from typing import Dict, List, Tuple, Optional, Union, Set
+from typing import Dict, List, Tuple, Optional, Union, Set, Any
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from typing import List, Tuple, Optional, Any
 from plot3d import Block
 from collections import defaultdict
 
@@ -221,6 +220,8 @@ def read_gridpro_connectivity(
                 parse_patch(toks)
 
     patches_df = pd.DataFrame(patch_rows)
+    patches_to_connectivity = patches_df[(patches_df['sb1'] > 0) & (patches_df['sb2'] > 0) & (patches_df['pty'] > 1)]
+    
 
     # ---------------------------- helpers ----------------------------
     def face_dict(sb: int, imin: int, jmin: int, kmin: int, imax: int, jmax: int, kmax: int, pty:int=-1) -> Dict[str, int]:
@@ -253,6 +254,14 @@ def read_gridpro_connectivity(
                 )
             )
 
+    # These are patches that should be in connectivity but aren't 
+    connectivity_to_check: List[Dict[str, Dict[str, int]]] = [] 
+    for p in patches_to_connectivity.itertuples(index=False): 
+        connectivity_to_check.append(pair_dict(
+                    p.sb1, (p.L1i, p.L1j, p.L1k, p.H1i, p.H1j, p.H1k),
+                    p.sb2, (p.L2i, p.L2j, p.L2k, p.H2i, p.H2j, p.H2k),
+                ))
+   
     # Boundary-condition groups (by pty)
     def bc_faces_for(name: str, pty_vals: List[int], bc_type: str) -> List[Dict[str, int]]:
         targets = set(pty_vals)
@@ -384,6 +393,7 @@ def read_gridpro_connectivity(
         "periodic_faces": periodic_faces,
         "volume_zones": volume_zones,
         "blocksizes": superblock_sizes,
+        "connectivity_to_check": connectivity_to_check,
         "patches": patches_df,
     }
 

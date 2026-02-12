@@ -904,3 +904,177 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
     return df,periodic_faces,split_faces
 
 
+def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, rotation_axis: str = 'x', tol: float = 1E-6):
+    """Verifies that the diagonal corners of periodic face_matches are spatially
+    consistent after rotating block1 by ±theta about the given axis.
+
+    For each face_match, rotates block1 by +theta (and if needed -theta) and checks
+    that the rotated lower/upper corner coordinates match block2's lower/upper
+    corners within tolerance. If the stored diagonal doesn't match, tries all
+    permutations of block2's face corners. If a valid permutation is found,
+    the face_match is corrected and added to the verified list.
+
+    Uses GCD reduction (same as connectivity_fast / periodicity_fast) for
+    efficient coordinate lookups.
+
+    Args:
+        blocks (List[Block]): List of all blocks (original full-resolution)
+        face_matches (list): List of face_match dicts from periodicity or rotated_periodicity
+        theta (float): Rotation angle in degrees
+        rotation_axis (str, optional): Axis of rotation 'x', 'y', or 'z'. Defaults to 'x'.
+        tol (float, optional): Euclidean distance tolerance. Defaults to 1E-6.
+
+    Returns:
+        (list): verified face_matches whose diagonals are confirmed or corrected
+        (list): mismatched face_matches where no corner permutation matched
+    """
+    # Compute GCD and reduce blocks (same pattern as connectivity_fast)
+    gcd_array = list()
+    for block_indx in range(len(blocks)):
+        block = blocks[block_indx]
+        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
+    gcd_to_use = min(gcd_array)
+    reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
+
+    # Build rotation matrices for +theta and -theta
+    rotation_matrix_pos = create_rotation_matrix(radians(theta), rotation_axis)
+    rotation_matrix_neg = create_rotation_matrix(radians(-theta), rotation_axis)
+
+    # Pre-rotate all reduced blocks in both directions
+    rotated_blocks_pos = [rotate_block(b, rotation_matrix_pos) for b in reduced_blocks]
+    rotated_blocks_neg = [rotate_block(b, rotation_matrix_neg) for b in reduced_blocks]
+
+    # Scale down face_matches indices by GCD
+    scaled_matches = deepcopy(face_matches)
+    for fm in scaled_matches:
+        for side in ['block1', 'block2']:
+            for key in ['IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX']:
+                fm[side][key] = fm[side][key] // gcd_to_use
+
+    verified = list()
+    mismatched = list()
+
+    for idx in range(len(scaled_matches)):
+        fm = scaled_matches[idx]
+        b1 = fm['block1']
+        b2 = fm['block2']
+        b1_idx = b1['block_index']
+        b2_idx = b2['block_index']
+        block2 = reduced_blocks[b2_idx]
+
+        # Enumerate unique corners of block2's face
+        I2 = [b2['IMIN'], b2['IMAX']]
+        J2 = [b2['JMIN'], b2['JMAX']]
+        K2 = [b2['KMIN'], b2['KMAX']]
+
+        unique_corners = list()
+        seen = set()
+        for i in I2:
+            for j in J2:
+                for k in K2:
+                    key = (i, j, k)
+                    if key not in seen:
+                        seen.add(key)
+                        unique_corners.append(key)
+
+        found = False
+        best_d_lower = float('inf')
+        best_d_upper = float('inf')
+
+        # Try +theta rotation first, then -theta
+        for rotated_blocks in [rotated_blocks_pos, rotated_blocks_neg]:
+            if found:
+                break
+
+            block1_rotated = rotated_blocks[b1_idx]
+
+            # Block1 rotated diagonal coordinates
+            x1_l = block1_rotated.X[b1['IMIN'], b1['JMIN'], b1['KMIN']]
+            y1_l = block1_rotated.Y[b1['IMIN'], b1['JMIN'], b1['KMIN']]
+            z1_l = block1_rotated.Z[b1['IMIN'], b1['JMIN'], b1['KMIN']]
+
+            x1_u = block1_rotated.X[b1['IMAX'], b1['JMAX'], b1['KMAX']]
+            y1_u = block1_rotated.Y[b1['IMAX'], b1['JMAX'], b1['KMAX']]
+            z1_u = block1_rotated.Z[b1['IMAX'], b1['JMAX'], b1['KMAX']]
+
+            # Check stored diagonal first
+            x2_l = block2.X[b2['IMIN'], b2['JMIN'], b2['KMIN']]
+            y2_l = block2.Y[b2['IMIN'], b2['JMIN'], b2['KMIN']]
+            z2_l = block2.Z[b2['IMIN'], b2['JMIN'], b2['KMIN']]
+
+            x2_u = block2.X[b2['IMAX'], b2['JMAX'], b2['KMAX']]
+            y2_u = block2.Y[b2['IMAX'], b2['JMAX'], b2['KMAX']]
+            z2_u = block2.Z[b2['IMAX'], b2['JMAX'], b2['KMAX']]
+
+            dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
+            d_lower = math.sqrt(dx*dx + dy*dy + dz*dz)
+            dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
+            d_upper = math.sqrt(dx*dx + dy*dy + dz*dz)
+
+            if d_lower < best_d_lower:
+                best_d_lower = d_lower
+            if d_upper < best_d_upper:
+                best_d_upper = d_upper
+
+            if d_lower < tol and d_upper < tol:
+                verified.append(face_matches[idx])
+                found = True
+                break
+
+            # Try all permutations of block2's corners
+            for corner_lower in unique_corners:
+                for corner_upper in unique_corners:
+                    if corner_lower == corner_upper:
+                        continue
+
+                    il, jl, kl = corner_lower
+                    iu, ju, ku = corner_upper
+
+                    x2_l = block2.X[il, jl, kl]
+                    y2_l = block2.Y[il, jl, kl]
+                    z2_l = block2.Z[il, jl, kl]
+
+                    x2_u = block2.X[iu, ju, ku]
+                    y2_u = block2.Y[iu, ju, ku]
+                    z2_u = block2.Z[iu, ju, ku]
+
+                    dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
+                    dl = math.sqrt(dx*dx + dy*dy + dz*dz)
+                    dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
+                    du = math.sqrt(dx*dx + dy*dy + dz*dz)
+
+                    if dl < best_d_lower:
+                        best_d_lower = dl
+                    if du < best_d_upper:
+                        best_d_upper = du
+
+                    if dl < tol and du < tol:
+                        corrected = deepcopy(face_matches[idx])
+                        corrected['block2']['IMIN'] = il * gcd_to_use
+                        corrected['block2']['JMIN'] = jl * gcd_to_use
+                        corrected['block2']['KMIN'] = kl * gcd_to_use
+                        corrected['block2']['IMAX'] = iu * gcd_to_use
+                        corrected['block2']['JMAX'] = ju * gcd_to_use
+                        corrected['block2']['KMAX'] = ku * gcd_to_use
+                        verified.append(corrected)
+                        found = True
+                        break
+                if found:
+                    break
+
+        if not found:
+            orig = face_matches[idx]
+            b1_orig = orig['block1']
+            b2_orig = orig['block2']
+            print(f"verify_periodicity: MISMATCH at face_match index {idx}")
+            print(f"  block1 (block_index={b1_orig['block_index']}): "
+                  f"lower=({b1_orig['IMIN']},{b1_orig['JMIN']},{b1_orig['KMIN']}) "
+                  f"upper=({b1_orig['IMAX']},{b1_orig['JMAX']},{b1_orig['KMAX']})")
+            print(f"  block2 (block_index={b2_orig['block_index']}): "
+                  f"lower=({b2_orig['IMIN']},{b2_orig['JMIN']},{b2_orig['KMIN']}) "
+                  f"upper=({b2_orig['IMAX']},{b2_orig['JMAX']},{b2_orig['KMAX']})")
+            print(f"  Closest rotated block1 corner dist to block2 lower: {best_d_lower:.6e}")
+            print(f"  Closest rotated block1 corner dist to block2 upper: {best_d_upper:.6e}")
+            mismatched.append(face_matches[idx])
+
+    return verified, mismatched

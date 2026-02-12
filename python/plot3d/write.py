@@ -51,7 +51,7 @@ def __write_plot3D_block_ASCII(f, B:Block, double_precision:bool=True, columns:i
         batch_size (int, optional): number of lines to buffer before writing. Defaults to 100.
     """
     # Scientific notation format: width.precision E
-    fmt = '{0:23.15E}' if double_precision else '{0:15.8E}'
+    fmt = '{0:23.15f}' if double_precision else '{0:15.8f}'
 
     def write_var(V:np.ndarray):
         line_entries = []
