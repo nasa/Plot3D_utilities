@@ -3,30 +3,27 @@
 stages:
   - build
   - deploy
-  
+
 job:
     stage: build
-    image: python:3.9
+    image: python:3.11
     script:
-        - sudo yum update -q -y
-        - sudo yum install -y python3-pip
-        - pip uninstall pandas numpy scipy -y -y -y
-        - pip install pandas numpy scipy
-        - pip install setuptools cython
+        - pip install poetry
         - cd python
-        - python3 setup.py install
+        - poetry install --with docs
         - cd ../
     artifacts:
         untracked: true
 
-pages:    
+pages:
   stage: deploy
   script:
+    - pip install poetry
+    - cd python
+    - poetry run sphinx-build -b html ../docs ../docs/_build/html
+    - cd ../
     - mkdir .public
-    - cd python/docs
-    - make html
-    - cd ../../
-    - cp -r python/docs/_build/html/* .public
+    - cp -r docs/_build/html/* .public
     - mv .public public
   artifacts:
     paths:

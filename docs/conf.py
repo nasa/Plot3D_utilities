@@ -32,7 +32,7 @@ rst_context = {'plot3d': plot3d}
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 
-html_theme = 'classic'
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 extensions = ['sphinx.ext.autodoc',

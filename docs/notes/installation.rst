@@ -16,5 +16,16 @@ Installation via Pip
 Installation from Source
 -------------------------
 
-Download the git repository and navigate to the python folder where you see setup.py. Run the following command `python setup.py install` and that should install the library in your python environment. 
+Download the git repository and navigate to the ``python`` folder. Install using Poetry:
 
+.. code-block:: none
+
+    cd python
+    poetry install
+
+To also install documentation dependencies:
+
+.. code-block:: none
+
+    cd python
+    poetry install --with docs
