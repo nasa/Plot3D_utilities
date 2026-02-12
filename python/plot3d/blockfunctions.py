@@ -216,7 +216,7 @@ def plot_blocks(blocks):
         block = blocks[block_indx]
         gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
     gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
-    blocks = reduce_blocks(deepcopy(blocks),4)
+    blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
     
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
@@ -327,7 +327,7 @@ def calculate_outward_normals(block:Block):
     z = [Z[0,0,0],Z[0,jmax,0],Z[0,0,kmax]]
     u = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]]) 
     v = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
-    n_imin = np.cross(v1,v2) # type: ignore
+    n_imin = np.cross(u,v)
     
     # Normals I direction: IMAX
     x = [X[imax,0,0],X[imax,jmax,0],X[imax,0,kmax]] 

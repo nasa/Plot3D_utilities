@@ -6,19 +6,19 @@ from .blockfunctions import rotate_block, reduce_blocks
 from .face import Face
 from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals, find_bounding_faces,get_outer_faces
 from .connectivity import get_face_intersection, face_matches_to_dict
-from math import cos, radians, sin, sqrt, acos, radians
+from math import cos, radians, sin, sqrt, acos
 from copy import deepcopy
 from tqdm import trange, tqdm
 import math 
 
-def periodicity_fast(blocks:List[Block],outer_faces:List[Face], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
+def periodicity_fast(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """Finds the connectivity of blocks when they are rotated by an angle defined by the number of blades. Only use this if your mesh is of an annulus. 
         This function reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity 
 
     Args:
         blocks (List[Block]): List of blocks that will be scanned for perodicity
         outer_faces (List[Dict[str,int]]): List of outer faces for each block as a dictionary format. You can get this from connectivity
-        matched_faces (ListList[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces 
+        matched_faces (List[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces
         periodic_direction (str): either i,j,k to look for
         rotation_axis (str): either x,y,z
         nblades (int): Number of blades to consider, this affects the rotation angle. 
@@ -132,8 +132,10 @@ def create_rotation_matrix(rotation_angle:float, rotation_axis:str="x"):
         rotation_matrix = np.array([[cos(rotation_angle),-sin(rotation_angle), 0],
                             [sin(rotation_angle),cos(rotation_angle), 0],
                             [0, 0, 1]])
+    else:
+        raise ValueError(f"rotation_axis must be 'x', 'y', or 'z', got '{rotation_axis}'")
 
-    return rotation_matrix 
+    return rotation_matrix
 
 def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """This function is used to check for periodicity of the other faces rotated about an axis. Use periodicity_fast instead. Periodicity_fast calls this function after reducing the size of the mesh.
@@ -142,7 +144,7 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
     Args:
         blocks (List[Block]): List of blocks that will be scanned for perodicity
         outer_faces (List[Dict[str,int]]): List of outer faces for each block as a dictionary format. You can get this from connectivity
-        matched_faces (ListList[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces 
+        matched_faces (List[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces
         periodic_direction (str): either i,j,k to look for
         rotation_axis (str): either x,y,z
         nblades (int): Number of blades to consider, this affects the rotation angle. 
@@ -171,9 +173,10 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
     matched_faces_all = match_faces_dict_to_list(blocks,matched_faces)
 
     split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
+    outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
     while periodic_found:
-        periodic_found = False        
-        outer_faces_to_remove = list()  # Integer list of which outher surfaces to remove
+        periodic_found = False
+        outer_faces_to_remove = list()
         outer_face_combos = list(combinations_with_replacement(range(len(outer_faces_all)),2))
         t = trange(len(outer_face_combos))
         for i in t: 
@@ -204,7 +207,7 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
                             outer_faces_to_remove.append(periodic_faces_temp[0])    # Make sure periodic faces are also removed from outer faces during the loop
                             outer_faces_to_remove.append(periodic_faces_temp[1])
                             periodic_faces.append(periodic_faces_temp)
-                            periodic_faces_export.append((face1,face2,block1_rotated,block2))
+                            periodic_faces_export.append(face_matches_to_dict(face1,face2,block1_rotated,block2))
                             split_faces.extend(split_faces_temp)
                             periodic_found = True
                             break
@@ -339,7 +342,8 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         Rotates the set of blocks by an angle and checks the matching surfaces for R and L. 
 
     Args:
-        blocks (List[Block]): List of blocks for a particular geometry. Do not duplicate the geometry and pass it in! 
+        blocks (List[Block]): List of blocks for a particular geometry. Do not duplicate the geometry and pass it in!
+        matched_faces (List[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces
         outer_faces (List[Dict[str,int]]): List of outer faces in dictionary form
         rotation_angle (float): rotation angle in between geometry in degrees.
         rotation_axis (str, Optional): "x", "y", or "z" 
@@ -364,7 +368,8 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
             - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
     """
     gcd_array = list()
-    # Find the gcd of all the blocks 
+    gcd_to_use = 1
+    # Find the gcd of all the blocks
     if ReduceMesh:
         for block_indx in range(len(blocks)):
             block = blocks[block_indx]
@@ -388,9 +393,10 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
 
     split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
     non_matching = list()
+    outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
     while periodic_found:
-        periodic_found = False        
-        outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
+        periodic_found = False
+        outer_faces_to_remove = list()
         outer_face_combos = list(permutations(range(len(outer_faces_all)),2))
         outer_face_combos = list(set(outer_face_combos) - set(non_matching)) # removes face combinations already checked
         t = trange(len(outer_face_combos))
@@ -473,8 +479,6 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         periodic_faces_export[i]['block1']['JMAX'] *= gcd_to_use
         periodic_faces_export[i]['block1']['KMAX'] *= gcd_to_use
 
-        if (periodic_faces_export[i]['block2']['IMIN'] == 168):
-            print("check")
         periodic_faces_export[i]['block2']['IMIN'] *= gcd_to_use
         periodic_faces_export[i]['block2']['JMIN'] *= gcd_to_use
         periodic_faces_export[i]['block2']['KMIN'] *= gcd_to_use

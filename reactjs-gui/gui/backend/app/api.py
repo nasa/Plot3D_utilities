@@ -115,7 +115,7 @@ def avg_centroid(item: UUIDFilename):
         for index, block in enumerate(blocks):
             cx_total += block.cx
             cy_total += block.cy
-            cy_total += block.cz
+            cz_total += block.cz
         
         cx_avg = cx_total / len(blocks)
         cy_avg = cy_total / len(blocks)
@@ -564,35 +564,35 @@ def delete_file(fileName: str):
         # Remove connectivity pickle file
         conn_pickle_file_path = os.path.join(os.path.abspath("."), "uploads", fileName + "-conn.pickle")
         if os.path.exists(conn_pickle_file_path):
-            os.remove(file_path)
+            os.remove(conn_pickle_file_path)
             removed = True
         else:
             print(f"file does not exist {conn_pickle_file_path}")
         # Remove connectivity json file
         conn_json_file_path = os.path.join(os.path.abspath("."), "uploads", fileName + "-conn.json")
         if os.path.exists(conn_json_file_path):
-            os.remove(file_path)
+            os.remove(conn_json_file_path)
             removed = True
         else:
             print(f"file does not exist {conn_json_file_path}")
         # Remove periodic pickle file
         periodic_pickle_file_path = os.path.join(os.path.abspath("."), "uploads", fileName + "-periodic.pickle")
         if os.path.exists(periodic_pickle_file_path):
-            os.remove(file_path)
+            os.remove(periodic_pickle_file_path)
             removed = True
         else:
             print(f"file does not exist {periodic_pickle_file_path}")
         # Remove periodic json file
         periodic_json_file_path = os.path.join(os.path.abspath("."), "uploads", fileName + "-periodic.json")
         if os.path.exists(periodic_json_file_path):
-            os.remove(file_path)
+            os.remove(periodic_json_file_path)
             removed = True
         else:
             print(f"file does not exist {periodic_json_file_path}")
         # Remove split blocks file
         split_blocks_file_path = os.path.join(os.path.abspath("."), "uploads", fileName +  "-splitblocks")
         if os.path.exists(split_blocks_file_path):
-            os.remove(file_path)
+            os.remove(split_blocks_file_path)
             removed = True
         else:
             print(f"file does not exist {split_blocks_file_path}")

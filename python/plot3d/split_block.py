@@ -50,17 +50,17 @@ def max_aspect_ratio(X:np.ndarray,Y:np.ndarray,Z:np.ndarray,ix:int,jx:int,kx:int
     
     ds = list()
     for n in range(len(i2)):
-        ds.append(sqrt((X(i2[n],j1[n],k1[n])-X(i1[n],j1[n],k1[n]))**2 +
-                    (Y(i2[n],j1[n],k1[n])-Y(i1[n],j1[n],k1[n]))**2 +  
-                    (Z(i2[n],j1[n],k1[n])-Z(i1[n],j1[n],k1[n]))**2)
+        ds.append(sqrt((X[i2[n],j1[n],k1[n]]-X[i1[n],j1[n],k1[n]])**2 +
+                    (Y[i2[n],j1[n],k1[n]]-Y[i1[n],j1[n],k1[n]])**2 +
+                    (Z[i2[n],j1[n],k1[n]]-Z[i1[n],j1[n],k1[n]])**2)
                 )
-        ds.append(sqrt((X(i1[n],j2[n],k1[n])-X(i1[n],j1[n],k1[n]))**2 +  
-                    (Y(i1[n],j2[n],k1[n])-Y(i1[n],j1[n],k1[n]))**2 +  
-                    (Z(i1[n],j2[n],k1[n])-Z(i1[n],j1[n],k1[n]))**2)
+        ds.append(sqrt((X[i1[n],j2[n],k1[n]]-X[i1[n],j1[n],k1[n]])**2 +
+                    (Y[i1[n],j2[n],k1[n]]-Y[i1[n],j1[n],k1[n]])**2 +
+                    (Z[i1[n],j2[n],k1[n]]-Z[i1[n],j1[n],k1[n]])**2)
                 )
-        ds.append(sqrt((X(i1[n],j1[n],k2[n])-X(i1[n],j1[n],k1[n]))**2 + 
-                    (Y(i1[n],j1[n],k2[n])-Y(i1[n],j1[n],k1[n]))**2 + 
-                    (Z(i1[n],j1[n],k2[n])-Z(i1[n],j1[n],k1[n]))**2)
+        ds.append(sqrt((X[i1[n],j1[n],k2[n]]-X[i1[n],j1[n],k1[n]])**2 +
+                    (Y[i1[n],j1[n],k2[n]]-Y[i1[n],j1[n],k1[n]])**2 +
+                    (Z[i1[n],j1[n],k2[n]]-Z[i1[n],j1[n],k1[n]])**2)
                 )
     aspect = [0,0,0]
     if ds[0]>0:
@@ -134,7 +134,7 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
         total_cells = block.IMAX*block.JMAX*block.KMAX
 
         if direction==None: 
-            indx = np.argmin(np.array([block.IMAX,block.JMAX,block.KMAX]))
+            indx = np.argmax(np.array([block.IMAX,block.JMAX,block.KMAX]))
             if indx == 0:
                 direction_to_use=Direction.i
             elif indx == 1:
@@ -153,7 +153,7 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
                 if step_size==-1:
                     step_size = __step_search(total_cells,greatest_common_divisor,ncells_per_block,denominator,direction='forward')
                 if step_size==-1:
-                    assert('no valid step size found, do you have multi-block? gcd > 1')
+                    raise ValueError('no valid step size found, do you have multi-block? gcd > 1')
                 # step_size-1 is the IMAX of the sub_blocks e.g. 0 to 92 this shows IMAX=93, (93-1) % 4 = 0 (good)
                 
                 iprev = 0
@@ -181,10 +181,10 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
                 if step_size==-1:
                     step_size = __step_search(total_cells,greatest_common_divisor,ncells_per_block,denominator,direction='forward')
                 if step_size==-1:
-                    assert('no valid step size found, do you have multi-block? gcd > 1')
+                    raise ValueError('no valid step size found, do you have multi-block? gcd > 1')
                 jprev = 0
                 for j in range(step_size,block.JMAX,step_size):
-                    if (j+1) > block.IMAX:
+                    if (j+1) > block.JMAX:
                         break
                     X = block.X[:,jprev:j,:]      # New X, Y, Z splits 
                     Y = block.Y[:,jprev:j,:]
@@ -205,7 +205,7 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
                 if step_size==-1:
                     step_size = __step_search(total_cells,greatest_common_divisor,ncells_per_block,denominator,direction='forward')
                 if step_size==-1:
-                    assert('no valid step size found, do you have multi-block? gcd > 1')
+                    raise ValueError('no valid step size found, do you have multi-block? gcd > 1')
                 kprev = 0
                 for k in range(step_size,block.KMAX,step_size):
                     if (k+1) > block.KMAX:
