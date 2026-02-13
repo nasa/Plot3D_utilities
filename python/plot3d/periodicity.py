@@ -400,23 +400,22 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         outer_face_combos = list(permutations(range(len(outer_faces_all)),2))
         outer_face_combos = list(set(outer_face_combos) - set(non_matching)) # removes face combinations already checked
         t = trange(len(outer_face_combos))
-        for i in t: 
+        for i in t:
             # Check if surfaces are periodic with each other
             face1_indx = outer_face_combos[i][0]
             face2_indx = outer_face_combos[i][1]
             face1 = outer_faces_all[face1_indx]
             face2 = outer_faces_all[face2_indx]
-            t.set_description(f"Checking connections block {face1.blockIndex} with {face2.blockIndex}")
 
             if (face1.IMIN == face1.IMAX) and (face2.IMIN == face2.IMAX) or \
                 (face1.JMIN == face1.JMAX) and (face2.JMIN == face2.JMAX) or \
                 (face1.KMIN == face1.KMAX) and (face2.KMIN == face2.KMAX):
-                    
+
                 # Rotate Block 1 -> Check periodicity -> if not periodic -> Rotate Block 1 opposite direction -> Check periodicity
                 #   Rotate Block 1
                 block1_rotated = blocks_rotated[face1.blockIndex]
                 block2 = blocks[face2.blockIndex]
-                print(f'evaluating working blocks: a={face1.blockIndex} b={face2.blockIndex}')
+                t.set_description(f"Blk {face1.blockIndex} <-> {face2.blockIndex} | found {len(periodic_faces)}")
                 #   Check periodicity
                 df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
                 
