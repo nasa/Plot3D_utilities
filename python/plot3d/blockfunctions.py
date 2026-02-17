@@ -15,37 +15,22 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy.typing as npt 
 
 def rotate_block(block,rotation_matrix:np.ndarray) -> Block:
-    """Rotates a block by a rotation matrix 
+    """Rotates a block by a rotation matrix
 
     Args:
-        rotation_matrix (np.ndarray): 3x3 rotation matrix 
+        block (Block): Block to rotate
+        rotation_matrix (np.ndarray): 3x3 rotation matrix
 
     Returns:
-        Block: returns a new rotated block 
+        Block: returns a new rotated block
     """
-    X = block.X.copy()
-    Y = block.Y.copy()
-    Z = block.Z.copy()
-    points = np.zeros(shape=(3,block.IMAX*block.JMAX*block.KMAX))
-    indx = 0
-    for i in range(block.IMAX):
-        for j in range(block.JMAX):
-            for k in range(block.KMAX):
-                points[0,indx] = block.X[i,j,k]
-                points[1,indx] = block.Y[i,j,k]
-                points[2,indx] = block.Z[i,j,k]
-                indx+=1
-    points_rotated = np.matmul(rotation_matrix,points)
-    indx=0
-    for i in range(block.IMAX):
-        for j in range(block.JMAX):
-            for k in range(block.KMAX):
-                X[i,j,k] = points_rotated[0,indx]
-                Y[i,j,k] = points_rotated[1,indx]
-                Z[i,j,k] = points_rotated[2,indx]
-                indx+=1
-                
-    return Block(X,Y,Z)
+    shape = block.X.shape
+    pts = np.stack([block.X.ravel(), block.Y.ravel(), block.Z.ravel()], axis=0)  # (3, N)
+    rotated = rotation_matrix @ pts  # (3, N)
+    X = rotated[0].reshape(shape)
+    Y = rotated[1].reshape(shape)
+    Z = rotated[2].reshape(shape)
+    return Block(X, Y, Z)
 
 def get_outer_bounds(blocks:List[Block]):
     """Get outer bounds for a set of blocks

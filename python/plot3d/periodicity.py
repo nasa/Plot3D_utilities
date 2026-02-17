@@ -378,9 +378,13 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
     rotation_matrix = create_rotation_matrix(radians(rotation_angle),rotation_axis)
-    
-    blocks_rotated = [rotate_block(b,rotation_matrix) for b in blocks] 
-   
+
+    _rotated_cache = {}
+    def get_rotated(block_index):
+        if block_index not in _rotated_cache:
+            _rotated_cache[block_index] = rotate_block(blocks[block_index], rotation_matrix)
+        return _rotated_cache[block_index]
+
     # Check periodic within a block 
     periodic_found = True
     
@@ -413,7 +417,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
 
                 # Rotate Block 1 -> Check periodicity -> if not periodic -> Rotate Block 1 opposite direction -> Check periodicity
                 #   Rotate Block 1
-                block1_rotated = blocks_rotated[face1.blockIndex]
+                block1_rotated = get_rotated(face1.blockIndex)
                 block2 = blocks[face2.blockIndex]
                 t.set_description(f"Blk {face1.blockIndex} <-> {face2.blockIndex} | found {len(periodic_faces)}")
                 #   Check periodicity
@@ -437,8 +441,11 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
             outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]
             if len(split_faces)>0:
                 outer_faces_all.extend(split_faces)
-                split_faces.clear()        
-            
+                split_faces.clear()
+
+    # Free rotated block copies no longer needed after the matching loop
+    del _rotated_cache
+
     # This is an added check to make sure all periodic faces are in the outer_faces_to_remove
     for p in periodic_faces:
         outer_faces_to_remove.append(p[0])
@@ -448,8 +455,9 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         outer_faces_to_remove.append(m)
 
     outer_faces_to_remove = list(set(outer_faces_to_remove))    # Use only unique values
-    outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]    # remove from outer faces 
-    # remove any duplicate periodic face pairs 
+    outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]    # remove from outer faces
+
+    # remove any duplicate periodic face pairs
     indx_to_remove = list()
     for i in range(len(periodic_faces)):
         for j in range(i+1,len(periodic_faces)):
@@ -459,12 +467,12 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
             if periodic_faces[i][1] == periodic_faces[j][0]:
                 if periodic_faces[i][0] == periodic_faces[j][1]:
                     indx_to_remove.append(j)
-    
+
 
     periodic_faces_export = [periodic_faces_export[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
     periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
     # Export periodic faces and outer faces
-    outer_faces_export = list() 
+    outer_faces_export = list()
 
     for o in outer_faces_all:
         outer_faces_export.append(o.to_dict())
