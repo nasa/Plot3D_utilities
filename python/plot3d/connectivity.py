@@ -301,36 +301,44 @@ def __check_edge(df:pd.DataFrame):
     else:
         return True
     
-def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
-    """Returns the indices of the nearest 6 blocks based on their centroid
+def candidate_neighbor_pairs(blocks:List[Block], tol:float=1e-6):
+    """Return (i, j) pairs of block indices whose bounding boxes overlap or touch.
+
+    Two blocks can only share a face if their axis-aligned bounding boxes (AABBs)
+    overlap or touch. This replaces the old centroid-distance approach which could
+    miss neighbors for irregularly shaped blocks (L-shaped, elongated, etc.).
 
     Args:
-        block (Block): block you are interested in
         blocks (List[Block]): list of all your blocks
+        tol (float): AABB expansion tolerance. Blocks whose bounding boxes are
+            within this distance of touching are still considered candidates.
 
     Returns:
-        List[Tuple[int,int]]: combinations of nearest blocks 
+        List[Tuple[int,int]]: candidate block pairs (i, j) with i < j
     """
-    # Pick a block get centroid of all outer faces        
-    centroids = np.array([(b.cx,b.cy,b.cz) for b in blocks])
-    distance_matrix = np.zeros((centroids.shape[0],centroids.shape[0]))+10000
-    # Build a matrix 
-    for i in range(centroids.shape[0]):
-        for j in range(centroids.shape[0]):
-            if i!=j:
-                dx = centroids[i,0]-centroids[j,0]
-                dy = centroids[i,1]-centroids[j,1]
-                dz = centroids[i,2]-centroids[j,2]
-                distance_matrix[i,j] = np.sqrt(dx*dx+dy*dy+dz*dz)
-    
-    # Now that we have this matrix, we sort the distances by rows and pick the closest 8 blocks, can use 4 but 8 might be safer
-    new_combos = list()
-    for i in range(len(blocks)): # For block i
-        indices = np.argsort(distance_matrix[i,:])
-        for j in indices[:nearest_nblocks]:
-            if distance_matrix[i,j] < 10000:
-                new_combos.append((i,j))
-    return new_combos
+    n = len(blocks)
+    # Precompute axis-aligned bounding boxes: [xmin, xmax, ymin, ymax, zmin, zmax]
+    aabbs = np.empty((n, 6), dtype=np.float64)
+    for i, b in enumerate(blocks):
+        aabbs[i, 0] = b.X.min()
+        aabbs[i, 1] = b.X.max()
+        aabbs[i, 2] = b.Y.min()
+        aabbs[i, 3] = b.Y.max()
+        aabbs[i, 4] = b.Z.min()
+        aabbs[i, 5] = b.Z.max()
+
+    pairs = []
+    for i in range(n):
+        for j in range(i + 1, n):
+            # Check AABB overlap/touch with tolerance on each axis
+            if (aabbs[i, 1] + tol >= aabbs[j, 0] and
+                aabbs[j, 1] + tol >= aabbs[i, 0] and
+                aabbs[i, 3] + tol >= aabbs[j, 2] and
+                aabbs[j, 3] + tol >= aabbs[i, 2] and
+                aabbs[i, 5] + tol >= aabbs[j, 4] and
+                aabbs[j, 5] + tol >= aabbs[i, 4]):
+                pairs.append((i, j))
+    return pairs
     
 def connectivity_fast(blocks:List[Block]):
     """Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity 
@@ -390,7 +398,7 @@ def connectivity(blocks:List[Block]):
     matches_to_remove = list()
     temp = [get_outer_faces(b) for b in blocks]
     block_outer_faces = [t[0] for t in temp]
-    combos = combinations_of_nearest_blocks(blocks,6) # Find the 6 nearest Blocks and search through all that. 
+    combos = candidate_neighbor_pairs(blocks) # Find all block pairs whose bounding boxes touch/overlap
     # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[0],blocks[1],[block_outer_faces[0][0],block_outer_faces[0][1]],[block_outer_faces[1][0],block_outer_faces[1][1]],1E-12)    # This function finds partial matches between blocks
 
     t = trange(len(combos))    

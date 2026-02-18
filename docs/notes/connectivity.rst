@@ -3,7 +3,7 @@ Block to Block Connectivity
 
 Computational Grids are often divided into blocks for easier gridding. It is important to know how these blocks connect with each other in order to model the transfer of information. Computational Fluid Dynamics (CFD) requires the solver to know the "connectivity" of these blocks. 
 
-The plot3D python library has a function for determining the connectivity. This is found by taking the combination of each block with another block and scanning the nodes on the exterior faces of block 1 with the exterior face of block 2. If there is a match then the two faces are connected. The code can search for *full face matches* or *partial matching*. *Full face matching* is much faster and should be used if your grid has a definite match. 
+The plot3D python library has a function for determining the connectivity. Candidate block pairs are identified using axis-aligned bounding box (AABB) overlap: two blocks can only share a face if their bounding boxes touch or overlap. This is guaranteed to find all true neighbors regardless of block shape (L-shaped, elongated, curved, etc.). For each candidate pair the code scans the nodes on the exterior faces of block 1 with the exterior face of block 2. If there is a match then the two faces are connected. The code can search for *full face matches* or *partial matching*. *Full face matching* is much faster and should be used if your grid has a definite match.
 
 Below is an example of a turbine domain with two blocks: HGrid in (red) and ogrid in (white). The two share a connected face with partial matching. There's also the o-mesh which within itself has a connected face. 
 
