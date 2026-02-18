@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Tuple
 from .listfunctions import unique_pairs
-from .block import Block, reduce_blocks
+from .block import Block, compute_gcd, reduce_blocks
 from .face import Face 
 from copy import deepcopy
 import numpy.typing as npt
@@ -292,8 +292,7 @@ def find_bounding_faces(blocks: List[Block],
         lower_connected_faces_export, upper_connected_faces_export, lower_connected_faces, upper_connected_faces
     """
     # 1) Reduce by GCD so grids line up
-    gcd_array = [math.gcd(b.IMAX-1, math.gcd(b.JMAX-1, b.KMAX-1)) for b in blocks]
-    gcd_to_use = min(gcd_array)
+    gcd_to_use = compute_gcd(blocks)
     blocks_r = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
     # 2) Build outer face list at reduced resolution
@@ -380,6 +379,107 @@ def find_bounding_faces(blocks: List[Block],
             lower_connected_faces,
             upper_connected_faces)
 
+
+def _to_theta(x, y, z, rotation_axis: str):
+    """Compute angular position (theta) about the given rotation axis.
+
+    Conventions match Block.cylindrical() for x-axis:
+        x-axis: theta = atan2(Y, Z)
+        y-axis: theta = atan2(Z, X)
+        z-axis: theta = atan2(Y, X)
+    """
+    if rotation_axis == "x":
+        return np.arctan2(y, z)
+    elif rotation_axis == "y":
+        return np.arctan2(z, x)
+    else:  # "z"
+        return np.arctan2(y, x)
+
+
+def _to_radius(x, y, z, rotation_axis: str):
+    """Compute radial distance from the given rotation axis."""
+    if rotation_axis == "x":
+        return np.sqrt(y * y + z * z)
+    elif rotation_axis == "y":
+        return np.sqrt(z * z + x * x)
+    else:  # "z"
+        return np.sqrt(y * y + x * x)
+
+
+def _global_theta_extreme(blocks: List[Block], rotation_axis: str) -> Tuple[float, float]:
+    """Global (theta_min, theta_max) across all blocks."""
+    thetas = []
+    for b in blocks:
+        theta = _to_theta(b.X.ravel(), b.Y.ravel(), b.Z.ravel(), rotation_axis)
+        thetas.append(theta)
+    all_theta = np.concatenate(thetas)
+    return float(all_theta.min()), float(all_theta.max())
+
+
+def _face_theta_extreme(face: Face, rotation_axis: str) -> Tuple[float, float]:
+    """Return (theta_min, theta_max) of the face's stored vertices."""
+    n = face.nvertex
+    theta = _to_theta(face.x[:n], face.y[:n], face.z[:n], rotation_axis)
+    return float(theta.min()), float(theta.max())
+
+
+def find_angular_bounding_faces(
+    blocks: List[Block],
+    outer_faces: List[Dict[str, int]],
+    rotation_axis: str = "x",
+    tol_rel: float = 1e-6,
+) -> Tuple[List[Dict[str, int]], List[Dict[str, int]], List[Face], List[Face]]:
+    """Find outer faces on the angular (theta) min/max boundaries of an annular domain.
+
+    This is the rotational analog of find_bounding_faces() for translational periodicity.
+    Works for any rotation axis (x, y, or z).
+
+    Args:
+        blocks: list of Block
+        outer_faces: outer faces in dict form (at original scale)
+        rotation_axis: 'x', 'y', or 'z'
+        tol_rel: relative tolerance for theta comparison
+
+    Returns:
+        (lower_theta_export, upper_theta_export, lower_theta_faces, upper_theta_faces)
+        Returns empty lists if the domain is non-annular (theta range > pi).
+    """
+    axis = rotation_axis.lower().strip()
+    assert axis in ("x", "y", "z")
+
+    # Convert outer faces to Face objects (at original scale)
+    outer_faces_all = outer_face_dict_to_list(blocks, outer_faces)
+
+    # Global theta range from all block grid points
+    theta_min, theta_max = _global_theta_extreme(blocks, axis)
+    theta_range = theta_max - theta_min
+
+    # Non-annular check: if domain spans more than half the circle, give up
+    if theta_range > np.pi or theta_range < 1e-10:
+        return [], [], [], []
+
+    tol_abs = max(1e-8, tol_rel * theta_range)
+
+    # Classify faces: a face is on the lower/upper angular boundary if ALL its
+    # corner vertices are at the global theta_min/theta_max within tolerance.
+    lower_faces: List[Face] = []
+    upper_faces: List[Face] = []
+
+    for f in outer_faces_all:
+        f_theta_min, f_theta_max = _face_theta_extreme(f, axis)
+        # ALL corners at theta_min
+        if (f_theta_max - theta_min) <= tol_abs:
+            lower_faces.append(f)
+        # ALL corners at theta_max
+        elif (theta_max - f_theta_min) <= tol_abs:
+            upper_faces.append(f)
+
+    lower_export = [f.to_dict() for f in lower_faces]
+    upper_export = [f.to_dict() for f in upper_faces]
+
+    return lower_export, upper_export, lower_faces, upper_faces
+
+
 def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray,centroid:np.ndarray,translational_direction:str="x",minvalue:bool=True):
     """Find the closest block to an extreme in the x,y, or z direction and returns the targeting point. 
     Target point is the reference point where we want the closest block and the closest face 
@@ -389,8 +489,8 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
         y (np.ndarray): y coordinate of all the blocks' centroid
         z (np.ndarray): z coordinate of all the blocks' centroid
         centroid (np.ndarray): centroid (cx,cy,cz)
-        translational_direction (str, optional): _description_. Defaults to "x".
-        minvalue (bool, optional): _description_. Defaults to True.
+        translational_direction (str, optional): Axis along which to search ('x', 'y', or 'z'). Defaults to "x".
+        minvalue (bool, optional): If True, find block nearest the minimum extent; if False, the maximum. Defaults to True.
 
     Returns:
         (tuple): containing
@@ -599,10 +699,10 @@ def match_faces_dict_to_list(blocks:List[Block],matched_faces:List[Dict[str,int]
     Args:
         blocks (List[Block]): List of blocks 
         matched_faces (List[Dict[str,int]]): List of matched faces represented as a dictionary 
-        gcd (int, optional): _description_. Defaults to 1.
+        gcd (int, optional): GCD factor to scale down face indices. Defaults to 1 (no scaling).
 
     Returns:
-        _type_: _description_
+        List[Face]: Face objects built from the matched-face dictionaries.
     """
     matched_faces_all = list() 
     for _,m in enumerate(matched_faces):

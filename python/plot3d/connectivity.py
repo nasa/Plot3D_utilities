@@ -1,14 +1,12 @@
-from .block import Block
-from .blockfunctions import reduce_blocks
+from .block import Block, compute_gcd, reduce_blocks
 from .face import Face
 from .facefunctions import create_face_from_diagonals, split_face, get_outer_faces
-import math 
-from itertools import product, combinations
+import math
+from itertools import product
 from tqdm import trange
-import numpy as np 
+import numpy as np
 import pandas as pd
 from typing import List
-import math
 from .point_match import point_match
 from copy import deepcopy
 
@@ -345,12 +343,7 @@ def connectivity_fast(blocks:List[Block]):
         (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'surfaces': [{'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX', 'ID'}] }
         
     """
-    gcd_array = list()
-    # Find the gcd of all the blocks 
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))        
-    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+    gcd_to_use = compute_gcd(blocks)
     print(f"gcd to use {gcd_to_use}")
     new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
@@ -587,12 +580,8 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
         (list): verified face_matches whose diagonals are confirmed or corrected
         (list): mismatched face_matches where no corner permutation matched
     """
-    # Compute GCD and reduce blocks (same pattern as connectivity_fast)
-    gcd_array = list()
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array)
+    # Compute GCD and reduce blocks
+    gcd_to_use = compute_gcd(blocks)
     reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
     # Scale down face_matches indices by GCD

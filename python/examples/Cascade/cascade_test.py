@@ -1,6 +1,6 @@
 from itertools import combinations
 import os
-from plot3d import write_plot3D, read_plot3D, periodicity, periodicity_fast
+from plot3d import write_plot3D, read_plot3D, rotated_periodicity
 from plot3d import find_matching_blocks, get_outer_faces, connectivity_fast
 from glennht_con import export_to_glennht_conn
 import pickle
@@ -24,7 +24,7 @@ with open('connectivity.pickle','rb') as f:
 
 blocks = read_plot3D('vspt.xyz', binary = True)
 
-periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity_fast(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
+periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = rotated_periodicity(blocks,face_matches,outer_faces,nblades=55,rotation_axis='x',periodic_direction='k')
 
 
 with open('connectivity_periodic.pickle','wb') as f:

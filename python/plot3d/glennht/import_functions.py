@@ -5,7 +5,7 @@ def read_ght_conn(filename:str):
     """Reads in the glennht connectivity file and splits it into partitions using metis 
 
     Args:
-        filename (str): _description_
+        filename (str): Path to the .ght_conn connectivity file.
 
     Returns:
         

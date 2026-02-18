@@ -1,8 +1,8 @@
 from itertools import combinations
 import os, sys
 sys.path.insert(0,'../../')
-from plot3d import write_plot3D, read_plot3D, periodicity, split_blocks, Direction,get_face_intersection
-from plot3d import find_matching_blocks, get_outer_faces, connectivity
+from plot3d import write_plot3D, read_plot3D, rotated_periodicity, split_blocks, Direction, get_face_intersection
+from plot3d import find_matching_blocks, get_outer_faces, connectivity_fast
 from glennht_con import export_to_glennht_conn
 import pickle
 
@@ -17,7 +17,7 @@ def find_connectivity():
         blocks_split = split_blocks(blocks,300000, direction=Direction.i)
         write_plot3D('finalmesh_split.xyz',blocks_split,binary=True)
         # Note: Block splits may not be exactly matching with each other so we have to run the connecitvity code again 
-        face_matches, outer_faces_formatted = connectivity(blocks_split)
+        face_matches, outer_faces_formatted = connectivity_fast(blocks_split)
         with open('connectivity-block-split.pickle','wb') as f:
             pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_formatted},f)
 
@@ -29,7 +29,7 @@ def find_periodicity():
 
     blocks = read_plot3D('finalmesh_split.xyz', binary = True, big_endian=False)
 
-    periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
+    periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = rotated_periodicity(blocks,face_matches,outer_faces,nblades=55,rotation_axis='x',periodic_direction='k')
     face_matches.extend(periodic_surfaces)
 
     with open('connectivity-block-split_v02.pickle','wb') as f:

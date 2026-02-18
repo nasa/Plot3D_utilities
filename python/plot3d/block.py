@@ -36,10 +36,10 @@ class Block:
         return f"({self.IMAX},{self.JMAX},{self.KMAX})"
     
     def scale(self,factor:float):
-        """Scales a mesh by a certain factor 
+        """Scales a mesh by a certain factor.
 
         Args:
-            factor (float): _description_
+            factor (float): Multiplicative scale factor applied to X, Y, Z.
         """
         
         self.X *= factor
@@ -47,11 +47,11 @@ class Block:
         self.Z *= factor
 
     def shift(self,shift_amount:float,direction:str="z"):
-        """shifts the blocks by a certain amount
+        """Shifts the block coordinates by a given amount along an axis.
 
         Args:
-            shift_amount (float): _description_
-            direction (str, optional): _description_. Defaults to "z".
+            shift_amount (float): Distance to shift.
+            direction (str, optional): Axis to shift along ('x', 'y', or 'z'). Defaults to 'z'.
         """
         if direction.lower() == 'z':
             self.Z +=shift_amount
@@ -198,15 +198,31 @@ class Block:
         return self.IMAX*self.JMAX*self.KMAX
 
 
-def reduce_blocks(blocks:List[Block],factor:int):
-    """reduce the blocks by a factor of (factor)
+def compute_gcd(blocks: List[Block]) -> int:
+    """Compute the minimum GCD across all blocks' (IMAX-1, JMAX-1, KMAX-1).
+
+    This is used throughout the library to reduce blocks to a coarser resolution
+    for faster matching, then scale results back up.
 
     Args:
-        blocks (List[Block]): list of blocks to reduce in size
-        factor (int, optional): Number of indicies to skip . Defaults to 2.
+        blocks (List[Block]): List of blocks.
 
     Returns:
-        [type]: [description]
+        int: Minimum GCD factor across all blocks.
+    """
+    gcd_array = [math.gcd(b.IMAX - 1, math.gcd(b.JMAX - 1, b.KMAX - 1)) for b in blocks]
+    return min(gcd_array)
+
+
+def reduce_blocks(blocks:List[Block],factor:int):
+    """Reduce blocks to a coarser resolution by subsampling every ``factor`` indices.
+
+    Args:
+        blocks (List[Block]): List of blocks to reduce in size. Modified in-place.
+        factor (int): Number of indices to skip (stride).
+
+    Returns:
+        List[Block]: The same list of blocks, now at reduced resolution.
     """
     for i in range(len(blocks)):
         blocks[i].X = blocks[i].X[::factor,::factor,::factor]

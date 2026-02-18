@@ -16,7 +16,7 @@ from datetime import datetime
 
 from pathlib import Path
 
-from plot3d import write_plot3D, read_plot3D, connectivity_fast, periodicity, split_blocks, Direction
+from plot3d import write_plot3D, read_plot3D, connectivity_fast, rotated_periodicity, split_blocks, Direction
 
 import pickle
 
@@ -407,7 +407,7 @@ def periodicities(item: PeriodicitiesItem):
         outer_faces = data['outer_faces']
 
     # This step may take a while. It is looking for periodicity for all surfaces that have constant "i,j,k", rotation_axis = "x,y,z", nblades=int
-    periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity(blocks,outer_faces,face_matches,periodic_direction=item.periodicDirection,rotation_axis=item.rotationAxis,nblades=item.nblades)
+    periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = rotated_periodicity(blocks,face_matches,outer_faces,nblades=item.nblades,rotation_axis=item.rotationAxis,periodic_direction=item.periodicDirection)
 
     # Save results
     periodic_file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName + "-periodic.pickle")

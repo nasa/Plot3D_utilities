@@ -1,18 +1,15 @@
 from copy import deepcopy
-from itertools import combinations, product
+from itertools import combinations
 import math
 import numpy as np
+import numpy.typing as npt
 from typing import Dict, List, Optional, Set, Tuple
 from tqdm import trange
-from .facefunctions import create_face_from_diagonals, get_outer_faces, find_matching_faces,faces_match
-from .block import Block, reduce_blocks
-from .write import write_plot3D
-from .face import Face
-import tqdm
 import networkx as nx
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D  
-import numpy.typing as npt 
+from .facefunctions import create_face_from_diagonals, get_outer_faces, find_matching_faces, faces_match
+from .block import Block, compute_gcd, reduce_blocks
+from .face import Face
 
 def rotate_block(block,rotation_matrix:np.ndarray) -> Block:
     """Rotates a block by a rotation matrix
@@ -100,11 +97,7 @@ def block_connection_matrix(
         connectivity_k   : (n,n) connections where both faces are K-constant
     """
     # Reduce the size of the blocks by the minimum GCD so index grids line up
-    gcd_array = []
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX - 1, math.gcd(block.JMAX - 1, block.KMAX - 1)))
-    gcd_to_use = min(gcd_array)
+    gcd_to_use = compute_gcd(blocks)
     blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
     # Convert dict outer faces (if provided) to Face objects at the reduced resolution
@@ -196,11 +189,7 @@ def block_connection_matrix(
     return connectivity, connectivity_i, connectivity_j, connectivity_k
 
 def plot_blocks(blocks):
-    gcd_array = list()    
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+    gcd_to_use = compute_gcd(blocks)
     blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
     
     fig = plt.figure(figsize=(10, 8))
@@ -355,15 +344,6 @@ def calculate_outward_normals(block:Block):
     n_kmax = np.cross(v1,v2)
 
     return n_imin,n_jmin,n_kmin,n_imax,n_jmax,n_kmax
-
-def split_blocks(blocks:List[Block],gcd:int=4):
-    """Split blocks but also keep greatest common divisor
-
-    Args:
-        blocks (List[]): _description_
-        gcd (int, optional): _description_. Defaults to 4.
-    """
-    pass
 
 def common_neighbor(G: nx.Graph, a: int, b: int, exclude: Set[int]) -> Optional[int]:
     """

@@ -1,112 +1,23 @@
 from typing import List, Dict, Tuple, Optional
-from itertools import combinations_with_replacement, permutations, product
 import numpy as np
-from .block import Block
-from .blockfunctions import rotate_block, reduce_blocks
-from .face import Face
-from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals, find_bounding_faces,get_outer_faces
-from .connectivity import get_face_intersection, face_matches_to_dict
+import math
 from math import cos, radians, sin, sqrt, acos
 from copy import deepcopy
-from tqdm import trange, tqdm
-import math 
+from .block import Block, compute_gcd, reduce_blocks
+from .blockfunctions import rotate_block
+from .face import Face
+from .facefunctions import (outer_face_dict_to_list, match_faces_dict_to_list,
+    create_face_from_diagonals, find_bounding_faces, get_outer_faces,
+    find_angular_bounding_faces, _to_theta, _to_radius)
+from .connectivity import get_face_intersection, face_matches_to_dict
 
-def periodicity_fast(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
-    """Finds the connectivity of blocks when they are rotated by an angle defined by the number of blades. Only use this if your mesh is of an annulus. 
-        This function reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity 
+def _scale_dicts_down(dicts: List[Dict], gcd: int, keys=('IMIN','JMIN','KMIN','IMAX','JMAX','KMAX')):
+    """Scale dictionary face indices down by GCD factor."""
+    for d in dicts:
+        for k in keys:
+            if k in d:
+                d[k] = int(d[k] / gcd)
 
-    Args:
-        blocks (List[Block]): List of blocks that will be scanned for perodicity
-        outer_faces (List[Dict[str,int]]): List of outer faces for each block as a dictionary format. You can get this from connectivity
-        matched_faces (List[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces
-        periodic_direction (str): either i,j,k to look for
-        rotation_axis (str): either x,y,z
-        nblades (int): Number of blades to consider, this affects the rotation angle. 
-
-    Returns:
-        (Tuple): containing
-
-        - **periodic_faces_export** (List[Dict[str,int]]):  This is list of all the surfaces/faces that match when rotated by an angle formatted as a dictionary.
-        - **outer_faces_export** (List[Dict[str,int]]): These are the list of outer faces that are not periodic formatted as a dictionary.
-        - **periodic_faces** (List[Tuple[Face,Face]]): - This is a list of Face objects that are connected to each other organized as a list of tuples: [Face1, Face2] where Face 1 will contain the block number and the diagonals [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]. Example: blk: 1 [168,0,0,268,100,0].
-        - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
-        
-    """
-    gcd_array = list()
-    # Find the gcd of all the blocks 
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
-    print(f"gcd to use {gcd_to_use}")
-    new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
-    matched_faces = deepcopy(matched_faces)
-    # Reduce face matches for the block 
-    for i in range(len(matched_faces)):
-        matched_faces[i]['block1']['IMIN'] = int(matched_faces[i]['block1']['IMIN']/gcd_to_use)
-        matched_faces[i]['block1']['JMIN'] = int(matched_faces[i]['block1']['JMIN']/gcd_to_use)
-        matched_faces[i]['block1']['KMIN'] = int(matched_faces[i]['block1']['KMIN']/gcd_to_use)
-        matched_faces[i]['block1']['IMAX'] = int(matched_faces[i]['block1']['IMAX']/gcd_to_use)
-        matched_faces[i]['block1']['JMAX'] = int(matched_faces[i]['block1']['JMAX']/gcd_to_use)
-        matched_faces[i]['block1']['KMAX'] = int(matched_faces[i]['block1']['KMAX']/gcd_to_use)
-
-        matched_faces[i]['block2']['IMIN'] = int(matched_faces[i]['block2']['IMIN']/gcd_to_use)
-        matched_faces[i]['block2']['JMIN'] = int(matched_faces[i]['block2']['JMIN']/gcd_to_use)
-        matched_faces[i]['block2']['KMIN'] = int(matched_faces[i]['block2']['KMIN']/gcd_to_use)
-        matched_faces[i]['block2']['IMAX'] = int(matched_faces[i]['block2']['IMAX']/gcd_to_use)
-        matched_faces[i]['block2']['JMAX'] = int(matched_faces[i]['block2']['JMAX']/gcd_to_use)
-        matched_faces[i]['block2']['KMAX'] = int(matched_faces[i]['block2']['KMAX']/gcd_to_use)
-
-    # Reduce outer faces for the block
-    for i in range(len(outer_faces)):
-        outer_faces[i]['IMIN'] = int(outer_faces[i]['IMIN']/gcd_to_use)
-        outer_faces[i]['IMAX'] = int(outer_faces[i]['IMAX']/gcd_to_use)
-        outer_faces[i]['JMIN'] = int(outer_faces[i]['JMIN']/gcd_to_use)
-        outer_faces[i]['JMAX'] = int(outer_faces[i]['JMAX']/gcd_to_use)
-        outer_faces[i]['KMIN'] = int(outer_faces[i]['KMIN']/gcd_to_use)
-        outer_faces[i]['KMAX'] = int(outer_faces[i]['KMAX']/gcd_to_use)
-
-    # Find Periodicity 
-    periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all = periodicity(new_blocks,outer_faces,matched_faces,periodic_direction,rotation_axis,nblades)
-    # scale it up
-    for i in range(len(periodic_faces_export)):
-        periodic_faces_export[i]['block1']['IMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['JMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['KMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['IMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['JMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['KMAX'] *= gcd_to_use
-
-        periodic_faces_export[i]['block2']['IMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['JMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['KMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['IMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['JMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['KMAX'] *= gcd_to_use
-    
-    for i in range(len(periodic_faces)):
-        periodic_faces[i][0].I *= gcd_to_use
-        periodic_faces[i][0].J *= gcd_to_use
-        periodic_faces[i][0].K *= gcd_to_use
-
-        periodic_faces[i][1].I *= gcd_to_use
-        periodic_faces[i][1].J *= gcd_to_use
-        periodic_faces[i][1].K *= gcd_to_use
-
-    for j in range(len(outer_faces_export)):
-        outer_faces_export[j]['IMIN'] *= gcd_to_use
-        outer_faces_export[j]['JMIN'] *= gcd_to_use
-        outer_faces_export[j]['KMIN'] *= gcd_to_use
-        outer_faces_export[j]['IMAX'] *= gcd_to_use
-        outer_faces_export[j]['JMAX'] *= gcd_to_use
-        outer_faces_export[j]['KMAX'] *= gcd_to_use
-    
-    for j in range(len(outer_faces_all)):
-        outer_faces_all[j].I *= gcd_to_use
-        outer_faces_all[j].J *= gcd_to_use
-        outer_faces_all[j].K *= gcd_to_use
-        
-    return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
 def create_rotation_matrix(rotation_angle:float, rotation_axis:str="x"):
     """Creates a rotation matrix given an angle and axis 
@@ -137,383 +48,336 @@ def create_rotation_matrix(rotation_angle:float, rotation_axis:str="x"):
 
     return rotation_matrix
 
-def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
-    """This function is used to check for periodicity of the other faces rotated about an axis. Use periodicity_fast instead. Periodicity_fast calls this function after reducing the size of the mesh.
-        The way it works is to find faces of a constant i,j, or k value
+
+def _faces_could_match_rotationally(
+    face1: Face, face2: Face,
+    rotation_matrix: np.ndarray,
+    rotation_axis: str,
+    tol_rel: float = 0.1,
+) -> bool:
+    """Cheap geometric pre-checks to reject obviously non-matching face pairs.
+
+    Checks (in order of cost): same const_type, cell count, axial overlap,
+    radial overlap, rotated centroid proximity.
+    """
+    # 1. Same const_type
+    if face1.const_type != face2.const_type:
+        return False
+    if face1.const_type == -1:
+        return False
+
+    # 2. Cell count compatibility
+    if face1.size != face2.size:
+        return False
+
+    # 3. Axial extent overlap (along rotation axis)
+    axis = rotation_axis.lower()
+    n1, n2 = face1.nvertex, face2.nvertex
+    if axis == "x":
+        f1_ax = (float(face1.x[:n1].min()), float(face1.x[:n1].max()))
+        f2_ax = (float(face2.x[:n2].min()), float(face2.x[:n2].max()))
+    elif axis == "y":
+        f1_ax = (float(face1.y[:n1].min()), float(face1.y[:n1].max()))
+        f2_ax = (float(face2.y[:n2].min()), float(face2.y[:n2].max()))
+    else:
+        f1_ax = (float(face1.z[:n1].min()), float(face1.z[:n1].max()))
+        f2_ax = (float(face2.z[:n2].min()), float(face2.z[:n2].max()))
+
+    axial_span = max(f1_ax[1] - f1_ax[0], f2_ax[1] - f2_ax[0], 1e-12)
+    tol_axial = tol_rel * axial_span
+    if f1_ax[1] + tol_axial < f2_ax[0] or f2_ax[1] + tol_axial < f1_ax[0]:
+        return False
+
+    # 4. Radial extent overlap
+    r1 = _to_radius(face1.x[:n1], face1.y[:n1], face1.z[:n1], axis)
+    r2 = _to_radius(face2.x[:n2], face2.y[:n2], face2.z[:n2], axis)
+    r1_range = (float(r1.min()), float(r1.max()))
+    r2_range = (float(r2.min()), float(r2.max()))
+    radial_span = max(r1_range[1] - r1_range[0], r2_range[1] - r2_range[0], 1e-12)
+    tol_radial = tol_rel * radial_span
+    if r1_range[1] + tol_radial < r2_range[0] or r2_range[1] + tol_radial < r1_range[0]:
+        return False
+
+    # 5. Rotated centroid proximity
+    c1 = np.array([[face1.cx], [face1.cy], [face1.cz]])
+    c1_rotated = (rotation_matrix @ c1).flatten()
+    c2 = np.array([face2.cx, face2.cy, face2.cz])
+    dist = float(np.sqrt(np.sum((c1_rotated - c2) ** 2)))
+    max_diag = max(face1.diagonal_length, face2.diagonal_length)
+    if dist > max_diag * 1.5:
+        return False
+
+    return True
+
+
+def _match_periodic_faces(
+    blocks: List[Block],
+    outer_faces_all: List[Face],
+    matched_faces_all: List[Face],
+    rotation_matrices: List[np.ndarray],
+    rotation_axis: str,
+    periodic_direction: Optional[str] = None,
+) -> Tuple[List[Dict], List[Dict], List[Tuple], List[Face]]:
+    """Core matching engine for rotated_periodicity().
 
     Args:
-        blocks (List[Block]): List of blocks that will be scanned for perodicity
-        outer_faces (List[Dict[str,int]]): List of outer faces for each block as a dictionary format. You can get this from connectivity
-        matched_faces (List[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces
-        periodic_direction (str): either i,j,k to look for
-        rotation_axis (str): either x,y,z
-        nblades (int): Number of blades to consider, this affects the rotation angle. 
+        blocks: reduced blocks
+        outer_faces_all: outer faces as Face objects (at reduced scale)
+        matched_faces_all: matched faces as Face objects (at reduced scale)
+        rotation_matrices: list of rotation matrices to try (1 or 2)
+        rotation_axis: 'x', 'y', or 'z'
+        periodic_direction: 'i', 'j', or 'k' to filter faces (None = any)
 
     Returns:
-        (Tuple): containing
-            
-            - **periodic_faces_export** (List[Dict[str,int]]):  This is list of all the surfaces/faces that match when rotated by an angle formatted as a dictionary.
-            - **outer_faces_export** (List[Dict[str,int]]): These are the list of outer faces that are not periodic formatted as a dictionary.
-            - **periodic_faces** (List[Tuple[Face,Face]]): - This is a list of Face objects that are connected to each other organized as a list of tuples: [Face1, Face2] where Face 1 will contain the block number and the diagonals [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]. Example: blk: 1 [168,0,0,268,100,0].
-            - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
-
+        (periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all)
     """
-    
-    rotation_angle = radians(360.0/nblades)
-    rotation_matrix1 = create_rotation_matrix(rotation_angle,rotation_axis)
-    rotation_matrix2 = create_rotation_matrix(-rotation_angle,rotation_axis)
-    
-    # Check periodic within a block 
-    periodic_found = True
-    
-    # Here we make a list of all the outer faces
-    periodic_faces = list()      # This is the output of the code 
-    periodic_faces_export = list() 
-    outer_faces_all = outer_face_dict_to_list(blocks,outer_faces)
-    matched_faces_all = match_faces_dict_to_list(blocks,matched_faces)
+    # Build rotation caches (one per matrix, lazy)
+    caches = {}
+    for idx, mat in enumerate(rotation_matrices):
+        caches[idx] = {}
 
-    split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
-    outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
-    while periodic_found:
-        periodic_found = False
-        outer_faces_to_remove = list()
-        outer_face_combos = list(combinations_with_replacement(range(len(outer_faces_all)),2))
-        t = trange(len(outer_face_combos))
-        for i in t: 
-            # Check if surfaces are periodic with each other
-            face1_indx = outer_face_combos[i][0]
-            face2_indx = outer_face_combos[i][1]
-            face1 = outer_faces_all[face1_indx]
-            face2 = outer_faces_all[face2_indx]
-            t.set_description(f"Checking connections block {face1.blockIndex} with {face2.blockIndex}")
+    def get_rotated(matrix_idx: int, block_index: int) -> Block:
+        cache = caches[matrix_idx]
+        if block_index not in cache:
+            cache[block_index] = rotate_block(blocks[block_index], rotation_matrices[matrix_idx])
+        return cache[block_index]
 
-            if periodic_direction.lower() == "i":
-                
-                if (face1.IMIN == face1.IMAX) and (face2.IMIN == face2.IMAX):
-                    # Rotate Block 1 -> Check periodicity -> if not periodic -> Rotate Block 1 opposite direction -> Check periodicity
-                    #   Rotate Block 1
-                    block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
-                    block2 = blocks[face2.blockIndex]
-                    #   Check periodicity
-                    df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
+    # Try to identify angular boundary faces
+    # Build dict-form outer faces for find_angular_bounding_faces
+    outer_dicts = [f.to_dict() for f in outer_faces_all]
+    lower_export, upper_export, lower_faces, upper_faces = find_angular_bounding_faces(
+        blocks, outer_dicts, rotation_axis
+    )
 
-                    if len(periodic_faces_temp) == 0:
-                        block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix2)
-                        block2 = blocks[face2.blockIndex]
-                        df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
-                        if len(periodic_faces_temp)>0:  # Save the data
-                            outer_faces_to_remove.append(face1)
-                            outer_faces_to_remove.append(face2)
-                            outer_faces_to_remove.append(periodic_faces_temp[0])    # Make sure periodic faces are also removed from outer faces during the loop
-                            outer_faces_to_remove.append(periodic_faces_temp[1])
-                            periodic_faces.append(periodic_faces_temp)
-                            periodic_faces_export.append(face_matches_to_dict(face1,face2,block1_rotated,block2))
-                            split_faces.extend(split_faces_temp)
-                            periodic_found = True
-                            break
-                    else:   # Save the data
-                        outer_faces_to_remove.append(face1)
-                        outer_faces_to_remove.append(face2)
-                        outer_faces_to_remove.append(periodic_faces_temp[0])
-                        outer_faces_to_remove.append(periodic_faces_temp[1])
-                        periodic_faces.append(periodic_faces_temp)
-                        periodic_faces_export.append(face_matches_to_dict(face1,face2,block1_rotated,block2))
-                        split_faces.extend(split_faces_temp)
-                        periodic_found = True
-                        break
+    use_angular = len(lower_faces) > 0 and len(upper_faces) > 0
 
-            elif periodic_direction.lower() == "j":
-                
-                if (face1.JMIN == face1.JMAX) and (face2.JMIN == face2.JMAX): 
-                    # Rotate Block 1 -> Check periodicity -> if not periodic -> Rotate Block 1 opposite direction -> Check periodicity
-                    #   Rotate Block 1
-                    block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
-                    block2 = blocks[face2.blockIndex]
-                    #   Check periodicity
-                    df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
+    def _face_key(f: Face):
+        return (f.BlockIndex, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX)
 
-                    if len(periodic_faces_temp) == 0:
-                        block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix2)
-                        block2 = blocks[face2.blockIndex]
-                        df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
-                        if len(periodic_faces_temp)>0:  # Save the data
-                            outer_faces_to_remove.append(face1)
-                            outer_faces_to_remove.append(face2)
-                            outer_faces_to_remove.append(periodic_faces_temp[0])
-                            outer_faces_to_remove.append(periodic_faces_temp[1])
-                            periodic_faces.append(periodic_faces_temp)
-                            periodic_faces_export.append(face_matches_to_dict(face1,face2,block1_rotated,block2))
-                            split_faces.extend(split_faces_temp)
-                            periodic_found = True
-                            break
-                    else:   # Save the data
-                        outer_faces_to_remove.append(face1)
-                        outer_faces_to_remove.append(face2)
-                        outer_faces_to_remove.append(periodic_faces_temp[0])
-                        outer_faces_to_remove.append(periodic_faces_temp[1])
-                        periodic_faces.append(periodic_faces_temp)
-                        periodic_faces_export.append(face_matches_to_dict(face1,face2,block1_rotated,block2))
-                        split_faces.extend(split_faces_temp)
-                        periodic_found = True
-                        break
+    if use_angular:
+        lower_keys = {_face_key(f) for f in lower_faces}
+        upper_keys = {_face_key(f) for f in upper_faces}
 
-            elif periodic_direction.lower() == 'k':       # constant k between surfaces 
-                 if (face1.KMIN == face1.KMAX) and (face2.KMIN == face2.KMAX): 
-                    # Rotate Block 1 -> Check periodicity -> if not periodic -> Rotate Block 1 opposite direction -> Check periodicity
-                    #   Rotate Block 1
-                    block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix1)
-                    block2 = blocks[face2.blockIndex]
-                    #   Check periodicity
-                    df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
+        lower_pool = [f for f in outer_faces_all if _face_key(f) in lower_keys]
+        upper_pool = [f for f in outer_faces_all if _face_key(f) in upper_keys]
+    else:
+        # Fallback: use all outer faces for both pools
+        lower_pool = list(outer_faces_all)
+        upper_pool = list(outer_faces_all)
 
-                    if len(periodic_faces_temp) == 0:
-                        block1_rotated = rotate_block(blocks[face1.blockIndex],rotation_matrix2)
-                        block2 = blocks[face2.blockIndex]
-                        df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
-                        if len(periodic_faces_temp)>0:  # Save the data
-                            outer_faces_to_remove.append(face1)
-                            outer_faces_to_remove.append(face2)
-                            outer_faces_to_remove.append(periodic_faces_temp[0])
-                            outer_faces_to_remove.append(periodic_faces_temp[1])
-                            periodic_faces.append(periodic_faces_temp)
-                            periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1_rotated,block2))
-                            split_faces.extend(split_faces_temp)
-                            periodic_found = True
-                            break
-                    else:   # Save the data
-                        outer_faces_to_remove.append(face1)
-                        outer_faces_to_remove.append(face2)
-                        outer_faces_to_remove.append(periodic_faces_temp[0])
-                        outer_faces_to_remove.append(periodic_faces_temp[1])
-                        periodic_faces.append(periodic_faces_temp)
-                        periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1_rotated,block2))
-                        split_faces.extend(split_faces_temp)
-                        periodic_found = True
-                        break
+    # Filter by periodic_direction if specified
+    dir_const_map = {"i": 0, "j": 1, "k": 2}
+    if periodic_direction is not None:
+        required_const = dir_const_map.get(periodic_direction.lower())
+        if required_const is not None:
+            lower_pool = [f for f in lower_pool if f.const_type == required_const]
+            upper_pool = [f for f in upper_pool if f.const_type == required_const]
 
-        if (periodic_found):
-            outer_faces_to_remove = list(set(outer_faces_to_remove))
-            outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]
-            if len(split_faces)>0:
-                outer_faces_all.extend(split_faces)
-                split_faces.clear()
+    # Single-pass greedy matching
+    periodic_faces: List[Tuple] = []
+    periodic_faces_export: List[Dict] = []
+    split_faces_collected: List[Face] = []
 
-    # This is an added check to make sure all periodic faces are in the outer_faces_to_remove
-    for p in periodic_faces:
-        outer_faces_to_remove.append(p[0])
-        outer_faces_to_remove.append(p[1])
+    upper_remaining = list(upper_pool)
 
-    for m in matched_faces_all:
-        outer_faces_to_remove.append(m)
+    for fL in list(lower_pool):
+        matched = False
+        for mat_idx, rot_mat in enumerate(rotation_matrices):
+            if matched:
+                break
+            for j, fU in enumerate(upper_remaining):
+                if not _faces_could_match_rotationally(fL, fU, rot_mat, rotation_axis):
+                    continue
 
-    outer_faces_to_remove = list(set(outer_faces_to_remove))    # Use only unique values
-    outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]    # remove from outer faces 
-    # remove any duplicate periodic face pairs 
-    indx_to_remove = list()
-    for i in range(len(periodic_faces)):
-        for j in range(i+1,len(periodic_faces)):
-            if periodic_faces[i][0] == periodic_faces[j][0]:
-                if periodic_faces[i][1] == periodic_faces[j][1]:
-                    indx_to_remove.append(j)
-            if periodic_faces[i][1] == periodic_faces[j][0]:
-                if periodic_faces[i][0] == periodic_faces[j][1]:
-                    indx_to_remove.append(j)
-    
+                block1_rotated = get_rotated(mat_idx, fL.blockIndex)
+                block2 = blocks[fU.blockIndex]
 
-    periodic_faces_export = [periodic_faces_export[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
-    periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
-    # Export periodic faces and outer faces
-    outer_faces_export = list() 
+                df, periodic_temp, split_temp = __periodicity_check__(
+                    fL, fU, block1_rotated, block2
+                )
 
-    for o in outer_faces_all:
-        outer_faces_export.append(o.to_dict())
-                        
-    return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
-
-
-def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]], rotation_angle:float, rotation_axis:str = "x", ReduceMesh:bool=True):
-    """Finds the peridocity/connectivity by rotating a block. This is a bit different from "periodicity_fast" where you specify the periodic direction. This method doesn't care about the direction as long as the angle you specify results in a match between the Left Face and the Right Face. I would use this instead.
-
-    Example 1:              
-        L      RL           R
-        | blk1 || Copy blk1 |
-        | blk2 || Copy blk2 |
-        | blk3 || Copy blk3 |
-        Rotates the set of blocks by an angle and checks the matching surfaces for R and L. 
-
-    Args:
-        blocks (List[Block]): List of blocks for a particular geometry. Do not duplicate the geometry and pass it in!
-        matched_faces (List[Dict[str,int]]): List of matched faces from connectivity. Matched faces was added so that it's always removed from outer faces
-        outer_faces (List[Dict[str,int]]): List of outer faces in dictionary form
-        rotation_angle (float): rotation angle in between geometry in degrees.
-        rotation_axis (str, Optional): "x", "y", or "z" 
-        ReduceMesh (bool, Optional): True, reduces the mesh for faster matching
-    
-    periodic_faces, outer_faces_export, _, _ = rotated_periodicity(blocks,face_matches, outer_faces, rotation_angle=rotation_angle, rotation_axis = "x")
-    
-    Replaces:
-        Is the same as 
-
-        periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity_fast(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
-        and
-        periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
-
-
-    Returns:
-        (Tuple): containing
-            
-            - **periodic_faces_export** (List[Dict[str,int]]):  This is list of all the surfaces/faces that match when rotated by an angle formatted as a dictionary.
-            - **outer_faces_export** (List[Dict[str,int]]): These are the list of outer faces that are not periodic formatted as a dictionary.
-            - **periodic_faces** (List[Tuple[Face,Face]]): - This is a list of Face objects that are connected to each other organized as a list of tuples: [Face1, Face2] where Face 1 will contain the block number and the diagonals [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]. Example: blk: 1 [168,0,0,268,100,0].
-            - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
-    """
-    gcd_array = list()
-    gcd_to_use = 1
-    # Find the gcd of all the blocks
-    if ReduceMesh:
-        for block_indx in range(len(blocks)):
-            block = blocks[block_indx]
-            gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-        gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
-        blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
-
-    rotation_matrix = create_rotation_matrix(radians(rotation_angle),rotation_axis)
-
-    _rotated_cache = {}
-    def get_rotated(block_index):
-        if block_index not in _rotated_cache:
-            _rotated_cache[block_index] = rotate_block(blocks[block_index], rotation_matrix)
-        return _rotated_cache[block_index]
-
-    # Check periodic within a block 
-    periodic_found = True
-    
-    # Here we make a list of all the outer faces
-    periodic_faces = list()      # This is the output of the code 
-    periodic_faces_export = list() 
-
-    outer_faces_all = outer_face_dict_to_list(blocks,outer_faces,gcd_to_use)
-    matched_faces_all = match_faces_dict_to_list(blocks,matched_faces,gcd_to_use)
-
-    split_faces = list()         # List of split but free surfaces, this will be appended to outer_faces_to_remove list
-    non_matching = list()
-    outer_faces_to_remove = list()  # Integer list of which outer surfaces to remove
-    while periodic_found:
-        periodic_found = False
-        outer_faces_to_remove = list()
-        outer_face_combos = list(permutations(range(len(outer_faces_all)),2))
-        outer_face_combos = list(set(outer_face_combos) - set(non_matching)) # removes face combinations already checked
-        t = trange(len(outer_face_combos))
-        for i in t:
-            # Check if surfaces are periodic with each other
-            face1_indx = outer_face_combos[i][0]
-            face2_indx = outer_face_combos[i][1]
-            face1 = outer_faces_all[face1_indx]
-            face2 = outer_faces_all[face2_indx]
-
-            if (face1.IMIN == face1.IMAX) and (face2.IMIN == face2.IMAX) or \
-                (face1.JMIN == face1.JMAX) and (face2.JMIN == face2.JMAX) or \
-                (face1.KMIN == face1.KMAX) and (face2.KMIN == face2.KMAX):
-
-                # Rotate Block 1 -> Check periodicity -> if not periodic -> Rotate Block 1 opposite direction -> Check periodicity
-                #   Rotate Block 1
-                block1_rotated = get_rotated(face1.blockIndex)
-                block2 = blocks[face2.blockIndex]
-                t.set_description(f"Blk {face1.blockIndex} <-> {face2.blockIndex} | found {len(periodic_faces)}")
-                #   Check periodicity
-                df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
-                
-                if len(periodic_faces_temp) > 0:
-                    outer_faces_to_remove.append(face1)
-                    outer_faces_to_remove.append(face2)
-                    outer_faces_to_remove.append(periodic_faces_temp[0])
-                    outer_faces_to_remove.append(periodic_faces_temp[1])
-                    periodic_faces.append(periodic_faces_temp)
-                    periodic_faces_export.append(face_matches_to_dict(periodic_faces_temp[0],periodic_faces_temp[1],block1_rotated,block2))
-                    split_faces.extend(split_faces_temp)
-                    periodic_found = True
+                if len(periodic_temp) > 0:
+                    periodic_faces.append(periodic_temp)
+                    periodic_faces_export.append(
+                        face_matches_to_dict(periodic_temp[0], periodic_temp[1], block1_rotated, block2)
+                    )
+                    split_faces_collected.extend(split_temp)
+                    upper_remaining.pop(j)
+                    matched = True
                     break
-            else: 
-                non_matching.append((face1_indx,face2_indx))
 
-        if (periodic_found):
-            outer_faces_to_remove = list(set(outer_faces_to_remove))
-            outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]
-            if len(split_faces)>0:
-                outer_faces_all.extend(split_faces)
-                split_faces.clear()
+    # Second pass: handle split faces (rare)
+    if split_faces_collected:
+        split_as_lower = []
+        split_as_upper = []
+        if use_angular:
+            for sf in split_faces_collected:
+                k = _face_key(sf)
+                if k in lower_keys:
+                    split_as_lower.append(sf)
+                elif k in upper_keys:
+                    split_as_upper.append(sf)
+        else:
+            split_as_lower = list(split_faces_collected)
+            split_as_upper = list(split_faces_collected)
 
-    # Free rotated block copies no longer needed after the matching loop
-    del _rotated_cache
+        for fL in split_as_lower:
+            for mat_idx, rot_mat in enumerate(rotation_matrices):
+                found = False
+                for j, fU in enumerate(upper_remaining):
+                    if not _faces_could_match_rotationally(fL, fU, rot_mat, rotation_axis):
+                        continue
+                    block1_rotated = get_rotated(mat_idx, fL.blockIndex)
+                    block2 = blocks[fU.blockIndex]
+                    df, periodic_temp, split_temp = __periodicity_check__(fL, fU, block1_rotated, block2)
+                    if len(periodic_temp) > 0:
+                        periodic_faces.append(periodic_temp)
+                        periodic_faces_export.append(
+                            face_matches_to_dict(periodic_temp[0], periodic_temp[1], block1_rotated, block2)
+                        )
+                        upper_remaining.pop(j)
+                        found = True
+                        break
+                if found:
+                    break
 
-    # This is an added check to make sure all periodic faces are in the outer_faces_to_remove
+    # Free rotation caches
+    caches.clear()
+
+    # Build removal set for outer faces
+    outer_faces_to_remove: List[Face] = []
     for p in periodic_faces:
         outer_faces_to_remove.append(p[0])
         outer_faces_to_remove.append(p[1])
-
     for m in matched_faces_all:
         outer_faces_to_remove.append(m)
+    outer_faces_to_remove = list(set(outer_faces_to_remove))
 
-    outer_faces_to_remove = list(set(outer_faces_to_remove))    # Use only unique values
-    outer_faces_all = [p for p in outer_faces_all if p not in outer_faces_to_remove]    # remove from outer faces
+    outer_faces_final = [p for p in outer_faces_all if p not in outer_faces_to_remove]
+    # Add non-matched split faces back
+    for sf in split_faces_collected:
+        if sf not in outer_faces_to_remove and sf not in outer_faces_final:
+            outer_faces_final.append(sf)
 
-    # remove any duplicate periodic face pairs
-    indx_to_remove = list()
+    # Deduplicate periodic face pairs
+    indx_to_remove = []
     for i in range(len(periodic_faces)):
-        for j in range(i+1,len(periodic_faces)):
-            if periodic_faces[i][0] == periodic_faces[j][0]:
-                if periodic_faces[i][1] == periodic_faces[j][1]:
-                    indx_to_remove.append(j)
-            if periodic_faces[i][1] == periodic_faces[j][0]:
-                if periodic_faces[i][0] == periodic_faces[j][1]:
-                    indx_to_remove.append(j)
-
+        for j_idx in range(i + 1, len(periodic_faces)):
+            if periodic_faces[i][0] == periodic_faces[j_idx][0]:
+                if periodic_faces[i][1] == periodic_faces[j_idx][1]:
+                    indx_to_remove.append(j_idx)
+            if periodic_faces[i][1] == periodic_faces[j_idx][0]:
+                if periodic_faces[i][0] == periodic_faces[j_idx][1]:
+                    indx_to_remove.append(j_idx)
 
     periodic_faces_export = [periodic_faces_export[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
     periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
-    # Export periodic faces and outer faces
-    outer_faces_export = list()
 
-    for o in outer_faces_all:
-        outer_faces_export.append(o.to_dict())
+    # Build outer faces export
+    outer_faces_export = [o.to_dict() for o in outer_faces_final]
 
-    # scale it up
-    for i in range(len(periodic_faces_export)):
-        periodic_faces_export[i]['block1']['IMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['JMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['KMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['IMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['JMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block1']['KMAX'] *= gcd_to_use
+    return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_final
 
-        periodic_faces_export[i]['block2']['IMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['JMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['KMIN'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['IMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['JMAX'] *= gcd_to_use
-        periodic_faces_export[i]['block2']['KMAX'] *= gcd_to_use
-    
-    for i in range(len(periodic_faces)):
-        periodic_faces[i][0].I *= gcd_to_use
-        periodic_faces[i][0].J *= gcd_to_use
-        periodic_faces[i][0].K *= gcd_to_use
 
-        periodic_faces[i][1].I *= gcd_to_use
-        periodic_faces[i][1].J *= gcd_to_use
-        periodic_faces[i][1].K *= gcd_to_use
+def _scale_results_up(periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all, gcd_to_use):
+    """Scale reduced-resolution results back to original grid resolution."""
+    if gcd_to_use <= 1:
+        return
 
-    for j in range(len(outer_faces_export)):
-        outer_faces_export[j]['IMIN'] *= gcd_to_use
-        outer_faces_export[j]['JMIN'] *= gcd_to_use
-        outer_faces_export[j]['KMIN'] *= gcd_to_use
-        outer_faces_export[j]['IMAX'] *= gcd_to_use
-        outer_faces_export[j]['JMAX'] *= gcd_to_use
-        outer_faces_export[j]['KMAX'] *= gcd_to_use
-    
-    for j in range(len(outer_faces_all)):
-        outer_faces_all[j].I *= gcd_to_use
-        outer_faces_all[j].J *= gcd_to_use
-        outer_faces_all[j].K *= gcd_to_use
+    for rec in periodic_faces_export:
+        for side in ('block1', 'block2'):
+            for key in ('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX'):
+                rec[side][key] *= gcd_to_use
+
+    for pair in periodic_faces:
+        for face in pair:
+            face.I *= gcd_to_use
+            face.J *= gcd_to_use
+            face.K *= gcd_to_use
+
+    for rec in outer_faces_export:
+        for key in ('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX'):
+            rec[key] *= gcd_to_use
+
+    for face in outer_faces_all:
+        face.I *= gcd_to_use
+        face.J *= gcd_to_use
+        face.K *= gcd_to_use
+
+
+def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]],
+                        rotation_angle:float=None, rotation_axis:str = "x",
+                        periodic_direction:str=None, nblades:int=None,
+                        ReduceMesh:bool=True):
+    """Find rotational periodicity between outer faces by rotating blocks.
+
+    Detects which outer faces match after rotation by the given angle about the
+    specified axis. Automatically reduces the mesh by GCD for faster matching,
+    uses angular boundary detection to narrow candidates, and applies geometric
+    pre-checks to reject non-matching pairs cheaply.
+
+    Tries both +angle and -angle rotations for robustness.
+
+    Args:
+        blocks (List[Block]): List of blocks (do not duplicate and pass in!).
+        matched_faces (List[Dict[str,int]]): Matched faces from connectivity.
+        outer_faces (List[Dict[str,int]]): Outer faces in dictionary form.
+        rotation_angle (float, optional): Rotation angle in degrees. Either this
+            or ``nblades`` must be provided. If both are given, ``rotation_angle``
+            takes precedence.
+        rotation_axis (str, optional): Axis of rotation: 'x', 'y', or 'z'. Defaults to 'x'.
+        periodic_direction (str, optional): Filter to only check faces with a constant
+            'i', 'j', or 'k' index. None means check all directions. Defaults to None.
+        nblades (int, optional): Number of blades. Used to compute
+            ``rotation_angle = 360.0 / nblades`` when ``rotation_angle`` is not provided.
+        ReduceMesh (bool, optional): If True, reduces the mesh by GCD for faster matching.
+            Defaults to True.
+
+    Returns:
+        (Tuple): containing
+
+            - **periodic_faces_export** (List[Dict[str,int]]): periodic face pairs as dicts
+            - **outer_faces_export** (List[Dict[str,int]]): remaining outer faces as dicts
+            - **periodic_faces** (List[Tuple[Face,Face]]): periodic face pairs as Face objects
+            - **outer_faces_all** (List[Face]): remaining outer faces as Face objects
+
+    Example::
+
+        # Using rotation_angle directly
+        periodic_faces, outer_faces_export, _, _ = rotated_periodicity(
+            blocks, face_matches, outer_faces,
+            rotation_angle=6.545, rotation_axis="x")
+
+        # Using nblades (computes 360/nblades)
+        periodic_faces, outer_faces_export, _, _ = rotated_periodicity(
+            blocks, face_matches, outer_faces,
+            nblades=55, rotation_axis="x", periodic_direction="k")
+    """
+    # Resolve rotation angle
+    if rotation_angle is None and nblades is not None:
+        rotation_angle = 360.0 / nblades
+    elif rotation_angle is None:
+        raise ValueError("Either rotation_angle (degrees) or nblades must be provided.")
+
+    gcd_to_use = 1
+    if ReduceMesh:
+        gcd_to_use = compute_gcd(blocks)
+        blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
+
+    # Build both +angle and -angle rotation matrices for robustness
+    rotation_matrix_pos = create_rotation_matrix(radians(rotation_angle), rotation_axis)
+    rotation_matrix_neg = create_rotation_matrix(radians(-rotation_angle), rotation_axis)
+
+    outer_faces_all = outer_face_dict_to_list(blocks, outer_faces, gcd_to_use)
+    matched_faces_all = match_faces_dict_to_list(blocks, matched_faces, gcd_to_use)
+
+    periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all = _match_periodic_faces(
+        blocks, outer_faces_all, matched_faces_all,
+        [rotation_matrix_pos, rotation_matrix_neg], rotation_axis, periodic_direction
+    )
+
+    _scale_results_up(periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all, gcd_to_use)
+
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
 def translational_periodicity(
@@ -607,8 +471,7 @@ def translational_periodicity(
     assert axis in ("x","y","z")
 
     # 1) GCD reduce
-    gcd_array = [math.gcd(b.IMAX-1, math.gcd(b.JMAX-1, b.KMAX-1)) for b in blocks]
-    gcd_to_use = min(gcd_array)
+    gcd_to_use = compute_gcd(blocks)
 
     lower_faces_r = outer_face_dict_to_list(blocks, lower_connected_faces, gcd_to_use)
     upper_faces_r = outer_face_dict_to_list(blocks, upper_connected_faces, gcd_to_use)
@@ -925,8 +788,7 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, ro
     permutations of block2's face corners. If a valid permutation is found,
     the face_match is corrected and added to the verified list.
 
-    Uses GCD reduction (same as connectivity_fast / periodicity_fast) for
-    efficient coordinate lookups.
+    Uses GCD reduction for efficient coordinate lookups.
 
     Args:
         blocks (List[Block]): List of all blocks (original full-resolution)
@@ -939,12 +801,8 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, ro
         (list): verified face_matches whose diagonals are confirmed or corrected
         (list): mismatched face_matches where no corner permutation matched
     """
-    # Compute GCD and reduce blocks (same pattern as connectivity_fast)
-    gcd_array = list()
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array)
+    # Compute GCD and reduce blocks
+    gcd_to_use = compute_gcd(blocks)
     reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
     # Build rotation matrices for +theta and -theta

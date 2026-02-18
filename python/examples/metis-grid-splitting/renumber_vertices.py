@@ -1,6 +1,6 @@
 import sys, os
 sys.path.insert(0,'../../')
-from plot3d import read_plot3D, write_plot3D, connectivity_fast, periodicity_fast
+from plot3d import read_plot3D, write_plot3D, connectivity_fast, rotated_periodicity
 from plot3d.graph import block_to_graph, get_face_vertex_indices, add_connectivity_to_graph
 import numpy as np
 import numpy.typing as npt 
@@ -31,7 +31,7 @@ if not os.path.exists('./VSPT_Binary.xyz'):
     
     face_matches, outer_faces = connectivity_fast(blocks)
     
-    periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = periodicity_fast(blocks,outer_faces,face_matches,periodic_direction='k',rotation_axis='x',nblades=55)
+    periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = rotated_periodicity(blocks,face_matches,outer_faces,nblades=55,rotation_axis='x',periodic_direction='k')
     
     face_matches.extend(periodic_surfaces)
     export_to_glennht_conn(face_matches,outer_faces_to_keep,'vspt')
