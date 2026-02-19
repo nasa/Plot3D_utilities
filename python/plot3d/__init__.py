@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+use_single_precision = False
+
 from .block import Block, compute_gcd, reduce_blocks
 from .blockfunctions import rotate_block, get_outer_bounds, block_connection_matrix, plot_blocks, find_matching_faces
 from .block_merging_mixed_facepairs import combine_nxnxn_cubes_mixed_pairs

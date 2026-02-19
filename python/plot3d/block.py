@@ -23,7 +23,12 @@ class Block:
             Z (npt.NDArray): All the Z coordinates (i,j,k)
 
         """
-        self.IMAX,self.JMAX,self.KMAX = X.shape; 
+        import plot3d as _p3d
+        if getattr(_p3d, 'use_single_precision', False):
+            X = np.asarray(X, dtype=np.float32)
+            Y = np.asarray(Y, dtype=np.float32)
+            Z = np.asarray(Z, dtype=np.float32)
+        self.IMAX,self.JMAX,self.KMAX = X.shape;
         self.X = X
         self.Y = Y
         self.Z = Z
