@@ -11,7 +11,7 @@ from .facefunctions import create_face_from_diagonals, get_outer_faces, find_bou
 from .read import read_plot3D, read_ap_nasa
 from .write import write_plot3D
 from .differencing import find_edges, find_face_edges
-from .periodicity import create_rotation_matrix, rotated_periodicity, translational_periodicity, verify_periodicity
+from .periodicity import create_rotation_matrix, rotated_periodicity, translational_periodicity, verify_periodicity, periodicity, periodicity_fast
 from .point_match import point_match
 from .split_block import split_blocks, Direction
 from .listfunctions import unique_pairs

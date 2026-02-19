@@ -1,6 +1,7 @@
 from .block import Block, compute_gcd, reduce_blocks
 from .face import Face
 from .facefunctions import create_face_from_diagonals, split_face, get_outer_faces
+from .utils import euclidean_distance, enumerate_unique_corners, scale_face_dict_indices
 import gc
 import math
 from itertools import product
@@ -331,30 +332,11 @@ def connectivity_fast(blocks:List[Block]):
     print(f"gcd to use {gcd_to_use}")
     new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
-    # Find Connectivity 
+    # Find Connectivity
     face_matches, outer_faces_formatted = connectivity(new_blocks)
     # scale it up
-    for i in range(len(face_matches)):
-        face_matches[i]['block1']['IMIN'] *= gcd_to_use
-        face_matches[i]['block1']['JMIN'] *= gcd_to_use
-        face_matches[i]['block1']['KMIN'] *= gcd_to_use
-        face_matches[i]['block1']['IMAX'] *= gcd_to_use
-        face_matches[i]['block1']['JMAX'] *= gcd_to_use
-        face_matches[i]['block1']['KMAX'] *= gcd_to_use
-
-        face_matches[i]['block2']['IMIN'] *= gcd_to_use
-        face_matches[i]['block2']['JMIN'] *= gcd_to_use
-        face_matches[i]['block2']['KMIN'] *= gcd_to_use
-        face_matches[i]['block2']['IMAX'] *= gcd_to_use
-        face_matches[i]['block2']['JMAX'] *= gcd_to_use
-        face_matches[i]['block2']['KMAX'] *= gcd_to_use
-    for j in range(len(outer_faces_formatted)):
-        outer_faces_formatted[j]['IMIN'] *= gcd_to_use
-        outer_faces_formatted[j]['JMIN'] *= gcd_to_use
-        outer_faces_formatted[j]['KMIN'] *= gcd_to_use
-        outer_faces_formatted[j]['IMAX'] *= gcd_to_use
-        outer_faces_formatted[j]['JMAX'] *= gcd_to_use
-        outer_faces_formatted[j]['KMAX'] *= gcd_to_use
+    scale_face_dict_indices(face_matches, gcd_to_use, nested_sides=['block1', 'block2'])
+    scale_face_dict_indices(outer_faces_formatted, gcd_to_use)
     return face_matches, outer_faces_formatted
 
 def connectivity(blocks:List[Block]):
@@ -613,19 +595,8 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
         z1_u = block1.Z[b1['IMAX'], b1['JMAX'], b1['KMAX']]
 
         # Enumerate unique corners of block2's face
-        I2 = [b2['IMIN'], b2['IMAX']]
-        J2 = [b2['JMIN'], b2['JMAX']]
-        K2 = [b2['KMIN'], b2['KMAX']]
-
-        unique_corners = list()
-        seen = set()
-        for i in I2:
-            for j in J2:
-                for k in K2:
-                    key = (i, j, k)
-                    if key not in seen:
-                        seen.add(key)
-                        unique_corners.append(key)
+        unique_corners = enumerate_unique_corners(
+            [b2['IMIN'], b2['IMAX']], [b2['JMIN'], b2['JMAX']], [b2['KMIN'], b2['KMAX']])
 
         # Check stored diagonal first
         x2_l = block2.X[b2['IMIN'], b2['JMIN'], b2['KMIN']]
@@ -636,10 +607,8 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
         y2_u = block2.Y[b2['IMAX'], b2['JMAX'], b2['KMAX']]
         z2_u = block2.Z[b2['IMAX'], b2['JMAX'], b2['KMAX']]
 
-        dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
-        d_lower = math.sqrt(dx*dx + dy*dy + dz*dz)
-        dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
-        d_upper = math.sqrt(dx*dx + dy*dy + dz*dz)
+        d_lower = euclidean_distance(x1_l, y1_l, z1_l, x2_l, y2_l, z2_l)
+        d_upper = euclidean_distance(x1_u, y1_u, z1_u, x2_u, y2_u, z2_u)
 
         if d_lower < tol and d_upper < tol:
             verified.append(face_matches[idx])
@@ -658,18 +627,10 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
                 il, jl, kl = corner_lower
                 iu, ju, ku = corner_upper
 
-                x2_l = block2.X[il, jl, kl]
-                y2_l = block2.Y[il, jl, kl]
-                z2_l = block2.Z[il, jl, kl]
-
-                x2_u = block2.X[iu, ju, ku]
-                y2_u = block2.Y[iu, ju, ku]
-                z2_u = block2.Z[iu, ju, ku]
-
-                dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
-                dl = math.sqrt(dx*dx + dy*dy + dz*dz)
-                dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
-                du = math.sqrt(dx*dx + dy*dy + dz*dz)
+                dl = euclidean_distance(x1_l, y1_l, z1_l,
+                                       block2.X[il, jl, kl], block2.Y[il, jl, kl], block2.Z[il, jl, kl])
+                du = euclidean_distance(x1_u, y1_u, z1_u,
+                                       block2.X[iu, ju, ku], block2.Y[iu, ju, ku], block2.Z[iu, ju, ku])
 
                 if dl < best_d_lower:
                     best_d_lower = dl

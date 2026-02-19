@@ -1,4 +1,5 @@
 from typing import List, Dict, Tuple, Optional
+import warnings
 import numpy as np
 import math
 from math import cos, radians, sin, sqrt, acos
@@ -10,6 +11,8 @@ from .facefunctions import (outer_face_dict_to_list, match_faces_dict_to_list,
     create_face_from_diagonals, find_bounding_faces, get_outer_faces,
     find_angular_bounding_faces, _to_theta, _to_radius)
 from .connectivity import get_face_intersection, face_matches_to_dict
+from .utils import euclidean_distance, enumerate_unique_corners, scale_face_dict_indices
+from tqdm import tqdm
 
 def _scale_dicts_down(dicts: List[Dict], gcd: int, keys=('IMIN','JMIN','KMIN','IMAX','JMAX','KMAX')):
     """Scale dictionary face indices down by GCD factor."""
@@ -179,6 +182,11 @@ def _match_periodic_faces(
     split_faces_all: List[Face] = []
     non_matching: set = set()  # Track known non-matching pairs to skip
 
+    initial_lower = len(lower_pool)
+    initial_upper = len(upper_pool)
+    pbar = tqdm(total=min(initial_lower, initial_upper),
+                desc="Periodic matching", unit="pair")
+
     periodic_found = True
     while periodic_found:
         periodic_found = False
@@ -229,7 +237,14 @@ def _match_periodic_faces(
 
                         split_faces_all.extend(split_temp)
                         periodic_found = True
+                        pbar.update(1)
+                        pbar.set_description(
+                            f"Periodic match: block {fL.blockIndex} <-> block {fU.blockIndex}")
+                        pbar.set_postfix(matches=len(periodic_faces),
+                                         lower=len(lower_pool), upper=len(upper_pool))
                         break
+
+    pbar.close()
 
     # Free rotation caches
     caches.clear()
@@ -303,8 +318,8 @@ def _scale_results_up(periodic_faces_export, outer_faces_export, periodic_faces,
 
 
 def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]],
-                        rotation_angle:float=None, rotation_axis:str = "x",
-                        periodic_direction:str=None, nblades:int=None,
+                        rotation_angle:float|None=None, rotation_axis:str = "x",
+                        periodic_direction:str|None=None, nblades:int | None=None,
                         ReduceMesh:bool=True):
     """Find rotational periodicity between outer faces by rotating blocks.
 
@@ -617,10 +632,14 @@ def translational_periodicity(
     periodic_pairs_r: List[Tuple[Face, Face, Dict[str,str]]] = []
     periodic_export: List[Dict[str, Dict[str,int]]] = []
 
-    for fL in list(lower_pool):
+    pbar = tqdm(list(lower_pool), desc="Translational periodicity", unit="face")
+    for fL in pbar:
         for j, fU in enumerate(upper_pool):
             ok, mode = faces_match(fL, fU)
             if ok:
+                pbar.set_description(
+                    f"Translational match: block {fL.BlockIndex} <-> block {fU.BlockIndex}")
+                pbar.set_postfix(matches=len(periodic_pairs_r) + 1, remaining=len(upper_pool) - 1)
                 m = mapping_minmax(fL, fU)
                 periodic_pairs_r.append((fL, fU, m))
                 periodic_export.append({
@@ -640,10 +659,7 @@ def translational_periodicity(
     del blocks_up, blocks_dn
 
     # 9) scale back up
-    for rec in periodic_export:
-        for side in ("block1","block2"):
-            for k in ("IMIN","JMIN","KMIN","IMAX","JMAX","KMAX"):
-                rec[side][k] = int(rec[side][k] * gcd_to_use)
+    scale_face_dict_indices(periodic_export, gcd_to_use, nested_sides=["block1", "block2"])
 
     periodic_pairs: List[Tuple[Face, Face, Dict[str,str]]] = []
     for (fL, fU, m) in periodic_pairs_r:
@@ -775,6 +791,41 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
     return df,periodic_faces,split_faces
 
 
+def periodicity(blocks, outer_faces, matched_faces, periodic_direction='k',
+                rotation_axis='x', nblades=55):
+    """Deprecated. Use rotated_periodicity() instead.
+
+    Note: argument order differs from rotated_periodicity —
+    this function takes (blocks, outer_faces, matched_faces)
+    while rotated_periodicity takes (blocks, matched_faces, outer_faces).
+    """
+    warnings.warn(
+        "periodicity() is deprecated. Use rotated_periodicity(blocks, matched_faces, "
+        "outer_faces, nblades=N, periodic_direction='k') instead.",
+        DeprecationWarning, stacklevel=2)
+    return rotated_periodicity(blocks, matched_faces, outer_faces,
+                               nblades=nblades, rotation_axis=rotation_axis,
+                               periodic_direction=periodic_direction)
+
+
+def periodicity_fast(blocks, outer_faces, matched_faces, periodic_direction='k',
+                     rotation_axis='x', nblades=55):
+    """Deprecated. Use rotated_periodicity() instead.
+
+    Note: argument order differs from rotated_periodicity —
+    this function takes (blocks, outer_faces, matched_faces)
+    while rotated_periodicity takes (blocks, matched_faces, outer_faces).
+    """
+    warnings.warn(
+        "periodicity_fast() is deprecated. Use rotated_periodicity(blocks, matched_faces, "
+        "outer_faces, nblades=N, periodic_direction='k') instead.",
+        DeprecationWarning, stacklevel=2)
+    return rotated_periodicity(blocks, matched_faces, outer_faces,
+                               nblades=nblades, rotation_axis=rotation_axis,
+                               periodic_direction=periodic_direction,
+                               ReduceMesh=True)
+
+
 def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, rotation_axis: str = 'x', tol: float = 1E-6):
     """Verifies that the diagonal corners of periodic face_matches are spatially
     consistent after rotating block1 by ±theta about the given axis.
@@ -829,19 +880,8 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, ro
         block2 = reduced_blocks[b2_idx]
 
         # Enumerate unique corners of block2's face
-        I2 = [b2['IMIN'], b2['IMAX']]
-        J2 = [b2['JMIN'], b2['JMAX']]
-        K2 = [b2['KMIN'], b2['KMAX']]
-
-        unique_corners = list()
-        seen = set()
-        for i in I2:
-            for j in J2:
-                for k in K2:
-                    key = (i, j, k)
-                    if key not in seen:
-                        seen.add(key)
-                        unique_corners.append(key)
+        unique_corners = enumerate_unique_corners(
+            [b2['IMIN'], b2['IMAX']], [b2['JMIN'], b2['JMAX']], [b2['KMIN'], b2['KMAX']])
 
         found = False
         best_d_lower = float('inf')
@@ -872,10 +912,8 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, ro
             y2_u = block2.Y[b2['IMAX'], b2['JMAX'], b2['KMAX']]
             z2_u = block2.Z[b2['IMAX'], b2['JMAX'], b2['KMAX']]
 
-            dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
-            d_lower = math.sqrt(dx*dx + dy*dy + dz*dz)
-            dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
-            d_upper = math.sqrt(dx*dx + dy*dy + dz*dz)
+            d_lower = euclidean_distance(x1_l, y1_l, z1_l, x2_l, y2_l, z2_l)
+            d_upper = euclidean_distance(x1_u, y1_u, z1_u, x2_u, y2_u, z2_u)
 
             if d_lower < best_d_lower:
                 best_d_lower = d_lower
@@ -896,18 +934,10 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, ro
                     il, jl, kl = corner_lower
                     iu, ju, ku = corner_upper
 
-                    x2_l = block2.X[il, jl, kl]
-                    y2_l = block2.Y[il, jl, kl]
-                    z2_l = block2.Z[il, jl, kl]
-
-                    x2_u = block2.X[iu, ju, ku]
-                    y2_u = block2.Y[iu, ju, ku]
-                    z2_u = block2.Z[iu, ju, ku]
-
-                    dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
-                    dl = math.sqrt(dx*dx + dy*dy + dz*dz)
-                    dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
-                    du = math.sqrt(dx*dx + dy*dy + dz*dz)
+                    dl = euclidean_distance(x1_l, y1_l, z1_l,
+                                           block2.X[il, jl, kl], block2.Y[il, jl, kl], block2.Z[il, jl, kl])
+                    du = euclidean_distance(x1_u, y1_u, z1_u,
+                                           block2.X[iu, ju, ku], block2.Y[iu, ju, ku], block2.Z[iu, ju, ku])
 
                     if dl < best_d_lower:
                         best_d_lower = dl
