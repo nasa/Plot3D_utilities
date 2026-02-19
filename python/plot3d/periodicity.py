@@ -57,7 +57,7 @@ def _faces_could_match_rotationally(
 ) -> bool:
     """Cheap geometric pre-checks to reject obviously non-matching face pairs.
 
-    Checks (in order of cost): same const_type, cell count, axial overlap,
+    Checks (in order of cost): same const_type, axial overlap,
     radial overlap, rotated centroid proximity.
     """
     # 1. Same const_type
@@ -66,11 +66,7 @@ def _faces_could_match_rotationally(
     if face1.const_type == -1:
         return False
 
-    # 2. Cell count compatibility
-    if face1.size != face2.size:
-        return False
-
-    # 3. Axial extent overlap (along rotation axis)
+    # 2. Axial extent overlap (along rotation axis)
     axis = rotation_axis.lower()
     n1, n2 = face1.nvertex, face2.nvertex
     if axis == "x":
@@ -88,7 +84,7 @@ def _faces_could_match_rotationally(
     if f1_ax[1] + tol_axial < f2_ax[0] or f2_ax[1] + tol_axial < f1_ax[0]:
         return False
 
-    # 4. Radial extent overlap
+    # 3. Radial extent overlap
     r1 = _to_radius(face1.x[:n1], face1.y[:n1], face1.z[:n1], axis)
     r2 = _to_radius(face2.x[:n2], face2.y[:n2], face2.z[:n2], axis)
     r1_range = (float(r1.min()), float(r1.max()))
@@ -98,7 +94,7 @@ def _faces_could_match_rotationally(
     if r1_range[1] + tol_radial < r2_range[0] or r2_range[1] + tol_radial < r1_range[0]:
         return False
 
-    # 5. Rotated centroid proximity
+    # 4. Rotated centroid proximity
     c1 = np.array([[face1.cx], [face1.cy], [face1.cz]])
     c1_rotated = (rotation_matrix @ c1).flatten()
     c2 = np.array([face2.cx, face2.cy, face2.cz])
@@ -174,73 +170,66 @@ def _match_periodic_faces(
             lower_pool = [f for f in lower_pool if f.const_type == required_const]
             upper_pool = [f for f in upper_pool if f.const_type == required_const]
 
-    # Single-pass greedy matching
+    # Iterative matching: find one match per iteration, remove matched faces,
+    # add split faces back to pools, and re-enter until no more matches found.
+    # This mirrors the original while-loop pattern so cascading partial matches
+    # (split faces that themselves partially match other faces) are discovered.
     periodic_faces: List[Tuple] = []
     periodic_faces_export: List[Dict] = []
-    split_faces_collected: List[Face] = []
+    split_faces_all: List[Face] = []
+    non_matching: set = set()  # Track known non-matching pairs to skip
 
-    upper_remaining = list(upper_pool)
-
-    for fL in list(lower_pool):
-        matched = False
-        for mat_idx, rot_mat in enumerate(rotation_matrices):
-            if matched:
+    periodic_found = True
+    while periodic_found:
+        periodic_found = False
+        for i_L, fL in enumerate(lower_pool):
+            if periodic_found:
                 break
-            for j, fU in enumerate(upper_remaining):
-                if not _faces_could_match_rotationally(fL, fU, rot_mat, rotation_axis):
-                    continue
-
-                block1_rotated = get_rotated(mat_idx, fL.blockIndex)
-                block2 = blocks[fU.blockIndex]
-
-                _, periodic_temp, split_temp = __periodicity_check__(
-                    fL, fU, block1_rotated, block2
-                )
-
-                if len(periodic_temp) > 0:
-                    periodic_faces.append(periodic_temp)
-                    periodic_faces_export.append(
-                        face_matches_to_dict(periodic_temp[0], periodic_temp[1], block1_rotated, block2)
-                    )
-                    split_faces_collected.extend(split_temp)
-                    upper_remaining.pop(j)
-                    matched = True
-                    break
-
-    # Second pass: handle split faces (rare)
-    if split_faces_collected:
-        split_as_lower = []
-        split_as_upper = []
-        if use_angular:
-            for sf in split_faces_collected:
-                k = _face_key(sf)
-                if k in lower_keys:
-                    split_as_lower.append(sf)
-                elif k in upper_keys:
-                    split_as_upper.append(sf)
-        else:
-            split_as_lower = list(split_faces_collected)
-            split_as_upper = list(split_faces_collected)
-
-        for fL in split_as_lower:
             for mat_idx, rot_mat in enumerate(rotation_matrices):
-                found = False
-                for j, fU in enumerate(upper_remaining):
-                    if not _faces_could_match_rotationally(fL, fU, rot_mat, rotation_axis):
+                if periodic_found:
+                    break
+                for j_U, fU in enumerate(upper_pool):
+                    # Skip known non-matching pairs
+                    pair_key = (_face_key(fL), mat_idx, _face_key(fU))
+                    if pair_key in non_matching:
                         continue
+
+                    if not _faces_could_match_rotationally(fL, fU, rot_mat, rotation_axis):
+                        non_matching.add(pair_key)
+                        continue
+
                     block1_rotated = get_rotated(mat_idx, fL.blockIndex)
                     block2 = blocks[fU.blockIndex]
-                    _, periodic_temp, split_temp = __periodicity_check__(fL, fU, block1_rotated, block2)
+
+                    _, periodic_temp, split_temp = __periodicity_check__(
+                        fL, fU, block1_rotated, block2
+                    )
+
                     if len(periodic_temp) > 0:
                         periodic_faces.append(periodic_temp)
                         periodic_faces_export.append(
                             face_matches_to_dict(periodic_temp[0], periodic_temp[1], block1_rotated, block2)
                         )
-                        upper_remaining.pop(j)
-                        found = True
+
+                        # Remove matched faces from pools
+                        lower_pool.pop(i_L)
+                        upper_pool.pop(j_U)
+
+                        # Add split faces back to pools for re-processing
+                        for sf in split_temp:
+                            k = _face_key(sf)
+                            if use_angular:
+                                if k in lower_keys:
+                                    lower_pool.append(sf)
+                                if k in upper_keys:
+                                    upper_pool.append(sf)
+                            else:
+                                lower_pool.append(sf)
+                                upper_pool.append(sf)
+
+                        split_faces_all.extend(split_temp)
+                        periodic_found = True
                         break
-                if found:
-                    break
 
     # Free rotation caches
     caches.clear()
@@ -256,7 +245,7 @@ def _match_periodic_faces(
     outer_faces_final = [p for p in outer_faces_all if _face_key(p) not in remove_keys]
     # Add non-matched split faces back
     final_keys = {_face_key(f) for f in outer_faces_final}
-    for sf in split_faces_collected:
+    for sf in split_faces_all:
         k = _face_key(sf)
         if k not in remove_keys and k not in final_keys:
             outer_faces_final.append(sf)
