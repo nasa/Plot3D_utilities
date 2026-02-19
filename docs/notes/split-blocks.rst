@@ -56,7 +56,6 @@ This will find the periodic faces of the split block
         blocks, face_matches, outer_faces,
         nblades=55, rotation_axis='x', periodic_direction='k')
     with open('connectivity-block-split_v02.pickle','wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
 
     # Append periodic surfaces to face_matches

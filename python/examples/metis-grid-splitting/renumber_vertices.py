@@ -50,21 +50,18 @@ if not os.path.exists('./VSPT_Binary.xyz'):
     G = nx.compose_all(graphs)    
 
     with open('connectivity.pickle','wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({
-                        "face_matches":face_matches, 
+                        "face_matches":face_matches,
                         "outer_faces":outer_faces_to_keep,
                         "graph":G,
                         "block_sizes":block_sizes
                     },f)
     
     with open('connectivity-julia.json','w') as f:
-        
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         json.dump({
-                        "face_matches":face_matches, 
-                        "outer_faces":outer_faces_to_keep,  
-                        "block_sizes":block_sizes                      
+                        "face_matches":face_matches,
+                        "outer_faces":outer_faces_to_keep,
+                        "block_sizes":block_sizes
                     },f,cls=NpEncoder)    
     write_plot3D('VSPT_Binary.xyz',blocks,binary=True)    # Writing plot3D to binary file
     

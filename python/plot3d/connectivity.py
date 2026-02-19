@@ -1,6 +1,7 @@
 from .block import Block, compute_gcd, reduce_blocks
 from .face import Face
 from .facefunctions import create_face_from_diagonals, split_face, get_outer_faces
+import gc
 import math
 from itertools import product
 from tqdm import trange
@@ -89,8 +90,8 @@ def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
     return T[dim1[0]:dim1[1], dim2[0]:dim2[1], dim3[0]:dim3[1]]
 
 def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:float=1E-6):
-    """Get the index of the intersection between two faces located on two different blocks 
-        Face1 needs to be the smaller face. 
+    """Get the index of the intersection between two faces located on two different blocks
+        Face1 needs to be the smaller face.
 
     Args:
         face1 (Face): An exterior face
@@ -104,14 +105,13 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
 
             - (pandas.DataFrame): dataframe with matches. Columns = I1, J1, K1, I2, J2, K2
             - (List[Face]): any split faces from block 1
-            - (List[Face]): any split faces from block 2 
+            - (List[Face]): any split faces from block 2
     """
-    
+
     match_location = list()
-    df =pd.DataFrame(columns=['i1','j1','k1','i2','j2','k2'])
     split_faces1 = list()
     split_faces2 = list()
-    
+
     I1 = [face1.IMIN,face1.IMAX]
     J1 = [face1.JMIN,face1.JMAX]
     K1 = [face1.KMIN,face1.KMAX]
@@ -119,7 +119,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
     I2 = [face2.IMIN,face2.IMAX]
     J2 = [face2.JMIN,face2.JMAX]
     K2 = [face2.KMIN,face2.KMAX]
-    
+
     # Grab the points of Face 1 and Face 2
     X1 = select_multi_dimensional(block1.X, (I1[0],I1[1]),(J1[0],J1[1]),(K1[0],K1[1]))
     Y1 = select_multi_dimensional(block1.Y, (I1[0],I1[1]),(J1[0],J1[1]),(K1[0],K1[1]))
@@ -129,66 +129,42 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
     Y2 = select_multi_dimensional(block2.Y, (I2[0],I2[1]),(J2[0],J2[1]),(K2[0],K2[1]))
     Z2 = select_multi_dimensional(block2.Z, (I2[0],I2[1]),(J2[0],J2[1]),(K2[0],K2[1]))
 
-    # General Search
-    if I1[0] == I1[1]: # I is constant in Face 1
-        combo = product(range(X1.shape[0]), range(X1.shape[1]))
-        for c in combo:
-            p, q = c
-            x = X1[p,q]
-            y = Y1[p,q]
-            z = Z1[p,q]
-            block2_match_location = point_match(x, y, z, X2, Y2, Z2,tol)
-            if sum(block2_match_location)!=-2:
-                p2 = int(block2_match_location[0])
-                q2 = int(block2_match_location[1])
-                # if __edge_match2(df1_edges,df2_edges, p, q, p2, q2):
-                if I2[0]==I2[1]:
-                    match_location.append({"i1":I1[0],"j1":p+J1[0],"k1":q+K1[0],'i2':I2[0],'j2':p2+J2[0],'k2':q2+K2[0]})
-                if J2[0]==J2[1]:
-                    match_location.append({"i1":I1[0],"j1":p+J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':J2[0],'k2':q2+K2[0]})
-                if K2[0]==K2[1]:
-                    match_location.append({"i1":I1[0],"j1":p+J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':q2+J2[0],'k2':K2[0]})
-        df = pd.concat([df, pd.DataFrame(match_location)], ignore_index=True)
+    # Determine which axis is constant for face1 and build the index mapper
+    # Each branch maps (p, q) -> (i1, j1, k1) differently based on the constant axis
+    if I1[0] == I1[1]:
+        def _map_face1(p, q): return (I1[0], p + J1[0], q + K1[0])
+    elif J1[0] == J1[1]:
+        def _map_face1(p, q): return (p + I1[0], J1[0], q + K1[0])
+    elif K1[0] == K1[1]:
+        def _map_face1(p, q): return (p + I1[0], q + J1[0], K1[0])
+    else:
+        # Not a proper face (no constant axis)
+        df = pd.DataFrame(columns=['i1','j1','k1','i2','j2','k2'])
+        return df, split_faces1, split_faces2
 
-    elif J1[0] == J1[1]: # J is constant in face 1 
-        combo = product(range(0,X1.shape[0]), range(0,X1.shape[1]))
-        for c in combo:
-            p, q = c
-            x = X1[p,q]
-            y = Y1[p,q]
-            z = Z1[p,q]
-            block2_match_location = point_match(x, y, z, X2, Y2, Z2,tol)
-            if sum(block2_match_location)!=-2:
-                p2 = int(block2_match_location[0])
-                q2 = int(block2_match_location[1])
-                # if __edge_match2(df1_edges,df2_edges, p, q, p2, q2):
-                if I2[0]==I2[1]:
-                    match_location.append({"i1":p+I1[0],"j1":J1[0],"k1":q+K1[0],'i2':I2[0],'j2':p2+J2[0],'k2':q2+K2[0]})    # Added an offset because some faces don't start at I=0 or J=0 or K=0 
-                if J2[0]==J2[1]:
-                    match_location.append({"i1":p+I1[0],"j1":J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':J2[0],'k2':q2+K2[0]})
-                if K2[0]==K2[1]:
-                    match_location.append({"i1":p+I1[0],"j1":J1[0],"k1":q+K1[0],'i2':p2+I2[0],'j2':q2+J2[0],'k2':K2[0]})
-            df = pd.concat([df, pd.DataFrame(match_location)], ignore_index=True)
+    # Build mappers for face2's constant axis -> (i2, j2, k2)
+    face2_mappers = []
+    if I2[0] == I2[1]:
+        face2_mappers.append(lambda p2, q2: (I2[0], p2 + J2[0], q2 + K2[0]))
+    if J2[0] == J2[1]:
+        face2_mappers.append(lambda p2, q2: (p2 + I2[0], J2[0], q2 + K2[0]))
+    if K2[0] == K2[1]:
+        face2_mappers.append(lambda p2, q2: (p2 + I2[0], q2 + J2[0], K2[0]))
 
-    elif K1[0] == K1[1]: # K is constant in face 1 
-        combo = product(range(X1.shape[0]), range(X1.shape[1]))
-        for c in combo:
-            p, q = c
-            x = X1[p,q]
-            y = Y1[p,q]
-            z = Z1[p,q]
-            block2_match_location = point_match(x, y, z, X2, Y2, Z2,tol) # pm,qm are the p and q indicies where match occurs 
-            if sum(block2_match_location)!=-2:
+    # Single loop for all constant-axis cases
+    for p in range(X1.shape[0]):
+        for q in range(X1.shape[1]):
+            block2_match_location = point_match(X1[p,q], Y1[p,q], Z1[p,q], X2, Y2, Z2, tol)
+            if sum(block2_match_location) != -2:
                 p2 = int(block2_match_location[0])
                 q2 = int(block2_match_location[1])
-                # if __edge_match2(df1_edges,df2_edges, p, q, p2, q2):
-                if I2[0]==I2[1]:
-                    match_location.append({"i1":p+I1[0],"j1":q+J1[0],"k1":K1[0],'i2':I2[0],'j2':p2+J2[0],'k2':q2+K2[0]})
-                if J2[0]==J2[1]:
-                    match_location.append({"i1":p+I1[0],"j1":q+J1[0],"k1":K1[0],'i2':p2+I2[0],'j2':J2[0],'k2':q2+K2[0]})
-                if K2[0]==K2[1]:
-                    match_location.append({"i1":p+I1[0],"j1":q+J1[0],"k1":K1[0],'i2':p2+I2[0],'j2':q2+J2[0],'k2':K2[0]})
-        df = pd.concat([df, pd.DataFrame(match_location)], ignore_index=True)
+                i1, j1, k1 = _map_face1(p, q)
+                for mapper in face2_mappers:
+                    i2, j2, k2 = mapper(p2, q2)
+                    match_location.append({"i1": i1, "j1": j1, "k1": k1, "i2": i2, "j2": j2, "k2": k2})
+
+    # Build DataFrame once from all matches
+    df = pd.DataFrame(match_location) if match_location else pd.DataFrame(columns=['i1','j1','k1','i2','j2','k2'])
     
     # Checking for split faces 
     if len(df)>=4:
@@ -393,84 +369,100 @@ def connectivity(blocks:List[Block]):
 
     """
 
-    outer_faces = list()      
     face_matches = list()
-    matches_to_remove = list()
+    # Use a set of (block_index, IMIN, JMIN, KMIN, IMAX, JMAX, KMAX) for fast removal lookups
+    matches_to_remove_keys = set()
     temp = [get_outer_faces(b) for b in blocks]
     block_outer_faces = [t[0] for t in temp]
+    del temp
     combos = candidate_neighbor_pairs(blocks) # Find all block pairs whose bounding boxes touch/overlap
-    # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[0],blocks[1],[block_outer_faces[0][0],block_outer_faces[0][1]],[block_outer_faces[1][0],block_outer_faces[1][1]],1E-12)    # This function finds partial matches between blocks
 
-    t = trange(len(combos))    
-    for indx in t:     # block i        
+    gc_interval = max(1, len(combos) // 20)  # gc every ~5% of progress
+    t = trange(len(combos))
+    for indx in t:     # block i
         i,j = combos[indx]
         t.set_description(f"Checking connections block {i} with {j}")
-        # Takes 2 blocks, gets the matching faces exterior faces of both blocks 
+        # Takes 2 blocks, gets the matching faces exterior faces of both blocks
         df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j],block_outer_faces[i],block_outer_faces[j])    # This function finds partial matches between blocks
         [o.set_block_index(i) for o in blocki_outerfaces]
         [o.set_block_index(j) for o in blockj_outerfaces]
         block_outer_faces[i] = blocki_outerfaces
         block_outer_faces[j] = blockj_outerfaces
-        # Update connectivity for blocks with matching faces 
+        # Update connectivity for blocks with matching faces
         if (len(df_matches)>0):
             for df in df_matches:
-                matches_to_remove.append(create_face_from_diagonals(block=blocks[i],imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(),
-                                                                                    imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max()))
-                matches_to_remove[-1].set_block_index(i)
+                face1 = create_face_from_diagonals(block=blocks[i],imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(),
+                                                                    imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max())
+                face1.set_block_index(i)
+                matches_to_remove_keys.add((i, face1.IMIN, face1.JMIN, face1.KMIN, face1.IMAX, face1.JMAX, face1.KMAX))
 
-                matches_to_remove.append(create_face_from_diagonals(block=blocks[j],imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(),
-                                                                                    imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max()))
-                matches_to_remove[-1].set_block_index(j)
-                
-                face1 = matches_to_remove[-2]
-                face2 = matches_to_remove[-1]
+                face2 = create_face_from_diagonals(block=blocks[j],imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(),
+                                                                    imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max())
+                face2.set_block_index(j)
+                matches_to_remove_keys.add((j, face2.IMIN, face2.JMIN, face2.KMIN, face2.IMAX, face2.JMAX, face2.KMAX))
 
-                temp = face_matches_to_dict(face1,face2,blocks[i],blocks[j])
-                temp['match'] = df
-                face_matches.append(temp)
+                face_matches.append(face_matches_to_dict(face1,face2,blocks[i],blocks[j]))
+                del df  # Free the DataFrame immediately
+        # Periodic garbage collection to prevent memory buildup
+        if indx % gc_interval == 0:
+            gc.collect()
 
-    # Update Outer Faces 
-    [outer_faces.extend(o) for o in block_outer_faces] # all the outer faces 
-    outer_faces = list(set(outer_faces))    # Get most unique
-        
-    outer_faces = [o for o in outer_faces if o not in matches_to_remove]
+    # Update Outer Faces — use dict-based dedup instead of list(set(...))
+    outer_faces_dict = dict()
+    for face_list in block_outer_faces:
+        for o in face_list:
+            key = (o.BlockIndex, o.IMIN, o.JMIN, o.KMIN, o.IMAX, o.JMAX, o.KMAX)
+            if key not in matches_to_remove_keys:
+                outer_faces_dict[key] = o
+    del block_outer_faces  # Free memory
+    del matches_to_remove_keys
+
     # Remove any outer faces that may have been found by mistake
-    # Check I,J,K if J and K are the same with another outer face, select the face with shorter I 
-    outer_faces_to_remove = list() 
-    for i in range(len(blocks)):
-        block_outerfaces = [o for o in outer_faces if o.BlockIndex == i]
-        for o in block_outerfaces:
-            IJK = np.array([o.IMIN,o.JMIN,o.KMIN,o.IMAX,o.JMAX,o.KMAX])
-            for o2 in block_outerfaces:
-                IJK2 = np.array([o2.IMIN,o2.JMIN,o2.KMIN,o2.IMAX,o2.JMAX,o2.KMAX])
-                if sum((IJK-IJK2)==0) == 5: # [0,0,0,40,100,0] (outer) [0,0,0,56,100,0] (outer) -> remove the longer face
-                    if (o2.diagonal_length>o.diagonal_length):
-                        outer_faces_to_remove.append(o2)
-                    else:
-                        outer_faces_to_remove.append(o)
+    # Check I,J,K if J and K are the same with another outer face, select the face with shorter I
+    outer_faces_to_remove_keys = set()
+    # Group faces by block index for efficient comparison
+    block_face_groups = dict()
+    for key, o in outer_faces_dict.items():
+        bi = o.BlockIndex
+        if bi not in block_face_groups:
+            block_face_groups[bi] = []
+        block_face_groups[bi].append((key, o))
 
-    outer_faces = [o for o in outer_faces if o not in outer_faces_to_remove]
+    for bi, face_pairs in block_face_groups.items():
+        for idx_a in range(len(face_pairs)):
+            key_a, o = face_pairs[idx_a]
+            if key_a in outer_faces_to_remove_keys:
+                continue
+            ijk = (o.IMIN, o.JMIN, o.KMIN, o.IMAX, o.JMAX, o.KMAX)
+            for idx_b in range(idx_a + 1, len(face_pairs)):
+                key_b, o2 = face_pairs[idx_b]
+                if key_b in outer_faces_to_remove_keys:
+                    continue
+                ijk2 = (o2.IMIN, o2.JMIN, o2.KMIN, o2.IMAX, o2.JMAX, o2.KMAX)
+                # Count matching indices
+                matching = sum(1 for a, b in zip(ijk, ijk2) if a == b)
+                if matching == 5:  # 5 of 6 indices match -> remove the longer face
+                    if o2.diagonal_length > o.diagonal_length:
+                        outer_faces_to_remove_keys.add(key_b)
+                    else:
+                        outer_faces_to_remove_keys.add(key_a)
+
+    outer_faces = [o for key, o in outer_faces_dict.items() if key not in outer_faces_to_remove_keys]
+    del outer_faces_dict, block_face_groups, outer_faces_to_remove_keys
 
 
     # Find self-matches: Do any faces of, for example, block1 match another face in block 1
     for i in range(len(blocks)):
-        _,self_matches = get_outer_faces(blocks[i]) 
-        for match in self_matches: # Append to face matches 
+        _,self_matches = get_outer_faces(blocks[i])
+        for match in self_matches: # Append to face matches
             face_matches.append({'block1':{
-                                            'block_index':i,'IMIN':match[0].I.min(),'JMIN':match[0].J.min(),'KMIN':match[0].K.min(),
-                                            'IMAX':match[0].I.max(),'JMAX':match[0].J.max(),'KMAX':match[0].K.max()
+                                            'block_index':i,'IMIN':int(match[0].I.min()),'JMIN':int(match[0].J.min()),'KMIN':int(match[0].K.min()),
+                                            'IMAX':int(match[0].I.max()),'JMAX':int(match[0].J.max()),'KMAX':int(match[0].K.max())
                                         },
                                     'block2':{
-                                            'block_index':i,'IMIN':match[1].I.min(),'JMIN':match[1].J.min(),'KMIN':match[1].K.min(),
-                                            'IMAX':match[1].I.max(),'JMAX':match[1].J.max(),'KMAX':match[1].K.max()
-                                        },
-                                    'match':pd.DataFrame([{
-                                            'block_index':i,'IMIN':match[0].I.min(),'JMIN':match[0].J.min(),'KMIN':match[0].K.min(),
-                                            'IMAX':match[0].I.max(),'JMAX':match[0].J.max(),'KMAX':match[0].K.max()
-                                        },{
-                                            'block_index':i,'IMIN':match[1].I.min(),'JMIN':match[1].J.min(),'KMIN':match[1].K.min(),
-                                            'IMAX':match[1].I.max(),'JMAX':match[1].J.max(),'KMAX':match[1].K.max()
-                                        }])
+                                            'block_index':i,'IMIN':int(match[1].I.min()),'JMIN':int(match[1].J.min()),'KMIN':int(match[1].K.min()),
+                                            'IMAX':int(match[1].I.max()),'JMAX':int(match[1].J.max()),'KMAX':int(match[1].K.max())
+                                        }
                                     })
 
     # Update the outer faces
@@ -520,51 +512,51 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
     J2 = [face2.JMIN,face2.JMAX]
     K2 = [face2.KMIN,face2.KMAX]
 
-    # Search for corners     
-    x1_l = block1.X[I1[0],J1[0],K1[0]]    # lower corner of block 1 
+    # Search for lower corner match
+    x1_l = block1.X[I1[0],J1[0],K1[0]]
     y1_l = block1.Y[I1[0],J1[0],K1[0]]
     z1_l = block1.Z[I1[0],J1[0],K1[0]]
-    # Matches which corner in block 2 
-    search_results = list()
-    for p in I2: 
+    best_d = float('inf')
+    best_ijk = (I2[0], J2[0], K2[0])
+    for p in I2:
         for q in J2:
             for r in K2:
-                x2 = block2.X[p,q,r]  
-                y2 = block2.Y[p,q,r]
-                z2 = block2.Z[p,q,r]
-                dx = x2-x1_l; dy = y2-y1_l; dz = z2 -z1_l                
-                search_results.append({'I':p,'J':q,'K':r,'d':math.sqrt(dx*dx + dy*dy + dz*dz)})    
-    df = pd.DataFrame(search_results)
-    df = df.sort_values(by=['d'])
+                dx = block2.X[p,q,r] - x1_l
+                dy = block2.Y[p,q,r] - y1_l
+                dz = block2.Z[p,q,r] - z1_l
+                d = dx*dx + dy*dy + dz*dz
+                if d < best_d:
+                    best_d = d
+                    best_ijk = (p, q, r)
     match['block1']['IMIN'] = face1.IMIN
     match['block1']['JMIN'] = face1.JMIN
     match['block1']['KMIN'] = face1.KMIN
-    match['block2']['IMIN'] = int(df.iloc[0]['I'])
-    match['block2']['JMIN'] = int(df.iloc[0]['J'])
-    match['block2']['KMIN'] = int(df.iloc[0]['K'])
-    
-    # Search for corners     
-    x1_u = block1.X[I1[1],J1[1],K1[1]]    # lower corner of block 1 
+    match['block2']['IMIN'] = best_ijk[0]
+    match['block2']['JMIN'] = best_ijk[1]
+    match['block2']['KMIN'] = best_ijk[2]
+
+    # Search for upper corner match
+    x1_u = block1.X[I1[1],J1[1],K1[1]]
     y1_u = block1.Y[I1[1],J1[1],K1[1]]
     z1_u = block1.Z[I1[1],J1[1],K1[1]]
-    # Matches which corner in block 2 
-    search_results = list()
-    for p in I2: 
+    best_d = float('inf')
+    best_ijk = (I2[0], J2[0], K2[0])
+    for p in I2:
         for q in J2:
             for r in K2:
-                x2 = block2.X[p,q,r]  
-                y2 = block2.Y[p,q,r]
-                z2 = block2.Z[p,q,r]
-                dx = x2-x1_u; dy = y2-y1_u; dz = z2 -z1_u
-                search_results.append({'I':p,'J':q,'K':r,'d':math.sqrt(dx*dx + dy*dy + dz*dz)})
-    df = pd.DataFrame(search_results)
-    df = df.sort_values(by=['d'])
+                dx = block2.X[p,q,r] - x1_u
+                dy = block2.Y[p,q,r] - y1_u
+                dz = block2.Z[p,q,r] - z1_u
+                d = dx*dx + dy*dy + dz*dz
+                if d < best_d:
+                    best_d = d
+                    best_ijk = (p, q, r)
     match['block1']['IMAX'] = face1.IMAX
     match['block1']['JMAX'] = face1.JMAX
     match['block1']['KMAX'] = face1.KMAX
-    match['block2']['IMAX'] = int(df.iloc[0]['I'])
-    match['block2']['JMAX'] = int(df.iloc[0]['J'])
-    match['block2']['KMAX'] = int(df.iloc[0]['K'])
+    match['block2']['IMAX'] = best_ijk[0]
+    match['block2']['JMAX'] = best_ijk[1]
+    match['block2']['KMAX'] = best_ijk[2]
     return match
 
 

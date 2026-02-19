@@ -14,7 +14,6 @@ if not os.path.exists('connectivity.pickle'):
     test = np.array([(c['block1']['block_index'],c['block2']['block_index'])  for c in face_matches])
     print(f'minimum block index: {test.min()}')
     with open('connectivity.pickle','wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_formatted},f)
     write_plot3D(cmc_p3d_bin, blocks,binary = True)
     
@@ -42,7 +41,6 @@ with open('connectivity.pickle','rb') as f:
         
         test = np.array([(c['block1']['block_index'],c['block2']['block_index'])  for c in merged_face_matches])
         print(f'minimum block index: {test.min()}')
-        [m.pop('match',None) for m in merged_face_matches] # Remove the dataframe
         print(f'Merge pass {i} number of blocks {len(merged_block_only)}')
     
         with open('merged_connectivity.pickle','wb') as f:

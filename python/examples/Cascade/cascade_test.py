@@ -14,7 +14,6 @@ if not os.path.exists('connectivity.pickle'):
     # outer_faces, _ = get_outer_faces(blocks[0]) # lets check
     face_matches, outer_faces_formatted = connectivity_fast(blocks)
     with open('connectivity.pickle','wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_formatted},f)
 
 with open('connectivity.pickle','rb') as f:
@@ -28,7 +27,6 @@ periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = rotated_peri
 
 
 with open('connectivity_periodic.pickle','wb') as f:
-    # [m.pop('match',None) for m in face_matches] # Remove the dataframe
     pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
 
 # Append periodic surfaces to face_matches

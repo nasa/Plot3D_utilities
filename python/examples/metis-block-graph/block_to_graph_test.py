@@ -29,7 +29,6 @@ if not os.path.exists('data.pickle'):
 
     print('Finding connectivity')
     face_matches, outer_faces = connectivity_fast(blocks)
-    [m.pop('match',None) for m in face_matches] # Remove the dataframe
     print('Organizing split and outerfaces')
     all_faces = match_faces_dict_to_list(blocks,face_matches)
     all_faces.extend(outer_face_dict_to_list(blocks,outer_faces))

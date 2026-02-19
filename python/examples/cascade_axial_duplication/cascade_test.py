@@ -29,7 +29,6 @@ blocks = read_plot3D('VSPT_ASCII.xyz', binary = False)
 # outer_faces, _ = get_outer_faces(blocks[0]) # lets check
 face_matches, outer_faces = connectivity_fast(blocks)
 with open('connectivity.pickle','wb') as f:
-    [m.pop('match',None) for m in face_matches] # Remove the dataframe
     pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces},f)
 
 # with open('connectivity.pickle','rb') as f:
@@ -69,7 +68,6 @@ inner_periodicities.extend(outer_periodicities)
 face_matches_all.extend(face_matches)
 
 with open('connectivity_periodic.pickle','wb') as f:
-    # [m.pop('match',None) for m in face_matches] # Remove the dataframe
     pickle.dump({"face_matches":face_matches_all, "outer_faces":outer_faces_to_keep, "periodic_surfaces":inner_periodicities},f)
 
 export_to_glennht_conn(face_matches,outer_faces_to_keep,'finalmesh')

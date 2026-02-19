@@ -148,6 +148,7 @@ def _match_periodic_faces(
     lower_export, upper_export, lower_faces, upper_faces = find_angular_bounding_faces(
         blocks, outer_dicts, rotation_axis
     )
+    del outer_dicts  # Free temporary dict list
 
     use_angular = len(lower_faces) > 0 and len(upper_faces) > 0
 
@@ -192,7 +193,7 @@ def _match_periodic_faces(
                 block1_rotated = get_rotated(mat_idx, fL.blockIndex)
                 block2 = blocks[fU.blockIndex]
 
-                df, periodic_temp, split_temp = __periodicity_check__(
+                _, periodic_temp, split_temp = __periodicity_check__(
                     fL, fU, block1_rotated, block2
                 )
 
@@ -229,7 +230,7 @@ def _match_periodic_faces(
                         continue
                     block1_rotated = get_rotated(mat_idx, fL.blockIndex)
                     block2 = blocks[fU.blockIndex]
-                    df, periodic_temp, split_temp = __periodicity_check__(fL, fU, block1_rotated, block2)
+                    _, periodic_temp, split_temp = __periodicity_check__(fL, fU, block1_rotated, block2)
                     if len(periodic_temp) > 0:
                         periodic_faces.append(periodic_temp)
                         periodic_faces_export.append(
@@ -244,31 +245,38 @@ def _match_periodic_faces(
     # Free rotation caches
     caches.clear()
 
-    # Build removal set for outer faces
-    outer_faces_to_remove: List[Face] = []
+    # Build removal set for outer faces using lightweight tuple keys
+    remove_keys = set()
     for p in periodic_faces:
-        outer_faces_to_remove.append(p[0])
-        outer_faces_to_remove.append(p[1])
+        remove_keys.add(_face_key(p[0]))
+        remove_keys.add(_face_key(p[1]))
     for m in matched_faces_all:
-        outer_faces_to_remove.append(m)
-    outer_faces_to_remove = list(set(outer_faces_to_remove))
+        remove_keys.add(_face_key(m))
 
-    outer_faces_final = [p for p in outer_faces_all if p not in outer_faces_to_remove]
+    outer_faces_final = [p for p in outer_faces_all if _face_key(p) not in remove_keys]
     # Add non-matched split faces back
+    final_keys = {_face_key(f) for f in outer_faces_final}
     for sf in split_faces_collected:
-        if sf not in outer_faces_to_remove and sf not in outer_faces_final:
+        k = _face_key(sf)
+        if k not in remove_keys and k not in final_keys:
             outer_faces_final.append(sf)
+            final_keys.add(k)
+    del remove_keys, final_keys
 
     # Deduplicate periodic face pairs
-    indx_to_remove = []
+    indx_to_remove = set()
     for i in range(len(periodic_faces)):
+        if i in indx_to_remove:
+            continue
         for j_idx in range(i + 1, len(periodic_faces)):
+            if j_idx in indx_to_remove:
+                continue
             if periodic_faces[i][0] == periodic_faces[j_idx][0]:
                 if periodic_faces[i][1] == periodic_faces[j_idx][1]:
-                    indx_to_remove.append(j_idx)
-            if periodic_faces[i][1] == periodic_faces[j_idx][0]:
+                    indx_to_remove.add(j_idx)
+            elif periodic_faces[i][1] == periodic_faces[j_idx][0]:
                 if periodic_faces[i][0] == periodic_faces[j_idx][1]:
-                    indx_to_remove.append(j_idx)
+                    indx_to_remove.add(j_idx)
 
     periodic_faces_export = [periodic_faces_export[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
     periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
@@ -375,6 +383,8 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         blocks, outer_faces_all, matched_faces_all,
         [rotation_matrix_pos, rotation_matrix_neg], rotation_axis, periodic_direction
     )
+    # Free reduced blocks and intermediate face lists — no longer needed after matching
+    del blocks, matched_faces_all
 
     _scale_results_up(periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all, gcd_to_use)
 
@@ -637,6 +647,9 @@ def translational_periodicity(
                 upper_pool.pop(j)
                 break  # move to next fL
 
+    # Free shifted block copies — no longer needed after matching
+    del blocks_up, blocks_dn
+
     # 9) scale back up
     for rec in periodic_export:
         for side in ("block1","block2"):
@@ -746,13 +759,8 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
     split_faces = list()
     swapped = False
     if (face2.diagonal_length < face1.diagonal_length): # switch so that face 2 is always longer
-        temp = deepcopy(face1)
-        face1 = deepcopy(face2)
-        face2 = temp
-
-        temp_block = deepcopy(block1)
-        block1 = deepcopy(block2)
-        block2 = temp_block        
+        face1, face2 = face2, face1
+        block1, block2 = block2, block1
         swapped = True
     
     df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2,tol)

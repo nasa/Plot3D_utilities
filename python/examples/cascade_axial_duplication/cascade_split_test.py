@@ -33,29 +33,26 @@ def find_periodicity():
     face_matches.extend(periodic_surfaces)
 
     with open('connectivity-block-split_v02.pickle','wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({
-            "face_matches":face_matches, 
+            "face_matches":face_matches,
             "periodic_faces":periodic_surfaces,
-            "outer_faces":outer_faces_to_keep       
+            "outer_faces":outer_faces_to_keep
             },f)
 
     export_to_glennht_conn(face_matches,outer_faces_to_keep,'finalmesh-block-split')
 
 def debug():
     with open('connectivity-block-split_v02.pickle','rb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({
-            "face_matches":face_matches, 
+            "face_matches":face_matches,
             "periodic_faces":periodic_faces,
             "outer_faces":outer_faces_to_keep,
             "outer_faces_debug":outer_faces,
             },f)
 
     with open('connectivity-block-split_v02.pickle','wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({
-            "face_matches":face_matches, 
+            "face_matches":face_matches,
             "periodic_faces":periodic_faces,
             "outer_faces":outer_faces_to_keep,
             "outer_faces_debug":outer_faces,

@@ -31,7 +31,6 @@ def find_connectivity(filename:str,nblades:int):
         print('checking connectivity')
         face_matches, outer_faces_formatted = connectivity_fast(blocks)
         with open(f'{filename}_connectivity.pickle','wb') as f:
-            [m.pop('match',None) for m in face_matches] # Remove the dataframe
             pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_formatted},f)
 
 
@@ -46,11 +45,10 @@ def find_connectivity(filename:str,nblades:int):
     periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = rotated_periodicity(blocks,face_matches,outer_faces,rotation_axis='x',rotation_angle=rotation_angle)
 
     with open(f'{filename}_connectivity_periodicity.pickle','wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({
             "face_matches":face_matches,
             "periodic_faces":periodic_surfaces,
-            "outer_faces":outer_faces_to_keep       
+            "outer_faces":outer_faces_to_keep
             },f)
 
 find_connectivity(filename="stator_split",nblades=55)

@@ -412,13 +412,11 @@ def periodicities(item: PeriodicitiesItem):
     # Save results
     periodic_file_path = os.path.join(os.path.abspath("."), "uploads", item.fileName + "-periodic.pickle")
     with open(periodic_file_path,'wb') as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
     
     # Save json
     periodic_file_path_json = os.path.join(os.path.abspath("."), "uploads", item.fileName + "-periodic.json")
     with open(periodic_file_path_json, "w") as f:
-        [m.pop('match',None) for m in face_matches] # Remove the dataframe
         json.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces}, f, cls=NpEncoder)
     
 
