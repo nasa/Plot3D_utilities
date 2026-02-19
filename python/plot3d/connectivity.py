@@ -90,6 +90,100 @@ def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
     
     return T[dim1[0]:dim1[1], dim2[0]:dim2[1], dim3[0]:dim3[1]]
 
+def _try_full_face_corner_match(face1, face2, block1, block2,
+                                I1, J1, K1, I2, J2, K2, tol):
+    """O(1) full face match using corner coordinates only.
+
+    Compares the 4 corner XYZ coordinates of face1 against the 4 corners of
+    face2. If all corners match bijectively within *tol*, the faces are a full
+    match and we can skip the expensive point-by-point search entirely.
+
+    Handles all 8 possible orientations (flips/transposes) because matching is
+    done by spatial proximity, not by index ordering.
+
+    Args:
+        face1, face2: Face objects
+        block1, block2: Block objects containing the faces
+        I1, J1, K1: [min, max] index ranges for face1
+        I2, J2, K2: [min, max] index ranges for face2
+        tol (float): matching tolerance
+
+    Returns:
+        pandas.DataFrame with 4 corner rows if full match, or None if not.
+    """
+    # 1. Dimension check — face grid sizes must match (allowing transpose)
+    def _face_grid_dims(I, J, K):
+        dims = []
+        if I[0] != I[1]: dims.append(I[1] - I[0])
+        if J[0] != J[1]: dims.append(J[1] - J[0])
+        if K[0] != K[1]: dims.append(K[1] - K[0])
+        return sorted(dims)
+
+    d1 = _face_grid_dims(I1, J1, K1)
+    d2 = _face_grid_dims(I2, J2, K2)
+    if d1 != d2:
+        return None
+
+    # 2. Extract 4 corner (i,j,k,x,y,z) tuples for each face
+    def _face_corners(block, I, J, K):
+        """Get the 4 corner vertices of a face, based on which axis is constant."""
+        corners = []
+        if I[0] == I[1]:       # I-constant face
+            i = I[0]
+            for j in [J[0], J[1]]:
+                for k in [K[0], K[1]]:
+                    corners.append((i, j, k, block.X[i,j,k], block.Y[i,j,k], block.Z[i,j,k]))
+        elif J[0] == J[1]:     # J-constant face
+            j = J[0]
+            for i in [I[0], I[1]]:
+                for k in [K[0], K[1]]:
+                    corners.append((i, j, k, block.X[i,j,k], block.Y[i,j,k], block.Z[i,j,k]))
+        elif K[0] == K[1]:     # K-constant face
+            k = K[0]
+            for i in [I[0], I[1]]:
+                for j in [J[0], J[1]]:
+                    corners.append((i, j, k, block.X[i,j,k], block.Y[i,j,k], block.Z[i,j,k]))
+        else:
+            return None        # Not a proper face
+        return corners
+
+    c1 = _face_corners(block1, I1, J1, K1)
+    c2 = _face_corners(block2, I2, J2, K2)
+    if c1 is None or c2 is None or len(c1) != 4 or len(c2) != 4:
+        return None
+
+    # 3. Bijective corner matching — each corner of face1 must match a
+    #    unique corner of face2 within tolerance
+    used = [False, False, False, False]
+    match_pairs = []       # list of (c1_idx, c2_idx)
+    for ci, (i1, j1, k1, x1, y1, z1) in enumerate(c1):
+        best_idx = -1
+        best_d = float('inf')
+        for cj, (i2, j2, k2, x2, y2, z2) in enumerate(c2):
+            if used[cj]:
+                continue
+            dx = x1 - x2
+            dy = y1 - y2
+            dz = z1 - z2
+            d = math.sqrt(dx*dx + dy*dy + dz*dz)
+            if d < best_d:
+                best_d = d
+                best_idx = cj
+        if best_idx < 0 or best_d >= tol:
+            return None        # No match for this corner → not a full face match
+        used[best_idx] = True
+        match_pairs.append((ci, best_idx))
+
+    # 4. Build minimal DataFrame with 4 corner correspondence rows
+    rows = []
+    for ci, cj in match_pairs:
+        rows.append({
+            'i1': c1[ci][0], 'j1': c1[ci][1], 'k1': c1[ci][2],
+            'i2': c2[cj][0], 'j2': c2[cj][1], 'k2': c2[cj][2],
+        })
+    return pd.DataFrame(rows)
+
+
 def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:float=1E-6):
     """Get the index of the intersection between two faces located on two different blocks
         Face1 needs to be the smaller face.
@@ -121,6 +215,15 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
     J2 = [face2.JMIN,face2.JMAX]
     K2 = [face2.KMIN,face2.KMAX]
 
+    # FAST PATH: Try full face corner match (O(1) — no point_match needed)
+    full_df = _try_full_face_corner_match(
+        face1, face2, block1, block2,
+        I1, J1, K1, I2, J2, K2, tol
+    )
+    if full_df is not None:
+        return full_df, split_faces1, split_faces2
+
+    # SLOW PATH: Point-by-point matching for partial/split faces
     # Grab the points of Face 1 and Face 2
     X1 = select_multi_dimensional(block1.X, (I1[0],I1[1]),(J1[0],J1[1]),(K1[0],K1[1]))
     Y1 = select_multi_dimensional(block1.Y, (I1[0],I1[1]),(J1[0],J1[1]),(K1[0],K1[1]))

@@ -25,7 +25,6 @@ blocks = read_plot3D('vspt.xyz', binary = True)
 
 periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = rotated_periodicity(blocks,face_matches,outer_faces,nblades=55,rotation_axis='x',periodic_direction='k')
 
-
 with open('connectivity_periodic.pickle','wb') as f:
     pickle.dump({"face_matches":face_matches, "outer_faces":outer_faces_to_keep, "periodic_surfaces":periodic_surfaces},f)
 

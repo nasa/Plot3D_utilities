@@ -30,7 +30,7 @@ if not os.path.exists('./VSPT_Binary.xyz'):
     blocks = read_plot3D('VSPT_ASCII.xyz',binary=False,read_double=False)
     
     face_matches, outer_faces = connectivity_fast(blocks)
-    
+
     periodic_surfaces, outer_faces_to_keep,periodic_faces,outer_faces = rotated_periodicity(blocks,face_matches,outer_faces,nblades=55,rotation_axis='x',periodic_direction='k')
     
     face_matches.extend(periodic_surfaces)
