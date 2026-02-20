@@ -63,10 +63,8 @@ def _faces_could_match_rotationally(
     Checks (in order of cost): same const_type, axial overlap,
     radial overlap, rotated centroid proximity.
     """
-    # 1. Same const_type
-    if face1.const_type != face2.const_type:
-        return False
-    if face1.const_type == -1:
+    # 1. Each face must be planar (constant on some axis), but not necessarily the same one
+    if face1.const_type == -1 or face2.const_type == -1:
         return False
 
     # 2. Axial extent overlap (along rotation axis)
@@ -245,6 +243,77 @@ def _match_periodic_faces(
                         break
 
     pbar.close()
+
+    # ===== PHASE 3: Relaxed matching for remaining wavy-surface faces =====
+    # After Phase 2, some faces on wavy surfaces remain unmatched because
+    # _faces_could_match_rotationally() rejected them (centroid drift).
+    # Phase 3 skips that precheck and brute-forces every remaining pair
+    # with a relaxed tolerance (5x default).
+    remaining_lower = list(lower_pool)
+    remaining_upper = list(upper_pool)
+    relaxed_tol = 5e-6  # 5x the default 1e-6
+
+    phase3_found = True
+    phase3_iter = 0
+    while phase3_found:
+        phase3_found = False
+        phase3_iter += 1
+        if phase3_iter > 50:
+            break
+        for i_L, fL in enumerate(remaining_lower):
+            if phase3_found:
+                break
+            for mat_idx, rot_mat in enumerate(rotation_matrices):
+                if phase3_found:
+                    break
+                for j_U, fU in enumerate(remaining_upper):
+                    # Skip same face
+                    if _face_key(fL) == _face_key(fU):
+                        continue
+
+                    # Lightweight filters only — no centroid precheck
+                    if periodic_direction is not None:
+                        required_const = dir_const_map.get(periodic_direction.lower())
+                        if required_const is not None:
+                            if fL.const_type != required_const or fU.const_type != required_const:
+                                continue
+                    elif fL.const_type == -1 or fU.const_type == -1:
+                        continue
+
+                    block1_rotated = get_rotated(mat_idx, fL.blockIndex)
+                    block2 = blocks[fU.blockIndex]
+
+                    _, periodic_temp, split_temp = __periodicity_check__(
+                        fL, fU, block1_rotated, block2, tol=relaxed_tol
+                    )
+
+                    if len(periodic_temp) > 0:
+                        periodic_faces.append(periodic_temp)
+                        periodic_faces_export.append(
+                            face_matches_to_dict(periodic_temp[0], periodic_temp[1], block1_rotated, block2)
+                        )
+
+                        remaining_lower.pop(i_L)
+                        remaining_upper.pop(j_U)
+
+                        for sf in split_temp:
+                            k = _face_key(sf)
+                            if use_angular:
+                                if k in lower_keys:
+                                    remaining_lower.append(sf)
+                                if k in upper_keys:
+                                    remaining_upper.append(sf)
+                            else:
+                                remaining_lower.append(sf)
+                                remaining_upper.append(sf)
+
+                        split_faces_all.extend(split_temp)
+                        phase3_found = True
+                        break
+
+    # Update pools with Phase 3 remainders
+    lower_pool = remaining_lower
+    upper_pool = remaining_upper
 
     # Free rotation caches
     caches.clear()
