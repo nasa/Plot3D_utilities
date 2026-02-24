@@ -6,41 +6,38 @@ from tqdm import tqdm
 from scipy.io import FortranFile
 from .block import Block
 
-def __write_plot3D_block_binary(f, B:Block, big_endian:bool=False, double_precision:bool=True, batch_size:int=100):
+
+def __write_plot3D_block_binary(f, B: Block, big_endian: bool = False,
+                                double_precision: bool = True, batch_size: int = 100):
     """Write binary plot3D block which contains X,Y,Z.
+
+    Uses vectorized numpy writes for fast I/O.
 
     Args:
         f (IO): file handle
         B (Block): writes a single block to a file
         big_endian (bool): use big-endian byte order. Defaults to False (little-endian).
         double_precision (bool): writes to binary using double precision. Defaults to True.
-        batch_size (int, optional): number of packed values to buffer before writing. Defaults to 100.
+        batch_size (int, optional): unused (kept for API compatibility). Defaults to 100.
 
     See: https://docs.python.org/3/library/struct.html
     """
-    def write_var(V:np.ndarray):
-        endian = '>' if big_endian else '<'
-        fmt = f'{endian}d' if double_precision else f'{endian}f'
-        value_size = struct.calcsize(fmt)
-        buffer = bytearray()
-        buffer_limit = value_size * batch_size
+    endian = '>' if big_endian else '<'
+    dtype_char = 'f8' if double_precision else 'f4'
+    dtype = np.dtype(f'{endian}{dtype_char}')
 
-        for k in range(B.KMAX):
-            for j in range(B.JMAX):
-                for i in range(B.IMAX):
-                    buffer.extend(struct.pack(fmt, V[i,j,k]))
-                    if len(buffer) >= buffer_limit:
-                        f.write(buffer)
-                        buffer.clear()
+    def write_var(V: np.ndarray):
+        # Plot3D stores in Fortran order: transpose (I,J,K) -> (K,J,I) then flatten
+        data = V.transpose(2, 1, 0).astype(dtype).tobytes()
+        f.write(data)
 
-        if buffer:
-            f.write(buffer)
     write_var(B.X)
     write_var(B.Y)
     write_var(B.Z)
 
 
-def __write_plot3D_block_ASCII(f, B:Block, double_precision:bool=True, columns:int=6, batch_size:int=100):
+def __write_plot3D_block_ASCII(f, B: Block, double_precision: bool = True,
+                               columns: int = 6, batch_size: int = 100):
     """Write plot3D block in ASCII format using scientific notation.
 
     Args:
@@ -53,7 +50,9 @@ def __write_plot3D_block_ASCII(f, B:Block, double_precision:bool=True, columns:i
     # Scientific notation format: width.precision E
     fmt = '{0:23.15f}' if double_precision else '{0:15.8f}'
 
-    def write_var(V:np.ndarray):
+    def write_var(V: np.ndarray):
+        # Flatten in Fortran order (K varies slowest, I fastest)
+        flat = V.transpose(2, 1, 0).ravel()
         line_entries = []
         line_batch = []
 
@@ -62,15 +61,13 @@ def __write_plot3D_block_ASCII(f, B:Block, double_precision:bool=True, columns:i
                 f.writelines(line_batch)
                 line_batch.clear()
 
-        for k in range(B.KMAX):
-            for j in range(B.JMAX):
-                for i in range(B.IMAX):
-                    line_entries.append(fmt.format(V[i,j,k]))
-                    if len(line_entries) == columns:
-                        line_batch.append(' '.join(line_entries) + '\n')
-                        line_entries.clear()
-                        if len(line_batch) == batch_size:
-                            flush_batch()
+        for val in flat:
+            line_entries.append(fmt.format(float(val)))
+            if len(line_entries) == columns:
+                line_batch.append(' '.join(line_entries) + '\n')
+                line_entries.clear()
+                if len(line_batch) == batch_size:
+                    flush_batch()
 
         if line_entries:
             line_batch.append(' '.join(line_entries) + '\n')
@@ -80,8 +77,9 @@ def __write_plot3D_block_ASCII(f, B:Block, double_precision:bool=True, columns:i
     write_var(B.Y)
     write_var(B.Z)
 
-def write_plot3D(filename:str, blocks:List[Block], binary:bool=True, big_endian:bool=False,
-                 double_precision:bool=True, fortran:bool=False, batch_size:int=100):
+
+def write_plot3D(filename: str, blocks: List[Block], binary: bool = True, big_endian: bool = False,
+                 double_precision: bool = True, fortran: bool = False, batch_size: int = 100):
     """Writes blocks to a Plot3D file.
 
     Args:
@@ -114,9 +112,7 @@ def write_plot3D(filename:str, blocks:List[Block], binary:bool=True, big_endian:
             f.write(struct.pack(f'{endian}I', len(blocks)))
             for b in blocks:
                 IMAX, JMAX, KMAX = b.X.shape
-                f.write(struct.pack(f'{endian}I', IMAX))
-                f.write(struct.pack(f'{endian}I', JMAX))
-                f.write(struct.pack(f'{endian}I', KMAX))
+                f.write(struct.pack(f'{endian}III', IMAX, JMAX, KMAX))
             for b in tqdm(blocks, desc="Writing binary blocks", unit="block"):
                 __write_plot3D_block_binary(f, b, big_endian, double_precision, batch_size)
     else:

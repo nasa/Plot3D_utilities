@@ -1,4 +1,3 @@
-from copy import deepcopy
 from itertools import combinations
 import math
 import numpy as np
@@ -98,7 +97,7 @@ def block_connection_matrix(
     """
     # Reduce the size of the blocks by the minimum GCD so index grids line up
     gcd_to_use = compute_gcd(blocks)
-    blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
+    blocks = reduce_blocks([b.copy() for b in blocks], gcd_to_use)
 
     # Convert dict outer faces (if provided) to Face objects at the reduced resolution
     outer_faces_all: List[Face] = []
@@ -190,8 +189,8 @@ def block_connection_matrix(
 
 def plot_blocks(blocks):
     gcd_to_use = compute_gcd(blocks)
-    blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
-    
+    blocks = reduce_blocks([b.copy() for b in blocks],gcd_to_use)
+
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
     markers = ['o', 's']  # alternate between circle and square

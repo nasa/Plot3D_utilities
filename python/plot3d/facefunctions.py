@@ -2,7 +2,6 @@ from typing import Dict, List, Optional, Tuple
 from .listfunctions import unique_pairs
 from .block import Block, compute_gcd, reduce_blocks
 from .face import Face 
-from copy import deepcopy
 import numpy.typing as npt
 import numpy as np
 import math
@@ -293,7 +292,7 @@ def find_bounding_faces(blocks: List[Block],
     """
     # 1) Reduce by GCD so grids line up
     gcd_to_use = compute_gcd(blocks)
-    blocks_r = reduce_blocks(deepcopy(blocks), gcd_to_use)
+    blocks_r = reduce_blocks([b.copy() for b in blocks], gcd_to_use)
 
     # 2) Build outer face list at reduced resolution
     if len(outer_faces) == 0:

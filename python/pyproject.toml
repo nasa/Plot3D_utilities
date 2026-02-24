@@ -14,7 +14,8 @@ networkx = "*"
 pymetis = { version = "*", markers = "platform_system != 'Windows'" }
 matplotlib = "*"
 
-[tool.poetry.group.deve.dependencies]
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.0"
 
 [tool.poetry.group.docs]
 optional = true
@@ -24,6 +25,10 @@ sphinx = "^7.4"
 sphinx-rtd-theme = "^2.0"
 sphinx-autobuild = "^2024.4"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"
+
 [build-system]
 requires = ["poetry>=1.1.2"]
-build-backend = "poetry.masonry.api"    
+build-backend = "poetry.masonry.api"

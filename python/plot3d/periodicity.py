@@ -3,7 +3,6 @@ import warnings
 import numpy as np
 import math
 from math import cos, radians, sin, sqrt, acos
-from copy import deepcopy
 from .block import Block, compute_gcd, reduce_blocks
 from .blockfunctions import rotate_block
 from .face import Face
@@ -11,7 +10,8 @@ from .facefunctions import (outer_face_dict_to_list, match_faces_dict_to_list,
     create_face_from_diagonals, find_bounding_faces, get_outer_faces,
     find_angular_bounding_faces, _to_theta, _to_radius)
 from .connectivity import get_face_intersection, face_matches_to_dict
-from .utils import euclidean_distance, enumerate_unique_corners, scale_face_dict_indices
+from .utils import (euclidean_distance, enumerate_unique_corners, scale_face_dict_indices,
+    face_key, divide_face_dict_indices)
 from tqdm import tqdm
 
 def _scale_dicts_down(dicts: List[Dict], gcd: int, keys=('IMIN','JMIN','KMIN','IMAX','JMAX','KMAX')):
@@ -107,6 +107,87 @@ def _faces_could_match_rotationally(
     return True
 
 
+def _count_rotated_corners_on_face(face_a: Face, face_b: Face, block_b: Block,
+                                    rotation_matrix: np.ndarray, tol: float = 1e-6) -> int:
+    """Count how many corners of face_a, after rotation, land on face_b's grid.
+
+    Ported from Rust ``count_rotated_corners_on_face``. Used as a cheap
+    pre-check: if fewer than 2 rotated corners hit face_b, the expensive
+    full intersection is skipped.
+
+    Args:
+        face_a: source face whose corners will be rotated
+        face_b: target face to check against
+        block_b: block containing face_b
+        rotation_matrix: 3x3 rotation matrix
+        tol: Euclidean distance tolerance
+
+    Returns:
+        Number of face_a corners (0-4) that match face_b grid points after rotation
+    """
+    pts_b = face_b.grid_points(block_b)
+    if pts_b.size == 0:
+        return 0
+
+    # Get face_a's 4 corner coordinates
+    n = face_a.nvertex
+    corners_a = np.column_stack([face_a.x[:n], face_a.y[:n], face_a.z[:n]])
+
+    # Rotate corners
+    rotated = (rotation_matrix @ corners_a.T).T  # (n, 3)
+
+    count = 0
+    for rc in rotated:
+        # Check if this rotated corner is close to any point on face_b
+        dists = np.sqrt(np.sum((pts_b - rc) ** 2, axis=1))
+        if np.min(dists) < tol:
+            count += 1
+    return count
+
+
+def _full_face_match_rotated(face_a: Face, face_b: Face, rotation_matrix: np.ndarray,
+                              tol: float = 1e-6) -> bool:
+    """Check if all corners of face_a after rotation match face_b's corners bijectively.
+
+    Ported from Rust ``full_face_match_transformed``. Used in Phase 1 to quickly
+    identify full-face periodic matches without expensive node-by-node intersection.
+
+    Args:
+        face_a: source face whose corners will be rotated
+        face_b: target face to check against
+        rotation_matrix: 3x3 rotation matrix
+        tol: Euclidean distance tolerance
+
+    Returns:
+        True if all corners match bijectively after rotation
+    """
+    n_a = face_a.nvertex
+    n_b = face_b.nvertex
+    if n_a != n_b or n_a < 4:
+        return False
+
+    # Face dimensions must match (allowing transpose)
+    from .utils import face_grid_dims
+    if (face_grid_dims(face_a.IMIN, face_a.IMAX, face_a.JMIN, face_a.JMAX, face_a.KMIN, face_a.KMAX) !=
+        face_grid_dims(face_b.IMIN, face_b.IMAX, face_b.JMIN, face_b.JMAX, face_b.KMIN, face_b.KMAX)):
+        return False
+
+    corners_a = np.column_stack([face_a.x[:n_a], face_a.y[:n_a], face_a.z[:n_a]])
+    rotated_a = (rotation_matrix @ corners_a.T).T
+
+    corners_b = np.column_stack([face_b.x[:n_b], face_b.y[:n_b], face_b.z[:n_b]])
+
+    # Bijective matching: each rotated corner must match a unique face_b corner
+    used = set()
+    for rc in rotated_a:
+        dists = np.sqrt(np.sum((corners_b - rc) ** 2, axis=1))
+        best_idx = int(np.argmin(dists))
+        if dists[best_idx] > tol or best_idx in used:
+            return False
+        used.add(best_idx)
+    return len(used) == n_b
+
+
 def _match_periodic_faces(
     blocks: List[Block],
     outer_faces_all: List[Face],
@@ -116,6 +197,20 @@ def _match_periodic_faces(
     periodic_direction: Optional[str] = None,
 ) -> Tuple[List[Dict], List[Dict], List[Tuple], List[Face]]:
     """Core matching engine for rotated_periodicity().
+
+    Uses a three-phase algorithm with FacePool theta bucketing for O(log N)
+    candidate selection:
+
+    **Phase 1**: Full-face matching using FacePool theta bucketing. For each
+    face, find candidates at theta +/- rotation_angle, try full face match.
+
+    **Phase 2**: Split-face matching with corner pre-check. Uses FacePool
+    to find candidates, then checks if >= 2 rotated corners land on the
+    candidate face before attempting expensive intersection. Iterates until
+    no new matches are found (no iteration limit).
+
+    **Phase 3**: Relaxed matching without pre-checks. Uses 5x tolerance
+    to catch wavy-surface faces. Runs until convergence.
 
     Args:
         blocks: reduced blocks
@@ -128,6 +223,8 @@ def _match_periodic_faces(
     Returns:
         (periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all)
     """
+    from .face_pool import FacePool
+
     # Build rotation caches (one per matrix, lazy)
     caches = {}
     for idx, mat in enumerate(rotation_matrices):
@@ -140,180 +237,257 @@ def _match_periodic_faces(
         return cache[block_index]
 
     # Try to identify angular boundary faces
-    # Build dict-form outer faces for find_angular_bounding_faces
     outer_dicts = [f.to_dict() for f in outer_faces_all]
     lower_export, upper_export, lower_faces, upper_faces = find_angular_bounding_faces(
         blocks, outer_dicts, rotation_axis
     )
-    del outer_dicts  # Free temporary dict list
+    del outer_dicts
 
     use_angular = len(lower_faces) > 0 and len(upper_faces) > 0
 
-    def _face_key(f: Face):
-        return (f.BlockIndex, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX)
+    # Use shared face_key utility (imported from utils)
+    _face_key = face_key
+
+    # Filter by periodic_direction and angular boundaries
+    dir_const_map = {"i": 0, "j": 1, "k": 2}
 
     if use_angular:
         lower_keys = {_face_key(f) for f in lower_faces}
         upper_keys = {_face_key(f) for f in upper_faces}
-
-        lower_pool = [f for f in outer_faces_all if _face_key(f) in lower_keys]
-        upper_pool = [f for f in outer_faces_all if _face_key(f) in upper_keys]
+        pool_faces = [f for f in outer_faces_all
+                      if _face_key(f) in lower_keys or _face_key(f) in upper_keys]
     else:
-        # Fallback: use all outer faces for both pools
-        lower_pool = list(outer_faces_all)
-        upper_pool = list(outer_faces_all)
+        lower_keys = set()
+        upper_keys = set()
+        pool_faces = list(outer_faces_all)
 
-    # Filter by periodic_direction if specified
-    dir_const_map = {"i": 0, "j": 1, "k": 2}
     if periodic_direction is not None:
         required_const = dir_const_map.get(periodic_direction.lower())
         if required_const is not None:
-            lower_pool = [f for f in lower_pool if f.const_type == required_const]
-            upper_pool = [f for f in upper_pool if f.const_type == required_const]
+            pool_faces = [f for f in pool_faces if f.const_type == required_const]
 
-    # Iterative matching: find one match per iteration, remove matched faces,
-    # add split faces back to pools, and re-enter until no more matches found.
-    # This mirrors the original while-loop pattern so cascading partial matches
-    # (split faces that themselves partially match other faces) are discovered.
+    # Compute rotation angle from the first rotation matrix
+    # Extract angle from rotation matrix (works for any axis)
+    rot_mat_0 = rotation_matrices[0]
+    # The rotation angle can be extracted from the trace: trace = 1 + 2*cos(theta)
+    trace = rot_mat_0[0, 0] + rot_mat_0[1, 1] + rot_mat_0[2, 2]
+    rotation_angle_rad = math.acos(max(-1.0, min(1.0, (trace - 1.0) / 2.0)))
+    theta_tol = abs(rotation_angle_rad) * 0.15 + 0.05  # Same as Rust
+
+    # Build FacePool with theta bucketing
+    pool = FacePool(pool_faces, blocks, rotation_axis)
+
+    # Track results
     periodic_faces: List[Tuple] = []
     periodic_faces_export: List[Dict] = []
     split_faces_all: List[Face] = []
-    non_matching: set = set()  # Track known non-matching pairs to skip
+    non_matching: set = set()
+    seen_pairs: set = set()
 
-    initial_lower = len(lower_pool)
-    initial_upper = len(upper_pool)
-    pbar = tqdm(total=min(initial_lower, initial_upper),
-                desc="Periodic matching", unit="pair")
+    MATCH_TOL = 1e-6
 
-    periodic_found = True
-    while periodic_found:
-        periodic_found = False
-        for i_L, fL in enumerate(lower_pool):
-            if periodic_found:
-                break
+    # ===== PHASE 1: Full-face matching via corner comparison =====
+    # Fast O(N log N) pass: for each face, check if all 4 rotated corners
+    # match a candidate's corners bijectively. No expensive intersection needed.
+    active = pool.active_indices()
+    pbar_p1 = tqdm(total=len(active), desc="Periodic matching (Phase 1)", unit="face")
+    for face_a_idx in active:
+        pbar_p1.update(1)
+        if pool.is_consumed(face_a_idx):
+            continue
+        face_a = pool.faces[face_a_idx]
+        if face_a.const_type == -1:
+            continue
+
+        candidates = pool.find_rotational_candidates(
+            face_a_idx, rotation_angle_rad, theta_tol
+        )
+
+        for cand_idx in candidates:
+            if pool.is_consumed(cand_idx):
+                continue
+            face_b = pool.faces[cand_idx]
+            if face_b.const_type == -1:
+                continue
+
             for mat_idx, rot_mat in enumerate(rotation_matrices):
-                if periodic_found:
+                if _full_face_match_rotated(face_a, face_b, rot_mat, MATCH_TOL):
+                    pair_key = (min(_face_key(face_a), _face_key(face_b)),
+                                max(_face_key(face_a), _face_key(face_b)))
+                    if pair_key in seen_pairs:
+                        continue
+                    seen_pairs.add(pair_key)
+
+                    block_a_rot = get_rotated(mat_idx, face_a.blockIndex)
+                    block_b = blocks[face_b.blockIndex]
+
+                    periodic_faces.append((face_a, face_b))
+                    periodic_faces_export.append(
+                        face_matches_to_dict(face_a, face_b, block_a_rot, block_b)
+                    )
+
+                    pool.consume(face_a_idx)
+                    pool.consume(cand_idx)
+
+                    pbar_p1.set_description(
+                        f"Phase 1: block {face_a.blockIndex} <-> block {face_b.blockIndex}")
+                    pbar_p1.set_postfix(matches=len(periodic_faces))
                     break
-                for j_U, fU in enumerate(upper_pool):
-                    # Skip known non-matching pairs
-                    pair_key = (_face_key(fL), mat_idx, _face_key(fU))
-                    if pair_key in non_matching:
+            if pool.is_consumed(face_a_idx):
+                break
+    pbar_p1.close()
+
+    # ===== PHASE 2: Split-face matching with corner pre-check =====
+    pbar = tqdm(total=len(pool_faces), desc="Periodic matching (Phase 2)", unit="pair")
+
+    changed = True
+    iteration = 0
+    while changed:
+        changed = False
+        iteration += 1
+        active = pool.active_indices()
+
+        for face_a_idx in active:
+            if pool.is_consumed(face_a_idx):
+                continue
+            face_a = pool.faces[face_a_idx]
+
+            # Skip non-planar faces
+            if face_a.const_type == -1:
+                continue
+
+            # Use FacePool to find candidates via theta bucketing
+            candidates = pool.find_rotational_candidates(
+                face_a_idx, rotation_angle_rad, theta_tol
+            )
+
+            match_found = False
+            for cand_idx in candidates:
+                if pool.is_consumed(cand_idx):
+                    continue
+                face_b = pool.faces[cand_idx]
+
+                if face_b.const_type == -1:
+                    continue
+
+                # Skip known non-matching pairs
+                pair_id = (face_a_idx, cand_idx)
+                if pair_id in non_matching:
+                    continue
+
+                # Try each rotation matrix
+                for mat_idx, rot_mat in enumerate(rotation_matrices):
+                    # Corner pre-check: at least 2 rotated corners must hit face_b
+                    corners_hit = _count_rotated_corners_on_face(
+                        face_a, face_b, blocks[face_b.blockIndex], rot_mat, MATCH_TOL
+                    )
+                    if corners_hit < 2:
                         continue
 
-                    if not _faces_could_match_rotationally(fL, fU, rot_mat, rotation_axis):
-                        non_matching.add(pair_key)
-                        continue
-
-                    block1_rotated = get_rotated(mat_idx, fL.blockIndex)
-                    block2 = blocks[fU.blockIndex]
+                    block_a_rot = get_rotated(mat_idx, face_a.blockIndex)
+                    block_b = blocks[face_b.blockIndex]
 
                     _, periodic_temp, split_temp = __periodicity_check__(
-                        fL, fU, block1_rotated, block2
+                        face_a, face_b, block_a_rot, block_b, tol=MATCH_TOL
                     )
 
                     if len(periodic_temp) > 0:
+                        # Check for duplicate pair
+                        pair_key = (min(_face_key(periodic_temp[0]), _face_key(periodic_temp[1])),
+                                    max(_face_key(periodic_temp[0]), _face_key(periodic_temp[1])))
+                        if pair_key in seen_pairs:
+                            continue
+                        seen_pairs.add(pair_key)
+
                         periodic_faces.append(periodic_temp)
                         periodic_faces_export.append(
-                            face_matches_to_dict(periodic_temp[0], periodic_temp[1], block1_rotated, block2)
+                            face_matches_to_dict(periodic_temp[0], periodic_temp[1], block_a_rot, block_b)
                         )
 
-                        # Remove matched faces from pools
-                        lower_pool.pop(i_L)
-                        upper_pool.pop(j_U)
+                        # Consume matched faces
+                        pool.consume(face_a_idx)
+                        pool.consume(cand_idx)
 
-                        # Add split faces back to pools for re-processing
+                        # Add split remnants back to pool
                         for sf in split_temp:
-                            k = _face_key(sf)
-                            if use_angular:
-                                if k in lower_keys:
-                                    lower_pool.append(sf)
-                                if k in upper_keys:
-                                    upper_pool.append(sf)
-                            else:
-                                lower_pool.append(sf)
-                                upper_pool.append(sf)
-
+                            pool.add_face(sf)
                         split_faces_all.extend(split_temp)
-                        periodic_found = True
+
+                        changed = True
+                        match_found = True
                         pbar.update(1)
                         pbar.set_description(
-                            f"Periodic match: block {fL.blockIndex} <-> block {fU.blockIndex}")
-                        pbar.set_postfix(matches=len(periodic_faces),
-                                         lower=len(lower_pool), upper=len(upper_pool))
+                            f"Phase 2: block {face_a.blockIndex} <-> block {face_b.blockIndex}")
+                        pbar.set_postfix(matches=len(periodic_faces), iteration=iteration)
                         break
+
+                if match_found:
+                    break
+
+                non_matching.add(pair_id)
+
+            if match_found:
+                break  # Restart search from beginning after a match
 
     pbar.close()
 
     # ===== PHASE 3: Relaxed matching for remaining wavy-surface faces =====
-    # After Phase 2, some faces on wavy surfaces remain unmatched because
-    # _faces_could_match_rotationally() rejected them (centroid drift).
-    # Phase 3 skips that precheck and brute-forces every remaining pair
-    # with a relaxed tolerance (5x default).
-    remaining_lower = list(lower_pool)
-    remaining_upper = list(upper_pool)
-    relaxed_tol = 5e-6  # 5x the default 1e-6
+    relaxed_tol = 5e-6  # 5x the default
+    active = pool.active_indices()
 
     phase3_found = True
-    phase3_iter = 0
     while phase3_found:
         phase3_found = False
-        phase3_iter += 1
-        if phase3_iter > 50:
-            break
-        for i_L, fL in enumerate(remaining_lower):
-            if phase3_found:
-                break
-            for mat_idx, rot_mat in enumerate(rotation_matrices):
-                if phase3_found:
-                    break
-                for j_U, fU in enumerate(remaining_upper):
-                    # Skip same face
-                    if _face_key(fL) == _face_key(fU):
-                        continue
+        active = pool.active_indices()
+        for i_a, face_a_idx in enumerate(active):
+            if pool.is_consumed(face_a_idx):
+                continue
+            face_a = pool.faces[face_a_idx]
+            if face_a.const_type == -1:
+                continue
 
-                    # Lightweight filters only — no centroid precheck
-                    if periodic_direction is not None:
-                        required_const = dir_const_map.get(periodic_direction.lower())
-                        if required_const is not None:
-                            if fL.const_type != required_const or fU.const_type != required_const:
-                                continue
-                    elif fL.const_type == -1 or fU.const_type == -1:
-                        continue
+            for i_b in range(i_a + 1, len(active)):
+                face_b_idx = active[i_b]
+                if pool.is_consumed(face_b_idx):
+                    continue
+                face_b = pool.faces[face_b_idx]
+                if face_b.const_type == -1:
+                    continue
 
-                    block1_rotated = get_rotated(mat_idx, fL.blockIndex)
-                    block2 = blocks[fU.blockIndex]
+                for mat_idx, rot_mat in enumerate(rotation_matrices):
+                    block_a_rot = get_rotated(mat_idx, face_a.blockIndex)
+                    block_b = blocks[face_b.blockIndex]
 
                     _, periodic_temp, split_temp = __periodicity_check__(
-                        fL, fU, block1_rotated, block2, tol=relaxed_tol
+                        face_a, face_b, block_a_rot, block_b, tol=relaxed_tol
                     )
 
                     if len(periodic_temp) > 0:
+                        pair_key = (min(_face_key(periodic_temp[0]), _face_key(periodic_temp[1])),
+                                    max(_face_key(periodic_temp[0]), _face_key(periodic_temp[1])))
+                        if pair_key in seen_pairs:
+                            continue
+                        seen_pairs.add(pair_key)
+
                         periodic_faces.append(periodic_temp)
                         periodic_faces_export.append(
-                            face_matches_to_dict(periodic_temp[0], periodic_temp[1], block1_rotated, block2)
+                            face_matches_to_dict(periodic_temp[0], periodic_temp[1], block_a_rot, block_b)
                         )
 
-                        remaining_lower.pop(i_L)
-                        remaining_upper.pop(j_U)
+                        pool.consume(face_a_idx)
+                        pool.consume(face_b_idx)
 
                         for sf in split_temp:
-                            k = _face_key(sf)
-                            if use_angular:
-                                if k in lower_keys:
-                                    remaining_lower.append(sf)
-                                if k in upper_keys:
-                                    remaining_upper.append(sf)
-                            else:
-                                remaining_lower.append(sf)
-                                remaining_upper.append(sf)
-
+                            pool.add_face(sf)
                         split_faces_all.extend(split_temp)
+
                         phase3_found = True
                         break
 
-    # Update pools with Phase 3 remainders
-    lower_pool = remaining_lower
-    upper_pool = remaining_upper
+                if phase3_found:
+                    break
+            if phase3_found:
+                break
 
     # Free rotation caches
     caches.clear()
@@ -336,24 +510,6 @@ def _match_periodic_faces(
             final_keys.add(k)
     del remove_keys, final_keys
 
-    # Deduplicate periodic face pairs
-    indx_to_remove = set()
-    for i in range(len(periodic_faces)):
-        if i in indx_to_remove:
-            continue
-        for j_idx in range(i + 1, len(periodic_faces)):
-            if j_idx in indx_to_remove:
-                continue
-            if periodic_faces[i][0] == periodic_faces[j_idx][0]:
-                if periodic_faces[i][1] == periodic_faces[j_idx][1]:
-                    indx_to_remove.add(j_idx)
-            elif periodic_faces[i][1] == periodic_faces[j_idx][0]:
-                if periodic_faces[i][0] == periodic_faces[j_idx][1]:
-                    indx_to_remove.add(j_idx)
-
-    periodic_faces_export = [periodic_faces_export[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
-    periodic_faces = [periodic_faces[i] for i in range(len(periodic_faces)) if i not in indx_to_remove]
-
     # Build outer faces export
     outer_faces_export = [o.to_dict() for o in outer_faces_final]
 
@@ -365,10 +521,7 @@ def _scale_results_up(periodic_faces_export, outer_faces_export, periodic_faces,
     if gcd_to_use <= 1:
         return
 
-    for rec in periodic_faces_export:
-        for side in ('block1', 'block2'):
-            for key in ('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX'):
-                rec[side][key] *= gcd_to_use
+    scale_face_dict_indices(periodic_faces_export, gcd_to_use, nested_sides=['block1', 'block2'])
 
     for pair in periodic_faces:
         for face in pair:
@@ -376,9 +529,7 @@ def _scale_results_up(periodic_faces_export, outer_faces_export, periodic_faces,
             face.J *= gcd_to_use
             face.K *= gcd_to_use
 
-    for rec in outer_faces_export:
-        for key in ('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX'):
-            rec[key] *= gcd_to_use
+    scale_face_dict_indices(outer_faces_export, gcd_to_use)
 
     for face in outer_faces_all:
         face.I *= gcd_to_use
@@ -443,7 +594,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
     gcd_to_use = 1
     if ReduceMesh:
         gcd_to_use = compute_gcd(blocks)
-        blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
+        blocks = reduce_blocks([b.copy() for b in blocks], gcd_to_use)
 
     # Build both +angle and -angle rotation matrices for robustness
     rotation_matrix_pos = create_rotation_matrix(radians(rotation_angle), rotation_axis)
@@ -558,7 +709,7 @@ def translational_periodicity(
 
     lower_faces_r = outer_face_dict_to_list(blocks, lower_connected_faces, gcd_to_use)
     upper_faces_r = outer_face_dict_to_list(blocks, upper_connected_faces, gcd_to_use)
-    blocks_r = reduce_blocks(deepcopy(blocks), gcd_to_use)
+    blocks_r = reduce_blocks([b.copy() for b in blocks], gcd_to_use)
 
     # 2) Δ along axis (if not provided)
     if axis == "x":
@@ -571,7 +722,7 @@ def translational_periodicity(
 
     # 3) Shifted copies
     def shift_blocks(bb: List[Block], amount: float) -> List[Block]:
-        cp = deepcopy(bb)
+        cp = [b.copy() for b in bb]
         for b in cp:
             b.shift(amount, axis)
         return cp
@@ -732,7 +883,7 @@ def translational_periodicity(
 
     periodic_pairs: List[Tuple[Face, Face, Dict[str,str]]] = []
     for (fL, fU, m) in periodic_pairs_r:
-        gL = deepcopy(fL); gU = deepcopy(fU)
+        gL = fL.copy(); gU = fU.copy()
         gL.I *= gcd_to_use; gL.J *= gcd_to_use; gL.K *= gcd_to_use
         gU.I *= gcd_to_use; gU.J *= gcd_to_use; gU.K *= gcd_to_use
         periodic_pairs.append((gL, gU, m))
@@ -807,28 +958,28 @@ def linear_real_transform(face1:Face,face2:Face) -> Tuple:
     return ang, rotation_matrix
 
 def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:float=1E-6):
-    """General function to find periodicity within a given block. 
-    
+    """General function to find periodicity within a given block.
+
     Steps:
-        - 1: Take the face with the shorter diagonal. 
-        - 2: Rotate the shorter face by angle 360/nblades.  
+        - 1: Take the face with the shorter diagonal.
+        - 2: Rotate the shorter face by angle 360/nblades.
         - 3: Check to see if faces intersect
 
     Args:
-        face1 (Face): An arbitrary face 
-        face2 (Face): An arbitrary face 
+        face1 (Face): An arbitrary face
+        face2 (Face): An arbitrary face
         block1 (Block): block 1 cooresponding to face 1
-        block2 (Block): block 2 cooresponding to face 2 
+        block2 (Block): block 2 cooresponding to face 2
 
     Returns:
         (tuple): containing
 
-            - **df** (pandas.Dataframe): List of point matches for periodic surfaces 
-            - **periodic_surface** (List[Face]):  These are faces that are periodic 
-            - **split_surfaces** (List[Face]): Some blocks may have periodic faces with other blocks. But the faces may need to be split so say you pair a small face with a larger face. The split surfaces should be treated as an outer face  
+            - **match_rows** (List[Dict]): List of point matches for periodic surfaces
+            - **periodic_surface** (List[Face]):  These are faces that are periodic
+            - **split_surfaces** (List[Face]): Some blocks may have periodic faces with other blocks. But the faces may need to be split so say you pair a small face with a larger face. The split surfaces should be treated as an outer face
 
     """
-    
+
     periodic_faces = list()
     split_faces = list()
     swapped = False
@@ -836,18 +987,22 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
         face1, face2 = face2, face1
         block1, block2 = block2, block1
         swapped = True
-    
-    df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2,tol)
 
-    if len(df)>=4:
-        f1 = create_face_from_diagonals(block1,imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(), imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max())
+    match_rows, split_face1, split_face2 = get_face_intersection(face1, face2, block1, block2, tol)
+
+    if len(match_rows) >= 4:
+        f1 = create_face_from_diagonals(block1,
+            imin=min(m['i1'] for m in match_rows), jmin=min(m['j1'] for m in match_rows), kmin=min(m['k1'] for m in match_rows),
+            imax=max(m['i1'] for m in match_rows), jmax=max(m['j1'] for m in match_rows), kmax=max(m['k1'] for m in match_rows))
         f1.set_block_index(face1.blockIndex)
         f1.set_face_id(face1.id)
 
-        f2 = create_face_from_diagonals(block2,imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(), imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max())
+        f2 = create_face_from_diagonals(block2,
+            imin=min(m['i2'] for m in match_rows), jmin=min(m['j2'] for m in match_rows), kmin=min(m['k2'] for m in match_rows),
+            imax=max(m['i2'] for m in match_rows), jmax=max(m['j2'] for m in match_rows), kmax=max(m['k2'] for m in match_rows))
         f2.set_block_index(face2.blockIndex)
         f2.set_face_id(face2.id)
-        
+
         split_faces.extend(split_face1)
         split_faces.extend(split_face2)
         if swapped:
@@ -857,7 +1012,7 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
             periodic_faces.append(f1)
             periodic_faces.append(f2)
 
-    return df,periodic_faces,split_faces
+    return match_rows, periodic_faces, split_faces
 
 
 def periodicity(blocks, outer_faces, matched_faces, periodic_direction='k',
@@ -920,7 +1075,7 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, ro
     """
     # Compute GCD and reduce blocks
     gcd_to_use = compute_gcd(blocks)
-    reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
+    reduced_blocks = reduce_blocks([b.copy() for b in blocks], gcd_to_use)
 
     # Build rotation matrices for +theta and -theta
     rotation_matrix_pos = create_rotation_matrix(radians(theta), rotation_axis)
@@ -931,11 +1086,8 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, ro
     rotated_blocks_neg = [rotate_block(b, rotation_matrix_neg) for b in reduced_blocks]
 
     # Scale down face_matches indices by GCD
-    scaled_matches = deepcopy(face_matches)
-    for fm in scaled_matches:
-        for side in ['block1', 'block2']:
-            for key in ['IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX']:
-                fm[side][key] = fm[side][key] // gcd_to_use
+    scaled_matches = [{k: (dict(v) if isinstance(v, dict) else v) for k, v in fm.items()} for fm in face_matches]
+    divide_face_dict_indices(scaled_matches, gcd_to_use, nested_sides=['block1', 'block2'])
 
     verified = list()
     mismatched = list()
@@ -1014,7 +1166,7 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, ro
                         best_d_upper = du
 
                     if dl < tol and du < tol:
-                        corrected = deepcopy(face_matches[idx])
+                        corrected = {k: (dict(v) if isinstance(v, dict) else v) for k, v in face_matches[idx].items()}
                         corrected['block2']['IMIN'] = il * gcd_to_use
                         corrected['block2']['JMIN'] = jl * gcd_to_use
                         corrected['block2']['KMIN'] = kl * gcd_to_use

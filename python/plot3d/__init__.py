@@ -5,8 +5,9 @@ use_single_precision = False
 from .block import Block, compute_gcd, reduce_blocks
 from .blockfunctions import rotate_block, get_outer_bounds, block_connection_matrix, plot_blocks, find_matching_faces
 from .block_merging_mixed_facepairs import combine_nxnxn_cubes_mixed_pairs
-from .connectivity import find_matching_blocks, get_face_intersection, connectivity_fast, face_matches_to_dict, verify_connectivity
+from .connectivity import find_matching_blocks, get_face_intersection, connectivity, connectivity_fast, face_matches_to_dict, verify_connectivity
 from .face import Face
+from .face_pool import FacePool
 from .facefunctions import create_face_from_diagonals, get_outer_faces, find_bounding_faces, find_angular_bounding_faces, split_face, find_face_nearest_point, match_faces_dict_to_list, outer_face_dict_to_list, find_closest_block
 from .read import read_plot3D, read_ap_nasa
 from .write import write_plot3D

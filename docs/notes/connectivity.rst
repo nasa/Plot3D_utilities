@@ -3,7 +3,16 @@ Block to Block Connectivity
 
 Computational Grids are often divided into blocks for easier gridding. It is important to know how these blocks connect with each other in order to model the transfer of information. Computational Fluid Dynamics (CFD) requires the solver to know the "connectivity" of these blocks. 
 
-The plot3D python library has a function for determining the connectivity. Candidate block pairs are identified using axis-aligned bounding box (AABB) overlap: two blocks can only share a face if their bounding boxes touch or overlap. This is guaranteed to find all true neighbors regardless of block shape (L-shaped, elongated, curved, etc.). For each candidate pair the code scans the nodes on the exterior faces of block 1 with the exterior face of block 2. If there is a match then the two faces are connected. The code can search for *full face matches* or *partial matching*. *Full face matching* is much faster and should be used if your grid has a definite match.
+The plot3D python library has a function for determining the connectivity. The algorithm works in three phases:
+
+**Phase 1 -- Full-face corner matching (fast path)**
+  Candidate block pairs are identified using axis-aligned bounding box (AABB) overlap: two blocks can only share a face if their bounding boxes touch or overlap. For each pair, a fast O(1) corner comparison is tried first. If all four corners of two faces match within tolerance, a full-face match is recorded immediately.
+
+**Phase 2 -- Partial / split-face matching**
+  When faces don't fully match, point-by-point intersection testing finds partial overlaps. Matched sub-regions are recorded and the remaining face remnants are split and re-entered into the pool. This loop continues iteratively until no new matches are found.
+
+**Phase 3 -- Fresh-face validation with all-node AABBs**
+  After Phases 1-2 converge, some outer faces may still have undetected partial overlaps with faces on neighbor blocks. Phase 3 re-examines each remaining face against *fresh* (un-consumed) outer faces of neighbor blocks. Axis-aligned bounding boxes computed from **all face nodes** (not just diagonal corners) are used for fast pre-filtering. This catches edge cases where curved or skewed faces have interior extents beyond their corner coordinates.
 
 Below is an example of a turbine domain with two blocks: HGrid in (red) and ogrid in (white). The two share a connected face with partial matching. There's also the o-mesh which within itself has a connected face. 
 

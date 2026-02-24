@@ -11,6 +11,50 @@ def euclidean_distance(x1, y1, z1, x2, y2, z2) -> float:
     return math.sqrt(dx * dx + dy * dy + dz * dz)
 
 
+def face_key(f) -> Tuple:
+    """Return a hashable key identifying a face by block index and IJK bounds.
+
+    Works with any object having BlockIndex/blockIndex and IMIN/JMIN/KMIN/IMAX/JMAX/KMAX
+    attributes (Face objects from both face.py and facefunctions.py).
+    """
+    bi = getattr(f, 'BlockIndex', getattr(f, 'blockIndex', 0))
+    return (bi, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX)
+
+
+def face_grid_dims(imin, imax, jmin, jmax, kmin, kmax) -> List[int]:
+    """Return sorted list of non-zero face extents along each axis.
+
+    E.g. a K-constant face from (0,0,5) to (10,20,5) returns [10, 20].
+    """
+    dims = []
+    if imin != imax: dims.append(imax - imin)
+    if jmin != jmax: dims.append(jmax - jmin)
+    if kmin != kmax: dims.append(kmax - kmin)
+    return sorted(dims)
+
+
+def divide_face_dict_indices(records: List[Dict], gcd: int,
+                              keys=('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX'),
+                              nested_sides=None):
+    """Divide face dictionary indices by a GCD factor (integer division).
+
+    Args:
+        records: List of dicts containing face indices to scale down.
+        gcd: Factor to divide each index by.
+        keys: Which keys to scale within each record.
+        nested_sides: If provided (e.g. ['block1', 'block2']), scale keys
+            inside each nested dict rather than at the top level.
+    """
+    for rec in records:
+        if nested_sides:
+            for side in nested_sides:
+                for k in keys:
+                    rec[side][k] = rec[side][k] // gcd
+        else:
+            for k in keys:
+                rec[k] = rec[k] // gcd
+
+
 def enumerate_unique_corners(I: list, J: list, K: list) -> List[Tuple[int, int, int]]:
     """Enumerate unique (i, j, k) corners from min/max index lists.
 

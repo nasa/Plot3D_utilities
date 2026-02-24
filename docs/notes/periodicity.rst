@@ -8,6 +8,12 @@ The function automatically:
   - Applies geometric pre-checks to reject non-matching pairs cheaply
   - Tries both +angle and -angle rotations for robustness
 
+The matching algorithm has multiple phases:
+
+**Phase 2** -- Main greedy loop with centroid precheck. Each unmatched face is tested against rotated candidates. Partial matches produce split faces that re-enter the pool. Runs until convergence with no iteration limit.
+
+**Phase 3** -- Relaxed matching without centroid precheck. Uses 5x tolerance (5e-6) to catch wavy-surface faces rejected by the centroid filter. Also runs until convergence with **no iteration limit** (earlier versions had a hardcoded limit of 50 iterations which was insufficient for large meshes needing 100+ iterations).
+
 You can optionally filter by ``periodic_direction`` ('i', 'j', or 'k') to only check faces on a constant index plane.
 
 In this example we will use the file  `PahtCascade-ASCII <https://nasa-public-data.s3.amazonaws.com/plot3d_utilities/PahtCascade-ASCII.xyz>`_

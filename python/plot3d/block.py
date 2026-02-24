@@ -2,7 +2,6 @@ import numpy as np
 import math 
 from tqdm import trange
 from typing import List
-from copy import deepcopy
 import numpy.typing as npt 
 
 class Block:
@@ -39,6 +38,10 @@ class Block:
         
     def __repr__(self):
         return f"({self.IMAX},{self.JMAX},{self.KMAX})"
+
+    def copy(self) -> 'Block':
+        """Create an efficient copy using numpy array copy (faster than deepcopy)."""
+        return Block(self.X.copy(), self.Y.copy(), self.Z.copy())
     
     def scale(self,factor:float):
         """Scales a mesh by a certain factor.

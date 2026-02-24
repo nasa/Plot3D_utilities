@@ -42,6 +42,23 @@ class Face:
     # Basic utilities
     # ------------------------------------------------------------------
 
+    def copy(self) -> 'Face':
+        """Create an efficient copy using numpy array copy (faster than deepcopy)."""
+        f = Face.__new__(Face)
+        f.x = self.x.copy()
+        f.y = self.y.copy()
+        f.z = self.z.copy()
+        f.I = self.I.copy()
+        f.J = self.J.copy()
+        f.K = self.K.copy()
+        f.cx = self.cx
+        f.cy = self.cy
+        f.cz = self.cz
+        f.nvertex = self.nvertex
+        f.blockIndex = self.blockIndex
+        f.id = self.id
+        return f
+
     def to_dict(self) -> Dict[str, int]:
         """Return a dictionary representation of this face."""
         return {

@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 import os.path as osp
 import struct
 from typing import List
@@ -6,8 +6,13 @@ from .block import Block
 from scipy.io import FortranFile
 from tqdm import tqdm
 
-def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=False,read_double:bool=True):
+
+def __read_plot3D_chunk_binary(f, IMAX: int, JMAX: int, KMAX: int,
+                               big_endian: bool = False, read_double: bool = True):
     """Reads and formats a binary chunk of data into a plot3D block.
+
+    Uses vectorized numpy reads instead of element-by-element struct.unpack
+    for dramatically faster I/O (10-100x speedup on large meshes).
 
     Args:
         f (io): file handle
@@ -18,17 +23,20 @@ def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=Fal
         read_double (bool, optional): When ``True`` read 8-byte doubles, otherwise read 4-byte floats.
 
     Returns:
-        numpy.ndarray: Plot3D variable either X,Y, or Z 
+        numpy.ndarray: Plot3D variable either X,Y, or Z
     """
-    A = np.empty(shape=(IMAX, JMAX, KMAX))
-    for k in range(KMAX):
-        for j in range(JMAX):
-            for i in range(IMAX):
-                if read_double:
-                    A[i,j,k] = struct.unpack(">d",f.read(8))[0] if big_endian else struct.unpack("<d",f.read(8))[0]
-                else:
-                    A[i,j,k] = struct.unpack(">f",f.read(4))[0] if big_endian else struct.unpack("<f",f.read(4))[0]
+    n = IMAX * JMAX * KMAX
+    endian = '>' if big_endian else '<'
+    dtype_char = 'f8' if read_double else 'f4'
+    dtype = np.dtype(f'{endian}{dtype_char}')
+    byte_size = dtype.itemsize * n
+    buf = f.read(byte_size)
+    A = np.frombuffer(buf, dtype=dtype, count=n)
+    # Plot3D stores data in Fortran order: K varies slowest, I varies fastest
+    # After reading flat array, reshape as (K,J,I) then transpose to (I,J,K)
+    A = A.reshape((KMAX, JMAX, IMAX)).transpose(2, 1, 0).astype(np.float64)
     return A
+
 
 def read_word(f):
     """Continously read a word from an ascii file
@@ -55,32 +63,31 @@ def __read_plot3D_chunk_ASCII(f,IMAX:int,JMAX:int,KMAX:int):
         KMAX (int): maximum K index
 
     Returns:
-        numpy.ndarray: Plot3D variable either X,Y, or Z 
+        numpy.ndarray: Plot3D variable either X,Y, or Z
     """
-    tokenArray = np.zeros(shape=(IMAX*JMAX*KMAX))
-    i = 0
+    n = IMAX * JMAX * KMAX
+    values = []
     for w in read_word(f):
-        tokenArray[i] = w
-        i+=1
-        if i>len(tokenArray)-1:
+        values.append(w)
+        if len(values) >= n:
             break
 
-    A = np.reshape(tokenArray,shape=(KMAX,JMAX,IMAX))
-    A = np.transpose(A,[2,1,0])    
+    A = np.array(values, dtype=np.float64).reshape((KMAX, JMAX, IMAX))
+    A = np.transpose(A, [2, 1, 0])
     return A
 
 def read_ap_nasa(filename:str):
     """Reads an AP NASA File and converts it to Block format which can be exported to a plot3d file
         AP NASA file represents a single block. The first 7 integers are il,jl,kl,ile,ite,jtip,nbld
-    
+
     Args:
         filename (str): location of the .ap file
 
     Returns:
-        Tuple containing: 
+        Tuple containing:
 
             *block* (Block): file in block format
-            *nbld* (int): Number of blades 
+            *nbld* (int): Number of blades
     """
 
     f = FortranFile(filename, 'r')
@@ -91,7 +98,7 @@ def read_ap_nasa(filename:str):
     il = ints[0]
     jl = ints[1]
     kl = ints[2]
-    jdim = jl 
+    jdim = jl
 
     ile = ints[3]
     ite = ints[4]
@@ -157,25 +164,22 @@ def read_plot3D(filename:str, binary:bool=True, big_endian:bool=False, read_doub
                     Z = f.read_reals(dtype).reshape((IMAX[b], JMAX[b], KMAX[b]), order='F')
                     blocks.append(Block(X, Y, Z))
         elif binary:
-            with open(filename,'rb') as f:
-                nblocks = struct.unpack(">I",f.read(4))[0] if big_endian else struct.unpack("I",f.read(4))[0] # Read bytes
-                IMAX = list(); JMAX = list(); KMAX = list()
-                for b in range(nblocks):
-                    if big_endian:
-                        IMAX.append(struct.unpack(">I",f.read(4))[0]) # Read bytes
-                        JMAX.append(struct.unpack(">I",f.read(4))[0]) # Read bytes
-                        KMAX.append(struct.unpack(">I",f.read(4))[0]) # Read bytes
-                    else:
-                        IMAX.append(struct.unpack("I",f.read(4))[0]) # Read bytes
-                        JMAX.append(struct.unpack("I",f.read(4))[0]) # Read bytes
-                        KMAX.append(struct.unpack("I",f.read(4))[0]) # Read bytes
+            with open(filename, 'rb') as f:
+                # Read nblocks
+                endian = '>' if big_endian else '<'
+                nblocks = struct.unpack(f'{endian}I', f.read(4))[0]
+                # Read all dimensions at once for efficiency
+                dim_data = f.read(nblocks * 3 * 4)
+                dims = struct.unpack(f'{endian}{nblocks * 3}I', dim_data)
+                IMAX = [dims[b * 3] for b in range(nblocks)]
+                JMAX = [dims[b * 3 + 1] for b in range(nblocks)]
+                KMAX = [dims[b * 3 + 2] for b in range(nblocks)]
 
                 for b in tqdm(range(nblocks), desc="Reading binary blocks", unit="block"):
-                    X = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
-                    Y = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
-                    Z = __read_plot3D_chunk_binary(f,IMAX[b],JMAX[b],KMAX[b], big_endian,read_double)
-                    b_temp = Block(X,Y,Z)
-                    blocks.append(b_temp)
+                    X = __read_plot3D_chunk_binary(f, IMAX[b], JMAX[b], KMAX[b], big_endian, read_double)
+                    Y = __read_plot3D_chunk_binary(f, IMAX[b], JMAX[b], KMAX[b], big_endian, read_double)
+                    Z = __read_plot3D_chunk_binary(f, IMAX[b], JMAX[b], KMAX[b], big_endian, read_double)
+                    blocks.append(Block(X, Y, Z))
         else:
             with open(filename,'r') as f:
                 nblocks = int(f.readline())
