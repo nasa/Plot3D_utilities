@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Utils &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Write" href="write.html" />
+    <link rel="prev" title="Splitting Blocks" href="split_block.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.utils.euclidean_distance"><code class="docutils literal notranslate"><span class="pre">euclidean_distance()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.utils.face_key"><code class="docutils literal notranslate"><span class="pre">face_key()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.utils.face_grid_dims"><code class="docutils literal notranslate"><span class="pre">face_grid_dims()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.utils.divide_face_dict_indices"><code class="docutils literal notranslate"><span class="pre">divide_face_dict_indices()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.utils.enumerate_unique_corners"><code class="docutils literal notranslate"><span class="pre">enumerate_unique_corners()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.utils.scale_face_dict_indices"><code class="docutils literal notranslate"><span class="pre">scale_face_dict_indices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-plot3d.utils">
+<span id="utils"></span><h1>Utils<a class="headerlink" href="#module-plot3d.utils" title="Link to this heading"></a></h1>
+<p>Shared utility functions for the plot3d library.</p>
+<p>Provides common helpers used across connectivity, periodicity, and verification
+modules, including distance calculations, face key generation, index scaling,
+and corner enumeration.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.utils.euclidean_distance">
+<span class="sig-prename descclassname"><span class="pre">plot3d.utils.</span></span><span class="sig-name descname"><span class="pre">euclidean_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">z1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">z2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../_modules/plot3d/utils.html#euclidean_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.utils.euclidean_distance" title="Link to this definition"></a></dt>
+<dd><p>Compute the Euclidean distance between two 3D points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x1</strong> – X coordinate of point 1.</p></li>
+<li><p><strong>y1</strong> – Y coordinate of point 1.</p></li>
+<li><p><strong>z1</strong> – Z coordinate of point 1.</p></li>
+<li><p><strong>x2</strong> – X coordinate of point 2.</p></li>
+<li><p><strong>y2</strong> – Y coordinate of point 2.</p></li>
+<li><p><strong>z2</strong> – Z coordinate of point 2.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The straight-line distance between the two points.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.utils.face_key">
+<span class="sig-prename descclassname"><span class="pre">plot3d.utils.</span></span><span class="sig-name descname"><span class="pre">face_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a></span></span><a class="reference internal" href="../_modules/plot3d/utils.html#face_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.utils.face_key" title="Link to this definition"></a></dt>
+<dd><p>Return a hashable key identifying a face by block index and IJK bounds.</p>
+<p>Works with any object that has <code class="docutils literal notranslate"><span class="pre">BlockIndex</span></code> (or <code class="docutils literal notranslate"><span class="pre">blockIndex</span></code>) and
+<code class="docutils literal notranslate"><span class="pre">IMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">JMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">KMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">IMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">JMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">KMAX</span></code> attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> – A Face-like object (from <a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> or
+<a class="reference internal" href="facefunctions.html#plot3d.facefunctions.create_face_from_diagonals" title="plot3d.facefunctions.create_face_from_diagonals"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_face_from_diagonals()</span></code></a>).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A 7-element tuple <code class="docutils literal notranslate"><span class="pre">(block_index,</span> <span class="pre">IMIN,</span> <span class="pre">JMIN,</span> <span class="pre">KMIN,</span> <span class="pre">IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.utils.face_grid_dims">
+<span class="sig-prename descclassname"><span class="pre">plot3d.utils.</span></span><span class="sig-name descname"><span class="pre">face_grid_dims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">imax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/utils.html#face_grid_dims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.utils.face_grid_dims" title="Link to this definition"></a></dt>
+<dd><p>Return the sorted list of non-zero face extents along each axis.</p>
+<p>For a face defined by its IJK bounds, computes the extent
+(max - min) along each axis where the face is not constant,
+and returns them sorted smallest-first. Useful for checking whether
+two faces have compatible grid dimensions (allowing transposition).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>imin</strong> – Minimum I index.</p></li>
+<li><p><strong>imax</strong> – Maximum I index.</p></li>
+<li><p><strong>jmin</strong> – Minimum J index.</p></li>
+<li><p><strong>jmax</strong> – Maximum J index.</p></li>
+<li><p><strong>kmin</strong> – Minimum K index.</p></li>
+<li><p><strong>kmax</strong> – Maximum K index.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sorted list of non-zero extents. For example, a K-constant face
+from <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">5)</span></code> to <code class="docutils literal notranslate"><span class="pre">(10,</span> <span class="pre">20,</span> <span class="pre">5)</span></code> returns <code class="docutils literal notranslate"><span class="pre">[10,</span> <span class="pre">20]</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.utils.divide_face_dict_indices">
+<span class="sig-prename descclassname"><span class="pre">plot3d.utils.</span></span><span class="sig-name descname"><span class="pre">divide_face_dict_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">records</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('IMIN',</span> <span class="pre">'JMIN',</span> <span class="pre">'KMIN',</span> <span class="pre">'IMAX',</span> <span class="pre">'JMAX',</span> <span class="pre">'KMAX')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nested_sides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/utils.html#divide_face_dict_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.utils.divide_face_dict_indices" title="Link to this definition"></a></dt>
+<dd><p>Divide face dictionary indices by a GCD factor using integer division.</p>
+<p>This is the inverse of <a class="reference internal" href="#plot3d.utils.scale_face_dict_indices" title="plot3d.utils.scale_face_dict_indices"><code class="xref py py-func docutils literal notranslate"><span class="pre">scale_face_dict_indices()</span></code></a>. Used when
+reducing a mesh to GCD resolution before matching, to scale face
+indices down accordingly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>records</strong> – List of dicts containing face indices to scale down.</p></li>
+<li><p><strong>gcd</strong> – Divisor applied to each index via <code class="docutils literal notranslate"><span class="pre">//</span></code>.</p></li>
+<li><p><strong>keys</strong> – Which keys to divide within each record.</p></li>
+<li><p><strong>nested_sides</strong> – If provided (e.g. <code class="docutils literal notranslate"><span class="pre">['block1',</span> <span class="pre">'block2']</span></code>), divides keys
+inside each nested sub-dict rather than at the top level.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.utils.enumerate_unique_corners">
+<span class="sig-prename descclassname"><span class="pre">plot3d.utils.</span></span><span class="sig-name descname"><span class="pre">enumerate_unique_corners</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">I</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">J</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/utils.html#enumerate_unique_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.utils.enumerate_unique_corners" title="Link to this definition"></a></dt>
+<dd><p>Enumerate unique <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j,</span> <span class="pre">k)</span></code> corners from min/max index lists.</p>
+<p>Given the <code class="docutils literal notranslate"><span class="pre">[min,</span> <span class="pre">max]</span></code> ranges along each axis, generates all
+combinations and deduplicates them. When an axis has <code class="docutils literal notranslate"><span class="pre">min</span> <span class="pre">==</span> <span class="pre">max</span></code>,
+fewer than 8 corners are produced.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>I</strong> – <code class="docutils literal notranslate"><span class="pre">[IMIN,</span> <span class="pre">IMAX]</span></code> index range.</p></li>
+<li><p><strong>J</strong> – <code class="docutils literal notranslate"><span class="pre">[JMIN,</span> <span class="pre">JMAX]</span></code> index range.</p></li>
+<li><p><strong>K</strong> – <code class="docutils literal notranslate"><span class="pre">[KMIN,</span> <span class="pre">KMAX]</span></code> index range.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of unique <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j,</span> <span class="pre">k)</span></code> tuples (up to 8 corners).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.utils.scale_face_dict_indices">
+<span class="sig-prename descclassname"><span class="pre">plot3d.utils.</span></span><span class="sig-name descname"><span class="pre">scale_face_dict_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">records</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('IMIN',</span> <span class="pre">'JMIN',</span> <span class="pre">'KMIN',</span> <span class="pre">'IMAX',</span> <span class="pre">'JMAX',</span> <span class="pre">'KMAX')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nested_sides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/utils.html#scale_face_dict_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.utils.scale_face_dict_indices" title="Link to this definition"></a></dt>
+<dd><p>Multiply face dictionary indices by a GCD factor.</p>
+<p>Used to scale indices back to the original grid resolution after
+performing matching at reduced (GCD) resolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>records</strong> – List of dicts containing face indices to scale up.</p></li>
+<li><p><strong>gcd</strong> – Factor to multiply each index by.</p></li>
+<li><p><strong>keys</strong> – Which keys to scale within each record.</p></li>
+<li><p><strong>nested_sides</strong> – If provided (e.g. <code class="docutils literal notranslate"><span class="pre">['block1',</span> <span class="pre">'block2']</span></code>), scales keys
+inside each nested sub-dict rather than at the top level.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="split_block.html" class="btn btn-neutral float-left" title="Splitting Blocks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="write.html" class="btn btn-neutral float-right" title="Write" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

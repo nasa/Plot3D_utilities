@@ -1,112 +1,930 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html lang="en" data-content_root="../">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
-    <title>Face &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
-    
-    <script src="../_static/documentation_options.js?v=514bbfa0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Face Functions" href="facefunctions.html" />
+    <link rel="next" title="Face Pool" href="face_pool.html" />
     <link rel="prev" title="Differencing" href="differencing.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="facefunctions.html" title="Face Functions"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="differencing.html" title="Differencing"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Face</a></li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Face</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.face.Face"><code class="docutils literal notranslate"><span class="pre">Face</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.x"><code class="docutils literal notranslate"><span class="pre">Face.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.y"><code class="docutils literal notranslate"><span class="pre">Face.y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.z"><code class="docutils literal notranslate"><span class="pre">Face.z</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.I"><code class="docutils literal notranslate"><span class="pre">Face.I</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.J"><code class="docutils literal notranslate"><span class="pre">Face.J</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.K"><code class="docutils literal notranslate"><span class="pre">Face.K</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.cx"><code class="docutils literal notranslate"><span class="pre">Face.cx</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.cy"><code class="docutils literal notranslate"><span class="pre">Face.cy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.cz"><code class="docutils literal notranslate"><span class="pre">Face.cz</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.nvertex"><code class="docutils literal notranslate"><span class="pre">Face.nvertex</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.blockIndex"><code class="docutils literal notranslate"><span class="pre">Face.blockIndex</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.id"><code class="docutils literal notranslate"><span class="pre">Face.id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.__init__"><code class="docutils literal notranslate"><span class="pre">Face.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.copy"><code class="docutils literal notranslate"><span class="pre">Face.copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.to_dict"><code class="docutils literal notranslate"><span class="pre">Face.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.centroid"><code class="docutils literal notranslate"><span class="pre">Face.centroid</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.IMIN"><code class="docutils literal notranslate"><span class="pre">Face.IMIN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.JMIN"><code class="docutils literal notranslate"><span class="pre">Face.JMIN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.KMIN"><code class="docutils literal notranslate"><span class="pre">Face.KMIN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.IMAX"><code class="docutils literal notranslate"><span class="pre">Face.IMAX</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.JMAX"><code class="docutils literal notranslate"><span class="pre">Face.JMAX</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.KMAX"><code class="docutils literal notranslate"><span class="pre">Face.KMAX</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.BlockIndex"><code class="docutils literal notranslate"><span class="pre">Face.BlockIndex</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.const_type"><code class="docutils literal notranslate"><span class="pre">Face.const_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.isEdge"><code class="docutils literal notranslate"><span class="pre">Face.isEdge</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.isPoint"><code class="docutils literal notranslate"><span class="pre">Face.isPoint</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.get_val"><code class="docutils literal notranslate"><span class="pre">Face.get_val()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.add_vertex"><code class="docutils literal notranslate"><span class="pre">Face.add_vertex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.size"><code class="docutils literal notranslate"><span class="pre">Face.size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.set_block_index"><code class="docutils literal notranslate"><span class="pre">Face.set_block_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.set_face_id"><code class="docutils literal notranslate"><span class="pre">Face.set_face_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.normal"><code class="docutils literal notranslate"><span class="pre">Face.normal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.match_indices"><code class="docutils literal notranslate"><span class="pre">Face.match_indices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.__eq__"><code class="docutils literal notranslate"><span class="pre">Face.__eq__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.vertices_equals"><code class="docutils literal notranslate"><span class="pre">Face.vertices_equals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.__ne__"><code class="docutils literal notranslate"><span class="pre">Face.__ne__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.index_equals"><code class="docutils literal notranslate"><span class="pre">Face.index_equals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.__hash__"><code class="docutils literal notranslate"><span class="pre">Face.__hash__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.__str__"><code class="docutils literal notranslate"><span class="pre">Face.__str__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.diagonal_length"><code class="docutils literal notranslate"><span class="pre">Face.diagonal_length</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.get_corners"><code class="docutils literal notranslate"><span class="pre">Face.get_corners()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.is_connected"><code class="docutils literal notranslate"><span class="pre">Face.is_connected()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.shift"><code class="docutils literal notranslate"><span class="pre">Face.shift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.overlap_fraction"><code class="docutils literal notranslate"><span class="pre">Face.overlap_fraction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.touches"><code class="docutils literal notranslate"><span class="pre">Face.touches()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.grid_points"><code class="docutils literal notranslate"><span class="pre">Face.grid_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.shared_point_fraction"><code class="docutils literal notranslate"><span class="pre">Face.shared_point_fraction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.face.Face.touches_by_nodes"><code class="docutils literal notranslate"><span class="pre">Face.touches_by_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Face</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/face.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="module-plot3d.face">
-<span id="face"></span><h1>Face<a class="headerlink" href="#module-plot3d.face" title="Link to this heading">¶</a></h1>
+<span id="face"></span><h1>Face<a class="headerlink" href="#module-plot3d.face" title="Link to this heading"></a></h1>
+<p>Face representation for Plot3D structured grid blocks.</p>
+<p>This module defines the <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> class, which represents a single face
+(quadrilateral or triangular surface) of a structured multi-block grid in the
+Plot3D format.  A face is described by four (or three) corner vertices with
+spatial coordinates <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> and structured indices <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code>.</p>
+<p>The class provides:</p>
+<ul class="simple">
+<li><p>vertex-level geometry operations (centroid, normals, diagonal length),</p></li>
+<li><p>index-range queries (<code class="docutils literal notranslate"><span class="pre">IMIN</span></code> … <code class="docutils literal notranslate"><span class="pre">KMAX</span></code>),</p></li>
+<li><p>equality / hashing based on block index and index ranges,</p></li>
+<li><p>polygon-based overlap detection (Sutherland-Hodgman clipping), and</p></li>
+<li><p>node-sharing predicates for structured connectivity analysis.</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="plot3d.face.Face">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.face.</span></span><span class="sig-name descname"><span class="pre">Face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvertex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face" title="Link to this definition"></a></dt>
+<dd><p>A face of a Plot3D structured grid block.</p>
+<p>A face is bounded by four corner vertices (quad) or three (triangle)
+and carries both physical coordinates <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> and structured
+indices <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code> for each vertex.  The face may be I-constant,
+J-constant, or K-constant depending on which index is the same across
+all vertices.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#plot3d.face.Face.x" title="Link to this definition"></a></dt>
+<dd><p>X-coordinates of the corner vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Any, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)">numpy.dtype</a>[numpy._typing._array_like._ScalarT]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#plot3d.face.Face.y" title="Link to this definition"></a></dt>
+<dd><p>Y-coordinates of the corner vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Any, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)">numpy.dtype</a>[numpy._typing._array_like._ScalarT]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#plot3d.face.Face.z" title="Link to this definition"></a></dt>
+<dd><p>Z-coordinates of the corner vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Any, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)">numpy.dtype</a>[numpy._typing._array_like._ScalarT]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.I">
+<span class="sig-name descname"><span class="pre">I</span></span><a class="headerlink" href="#plot3d.face.Face.I" title="Link to this definition"></a></dt>
+<dd><p>Structured I-indices of the corner vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Any, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)">numpy.dtype</a>[numpy._typing._array_like._ScalarT]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.J">
+<span class="sig-name descname"><span class="pre">J</span></span><a class="headerlink" href="#plot3d.face.Face.J" title="Link to this definition"></a></dt>
+<dd><p>Structured J-indices of the corner vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Any, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)">numpy.dtype</a>[numpy._typing._array_like._ScalarT]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.K">
+<span class="sig-name descname"><span class="pre">K</span></span><a class="headerlink" href="#plot3d.face.Face.K" title="Link to this definition"></a></dt>
+<dd><p>Structured K-indices of the corner vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Any, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)">numpy.dtype</a>[numpy._typing._array_like._ScalarT]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.cx">
+<span class="sig-name descname"><span class="pre">cx</span></span><a class="headerlink" href="#plot3d.face.Face.cx" title="Link to this definition"></a></dt>
+<dd><p>X-component of the face centroid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.cy">
+<span class="sig-name descname"><span class="pre">cy</span></span><a class="headerlink" href="#plot3d.face.Face.cy" title="Link to this definition"></a></dt>
+<dd><p>Y-component of the face centroid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.cz">
+<span class="sig-name descname"><span class="pre">cz</span></span><a class="headerlink" href="#plot3d.face.Face.cz" title="Link to this definition"></a></dt>
+<dd><p>Z-component of the face centroid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.nvertex">
+<span class="sig-name descname"><span class="pre">nvertex</span></span><a class="headerlink" href="#plot3d.face.Face.nvertex" title="Link to this definition"></a></dt>
+<dd><p>Number of vertices added so far (up to 4).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.blockIndex">
+<span class="sig-name descname"><span class="pre">blockIndex</span></span><a class="headerlink" href="#plot3d.face.Face.blockIndex" title="Link to this definition"></a></dt>
+<dd><p>Zero-based index of the parent block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.face.Face.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#plot3d.face.Face.id" title="Link to this definition"></a></dt>
+<dd><p>Integer identifier for this face.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvertex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialise a face with pre-allocated vertex storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nvertex</strong> – Maximum number of vertices (4 for a quad, 3 for a
+triangle).  Storage is always allocated for 4 vertices
+regardless of this value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.copy" title="Link to this definition"></a></dt>
+<dd><p>Create an independent copy of this face.</p>
+<p>Uses <code class="docutils literal notranslate"><span class="pre">numpy.ndarray.copy</span></code> for the coordinate and index arrays,
+which is significantly faster than <code class="docutils literal notranslate"><span class="pre">copy.deepcopy</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> instance with identical attribute values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.to_dict" title="Link to this definition"></a></dt>
+<dd><p>Return a dictionary representation of this face.</p>
+<p>The dictionary keys are <code class="docutils literal notranslate"><span class="pre">IMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">JMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">KMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">IMAX</span></code>,
+<code class="docutils literal notranslate"><span class="pre">JMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">KMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">id</span></code>, and <code class="docutils literal notranslate"><span class="pre">block_index</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary mapping string keys to integer values that
+fully describe the face’s index range and identity.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.centroid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">centroid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#plot3d.face.Face.centroid" title="Link to this definition"></a></dt>
+<dd><p>Centroid of the face as a length-3 array <code class="docutils literal notranslate"><span class="pre">[cx,</span> <span class="pre">cy,</span> <span class="pre">cz]</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A NumPy array of shape <code class="docutils literal notranslate"><span class="pre">(3,)</span></code> with dtype <code class="docutils literal notranslate"><span class="pre">float64</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.IMIN">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IMIN</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#plot3d.face.Face.IMIN" title="Link to this definition"></a></dt>
+<dd><p>Minimum I-index across all vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The smallest <code class="docutils literal notranslate"><span class="pre">I</span></code> value stored in this face.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.JMIN">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">JMIN</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#plot3d.face.Face.JMIN" title="Link to this definition"></a></dt>
+<dd><p>Minimum J-index across all vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The smallest <code class="docutils literal notranslate"><span class="pre">J</span></code> value stored in this face.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.KMIN">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">KMIN</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#plot3d.face.Face.KMIN" title="Link to this definition"></a></dt>
+<dd><p>Minimum K-index across all vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The smallest <code class="docutils literal notranslate"><span class="pre">K</span></code> value stored in this face.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.IMAX">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IMAX</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#plot3d.face.Face.IMAX" title="Link to this definition"></a></dt>
+<dd><p>Maximum I-index across all vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The largest <code class="docutils literal notranslate"><span class="pre">I</span></code> value stored in this face.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.JMAX">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">JMAX</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#plot3d.face.Face.JMAX" title="Link to this definition"></a></dt>
+<dd><p>Maximum J-index across all vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The largest <code class="docutils literal notranslate"><span class="pre">J</span></code> value stored in this face.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.KMAX">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">KMAX</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#plot3d.face.Face.KMAX" title="Link to this definition"></a></dt>
+<dd><p>Maximum K-index across all vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The largest <code class="docutils literal notranslate"><span class="pre">K</span></code> value stored in this face.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.BlockIndex">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BlockIndex</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#plot3d.face.Face.BlockIndex" title="Link to this definition"></a></dt>
+<dd><p>Zero-based block index of the parent block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The block index as a Python <code class="docutils literal notranslate"><span class="pre">int</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.const_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">const_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#plot3d.face.Face.const_type" title="Link to this definition"></a></dt>
+<dd><p>Identify which structured index is constant across the face.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if I-constant (<code class="docutils literal notranslate"><span class="pre">IMIN</span> <span class="pre">==</span> <span class="pre">IMAX</span></code>), <code class="docutils literal notranslate"><span class="pre">1</span></code> if J-constant
+(<code class="docutils literal notranslate"><span class="pre">JMIN</span> <span class="pre">==</span> <span class="pre">JMAX</span></code>), <code class="docutils literal notranslate"><span class="pre">2</span></code> if K-constant (<code class="docutils literal notranslate"><span class="pre">KMIN</span> <span class="pre">==</span> <span class="pre">KMAX</span></code>),
+or <code class="docutils literal notranslate"><span class="pre">-1</span></code> if no single index is constant.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.isEdge">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isEdge</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#plot3d.face.Face.isEdge" title="Link to this definition"></a></dt>
+<dd><p>Check whether the face degenerates to an edge.</p>
+<p>A face is an edge when two or more of its three index ranges
+collapse (i.e., min equals max).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the face degenerates to an edge, <code class="docutils literal notranslate"><span class="pre">False</span></code>
+otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.isPoint">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isPoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#plot3d.face.Face.isPoint" title="Link to this definition"></a></dt>
+<dd><p>Check whether the face degenerates to a single point.</p>
+<p>A face is a point when all three index ranges collapse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the face degenerates to a point, <code class="docutils literal notranslate"><span class="pre">False</span></code>
+otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.get_val">
+<span class="sig-name descname"><span class="pre">get_val</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">j_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.get_val"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.get_val" title="Link to this definition"></a></dt>
+<dd><p>Retrieve the spatial coordinates for a specific vertex.</p>
+<p>Searches the stored vertices for one whose <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code> indices
+match the requested values exactly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i_val</strong> – I-index of the desired vertex.</p></li>
+<li><p><strong>j_val</strong> – J-index of the desired vertex.</p></li>
+<li><p><strong>k_val</strong> – K-index of the desired vertex.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> of the matching vertex coordinates.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.14)"><strong>KeyError</strong></a> – If no vertex with the given <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code> exists in
+    this face.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.add_vertex">
+<span class="sig-name descname"><span class="pre">add_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.add_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.add_vertex" title="Link to this definition"></a></dt>
+<dd><p>Append a vertex to this face.</p>
+<p>Vertices are stored in insertion order.  Once the fourth vertex
+has been added the centroid <code class="docutils literal notranslate"><span class="pre">(cx,</span> <span class="pre">cy,</span> <span class="pre">cz)</span></code> is computed
+automatically as the mean of the four vertex positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – X-coordinate of the vertex.</p></li>
+<li><p><strong>y</strong> – Y-coordinate of the vertex.</p></li>
+<li><p><strong>z</strong> – Z-coordinate of the vertex.</p></li>
+<li><p><strong>i</strong> – Structured I-index of the vertex.</p></li>
+<li><p><strong>j</strong> – Structured J-index of the vertex.</p></li>
+<li><p><strong>k</strong> – Structured K-index of the vertex.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#plot3d.face.Face.size" title="Link to this definition"></a></dt>
+<dd><p>Parametric face size in index-space cells.</p>
+<p>Computed as the product of the two non-constant index spans.
+For a fully 3-D range (no constant index) the product of all
+three spans is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of index-space cells covered by this face.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.set_block_index">
+<span class="sig-name descname"><span class="pre">set_block_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.set_block_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.set_block_index" title="Link to this definition"></a></dt>
+<dd><p>Set the parent block index for this face.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – Zero-based block index.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.set_face_id">
+<span class="sig-name descname"><span class="pre">set_face_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.set_face_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.set_face_id" title="Link to this definition"></a></dt>
+<dd><p>Set the integer identifier for this face.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – Face identifier.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.normal">
+<span class="sig-name descname"><span class="pre">normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.normal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.normal" title="Link to this definition"></a></dt>
+<dd><p>Compute the unnormalised geometric normal of this face.</p>
+<p>Uses three corner points from the parent <code class="docutils literal notranslate"><span class="pre">block</span></code> to form two
+edge vectors and returns their cross product.  The resulting
+vector is <strong>not</strong> unit-length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>block</strong> – The parent <code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code> object whose <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Z</span></code> arrays are indexed by <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A NumPy array of shape <code class="docutils literal notranslate"><span class="pre">(3,)</span></code> representing the face normal
+vector (unnormalised).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.match_indices">
+<span class="sig-name descname"><span class="pre">match_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.match_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.match_indices" title="Link to this definition"></a></dt>
+<dd><p>Find matching vertex pairs between this face and another.</p>
+<p>Vertices are matched by spatial proximity using a tolerance of
+<code class="docutils literal notranslate"><span class="pre">1e-6</span></code>.  Each vertex in <code class="docutils literal notranslate"><span class="pre">self</span></code> is matched to at most one
+vertex in <em>f</em>, and vice versa.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> – The other <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> to compare against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of <code class="docutils literal notranslate"><span class="pre">[i,</span> <span class="pre">j]</span></code> pairs where <code class="docutils literal notranslate"><span class="pre">i</span></code> is the vertex index
+in <code class="docutils literal notranslate"><span class="pre">self</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> is the matching vertex index in <em>f</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__eq__" title="Link to this definition"></a></dt>
+<dd><p>Test equality by block index and all six index-range bounds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> – Another object to compare.  Must be a <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if <em>f</em> is a <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> with identical
+<code class="docutils literal notranslate"><span class="pre">BlockIndex</span></code>, <code class="docutils literal notranslate"><span class="pre">IMIN</span></code>…``KMAX``.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.vertices_equals">
+<span class="sig-name descname"><span class="pre">vertices_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.vertices_equals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.vertices_equals" title="Link to this definition"></a></dt>
+<dd><p>Test whether all vertices of this face match another by coordinates.</p>
+<p>Uses <a class="reference internal" href="#plot3d.face.Face.match_indices" title="plot3d.face.Face.match_indices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">match_indices()</span></code></a> with the default tolerance to check
+that every vertex in <code class="docutils literal notranslate"><span class="pre">self</span></code> has a spatial match in <em>f</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> – The other <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> to compare against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the number of matched vertex pairs equals
+<code class="docutils literal notranslate"><span class="pre">nvertex</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.__ne__">
+<span class="sig-name descname"><span class="pre">__ne__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__ne__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__ne__" title="Link to this definition"></a></dt>
+<dd><p>Test inequality (inverse of <a class="reference internal" href="#plot3d.face.Face.__eq__" title="plot3d.face.Face.__eq__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__eq__()</span></code></a>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> – Another object to compare.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">!=</span> <span class="pre">f</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.index_equals">
+<span class="sig-name descname"><span class="pre">index_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.index_equals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.index_equals" title="Link to this definition"></a></dt>
+<dd><p>Test whether the six index-range bounds match exactly.</p>
+<p>Unlike <a class="reference internal" href="#plot3d.face.Face.__eq__" title="plot3d.face.Face.__eq__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__eq__()</span></code></a>, this does <strong>not</strong> compare
+<code class="docutils literal notranslate"><span class="pre">blockIndex</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f2</strong> – The other <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> to compare against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if <code class="docutils literal notranslate"><span class="pre">IMIN</span></code>…``KMAX`` are identical.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__hash__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__hash__" title="Link to this definition"></a></dt>
+<dd><p>Return a hash based on the first and last vertex indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An integer hash value derived from the <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code>
+indices of the first and last stored vertices.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.__str__" title="Link to this definition"></a></dt>
+<dd><p>Return a human-readable string of block index and ranges.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A string in the form
+<code class="docutils literal notranslate"><span class="pre">blk:</span> <span class="pre">&lt;blockIndex&gt;</span> <span class="pre">[IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="plot3d.face.Face.diagonal_length">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">diagonal_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><a class="headerlink" href="#plot3d.face.Face.diagonal_length" title="Link to this definition"></a></dt>
+<dd><p>Euclidean distance between the two extreme corners.</p>
+<p>Computes the distance between the vertex at
+<code class="docutils literal notranslate"><span class="pre">(IMIN,</span> <span class="pre">JMIN,</span> <span class="pre">KMIN)</span></code> and the vertex at <code class="docutils literal notranslate"><span class="pre">(IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code>
+in physical <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The diagonal length as a <code class="docutils literal notranslate"><span class="pre">float</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.get_corners">
+<span class="sig-name descname"><span class="pre">get_corners</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.get_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.get_corners" title="Link to this definition"></a></dt>
+<dd><p>Get the two extreme-corner coordinates of this face.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A 2-tuple of <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> tuples.  The first element
+corresponds to the vertex at <code class="docutils literal notranslate"><span class="pre">(IMIN,</span> <span class="pre">JMIN,</span> <span class="pre">KMIN)</span></code> and the
+second to <code class="docutils literal notranslate"><span class="pre">(IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.is_connected">
+<span class="sig-name descname"><span class="pre">is_connected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.is_connected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.is_connected" title="Link to this definition"></a></dt>
+<dd><p>Test connectivity by centroid proximity (legacy method).</p>
+<p>This is a simple heuristic retained for backward compatibility.
+For robust contact detection, prefer <a class="reference internal" href="#plot3d.face.Face.touches" title="plot3d.face.Face.touches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">touches()</span></code></a> or
+<a class="reference internal" href="#plot3d.face.Face.touches_by_nodes" title="plot3d.face.Face.touches_by_nodes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">touches_by_nodes()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – The other <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> to test against.</p></li>
+<li><p><strong>tol</strong> – Maximum Euclidean distance between centroids for the
+faces to be considered connected.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the centroid-to-centroid distance is less than
+<em>tol</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.shift">
+<span class="sig-name descname"><span class="pre">shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/face.html#Face.shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.shift" title="Link to this definition"></a></dt>
+<dd><p>Translate the face vertices in-place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dx</strong> – Translation along the X-axis.</p></li>
+<li><p><strong>dy</strong> – Translation along the Y-axis.</p></li>
+<li><p><strong>dz</strong> – Translation along the Z-axis.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.overlap_fraction">
+<span class="sig-name descname"><span class="pre">overlap_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_angle_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_plane_dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.overlap_fraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.overlap_fraction" title="Link to this definition"></a></dt>
+<dd><p>Compute the fractional area overlap between two faces.</p>
+<p>Projects both faces onto the dominant 2-D plane, clips the
+polygons using Sutherland-Hodgman, and returns the ratio of the
+intersection area to the smaller face area.</p>
+<p>Faces whose normals differ by more than <em>tol_angle_deg</em> (parallel
+<strong>or</strong> anti-parallel) are treated as non-overlapping.  A
+plane-distance check scaled by the characteristic face length is
+also applied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – The other <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> to test overlap against.</p></li>
+<li><p><strong>tol_angle_deg</strong> – Maximum angle (in degrees) between the face
+normals for the faces to be considered coplanar.</p></li>
+<li><p><strong>tol_plane_dist</strong> – Absolute minimum tolerance for the
+plane-distance check.  The effective tolerance is
+<code class="docutils literal notranslate"><span class="pre">max(tol_plane_dist,</span> <span class="pre">1e-6</span> <span class="pre">*</span> <span class="pre">max(1.0,</span> <span class="pre">Lc))</span></code> where
+<code class="docutils literal notranslate"><span class="pre">Lc</span></code> is the average characteristic edge length.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <code class="docutils literal notranslate"><span class="pre">float</span></code> in <code class="docutils literal notranslate"><span class="pre">[0.0,</span> <span class="pre">1.0]</span></code> representing the overlap
+fraction.  Returns <code class="docutils literal notranslate"><span class="pre">0.0</span></code> when the faces are not coplanar or
+do not intersect.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.touches">
+<span class="sig-name descname"><span class="pre">touches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_angle_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_plane_dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_overlap_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.touches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.touches" title="Link to this definition"></a></dt>
+<dd><p>Test whether two faces are in surface contact.</p>
+<p>Two faces touch if they are nearly coplanar (normals parallel or
+anti-parallel within <em>tol_angle_deg</em>) and their projected area
+overlap fraction meets the <em>min_overlap_frac</em> threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – The other <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> to test against.</p></li>
+<li><p><strong>tol_angle_deg</strong> – Maximum angular deviation (degrees) between
+normals.</p></li>
+<li><p><strong>tol_plane_dist</strong> – Plane-distance tolerance passed to
+<a class="reference internal" href="#plot3d.face.Face.overlap_fraction" title="plot3d.face.Face.overlap_fraction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">overlap_fraction()</span></code></a>.</p></li>
+<li><p><strong>min_overlap_frac</strong> – Minimum overlap fraction (in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>)
+for the faces to be considered touching.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the faces are in surface contact, <code class="docutils literal notranslate"><span class="pre">False</span></code>
+otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.grid_points">
+<span class="sig-name descname"><span class="pre">grid_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride_u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride_v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.grid_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.grid_points" title="Link to this definition"></a></dt>
+<dd><p>Extract all XYZ grid points on this face from a parent block.</p>
+<p>Samples the structured face grid at the given strides in the
+two parametric directions.  Only works for faces with a single
+constant index (<code class="docutils literal notranslate"><span class="pre">const_type</span></code> in <code class="docutils literal notranslate"><span class="pre">{0,</span> <span class="pre">1,</span> <span class="pre">2}</span></code>); for
+unstructured faces, falls back to the stored corner vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>block</strong> – The parent <code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code> whose <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code>, <code class="docutils literal notranslate"><span class="pre">Z</span></code>
+arrays are indexed by <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code>.</p></li>
+<li><p><strong>stride_u</strong> – Sampling stride in the first parametric direction.</p></li>
+<li><p><strong>stride_v</strong> – Sampling stride in the second parametric direction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A NumPy array of shape <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">3)</span></code> containing the sampled
+<code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.shared_point_fraction">
+<span class="sig-name descname"><span class="pre">shared_point_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_xyz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride_u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride_v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.shared_point_fraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.shared_point_fraction" title="Link to this definition"></a></dt>
+<dd><p>Compute the fraction of coincident grid nodes between two faces.</p>
+<p>Samples both faces from their respective parent blocks, quantizes
+the coordinates, and counts how many nodes coincide within
+<em>tol_xyz</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> – The other <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> to compare with.</p></li>
+<li><p><strong>block_self</strong> – Parent block for <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p></li>
+<li><p><strong>block_other</strong> – Parent block for <em>other</em>.</p></li>
+<li><p><strong>tol_xyz</strong> – Spatial tolerance for node coincidence.</p></li>
+<li><p><strong>stride_u</strong> – Sampling stride in the first parametric direction.</p></li>
+<li><p><strong>stride_v</strong> – Sampling stride in the second parametric direction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(#</span> <span class="pre">coincident</span> <span class="pre">nodes)</span> <span class="pre">/</span> <span class="pre">min(N_self,</span> <span class="pre">N_other)</span></code> as a
+<code class="docutils literal notranslate"><span class="pre">float</span></code> in <code class="docutils literal notranslate"><span class="pre">[0.0,</span> <span class="pre">1.0]</span></code>.  Returns <code class="docutils literal notranslate"><span class="pre">0.0</span></code> if either face
+has no points.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.face.Face.touches_by_nodes">
+<span class="sig-name descname"><span class="pre">touches_by_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_xyz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_shared_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_shared_abs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride_u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride_v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/plot3d/face.html#Face.touches_by_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.face.Face.touches_by_nodes" title="Link to this definition"></a></dt>
+<dd><p>Test surface contact by counting shared structured grid nodes.</p>
+<p>Two faces are considered in contact when they share at least
+<em>min_shared_abs</em> coincident nodes <strong>and</strong> at least
+<em>min_shared_frac</em> of the smaller face’s sampled nodes.  This
+method is more robust than polygon overlap for detecting partial
+contact between blocks that truly share grid nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> – The other <a class="reference internal" href="#plot3d.face.Face" title="plot3d.face.Face"><code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code></a> to test against.</p></li>
+<li><p><strong>block_self</strong> – Parent block for <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p></li>
+<li><p><strong>block_other</strong> – Parent block for <em>other</em>.</p></li>
+<li><p><strong>tol_xyz</strong> – Spatial tolerance for node coincidence.</p></li>
+<li><p><strong>min_shared_frac</strong> – Minimum fraction of the smaller face’s nodes
+that must coincide for contact to be detected.</p></li>
+<li><p><strong>min_shared_abs</strong> – Minimum absolute number of coincident nodes
+required.</p></li>
+<li><p><strong>stride_u</strong> – Sampling stride in the first parametric direction.</p></li>
+<li><p><strong>stride_v</strong> – Sampling stride in the second parametric direction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if both the absolute and fractional thresholds are
+met, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
-            <div class="clearer"></div>
+           </div>
           </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="differencing.html" class="btn btn-neutral float-left" title="Differencing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="face_pool.html" class="btn btn-neutral float-right" title="Face Pool" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="differencing.html"
-                          title="previous chapter">Differencing</a></p>
+    </section>
   </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="facefunctions.html"
-                          title="next chapter">Face Functions</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/modules/face.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="facefunctions.html" title="Face Functions"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="differencing.html" title="Differencing"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Face</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
-    </div>
-  </body>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

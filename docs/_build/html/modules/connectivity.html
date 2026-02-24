@@ -1,217 +1,222 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html lang="en" data-content_root="../">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connectivity &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
-    <title>Connectivity &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
-    
-    <script src="../_static/documentation_options.js?v=514bbfa0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Differencing" href="differencing.html" />
     <link rel="prev" title="Block Functions" href="blockfunctions.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="differencing.html" title="Differencing"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="blockfunctions.html" title="Block Functions"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Connectivity</a></li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.connectivity.find_matching_blocks"><code class="docutils literal notranslate"><span class="pre">find_matching_blocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.connectivity.select_multi_dimensional"><code class="docutils literal notranslate"><span class="pre">select_multi_dimensional()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.connectivity.get_face_intersection"><code class="docutils literal notranslate"><span class="pre">get_face_intersection()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.connectivity.candidate_neighbor_pairs"><code class="docutils literal notranslate"><span class="pre">candidate_neighbor_pairs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.connectivity.connectivity_fast"><code class="docutils literal notranslate"><span class="pre">connectivity_fast()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.connectivity.connectivity"><code class="docutils literal notranslate"><span class="pre">connectivity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.connectivity.face_matches_to_dict"><code class="docutils literal notranslate"><span class="pre">face_matches_to_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.connectivity.verify_connectivity"><code class="docutils literal notranslate"><span class="pre">verify_connectivity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Connectivity</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/connectivity.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="module-plot3d.connectivity">
-<span id="connectivity"></span><h1>Connectivity<a class="headerlink" href="#module-plot3d.connectivity" title="Link to this heading">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="plot3d.connectivity.combinations_of_nearest_blocks">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">combinations_of_nearest_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nearest_nblocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#combinations_of_nearest_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.combinations_of_nearest_blocks" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the indices of the nearest 6 blocks based on their centroid</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>block</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – block you are interested in</p></li>
-<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – list of all your blocks</p></li>
-</ul>
+<span id="connectivity"></span><h1>Connectivity<a class="headerlink" href="#module-plot3d.connectivity" title="Link to this heading"></a></h1>
+<p>Three-phase connectivity detection for multi-block Plot3D structured meshes.</p>
+<p>This module implements a three-phase algorithm to detect face connectivity
+between blocks in a multi-block Plot3D mesh:</p>
+<dl class="simple">
+<dt><strong>Phase 1</strong> (fast full-face corner matching):</dt><dd><p>For each candidate block pair (identified by axis-aligned bounding box
+overlap via <code class="docutils literal notranslate"><span class="pre">candidate_neighbor_pairs</span></code>), an O(1) corner-based comparison
+is attempted. If all four corner vertices of two faces match bijectively
+within tolerance, the faces are declared a full 1:1 match and the expensive
+point-by-point search is skipped entirely. An interior-point verification
+step rejects false positives from curved surfaces that share corners but
+diverge internally.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>combinations of nearest blocks</p>
+<dt><strong>Phase 2</strong> (slow partial/split-face matching):</dt><dd><p>When Phase 1 does not produce a match, a point-by-point intersection
+search is performed. If a partial overlap is found, the original faces
+are split into matched and remnant sub-faces. Remnant sub-faces re-enter
+the face pool and the process iterates until no new matches are found.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[Tuple[int,int]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="plot3d.connectivity.connectivity">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">connectivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#connectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.connectivity" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – List of all blocks in multi-block plot3d mesh</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>All matching faces formatted as a list of { ‘block1’: {‘block_index’, ‘IMIN’, ‘JMIN’,’KMIN’, ‘IMAX’,’JMAX’,’KMAX’} }
-(List[Dict]): All exterior surfaces formatted as a list of { ‘block_index’, ‘surfaces’: [{‘IMIN’, ‘JMIN’,’KMIN’, ‘IMAX’,’JMAX’,’KMAX’, ‘ID’}] }</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(List[Dict])</p>
+<dt><strong>Phase 3</strong> (fresh-face validation):</dt><dd><p>After Phases 1-2 converge, some outer faces may remain unmatched because
+the neighboring block’s face pool was consumed by an earlier pair. Each
+remaining face is re-checked against <em>fresh</em> (un-consumed) outer faces of
+neighboring blocks. Axis-aligned bounding boxes computed from <strong>all</strong> face
+nodes (not just corners) provide fast pre-filtering before invoking the
+full intersection test. This catches curved or skewed faces whose interior
+extents exceed their corner coordinates.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="plot3d.connectivity.connectivity_fast">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">connectivity_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#connectivity_fast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.connectivity_fast" title="Link to this definition">¶</a></dt>
-<dd><p>Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – Lists of blocks you want to find the connectivity for</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>All matching faces formatted as a list of { ‘block1’: {‘block_index’, ‘IMIN’, ‘JMIN’,’KMIN’, ‘IMAX’,’JMAX’,’KMAX’} }
-(List[Dict]): All exterior surfaces formatted as a list of { ‘block_index’, ‘surfaces’: [{‘IMIN’, ‘JMIN’,’KMIN’, ‘IMAX’,’JMAX’,’KMAX’, ‘ID’}] }</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(List[Dict])</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="plot3d.connectivity.face_matches_to_dict">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">face_matches_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#face_matches_to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.face_matches_to_dict" title="Link to this definition">¶</a></dt>
-<dd><p>Makes sure the diagonal of face 1 match the diagonal of face 2</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>face1</strong> (<em>Face</em>) – Face 1 with block index</p></li>
-<li><p><strong>face2</strong> (<em>Face</em>) – Face 2 with block index</p></li>
-<li><p><strong>block1</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block 1</p></li>
-<li><p><strong>block2</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block 2</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>dictionary describing the corner matches</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(dict)</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.connectivity.find_matching_blocks">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">find_matching_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Face</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Face</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#find_matching_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.find_matching_blocks" title="Link to this definition">¶</a></dt>
-<dd><p>Takes two blocks and finds all matching pairs</p>
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">find_matching_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#find_matching_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.find_matching_blocks" title="Link to this definition"></a></dt>
+<dd><p>Find all matching face pairs between two blocks.</p>
+<p>Iteratively compares outer faces of <code class="docutils literal notranslate"><span class="pre">block1</span></code> against outer faces of
+<code class="docutils literal notranslate"><span class="pre">block2</span></code>. When a match (full or partial) is found, the matched faces
+are removed from their respective pools and any split remnants are added
+back. Iteration continues until no new matches are discovered.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>block1</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Any plot3d Block that is not the same as block2</p></li>
-<li><p><strong>block2</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Any plot3d Block that is not the same as block1</p></li>
-<li><p><strong>block1_outer</strong> (<em>List</em><em>[</em><em>Face</em><em>]</em>) – outer faces for block 1.</p></li>
-<li><p><strong>block2_outer</strong> (<em>List</em><em>[</em><em>Face</em><em>]</em>) – Outer faces for block 2</p></li>
-<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>Optional</em>) – tolerance to use. Defaults to 1E-6</p></li>
-</ul>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This function was changed to be given an input of outer faces for block 1 and block 2. Outer faces can change and we should use the updated value</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><dl class="simple">
-<dt>containing</dt><dd><ul class="simple">
-<li><p><strong>df</strong> (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])</p></li>
-<li><p><strong>block1_outer</strong> (List[Face]):</p></li>
-<li><p><strong>block2_outer</strong> (List[Face]):</p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>(tuple)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="plot3d.connectivity.get_face_intersection">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">get_face_intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#get_face_intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.get_face_intersection" title="Link to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Get the index of the intersection between two faces located on two different blocks</dt><dd><p>Face1 needs to be the smaller face.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>face1</strong> (<em>Face</em>) – An exterior face</p></li>
-<li><p><strong>face2</strong> (<em>Face</em>) – An exterior face from a different block</p></li>
-<li><p><strong>block1</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – block containing face1</p></li>
-<li><p><strong>block2</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – block containing face2</p></li>
-<li><p><strong>tol</strong> (<em>float</em>) – matching tolerance</p></li>
+<li><p><strong>block1</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – First Plot3D block. Must not be the same object as
+<code class="docutils literal notranslate"><span class="pre">block2</span></code>.</p></li>
+<li><p><strong>block2</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Second Plot3D block. Must not be the same object as
+<code class="docutils literal notranslate"><span class="pre">block1</span></code>.</p></li>
+<li><p><strong>block1_outer</strong> (<em>List</em><em>[</em><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a><em>]</em>) – Current outer (unmatched) faces for
+<code class="docutils literal notranslate"><span class="pre">block1</span></code>. This list is modified in place.</p></li>
+<li><p><strong>block2_outer</strong> (<em>List</em><em>[</em><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a><em>]</em>) – Current outer (unmatched) faces for
+<code class="docutils literal notranslate"><span class="pre">block2</span></code>. This list is modified in place.</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Euclidean distance tolerance for node matching.
+Defaults to <code class="docutils literal notranslate"><span class="pre">1E-6</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>containing</p>
+<dd class="field-even"><p><p>A 3-element tuple containing:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>(pandas.DataFrame): dataframe with matches. Columns = I1, J1, K1, I2, J2, K2</p></li>
-<li><p>(List[Face]): any split faces from block 1</p></li>
-<li><p>(List[Face]): any split faces from block 2</p></li>
+<li><p><strong>block_match_indices</strong> (List[List[Dict]]): Each element is a
+list of match dicts (keys <code class="docutils literal notranslate"><span class="pre">i1</span></code>, <code class="docutils literal notranslate"><span class="pre">j1</span></code>, <code class="docutils literal notranslate"><span class="pre">k1</span></code>, <code class="docutils literal notranslate"><span class="pre">i2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">j2</span></code>, <code class="docutils literal notranslate"><span class="pre">k2</span></code>) representing one matched face pair.</p></li>
+<li><p><strong>block1_outer</strong> (List[Face]): Updated outer faces for
+<code class="docutils literal notranslate"><span class="pre">block1</span></code> with matched faces removed and split remnants added.</p></li>
+<li><p><strong>block2_outer</strong> (List[Face]): Updated outer faces for
+<code class="docutils literal notranslate"><span class="pre">block2</span></code> with matched faces removed and split remnants added.</p></li>
 </ul>
 </div></blockquote>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(Tuple)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">block1_outer</span></code> and <code class="docutils literal notranslate"><span class="pre">block2_outer</span></code> lists are modified in place.
+Callers should pass the most up-to-date outer face lists because
+earlier matching iterations may have consumed or split faces.</p>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.connectivity.select_multi_dimensional">
-<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">select_multi_dimensional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#select_multi_dimensional"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.select_multi_dimensional" title="Link to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Takes a block (T) and selects X,Y,Z from the block given a face’s dimensions</dt><dd><p>theres really no good way to do this in python</p>
-</dd>
-</dl>
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">select_multi_dimensional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#select_multi_dimensional"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.select_multi_dimensional" title="Link to this definition"></a></dt>
+<dd><p>Select a 2-D slice from a 3-D array along a constant-index axis.</p>
+<p>Given a 3-D array (e.g. a block’s <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code>, or <code class="docutils literal notranslate"><span class="pre">Z</span></code> coordinate
+array) and index ranges for each dimension, returns the 2-D sub-array
+corresponding to a face. Exactly one dimension should have equal min/max
+values, indicating the constant axis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>T</strong> (<em>np.ndarray</em>) – arbitrary array so say a full matrix containing X</p></li>
-<li><p><strong>dim1</strong> (<em>tuple</em>) – 20,50 this selects X in the i direction from i=20 to 50</p></li>
-<li><p><strong>dim2</strong> (<em>tuple</em>) – 40,60 this selects X in the j direction from j=40 to 60</p></li>
-<li><p><strong>dim3</strong> (<em>tuple</em>) – 10,20 this selects X in the k direction from k=10 to 20</p></li>
+<li><p><strong>T</strong> (<em>np.ndarray</em>) – 3-D array indexed as <code class="docutils literal notranslate"><span class="pre">T[i,</span> <span class="pre">j,</span> <span class="pre">k]</span></code>.</p></li>
+<li><p><strong>dim1</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – <code class="docutils literal notranslate"><span class="pre">(imin,</span> <span class="pre">imax)</span></code> index range for the first dimension.</p></li>
+<li><p><strong>dim2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – <code class="docutils literal notranslate"><span class="pre">(jmin,</span> <span class="pre">jmax)</span></code> index range for the second dimension.</p></li>
+<li><p><strong>dim3</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – <code class="docutils literal notranslate"><span class="pre">(kmin,</span> <span class="pre">kmax)</span></code> index range for the third dimension.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns X or Y or Z given some range of I,J,K</p>
+<dd class="field-even"><p>2-D sub-array extracted from <code class="docutils literal notranslate"><span class="pre">T</span></code>. If no dimension is
+constant, returns a 3-D sub-array using half-open slicing.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray</p>
@@ -219,84 +224,269 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.connectivity.get_face_intersection">
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">get_face_intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#get_face_intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.get_face_intersection" title="Link to this definition"></a></dt>
+<dd><p>Compute the intersection between two exterior faces on different blocks.</p>
+<p>Uses a two-tier strategy:</p>
+<ol class="arabic simple">
+<li><p><strong>Fast path</strong> – Attempts an O(1) full-face corner match via
+<code class="docutils literal notranslate"><span class="pre">_try_full_face_corner_match</span></code>, verified by an interior-node sample.</p></li>
+<li><p><strong>Slow path</strong> – Falls back to point-by-point matching when the fast
+path fails or when the faces partially overlap. Matched indices are
+filtered for contiguity (<code class="docutils literal notranslate"><span class="pre">_filter_block_increasing</span></code>) and checked
+against edge-only degeneracy (<code class="docutils literal notranslate"><span class="pre">_check_edge</span></code>). If the match is
+partial, the original faces are split into matched and remnant
+sub-faces.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>face1</strong> (<a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – An exterior face from <code class="docutils literal notranslate"><span class="pre">block1</span></code>.</p></li>
+<li><p><strong>face2</strong> (<a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – An exterior face from <code class="docutils literal notranslate"><span class="pre">block2</span></code>.</p></li>
+<li><p><strong>block1</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block containing <code class="docutils literal notranslate"><span class="pre">face1</span></code>.</p></li>
+<li><p><strong>block2</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block containing <code class="docutils literal notranslate"><span class="pre">face2</span></code>.</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Euclidean distance tolerance for node
+matching. Defaults to <code class="docutils literal notranslate"><span class="pre">1E-6</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A 3-element tuple containing:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>match_location</strong> (List[Dict]): List of match dicts with keys
+<code class="docutils literal notranslate"><span class="pre">i1</span></code>, <code class="docutils literal notranslate"><span class="pre">j1</span></code>, <code class="docutils literal notranslate"><span class="pre">k1</span></code>, <code class="docutils literal notranslate"><span class="pre">i2</span></code>, <code class="docutils literal notranslate"><span class="pre">j2</span></code>, <code class="docutils literal notranslate"><span class="pre">k2</span></code>. Empty if no
+valid face intersection is found.</p></li>
+<li><p><strong>split_faces1</strong> (List[Face]): Remnant sub-faces from
+<code class="docutils literal notranslate"><span class="pre">block1</span></code> created by splitting <code class="docutils literal notranslate"><span class="pre">face1</span></code> around the matched
+region. Empty if no split occurred.</p></li>
+<li><p><strong>split_faces2</strong> (List[Face]): Remnant sub-faces from
+<code class="docutils literal notranslate"><span class="pre">block2</span></code> created by splitting <code class="docutils literal notranslate"><span class="pre">face2</span></code> around the matched
+region. Empty if no split occurred.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.connectivity.candidate_neighbor_pairs">
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">candidate_neighbor_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#candidate_neighbor_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.candidate_neighbor_pairs" title="Link to this definition"></a></dt>
+<dd><p>Return block index pairs whose bounding boxes overlap or nearly touch.</p>
+<p>Two blocks can only share a face if their axis-aligned bounding boxes
+(AABBs) overlap or are within <code class="docutils literal notranslate"><span class="pre">tol</span></code> of touching. This spatial
+pre-filter replaces the older centroid-distance approach, which could
+miss neighbors for irregularly shaped blocks (L-shaped, elongated, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – All blocks in the multi-block mesh.</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – AABB expansion tolerance. Blocks whose
+bounding boxes are within this distance of touching are still
+considered candidates. Defaults to <code class="docutils literal notranslate"><span class="pre">1e-6</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Candidate block pairs <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j)</span></code> with
+<code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">&lt;</span> <span class="pre">j</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Tuple[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.connectivity.connectivity_fast">
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">connectivity_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#connectivity_fast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.connectivity_fast" title="Link to this definition"></a></dt>
+<dd><p>Run GCD-accelerated connectivity detection.</p>
+<p>Down-samples all blocks by their minimum GCD (greatest common divisor of
+grid dimensions minus one), runs the three-phase connectivity algorithm
+via <code class="docutils literal notranslate"><span class="pre">connectivity</span></code>, then scales the resulting indices back to the
+original resolution.</p>
+<p>This is the recommended entry point for large meshes where GCD reduction
+significantly decreases the number of nodes to compare.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – All blocks to find connectivity for.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A 2-element tuple containing:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>face_matches</strong> (List[Dict]): All matching face pairs. Each
+dict has keys <code class="docutils literal notranslate"><span class="pre">block1</span></code> and <code class="docutils literal notranslate"><span class="pre">block2</span></code>, each containing
+<code class="docutils literal notranslate"><span class="pre">block_index</span></code>, <code class="docutils literal notranslate"><span class="pre">IMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">JMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">KMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">IMAX</span></code>,
+<code class="docutils literal notranslate"><span class="pre">JMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">KMAX</span></code>.</p></li>
+<li><p><strong>outer_faces_formatted</strong> (List[Dict]): All remaining exterior
+surfaces. Each dict has keys <code class="docutils literal notranslate"><span class="pre">block_index</span></code>, <code class="docutils literal notranslate"><span class="pre">IMIN</span></code>,
+<code class="docutils literal notranslate"><span class="pre">JMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">KMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">IMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">JMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">KMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">id</span></code>.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.connectivity.connectivity">
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">connectivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#connectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.connectivity" title="Link to this definition"></a></dt>
+<dd><p>Detect face connectivity between blocks using a three-phase algorithm.</p>
+<p><strong>Phase 1-2</strong> (in <code class="docutils literal notranslate"><span class="pre">find_matching_blocks</span></code>): For each candidate block
+pair (identified by AABB overlap), faces are matched iteratively.
+Phase 1 uses O(1) corner matching for full 1:1 faces. Phase 2 handles
+partial/split faces via point-by-point intersection, creating remnant
+sub-faces that re-enter the pool until convergence.</p>
+<p><strong>Phase 3</strong> (fresh-face validation): After Phases 1-2 converge,
+remaining unmatched faces are re-checked against <em>fresh</em> outer faces of
+neighbor blocks. Axis-aligned bounding boxes computed from <strong>all</strong> face
+nodes (not just corners) are used for fast pre-filtering before calling
+<code class="docutils literal notranslate"><span class="pre">get_face_intersection</span></code>. This catches edge cases where curved or
+skewed faces have interior extents beyond their corner coordinates.</p>
+<p>After all three phases, self-matching faces within the same block are
+detected and appended. Duplicate and subsumed outer faces are pruned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – All blocks in the multi-block Plot3D mesh.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A 2-element tuple containing:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>face_matches</strong> (List[Dict]): All matching face pairs. Each
+dict has keys <code class="docutils literal notranslate"><span class="pre">block1</span></code> and <code class="docutils literal notranslate"><span class="pre">block2</span></code>, each containing
+<code class="docutils literal notranslate"><span class="pre">block_index</span></code>, <code class="docutils literal notranslate"><span class="pre">IMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">JMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">KMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">IMAX</span></code>,
+<code class="docutils literal notranslate"><span class="pre">JMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">KMAX</span></code>, and <code class="docutils literal notranslate"><span class="pre">id</span></code>.</p></li>
+<li><p><strong>outer_faces_formatted</strong> (List[Dict]): All remaining exterior
+surfaces. Each dict has keys <code class="docutils literal notranslate"><span class="pre">block_index</span></code>, <code class="docutils literal notranslate"><span class="pre">IMIN</span></code>,
+<code class="docutils literal notranslate"><span class="pre">JMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">KMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">IMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">JMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">KMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">id</span></code>.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.connectivity.face_matches_to_dict">
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">face_matches_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">face2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><span class="pre">Face</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#face_matches_to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.face_matches_to_dict" title="Link to this definition"></a></dt>
+<dd><p>Convert a matched face pair into a structured connectivity dictionary.</p>
+<p>Determines which corner of <code class="docutils literal notranslate"><span class="pre">face2</span></code> corresponds to the lower-left and
+upper-right corners of <code class="docutils literal notranslate"><span class="pre">face1</span></code> by finding the nearest spatial match
+among the four corners of <code class="docutils literal notranslate"><span class="pre">face2</span></code>. This ensures the diagonal
+representation is consistent regardless of face orientation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>face1</strong> (<a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – Matched face on <code class="docutils literal notranslate"><span class="pre">block1</span></code>. Must have <code class="docutils literal notranslate"><span class="pre">BlockIndex</span></code>
+set.</p></li>
+<li><p><strong>face2</strong> (<a class="reference internal" href="face.html#plot3d.face.Face" title="plot3d.face.Face"><em>Face</em></a>) – Matched face on <code class="docutils literal notranslate"><span class="pre">block2</span></code>. Must have <code class="docutils literal notranslate"><span class="pre">BlockIndex</span></code>
+set.</p></li>
+<li><p><strong>block1</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block containing <code class="docutils literal notranslate"><span class="pre">face1</span></code>.</p></li>
+<li><p><strong>block2</strong> (<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a>) – Block containing <code class="docutils literal notranslate"><span class="pre">face2</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary with keys <code class="docutils literal notranslate"><span class="pre">block1</span></code> and <code class="docutils literal notranslate"><span class="pre">block2</span></code>, each
+containing <code class="docutils literal notranslate"><span class="pre">block_index</span></code>, <code class="docutils literal notranslate"><span class="pre">IMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">JMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">KMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">IMAX</span></code>,
+<code class="docutils literal notranslate"><span class="pre">JMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">KMAX</span></code>, and <code class="docutils literal notranslate"><span class="pre">id</span></code>. The lower/upper corners of
+<code class="docutils literal notranslate"><span class="pre">block2</span></code> are reordered to spatially match those of <code class="docutils literal notranslate"><span class="pre">block1</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.connectivity.verify_connectivity">
+<span class="sig-prename descclassname"><span class="pre">plot3d.connectivity.</span></span><span class="sig-name descname"><span class="pre">verify_connectivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/connectivity.html#verify_connectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.connectivity.verify_connectivity" title="Link to this definition"></a></dt>
+<dd><p>Verify that face match diagonals are spatially consistent.</p>
+<p>For each entry in <code class="docutils literal notranslate"><span class="pre">face_matches</span></code>, checks that the lower-corner
+coordinates of <code class="docutils literal notranslate"><span class="pre">block1</span></code> match the lower-corner coordinates of
+<code class="docutils literal notranslate"><span class="pre">block2</span></code> (and similarly for upper corners) within the specified
+tolerance. If the stored diagonal does not match, all permutations of
+<code class="docutils literal notranslate"><span class="pre">block2</span></code>’s face corners are tried. If a valid permutation is found,
+the face match is corrected and added to the verified list.</p>
+<p>Uses GCD reduction (same as <code class="docutils literal notranslate"><span class="pre">connectivity_fast</span></code>) for efficient
+coordinate lookups on large meshes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – All blocks at original full resolution.</p></li>
+<li><p><strong>face_matches</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of face match dicts produced by
+<code class="docutils literal notranslate"><span class="pre">connectivity</span></code> or <code class="docutils literal notranslate"><span class="pre">connectivity_fast</span></code>. Each dict has keys
+<code class="docutils literal notranslate"><span class="pre">block1</span></code> and <code class="docutils literal notranslate"><span class="pre">block2</span></code> with sub-keys <code class="docutils literal notranslate"><span class="pre">block_index</span></code>,
+<code class="docutils literal notranslate"><span class="pre">IMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">JMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">KMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">IMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">JMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">KMAX</span></code>.</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Euclidean distance tolerance for corner
+comparison. Defaults to <code class="docutils literal notranslate"><span class="pre">1E-6</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A 2-element tuple containing:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>verified</strong> (list): Face matches whose diagonals are confirmed
+or corrected to be spatially consistent.</p></li>
+<li><p><strong>mismatched</strong> (list): Face matches where no corner permutation
+produced a match within tolerance.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Mismatched entries are printed to stdout with detailed diagnostic
+information including block indices, corner coordinates, and closest
+distances.</p>
+</div>
+</dd></dl>
+
 </section>
 
 
-            <div class="clearer"></div>
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="../index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Connectivity</a><ul>
-<li><a class="reference internal" href="#plot3d.connectivity.combinations_of_nearest_blocks"><code class="docutils literal notranslate"><span class="pre">combinations_of_nearest_blocks()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.connectivity.connectivity"><code class="docutils literal notranslate"><span class="pre">connectivity()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.connectivity.connectivity_fast"><code class="docutils literal notranslate"><span class="pre">connectivity_fast()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.connectivity.face_matches_to_dict"><code class="docutils literal notranslate"><span class="pre">face_matches_to_dict()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.connectivity.find_matching_blocks"><code class="docutils literal notranslate"><span class="pre">find_matching_blocks()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.connectivity.get_face_intersection"><code class="docutils literal notranslate"><span class="pre">get_face_intersection()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.connectivity.select_multi_dimensional"><code class="docutils literal notranslate"><span class="pre">select_multi_dimensional()</span></code></a></li>
-</ul>
-</li>
-</ul>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="blockfunctions.html" class="btn btn-neutral float-left" title="Block Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="differencing.html" class="btn btn-neutral float-right" title="Differencing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
   </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="blockfunctions.html"
-                          title="previous chapter">Block Functions</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="differencing.html"
-                          title="next chapter">Differencing</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/modules/connectivity.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="differencing.html" title="Differencing"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="blockfunctions.html" title="Block Functions"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Connectivity</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
-    </div>
-  </body>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

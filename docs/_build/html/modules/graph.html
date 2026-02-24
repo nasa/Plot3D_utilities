@@ -1,221 +1,325 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html lang="en" data-content_root="../">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graph &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
-    <title>Graph &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
-    
-    <script src="../_static/documentation_options.js?v=514bbfa0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Read" href="read.html" />
+    <link rel="next" title="List Functions" href="listfunctions.html" />
     <link rel="prev" title="Face Functions" href="facefunctions.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="read.html" title="Read"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="facefunctions.html" title="Face Functions"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Graph</a></li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Graph</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.graph.build_weighted_graph_from_face_matches"><code class="docutils literal notranslate"><span class="pre">build_weighted_graph_from_face_matches()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.graph.csr_from_adj_and_weights"><code class="docutils literal notranslate"><span class="pre">csr_from_adj_and_weights()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.graph.partition_from_face_matches"><code class="docutils literal notranslate"><span class="pre">partition_from_face_matches()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.graph.write_ddcmp"><code class="docutils literal notranslate"><span class="pre">write_ddcmp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Graph</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/graph.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="module-plot3d.graph">
-<span id="graph"></span><h1>Graph<a class="headerlink" href="#module-plot3d.graph" title="Link to this heading">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="plot3d.graph.build_weighted_graph_from_face_matches">
-<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">build_weighted_graph_from_face_matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_self_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#build_weighted_graph_from_face_matches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.build_weighted_graph_from_face_matches" title="Link to this definition">¶</a></dt>
-<dd><p>Convert connectivity_fast face_matches into adjacency + weights.</p>
+<span id="graph"></span><h1>Graph<a class="headerlink" href="#module-plot3d.graph" title="Link to this heading"></a></h1>
+<p>Graph construction and METIS-based partitioning utilities for Plot3D meshes.</p>
+<p>This module converts face-match connectivity data (output of <code class="docutils literal notranslate"><span class="pre">connectivity_fast</span></code>)
+into a weighted block-adjacency graph, partitions that graph with METIS via
+<code class="docutils literal notranslate"><span class="pre">pymetis</span></code>, and writes the resulting partition assignment to a DDCMP input file.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pymetis</span></code> is an optional dependency.  On Windows it is skipped at install
+time; METIS-based partitioning is therefore only available on Linux/macOS.</p>
 </div>
-<dl class="simple">
-<dt>Why this matters:</dt><dd><p>connectivity_fast can return more than one face between the same pair of blocks
-(e.g. a block is split and has two non-contiguous interfaces with its neighbor).
-Each face gives a weight = dI * dJ * dK (number of shared nodes).
-METIS expects one edge per block-pair, with a single weight.
-So if there are multiple faces, we must decide how to merge them. That’s what aggregate does.</p>
-</dd>
-</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.graph.build_weighted_graph_from_face_matches">
+<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">build_weighted_graph_from_face_matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_self_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#build_weighted_graph_from_face_matches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.build_weighted_graph_from_face_matches" title="Link to this definition"></a></dt>
+<dd><p>Convert <code class="docutils literal notranslate"><span class="pre">connectivity_fast</span></code> face matches into a weighted block-adjacency graph.</p>
+<p><code class="docutils literal notranslate"><span class="pre">connectivity_fast</span></code> can return more than one face between the same pair of
+blocks (e.g. when a block has two non-contiguous interfaces with its
+neighbor).  Each face contributes a weight equal to <code class="docutils literal notranslate"><span class="pre">dI</span> <span class="pre">*</span> <span class="pre">dJ</span> <span class="pre">*</span> <span class="pre">dK</span></code> (the
+number of shared nodes on that face).  Because METIS expects exactly one
+edge per block-pair, multiple faces between the same pair are merged
+according to <em>aggregate</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>face_matches</strong> (<em>List</em><em>[</em><em>dict</em><em>]</em>) – Output from connectivity_fast</p></li>
-<li><p><strong>n_blocks</strong> (<em>int</em>) – number of blocks in a mesh</p></li>
-<li><p><strong>aggregate</strong> (<em>str</em><em>, </em><em>optional</em>) – ‘sum’|’max’|’min’. Controls how weights are combined. Defaults to “sum”.</p></li>
-<li><p><strong>ignore_self_matches</strong> (<em>bool</em><em>, </em><em>optional</em>) – ignores self matching (i==j). Defaults to True.</p></li>
+<li><p><strong>face_matches</strong> – Output from <code class="docutils literal notranslate"><span class="pre">connectivity_fast</span></code>.  Each element is a
+dict containing <code class="docutils literal notranslate"><span class="pre">block1</span></code> and <code class="docutils literal notranslate"><span class="pre">block2</span></code> sub-dicts with keys
+<code class="docutils literal notranslate"><span class="pre">block_index</span></code>, <code class="docutils literal notranslate"><span class="pre">IMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">JMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">KMIN</span></code>, <code class="docutils literal notranslate"><span class="pre">IMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">JMAX</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">KMAX</span></code>.</p></li>
+<li><p><strong>n_blocks</strong> – Total number of blocks in the mesh.</p></li>
+<li><p><strong>aggregate</strong> – Strategy for merging multiple face weights between the same
+block pair.  Must be one of <code class="docutils literal notranslate"><span class="pre">’sum’</span></code>, <code class="docutils literal notranslate"><span class="pre">’max’</span></code>, or <code class="docutils literal notranslate"><span class="pre">’min’</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">’sum’</span></code>.</p></li>
+<li><p><strong>ignore_self_matches</strong> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, face matches where both sides belong
+to the same block are discarded.  Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – if aggregate is not one of ‘sum’,’max’,’min’</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>adj_list (Dict[int, List[int]]): Neighbors for each block.</p></li>
-<li><p>edge_w   (Dict[int, Dict[int, int]]): Edge weights (u-&gt;v).</p></li>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>adj_list</strong> (<code class="docutils literal notranslate"><span class="pre">Dict[int,</span> <span class="pre">List[int]]</span></code>): Sorted neighbor list for
+each block index.</p></li>
+<li><p><strong>edge_w</strong> (<code class="docutils literal notranslate"><span class="pre">Dict[int,</span> <span class="pre">Dict[int,</span> <span class="pre">int]]</span></code>): Mapping
+<code class="docutils literal notranslate"><span class="pre">edge_w[u][v]</span></code> -&gt; integer edge weight for the undirected edge
+between blocks <em>u</em> and <em>v</em>.</p></li>
 </ul>
 </p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Tuple[Dict[int, List[int]], Dict[int, Dict[int, int]]]</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A two-element tuple <code class="docutils literal notranslate"><span class="pre">(adj_list,</span> <span class="pre">edge_w)</span></code> where</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If <em>aggregate</em> is not one of <code class="docutils literal notranslate"><span class="pre">’sum’</span></code>, <code class="docutils literal notranslate"><span class="pre">’max’</span></code>,
+    or <code class="docutils literal notranslate"><span class="pre">’min’</span></code>.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.graph.csr_from_adj_and_weights">
-<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">csr_from_adj_and_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adj_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#csr_from_adj_and_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.csr_from_adj_and_weights" title="Link to this definition">¶</a></dt>
-<dd><p>Build CSR arrays (xadj, adjncy, eweights) from adjacency + weights.</p>
+<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">csr_from_adj_and_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adj_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#csr_from_adj_and_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.csr_from_adj_and_weights" title="Link to this definition"></a></dt>
+<dd><p>Build CSR arrays from an adjacency list and edge-weight mapping.</p>
+<p>Produces the three arrays required by METIS/pymetis in Compressed Sparse
+Row (CSR) format.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>prefix sum of neighbors
-adjncy (List[int]): flattened neighbor list
-eweights (List[int]): edge weights aligned with adjncy</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_list</strong> – Neighbor list for each block index, keyed by block index.
+Neighbors must be sorted (as returned by
+<a class="reference internal" href="#plot3d.graph.build_weighted_graph_from_face_matches" title="plot3d.graph.build_weighted_graph_from_face_matches"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_weighted_graph_from_face_matches()</span></code></a>).</p></li>
+<li><p><strong>edge_w</strong> – Edge weights, where <code class="docutils literal notranslate"><span class="pre">edge_w[u][v]</span></code> is the integer weight of
+the undirected edge between blocks <em>u</em> and <em>v</em>.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>xadj (List[int])</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>xadj</strong> (<code class="docutils literal notranslate"><span class="pre">List[int]</span></code>): Row-pointer array of length
+<code class="docutils literal notranslate"><span class="pre">n_blocks</span> <span class="pre">+</span> <span class="pre">1</span></code>; <code class="docutils literal notranslate"><span class="pre">xadj[u]</span></code> is the index in <em>adjncy</em> where
+block <em>u</em>’s neighbors begin.</p></li>
+<li><p><strong>adjncy</strong> (<code class="docutils literal notranslate"><span class="pre">List[int]</span></code>): Flattened neighbor indices.</p></li>
+<li><p><strong>eweights</strong> (<code class="docutils literal notranslate"><span class="pre">List[int]</span></code>): Edge weights aligned element-wise
+with <em>adjncy</em>.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A three-element tuple <code class="docutils literal notranslate"><span class="pre">(xadj,</span> <span class="pre">adjncy,</span> <span class="pre">eweights)</span></code> where</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.graph.partition_from_face_matches">
-<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">partition_from_face_matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nparts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">favor_blocksize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_self_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#partition_from_face_matches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.partition_from_face_matches" title="Link to this definition">¶</a></dt>
-<dd><p>Partition a graph derived from <cite>face_matches</cite> using pymetis.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.</p>
-</div>
-<dl class="simple">
-<dt>Why this matters:</dt><dd><p>connectivity_fast can return more than one face between the same pair of blocks
-(e.g. a block is split and has two non-contiguous interfaces with its neighbor).
-Each face gives a weight = dI * dJ * dK (number of shared nodes).
-METIS expects one edge per block-pair, with a single weight.
-So if there are multiple faces, we must decide how to merge them. That’s what aggregate does.</p>
-</dd>
-</dl>
+<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">partition_from_face_matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nparts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">favor_blocksize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_self_matches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#partition_from_face_matches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.partition_from_face_matches" title="Link to this definition"></a></dt>
+<dd><p>Partition a block-connectivity graph into <em>nparts</em> parts using METIS.</p>
+<p>Builds a weighted adjacency graph from <em>face_matches</em> (see
+<a class="reference internal" href="#plot3d.graph.build_weighted_graph_from_face_matches" title="plot3d.graph.build_weighted_graph_from_face_matches"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_weighted_graph_from_face_matches()</span></code></a>), converts it to CSR format,
+and calls METIS via <code class="xref py py-func docutils literal notranslate"><span class="pre">_metis_part_graph_compat()</span></code>.</p>
+<p>When <em>favor_blocksize</em> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, each block’s vertex weight is set to
+its node count so that METIS balances computational work rather than simply
+counting blocks.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>parts</strong> (<em>List[int]</em>) – Partition id (0-based) for each block.</p></li>
-<li><p><strong>adj_list</strong> (<em>Dict[int, List[int]]</em>) – Adjacency list used for the partitioning.</p></li>
-<li><p><strong>edge_w</strong> (<em>Dict[int, Dict[int, int]]</em>) – Edge weights.</p></li>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>face_matches</strong> – Output from <code class="docutils literal notranslate"><span class="pre">connectivity_fast</span></code>.  Each element is a
+dict with <code class="docutils literal notranslate"><span class="pre">block1</span></code> and <code class="docutils literal notranslate"><span class="pre">block2</span></code> sub-dicts describing the shared
+face extents and block indices.</p></li>
+<li><p><strong>block_sizes</strong> – Number of nodes in each block (used as vertex weights when
+<em>favor_blocksize</em> is <code class="docutils literal notranslate"><span class="pre">True</span></code>).</p></li>
+<li><p><strong>nparts</strong> – Desired number of partitions.</p></li>
+<li><p><strong>favor_blocksize</strong> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, use block node counts as METIS vertex
+weights so that partitions balance computational load.
+Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>aggregate</strong> – Strategy for merging multiple face weights between the same
+block pair.  One of <code class="docutils literal notranslate"><span class="pre">’sum’</span></code>, <code class="docutils literal notranslate"><span class="pre">’max’</span></code>, or <code class="docutils literal notranslate"><span class="pre">’min’</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">’sum’</span></code>.</p></li>
+<li><p><strong>ignore_self_matches</strong> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, self-matching faces (same block on
+both sides) are discarded before building the graph.
+Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>parts</strong> (<code class="docutils literal notranslate"><span class="pre">List[int]</span></code>): 0-based partition ID for each block.</p></li>
+<li><p><strong>adj_list</strong> (<code class="docutils literal notranslate"><span class="pre">Dict[int,</span> <span class="pre">List[int]]</span></code>): Adjacency list used for
+the partitioning.</p></li>
+<li><p><strong>edge_w</strong> (<code class="docutils literal notranslate"><span class="pre">Dict[int,</span> <span class="pre">Dict[int,</span> <span class="pre">int]]</span></code>): Edge weights used for
+the partitioning.</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A three-element tuple <code class="docutils literal notranslate"><span class="pre">(parts,</span> <span class="pre">adj_list,</span> <span class="pre">edge_w)</span></code> where</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">pymetis</span></code> is not installed or is unavailable on
+    the current platform.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.graph.write_ddcmp">
-<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">write_ddcmp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ddcmp.dat'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#write_ddcmp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.write_ddcmp" title="Link to this definition">¶</a></dt>
-<dd><p>Writes ddcmp.dat and ddcmp_info.txt.</p>
-<p class="rubric">Notes</p>
+<span class="sig-prename descclassname"><span class="pre">plot3d.graph.</span></span><span class="sig-name descname"><span class="pre">write_ddcmp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocksizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ddcmp.dat'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/plot3d/graph.html#write_ddcmp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.graph.write_ddcmp" title="Link to this definition"></a></dt>
+<dd><p>Write DDCMP partition files from a METIS partition assignment.</p>
+<p>Produces two output files in the directory of <em>filename</em>:</p>
 <ul class="simple">
-<li><p>parts are 0-based in memory, but written 1-based in the file (to match your C#).</p></li>
-<li><p>edge_weights affects the per-partition ‘edge_work’ if provided.</p></li>
+<li><p><strong>ddcmp.dat</strong> – main partition assignment file consumed by downstream
+C# / Fortran solvers.  Block and processor indices are written
+<strong>1-based</strong> even though <em>parts</em> is 0-based in memory.</p></li>
+<li><p><strong>ddcmp_info.txt</strong> – human-readable summary reporting block counts,
+communication work, edge work, and volume-node counts per partition.</p></li>
 </ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parts</strong> – 0-based partition ID for each block, as returned by
+<a class="reference internal" href="#plot3d.graph.partition_from_face_matches" title="plot3d.graph.partition_from_face_matches"><code class="xref py py-func docutils literal notranslate"><span class="pre">partition_from_face_matches()</span></code></a>.</p></li>
+<li><p><strong>blocksizes</strong> – Number of nodes in each block; used to compute per-partition
+volume-node totals.</p></li>
+<li><p><strong>adj_list</strong> – Block-adjacency list (keyed by block index) used to identify
+cross-partition edges.</p></li>
+<li><p><strong>edge_weights</strong> – Optional edge-weight mapping <code class="docutils literal notranslate"><span class="pre">edge_weights[u][v]</span></code>
+used to compute per-partition edge work.  If <code class="docutils literal notranslate"><span class="pre">None</span></code>, every
+cross-partition edge counts as weight 1.</p></li>
+<li><p><strong>filename</strong> – Path to the primary output file.  The info file is written
+to the same directory with the name <code class="docutils literal notranslate"><span class="pre">ddcmp_info.txt</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">'ddcmp.dat'</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
 
 
-            <div class="clearer"></div>
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="../index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Graph</a><ul>
-<li><a class="reference internal" href="#plot3d.graph.build_weighted_graph_from_face_matches"><code class="docutils literal notranslate"><span class="pre">build_weighted_graph_from_face_matches()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.graph.csr_from_adj_and_weights"><code class="docutils literal notranslate"><span class="pre">csr_from_adj_and_weights()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.graph.partition_from_face_matches"><code class="docutils literal notranslate"><span class="pre">partition_from_face_matches()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.graph.write_ddcmp"><code class="docutils literal notranslate"><span class="pre">write_ddcmp()</span></code></a></li>
-</ul>
-</li>
-</ul>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="facefunctions.html" class="btn btn-neutral float-left" title="Face Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="listfunctions.html" class="btn btn-neutral float-right" title="List Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
   </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="facefunctions.html"
-                          title="previous chapter">Face Functions</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="read.html"
-                          title="next chapter">Read</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/modules/graph.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="read.html" title="Read"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="facefunctions.html" title="Face Functions"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Graph</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
-    </div>
-  </body>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

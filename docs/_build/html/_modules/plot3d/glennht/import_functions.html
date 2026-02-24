@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plot3d.glennht.import_functions &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plot3d.glennht.import_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plot3d.glennht.import_functions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Import functions for reading GlennHT connectivity files.</span>
+
+<span class="sd">This module provides utilities for parsing ``.ght_conn`` files produced by</span>
+<span class="sd">GlennHT or by the export helpers in</span>
+<span class="sd">:mod:`~plot3d.glennht.export_functions`.  Block indices read from the file</span>
+<span class="sd">are converted from 1-based (GlennHT convention) to 0-based (Python</span>
+<span class="sd">convention) before being returned.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="read_ght_conn">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.import_functions.read_ght_conn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_ght_conn</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a GlennHT connectivity file and return its parsed sections.</span>
+
+<span class="sd">    All block and face indices are returned 0-based (the file stores them</span>
+<span class="sd">    1-based; this function subtracts 1 on read).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename: Path to the ``.ght_conn`` connectivity file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple of eight elements:</span>
+
+<span class="sd">        - **max_block_index** (*int*): Maximum 0-based block index found in</span>
+<span class="sd">          the face-match section.</span>
+<span class="sd">        - **face_matches** (*List[Dict[str, dict]]*): Block-to-block face</span>
+<span class="sd">          match records.  Each entry is a dict with keys ``&quot;block1&quot;`` and</span>
+<span class="sd">          ``&quot;block2&quot;``, where each value contains ``&quot;block_index&quot;``,</span>
+<span class="sd">          ``&quot;IMIN&quot;``, ``&quot;JMIN&quot;``, ``&quot;KMIN&quot;``, ``&quot;IMAX&quot;``, ``&quot;JMAX&quot;``, and</span>
+<span class="sd">          ``&quot;KMAX&quot;`` (all 0-based).</span>
+<span class="sd">        - **outer_faces** (*List[Dict[str, int]]*): Boundary surface records</span>
+<span class="sd">          with keys ``&quot;block_index&quot;``, ``&quot;IMIN&quot;``, ``&quot;JMIN&quot;``, ``&quot;KMIN&quot;``,</span>
+<span class="sd">          ``&quot;IMAX&quot;``, ``&quot;JMAX&quot;``, ``&quot;KMAX&quot;`` (0-based), and ``&quot;id&quot;``</span>
+<span class="sd">          (0-based surface ID).</span>
+<span class="sd">        - **num_connections_foreach_block** (*np.ndarray*): Array of shape</span>
+<span class="sd">          ``(N, 2)`` where column 0 is the 0-based block index and column 1</span>
+<span class="sd">          is the number of shared interface nodes for that block.</span>
+<span class="sd">        - **nZones** (*int*): Total number of volume zones declared in the</span>
+<span class="sd">          file.</span>
+<span class="sd">        - **zone_types** (*List[int]*): Zone type codes (e.g. 1 = fluid,</span>
+<span class="sd">          2 = solid) read from the zone header line.</span>
+<span class="sd">        - **Zones** (*List[int]*): Flat list of contiguous zone indices</span>
+<span class="sd">          assigned to each block.</span>
+<span class="sd">        - **GIFs** (*List[Dict[str, int]]*): General Interface records, each</span>
+<span class="sd">          with keys ``&quot;S1&quot;``, ``&quot;S2&quot;``, ``&quot;GIF_TYPE&quot;``, and ``&quot;GIF_ORDER&quot;``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">IMIN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">JMIN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">KMIN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">IMAX</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">JMAX</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">KMAX</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Preallocate  # noqa: E702</span>
+    <span class="c1"># Read in the glennht connectivity file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>        
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">pairs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">blk_id1</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">block_to_block</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="c1"># Read matches </span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pairs</span><span class="o">*</span><span class="mi">2</span><span class="p">):</span> 
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">idx</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># When there is a pair of blockd, write to the list</span>
+                    <span class="n">block_to_block</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s1">&#39;block1&#39;</span><span class="p">:{</span><span class="s1">&#39;block_index&#39;</span><span class="p">:</span><span class="n">blk_id1</span><span class="p">,</span>
+                                  <span class="s2">&quot;IMIN&quot;</span><span class="p">:</span><span class="n">IMIN</span><span class="p">,</span><span class="s2">&quot;JMIN&quot;</span><span class="p">:</span><span class="n">JMIN</span><span class="p">,</span><span class="s2">&quot;KMIN&quot;</span><span class="p">:</span><span class="n">KMIN</span><span class="p">,</span>
+                                  <span class="s2">&quot;IMAX&quot;</span><span class="p">:</span><span class="n">IMAX</span><span class="p">,</span><span class="s2">&quot;JMAX&quot;</span><span class="p">:</span><span class="n">JMAX</span><span class="p">,</span><span class="s2">&quot;KMAX&quot;</span><span class="p">:</span><span class="n">KMAX</span><span class="p">},</span>
+                        <span class="s1">&#39;block2&#39;</span><span class="p">:{</span><span class="s1">&#39;block_index&#39;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                  <span class="s2">&quot;IMIN&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s2">&quot;JMIN&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="s2">&quot;KMIN&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                                  <span class="s2">&quot;IMAX&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="s2">&quot;JMAX&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="s2">&quot;KMAX&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">6</span><span class="p">]},</span>
+                        
+                    <span class="p">})</span>                   
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">blk_id1</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">IMIN</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">JMIN</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span> <span class="n">KMIN</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># noqa: E702</span>
+                    <span class="n">IMAX</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span> <span class="n">JMAX</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span> <span class="n">KMAX</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>  <span class="c1"># noqa: E702</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="c1"># Read OuterFaces</span>
+        <span class="n">outer_faces</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nFaces</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">nFaces</span><span class="p">)):</span> 
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span> <span class="c1"># Skip outer faces</span>
+            <span class="n">temp</span>  <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> 
+            <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
+            <span class="n">outer_faces</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;block_index&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;IMIN&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s2">&quot;JMIN&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="s2">&quot;KMIN&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                <span class="s2">&quot;IMAX&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="s2">&quot;JMAX&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="s2">&quot;KMAX&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+                <span class="p">})</span>
+        
+        <span class="c1"># Read GIF</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span> 
+        <span class="n">nGIF</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">GIFs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">nGIF</span><span class="p">)):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+            <span class="n">GIFs</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;S1&#39;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;S2&#39;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;GIF_TYPE&#39;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="s1">&#39;GIF_ORDER&#39;</span><span class="p">:</span><span class="n">temp</span><span class="p">[</span><span class="mi">3</span><span class="p">]})</span>
+        
+        <span class="c1"># Read Zones</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span> 
+        <span class="n">nZones</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># 4 - number of zones</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="n">zone_types</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="c1"># 1 1 1 2 -&gt; fluid, fluid, fluid, solid; 4 zones</span>
+        <span class="n">Zones</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+                <span class="n">Zones</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+    
+        <span class="c1"># Find out how many connecting nodes each block has </span>
+        <span class="n">l1</span> <span class="o">=</span> <span class="p">[(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">],</span>
+              <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">])</span><span class="o">*</span>
+              <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">])</span><span class="o">*</span>
+              <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]))</span>
+              <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">block_to_block</span><span class="p">]</span>
+        <span class="n">l2</span><span class="o">=</span> <span class="p">[(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">],</span>
+              <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">])</span><span class="o">*</span>  
+              <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">])</span><span class="o">*</span>
+              <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;block2&#39;</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]))</span>
+              <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">block_to_block</span><span class="p">]</span>
+        
+        <span class="n">l1</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">l2</span><span class="p">)</span>
+        <span class="n">l1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">l1</span><span class="p">)</span>
+        <span class="n">total_blocks</span> <span class="o">=</span> <span class="n">l1</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span><span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">l1</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">num_connections_foreach_block</span> <span class="o">=</span> <span class="n">l1</span><span class="p">[</span><span class="n">indices</span><span class="p">,:]</span>
+        <span class="n">num_connections_foreach_block</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">face_matches</span> <span class="o">=</span> <span class="n">block_to_block</span>
+        <span class="k">return</span> <span class="n">total_blocks</span><span class="p">,</span> <span class="n">face_matches</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">,</span><span class="n">num_connections_foreach_block</span><span class="p">,</span><span class="n">nZones</span><span class="p">,</span><span class="n">zone_types</span><span class="p">,</span><span class="n">Zones</span><span class="p">,</span><span class="n">GIFs</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

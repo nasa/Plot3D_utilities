@@ -98,7 +98,7 @@ def read_gridpro_connectivity(
     ``P pid sb1 sf1 sb2 sf2 fmap L1i L1j L1k H1i H1j H1k L2i L2j L2k H2i H2j H2k pty lbid``
 
     Boundary-condition IDs default to GridPro's PTY values but can be overridden
-    via the provided *_ids arguments (either a list of PTY ints or
+    via the provided ``*_ids`` arguments (either a list of PTY ints or
     ``{"name": str, "ids": [...]}``) or extended via
     ``custom_bc_ids={"name": [ids]}``.
 

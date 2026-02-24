@@ -1,52 +1,133 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html lang="en" data-content_root="../">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Block to Block Connectivity &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
-    <title>Block to Block Connectivity &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
-    
-    <script src="../_static/documentation_options.js?v=514bbfa0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Periodicity" href="periodicity.html" />
     <link rel="prev" title="Reading and Writing Plot3D Files" href="reading_writing.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="periodicity.html" title="Periodicity"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="reading_writing.html" title="Reading and Writing Plot3D Files"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Block to Block Connectivity</a></li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Block to Block Connectivity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plotting-connectivity-using-paraview">Plotting Connectivity using Paraview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#part-1-processing-the-data-locally-for-paraview-import">Part 1 - Processing the data locally for paraview import</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-2-calling-paraview-in-script-mode">Part 2 - Calling Paraview in script mode</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Block to Block Connectivity</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/notes/connectivity.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="block-to-block-connectivity">
-<h1>Block to Block Connectivity<a class="headerlink" href="#block-to-block-connectivity" title="Link to this heading">¶</a></h1>
+<h1>Block to Block Connectivity<a class="headerlink" href="#block-to-block-connectivity" title="Link to this heading"></a></h1>
 <p>Computational Grids are often divided into blocks for easier gridding. It is important to know how these blocks connect with each other in order to model the transfer of information. Computational Fluid Dynamics (CFD) requires the solver to know the “connectivity” of these blocks.</p>
-<p>The plot3D python library has a function for determining the connectivity. This is found by taking the combination of each block with another block and scanning the nodes on the exterior faces of block 1 with the exterior face of block 2. If there is a match then the two faces are connected. The code can search for <em>full face matches</em> or <em>partial matching</em>. <em>Full face matching</em> is much faster and should be used if your grid has a definite match.</p>
+<p>The plot3D python library has a function for determining the connectivity. The algorithm works in three phases:</p>
+<dl class="simple">
+<dt><strong>Phase 1 – Full-face corner matching (fast path)</strong></dt><dd><p>Candidate block pairs are identified using axis-aligned bounding box (AABB) overlap: two blocks can only share a face if their bounding boxes touch or overlap. For each pair, a fast O(1) corner comparison is tried first. If all four corners of two faces match within tolerance, a full-face match is recorded immediately.</p>
+</dd>
+<dt><strong>Phase 2 – Partial / split-face matching</strong></dt><dd><p>When faces don’t fully match, point-by-point intersection testing finds partial overlaps. Matched sub-regions are recorded and the remaining face remnants are split and re-entered into the pool. This loop continues iteratively until no new matches are found.</p>
+</dd>
+<dt><strong>Phase 3 – Fresh-face validation with all-node AABBs</strong></dt><dd><p>After Phases 1-2 converge, some outer faces may still have undetected partial overlaps with faces on neighbor blocks. Phase 3 re-examines each remaining face against <em>fresh</em> (un-consumed) outer faces of neighbor blocks. Axis-aligned bounding boxes computed from <strong>all face nodes</strong> (not just diagonal corners) are used for fast pre-filtering. This catches edge cases where curved or skewed faces have interior extents beyond their corner coordinates.</p>
+</dd>
+</dl>
 <p>Below is an example of a turbine domain with two blocks: HGrid in (red) and ogrid in (white). The two share a connected face with partial matching. There’s also the o-mesh which within itself has a connected face.</p>
 <figure class="align-center">
 <a class="reference internal image-reference" href="../_images/turbine_domain-blocking.png"><img alt="Two blocks, one in red for h mesh and white for omesh" src="../_images/turbine_domain-blocking.png" style="width: 800px;" /></a>
@@ -67,7 +148,7 @@
 <a class="reference internal image-reference" href="../_images/turbine_domain-matching1-1.png"><img alt="matching block 1 and block 2 faces" src="../_images/turbine_domain-matching1-1.png" style="width: 800px;" /></a>
 </figure>
 <section id="plotting-connectivity-using-paraview">
-<h2>Plotting Connectivity using Paraview<a class="headerlink" href="#plotting-connectivity-using-paraview" title="Link to this heading">¶</a></h2>
+<h2>Plotting Connectivity using Paraview<a class="headerlink" href="#plotting-connectivity-using-paraview" title="Link to this heading"></a></h2>
 <p>This example shows how you can take a mesh created Numeca Autogrid and plot the connecitivity using paraview. With this information, anyone should be able to comprehend the format and export it to whatever solver.
 This code has been tested using paraview 5.9. Modifications may need to be added for Paraview 5.10</p>
 <div class="admonition note">
@@ -79,14 +160,14 @@ You do not have full access to this library, so pip installs won’t work. This 
 <p><strong>Part 2</strong> the other code runs from paraview’s python environment.</p>
 </div>
 <section id="part-1-processing-the-data-locally-for-paraview-import">
-<h3>Part 1 - Processing the data locally for paraview import<a class="headerlink" href="#part-1-processing-the-data-locally-for-paraview-import" title="Link to this heading">¶</a></h3>
+<h3>Part 1 - Processing the data locally for paraview import<a class="headerlink" href="#part-1-processing-the-data-locally-for-paraview-import" title="Link to this heading"></a></h3>
 <p>The goal if this code is to create a pickle file that is read in part 2. This pickle file contains the matching faces and outer faces.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">combinations</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;../../&#39;</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;../Cascade&quot;</span><span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">plot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">find_periodicity</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">plot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_matching_blocks</span><span class="p">,</span> <span class="n">get_outer_faces</span><span class="p">,</span> <span class="n">connectivity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">plot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">rotated_periodicity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">plot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_matching_blocks</span><span class="p">,</span> <span class="n">get_outer_faces</span><span class="p">,</span> <span class="n">connectivity_fast</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">glennht_con</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_to_glennht_conn</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 
@@ -96,14 +177,14 @@ You do not have full access to this library, so pip installs won’t work. This 
     <span class="n">write_plot3D</span><span class="p">(</span><span class="s1">&#39;[Path to your Plot3D File]&#39;</span><span class="p">,</span><span class="n">blocks</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>   <span class="c1"># Converted to binary for easy reading </span>
 
     <span class="c1"># Block 1 is the blade O-Mesh k=0</span>
-    <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+    <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> <span class="o">=</span> <span class="n">connectivity_fast</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;connectivity.pickle&#39;</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s2">&quot;face_matches&quot;</span><span class="p">:</span><span class="n">face_matches</span><span class="p">,</span> <span class="s2">&quot;outer_faces&quot;</span><span class="p">:</span><span class="n">outer_faces_formatted</span><span class="p">},</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="part-2-calling-paraview-in-script-mode">
-<h3>Part 2 - Calling Paraview in script mode<a class="headerlink" href="#part-2-calling-paraview-in-script-mode" title="Link to this heading">¶</a></h3>
+<h3>Part 2 - Calling Paraview in script mode<a class="headerlink" href="#part-2-calling-paraview-in-script-mode" title="Link to this heading"></a></h3>
 <p>This part of the code shows how you can read the pickle file in part 1 from within paraview to display all your plots.</p>
 <p>This code was tested with Paraview version 5.9 <a class="reference external" href="https://www.paraview.org/download/">https://www.paraview.org/download/</a></p>
 <p>Paraview executable can be called with the script option to have it automatically create the plots for you.</p>
@@ -482,79 +563,34 @@ You do not have full access to this library, so pip installs won’t work. This 
 </section>
 
 
-            <div class="clearer"></div>
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="../index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Block to Block Connectivity</a><ul>
-<li><a class="reference internal" href="#plotting-connectivity-using-paraview">Plotting Connectivity using Paraview</a><ul>
-<li><a class="reference internal" href="#part-1-processing-the-data-locally-for-paraview-import">Part 1 - Processing the data locally for paraview import</a></li>
-<li><a class="reference internal" href="#part-2-calling-paraview-in-script-mode">Part 2 - Calling Paraview in script mode</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="reading_writing.html" class="btn btn-neutral float-left" title="Reading and Writing Plot3D Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="periodicity.html" class="btn btn-neutral float-right" title="Periodicity" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
   </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="reading_writing.html"
-                          title="previous chapter">Reading and Writing Plot3D Files</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="periodicity.html"
-                          title="next chapter">Periodicity</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/notes/connectivity.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="periodicity.html" title="Periodicity"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="reading_writing.html" title="Reading and Writing Plot3D Files"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Block to Block Connectivity</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
-    </div>
-  </body>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GridPro &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Pointwise" href="pointwise.html" />
+    <link rel="prev" title="GlennHT" href="glennht.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="glennht.html">GlennHT</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GridPro</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-plot3d.gridpro.import_functions">Import Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.gridpro.import_functions.read_gridpro_to_blocks"><code class="docutils literal notranslate"><span class="pre">read_gridpro_to_blocks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.gridpro.import_functions.read_gridpro_connectivity"><code class="docutils literal notranslate"><span class="pre">read_gridpro_connectivity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.gridpro.import_functions.bc_faces_by_type"><code class="docutils literal notranslate"><span class="pre">bc_faces_by_type()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">GridPro</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/gridpro.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-plot3d.gridpro">
+<span id="gridpro"></span><h1>GridPro<a class="headerlink" href="#module-plot3d.gridpro" title="Link to this heading"></a></h1>
+<p>GridPro grid and connectivity import utilities.</p>
+<p>Provides functions to read GridPro structured-grid text files into
+<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> objects and to parse GridPro connectivity files
+into <code class="docutils literal notranslate"><span class="pre">plot3d.connectivity_fast</span></code>-compatible face-match dictionaries with
+boundary-condition grouping.</p>
+<section id="module-plot3d.gridpro.import_functions">
+<span id="import-functions"></span><h2>Import Functions<a class="headerlink" href="#module-plot3d.gridpro.import_functions" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.gridpro.import_functions.read_gridpro_to_blocks">
+<span class="sig-prename descclassname"><span class="pre">plot3d.gridpro.import_functions.</span></span><span class="sig-name descname"><span class="pre">read_gridpro_to_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment_prefixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('#',</span> <span class="pre">'//')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/gridpro/import_functions.html#read_gridpro_to_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.gridpro.import_functions.read_gridpro_to_blocks" title="Link to this definition"></a></dt>
+<dd><p>Read a structured GridPro text grid into Plot3D Block objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – Path to the GridPro grid file.</p></li>
+<li><p><strong>encoding</strong> – Encoding to use while reading the text file.</p></li>
+<li><p><strong>comment_prefixes</strong> – Line prefixes that should be treated as comments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If a block does not contain the expected number of floats.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of Block objects representing each GridPro block.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block">Block</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.gridpro.import_functions.read_gridpro_connectivity">
+<span class="sig-prename descclassname"><span class="pre">plot3d.gridpro.import_functions.</span></span><span class="sig-name descname"><span class="pre">read_gridpro_connectivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sb_zero_based_in_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_zero_based_in_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inlet_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outlet_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wall_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symm_slip_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_bc_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><span class="pre">object</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/gridpro/import_functions.html#read_gridpro_connectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.gridpro.import_functions.read_gridpro_connectivity" title="Link to this definition"></a></dt>
+<dd><p>Parse a GridPro connectivity file into plot3d.connectivity_fast-like structures.</p>
+<p>Expected P-line layout (as provided):
+<code class="docutils literal notranslate"><span class="pre">P</span> <span class="pre">pid</span> <span class="pre">sb1</span> <span class="pre">sf1</span> <span class="pre">sb2</span> <span class="pre">sf2</span> <span class="pre">fmap</span> <span class="pre">L1i</span> <span class="pre">L1j</span> <span class="pre">L1k</span> <span class="pre">H1i</span> <span class="pre">H1j</span> <span class="pre">H1k</span> <span class="pre">L2i</span> <span class="pre">L2j</span> <span class="pre">L2k</span> <span class="pre">H2i</span> <span class="pre">H2j</span> <span class="pre">H2k</span> <span class="pre">pty</span> <span class="pre">lbid</span></code></p>
+<p>Boundary-condition IDs default to GridPro’s PTY values but can be overridden
+via the provided <code class="docutils literal notranslate"><span class="pre">*_ids</span></code> arguments (either a list of PTY ints or
+<code class="docutils literal notranslate"><span class="pre">{&quot;name&quot;:</span> <span class="pre">str,</span> <span class="pre">&quot;ids&quot;:</span> <span class="pre">[...]}</span></code>) or extended via
+<code class="docutils literal notranslate"><span class="pre">custom_bc_ids={&quot;name&quot;:</span> <span class="pre">[ids]}</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – Path to the GridPro connectivity file.</p></li>
+<li><p><strong>sb_zero_based_in_file</strong> – Set False if <code class="docutils literal notranslate"><span class="pre">sb1/sb2</span></code> are 1-based in the file.</p></li>
+<li><p><strong>index_zero_based_in_file</strong> – Set False if IMIN..KMAX are 1-based in the file.</p></li>
+<li><p><strong>inlet_ids</strong> – PTY ids to treat as inlet; defaults to <code class="docutils literal notranslate"><span class="pre">[5]</span></code>.
+Pass a dict <code class="docutils literal notranslate"><span class="pre">{&quot;name&quot;:</span> <span class="pre">&quot;...&quot;,</span> <span class="pre">&quot;ids&quot;:</span> <span class="pre">[...]}</span></code> to rename the group, or
+provide a mapping like <code class="docutils literal notranslate"><span class="pre">{&quot;Inlet&quot;:</span> <span class="pre">[...],</span> <span class="pre">&quot;Pressure</span> <span class="pre">Inlet&quot;:</span> <span class="pre">[...]}</span></code>
+to emit multiple named inlet groups. Each named group remembers its
+base type in the returned <code class="docutils literal notranslate"><span class="pre">bc_group</span></code> mapping.</p></li>
+<li><p><strong>outlet_ids</strong> – PTY ids to treat as outlet; defaults to <code class="docutils literal notranslate"><span class="pre">[6]</span></code> (same dict
+options as <code class="docutils literal notranslate"><span class="pre">inlet_ids</span></code>).</p></li>
+<li><p><strong>wall_ids</strong> – PTY ids to treat as wall; defaults to <code class="docutils literal notranslate"><span class="pre">[2]</span></code> (same dict options).</p></li>
+<li><p><strong>symm_slip_ids</strong> – PTY ids to treat as symmetry/slip; defaults to <code class="docutils literal notranslate"><span class="pre">[4]</span></code> (same dict options).</p></li>
+<li><p><strong>custom_bc_ids</strong> – Optional mapping of <code class="docutils literal notranslate"><span class="pre">group_name</span> <span class="pre">-&gt;</span> <span class="pre">[pty</span> <span class="pre">ids]</span></code> for any
+additional boundary-condition groupings (e.g., <code class="docutils literal notranslate"><span class="pre">{&quot;cooling&quot;:</span> <span class="pre">[500]}</span></code>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A dictionary with keys:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">face_matches</span></code>: list of face-pair dictionaries for connected blocks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">all_surfaces</span></code>: list of faces on the exterior (no neighbor).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ungrouped_surfaces</span></code>: exterior faces whose PTY does not belong to any BC group.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bc_group</span></code>: mapping of bc name to a metadata dict
+<code class="docutils literal notranslate"><span class="pre">{&quot;type&quot;:</span> <span class="pre">base_type,</span> <span class="pre">&quot;pty_ids&quot;:</span> <span class="pre">[...],</span> <span class="pre">&quot;faces&quot;:</span> <span class="pre">[...]}</span></code>. Each
+face dict also includes <code class="docutils literal notranslate"><span class="pre">bc_name</span></code> (group label) and <code class="docutils literal notranslate"><span class="pre">bc_type</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gif_faces</span></code>: list of faces tagged as GIF (pty 12..21 or 1000).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodic_faces</span></code>: list of paired periodic faces (pty 3).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">volume_zones</span></code>: list describing volume zone type per superblock.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">blocksizes</span></code>: list of per-superblock cell counts (I*J*K).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">patches</span></code>: pandas DataFrame of raw patch records.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)">object</a>]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Basic usage with defaults:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">read_gridpro_connectivity</span><span class="p">(</span><span class="s2">&quot;connectivity.dat&quot;</span><span class="p">)</span>
+<span class="n">inlet_faces</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;bc_group&quot;</span><span class="p">][</span><span class="s2">&quot;inlet&quot;</span><span class="p">][</span><span class="s2">&quot;faces&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Override built-in BC ids and add a custom group:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">read_gridpro_connectivity</span><span class="p">(</span>
+    <span class="s2">&quot;connectivity.dat&quot;</span><span class="p">,</span>
+    <span class="n">inlet_ids</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">105</span><span class="p">],</span>
+    <span class="n">custom_bc_ids</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cooling_hole1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">500</span><span class="p">]},</span>
+<span class="p">)</span>
+<span class="n">cooling_faces</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;bc_group&quot;</span><span class="p">][</span><span class="s2">&quot;cooling_hole1&quot;</span><span class="p">][</span><span class="s2">&quot;faces&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot3d.gridpro.import_functions.bc_faces_by_type">
+<span class="sig-prename descclassname"><span class="pre">plot3d.gridpro.import_functions.</span></span><span class="sig-name descname"><span class="pre">bc_faces_by_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bc_group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/plot3d/gridpro/import_functions.html#bc_faces_by_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.gridpro.import_functions.bc_faces_by_type" title="Link to this definition"></a></dt>
+<dd><p>Collect faces for a specific boundary-condition type across all named groups.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bc_group</strong> – Mapping returned by <a class="reference internal" href="#plot3d.gridpro.import_functions.read_gridpro_connectivity" title="plot3d.gridpro.import_functions.read_gridpro_connectivity"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_gridpro_connectivity()</span></code></a> (supports
+both the legacy <code class="docutils literal notranslate"><span class="pre">{name:</span> <span class="pre">[faces]}</span></code> and the new
+<code class="docutils literal notranslate"><span class="pre">{name:</span> <span class="pre">{&quot;type&quot;:</span> <span class="pre">...,</span> <span class="pre">&quot;faces&quot;:</span> <span class="pre">[...]}}</span></code> shapes).</p></li>
+<li><p><strong>bc_type</strong> – Base BC type (<code class="docutils literal notranslate"><span class="pre">&quot;inlet&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;outlet&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;wall&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;symm_slip&quot;</span></code>).</p></li>
+<li><p><strong>unique</strong> – When True, keep only the first face per unique <code class="docutils literal notranslate"><span class="pre">id</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of face dictionaries belonging to the requested base type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="glennht.html" class="btn btn-neutral float-left" title="GlennHT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pointwise.html" class="btn btn-neutral float-right" title="Pointwise" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

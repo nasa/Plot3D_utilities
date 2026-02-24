@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plot3d.glennht.class_definitions &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plot3d.glennht.class_definitions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plot3d.glennht.class_definitions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># glennht_export_classes.py</span>
+<span class="sd">&quot;&quot;&quot;Dataclass and enum definitions for GlennHT boundary condition and job configuration.</span>
+
+<span class="sd">This module mirrors the C# class hierarchy used by GlennHT and provides</span>
+<span class="sd">Python dataclasses for boundary conditions, job control parameters, scheme</span>
+<span class="sd">settings, gas properties, and reference conditions.  These definitions are</span>
+<span class="sd">consumed by the export functions in ``export_functions.py``.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span><span class="p">,</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Enums (mirror your C#)</span>
+<span class="c1"># ----------------------------</span>
+<div class="viewcode-block" id="BoundaryConditionType">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.BoundaryConditionType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BoundaryConditionType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Top-level boundary condition category.&quot;&quot;&quot;</span>
+    <span class="n">Inlet</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">Outlet</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">SymmetryOrSlip</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">Wall</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">GIF</span> <span class="o">=</span> <span class="mi">1000</span></div>
+
+
+<div class="viewcode-block" id="InletBC_Subtype">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.InletBC_Subtype">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InletBC_Subtype</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Inlet boundary condition sub-classification.&quot;&quot;&quot;</span>
+    <span class="n">Normal</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">AngleSpecified</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">AngleAndProfileSpecified</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="InletBC_Direction">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.InletBC_Direction">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InletBC_Direction</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Flow direction convention for inlet boundary conditions.&quot;&quot;&quot;</span>
+    <span class="n">Something</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">Annular</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">Cascade</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="OutletSubtype">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.OutletSubtype">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OutletSubtype</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Outlet boundary condition sub-classification.&quot;&quot;&quot;</span>
+    <span class="n">UniformPressure</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">AveragePressure</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">UnsteadyFlow</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+<div class="viewcode-block" id="SymmetricSlipSubtype">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.SymmetricSlipSubtype">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SymmetricSlipSubtype</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sub-type for symmetry or slip-wall boundary conditions.&quot;&quot;&quot;</span>
+    <span class="n">Symmetry</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">Slip</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="WallSubtype">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.WallSubtype">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WallSubtype</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wall thermal boundary condition sub-type.&quot;&quot;&quot;</span>
+    <span class="n">SpecifiedWallHeatFlux</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">SpecifiedWallTemperature</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">BCWall_Subtype_Conjugate</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="GIFCoordinate">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.GIFCoordinate">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GIFCoordinate</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coordinate system used for General Interface (GIF) interpolation.&quot;&quot;&quot;</span>
+    <span class="n">Cartesian</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">Polar</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="GIFType">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.GIFType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GIFType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolation strategy for a General Interface patch.&quot;&quot;&quot;</span>
+    <span class="n">Conjugate</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">StraightInterpolation</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+<div class="viewcode-block" id="GIFOrder">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.GIFOrder">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GIFOrder</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Polynomial order used for GIF interpolation.&quot;&quot;&quot;</span>
+    <span class="n">ZeroOrder</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">LinearOrder</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">CubicOrder</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="TbModelType">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.TbModelType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TbModelType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Turbulence model selector.&quot;&quot;&quot;</span>
+    <span class="n">NO_TURB_MODEL</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">K_OMEGA_TURB_MODEL</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">K_EPS_TURB_MODEL</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">ARSM_TURB_MODEL</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RSM_TURB_MODEL</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">SST_TURB_MODEL</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">LES_TURB_MODEL</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">WL_KOMEGA_TURB_MODEL</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">K_OMEGA_GAMMA_TURB_MODEL</span> <span class="o">=</span> <span class="mi">12</span></div>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Base + concrete BCs</span>
+<span class="c1"># ----------------------------</span>
+<div class="viewcode-block" id="BoundaryCondition">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.BoundaryCondition">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BoundaryCondition</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all GlennHT boundary conditions.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        BCType: High-level boundary condition category.</span>
+<span class="sd">        SurfaceID: Integer surface identifier used in the connectivity file.</span>
+<span class="sd">        Name: Human-readable label written as a comment in the ``.bcs`` file.</span>
+<span class="sd">        IsPostProcessing: When True, marks the surface as a post-processing</span>
+<span class="sd">            reference surface (``BRefCond=T`` in the namelist).</span>
+<span class="sd">        IsCalculateMassFlow: When True, requests mass-flow calculation on this</span>
+<span class="sd">            surface (``BCalc=T``).</span>
+<span class="sd">        ToggleProcessSurface: Alternative flag that also sets ``BCalc=T``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">BCType</span><span class="p">:</span> <span class="n">BoundaryConditionType</span>
+    <span class="n">SurfaceID</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">Name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">IsPostProcessing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">IsCalculateMassFlow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">ToggleProcessSurface</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="InletBC">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.InletBC">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InletBC</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Inlet boundary condition with optional profile and annular geometry.</span>
+
+<span class="sd">    Physical pressure and temperature values are supplied in user-specified</span>
+<span class="sd">    units; the exporter normalizes them by the reference conditions before</span>
+<span class="sd">    writing the namelist.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        inlet_subType: Selects how the flow angle is specified.</span>
+<span class="sd">        surfID_inlet: Surface ID echoed inside the ``INLET_BC`` namelist block.</span>
+<span class="sd">        inlet_ref_Mach_Nr: Reference Mach number at the inlet.</span>
+<span class="sd">        T0_const: Total temperature in Kelvin; normalized by ``refT0`` on export.</span>
+<span class="sd">        P0_const: Total pressure in the units given by ``P0_const_unit``;</span>
+<span class="sd">            normalized by ``refP0`` on export.</span>
+<span class="sd">        P0_const_unit: Unit string for ``P0_const`` (e.g. ``&quot;Pa&quot;``, ``&quot;bar&quot;``).</span>
+<span class="sd">            Not written to the namelist.</span>
+<span class="sd">        Tu_const: Turbulence intensity.</span>
+<span class="sd">        Ts_const: Turbulent length scale; normalized by ``reflen`` on export.</span>
+<span class="sd">        ang1_const: Flow angle (primary).</span>
+<span class="sd">        bet1_const: Flow angle (secondary).</span>
+<span class="sd">        annular_inlet: Enable annular inlet geometry.</span>
+<span class="sd">        deltah: Hub delta height for annular geometry.</span>
+<span class="sd">        deltat: Tip delta height for annular geometry.</span>
+<span class="sd">        twall_hub: Hub wall temperature; normalized by ``refT0`` on export.</span>
+<span class="sd">        twall_case: Casing wall temperature; normalized by ``refT0`` on export.</span>
+<span class="sd">        have_inlet_prof: Whether a profile file is provided.</span>
+<span class="sd">        filen_inlet_profile: Path to the inlet profile file.</span>
+<span class="sd">        direction: Optional flow direction convention.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">inlet_subType</span><span class="p">:</span> <span class="n">InletBC_Subtype</span> <span class="o">=</span> <span class="n">InletBC_Subtype</span><span class="o">.</span><span class="n">Normal</span>
+    <span class="n">surfID_inlet</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">inlet_ref_Mach_Nr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+
+    <span class="n">T0_const</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>      <span class="c1"># K (will be normalized by refT0)</span>
+    <span class="n">P0_const</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>      <span class="c1"># physical input + unit → normalized</span>
+    <span class="n">P0_const_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Pa&quot;</span>             <span class="c1"># NOT exported (used only for conversion)</span>
+    <span class="n">Tu_const</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">Ts_const</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ang1_const</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">bet1_const</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">annular_inlet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">deltah</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">deltat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">twall_hub</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">twall_case</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">have_inlet_prof</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">filen_inlet_profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">direction</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">InletBC_Direction</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="OutletBC">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.OutletBC">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OutletBC</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Outlet boundary condition with back-pressure specification.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        outlet_subType: Selects how the back-pressure is applied.</span>
+<span class="sd">        surfID_outlet: Surface ID echoed inside the ``OUTLET_BC`` namelist.</span>
+<span class="sd">        extrapolation_order: Order of extrapolation at the outlet patch.</span>
+<span class="sd">        Pback_extrapolate_profile: Use a radial profile for back-pressure</span>
+<span class="sd">            extrapolation when True.</span>
+<span class="sd">        Pback_const: Back-pressure in the units given by ``Pback_const_unit``;</span>
+<span class="sd">            normalized by ``refP0`` on export.</span>
+<span class="sd">        Pback_const_unit: Unit string for ``Pback_const``.  Not written to the</span>
+<span class="sd">            namelist.</span>
+<span class="sd">        have_Pback_prof: Whether a back-pressure profile file is provided.</span>
+<span class="sd">        annular_outlet: Enable annular outlet geometry.</span>
+<span class="sd">        approx_Mach_out: Approximate exit Mach number (used for averaging).</span>
+<span class="sd">        filen_Pback_prof: Path to the back-pressure profile file.</span>
+<span class="sd">        mult_for_full_ring: Multiplier mapping a sector to the full annulus.</span>
+<span class="sd">        p_over_pt_ratio_limit: Lower bound on static-to-total pressure ratio.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">outlet_subType</span><span class="p">:</span> <span class="n">OutletSubtype</span> <span class="o">=</span> <span class="n">OutletSubtype</span><span class="o">.</span><span class="n">UniformPressure</span>
+    <span class="n">surfID_outlet</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">extrapolation_order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">Pback_extrapolate_profile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">Pback_const</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">Pback_const_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Pa&quot;</span>          <span class="c1"># NOT exported</span>
+    <span class="n">have_Pback_prof</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">annular_outlet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">approx_Mach_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">filen_Pback_prof</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">mult_for_full_ring</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">p_over_pt_ratio_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SymmetricSlipBC">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.SymmetricSlipBC">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SymmetricSlipBC</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Symmetry or slip-wall boundary condition.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        surfID_symmetricSlip: Surface ID echoed inside the ``SLIP_BC`` namelist.</span>
+<span class="sd">        slip_subType: Distinguishes a true symmetry plane from a slip wall.</span>
+<span class="sd">        slip_omega: Rotational speed (rad/s) for a moving slip wall.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">surfID_symmetricSlip</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">slip_subType</span><span class="p">:</span> <span class="n">SymmetricSlipSubtype</span> <span class="o">=</span> <span class="n">SymmetricSlipSubtype</span><span class="o">.</span><span class="n">Slip</span>
+    <span class="n">slip_omega</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="WallBC">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.WallBC">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WallBC</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Viscous wall boundary condition with optional heat-flux or temperature profile.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        wall_subType: Thermal treatment applied at the wall.</span>
+<span class="sd">        surfID_wall: Surface ID echoed inside the ``WALL_BC`` namelist.</span>
+<span class="sd">        Twall_const: Constant wall temperature (K).</span>
+<span class="sd">        have_Twall_prof: Whether a wall-temperature profile file is provided.</span>
+<span class="sd">        filen_Twall_prof: Path to the wall-temperature profile file.</span>
+<span class="sd">        Qwall_const: Constant wall heat flux (W/m²); defaults to adiabatic (0).</span>
+<span class="sd">        have_Qwall_prof: Whether a wall heat-flux profile file is provided.</span>
+<span class="sd">        filen_Qwall_prof: Path to the wall heat-flux profile file.</span>
+<span class="sd">        BEM_coupled_surf: Enable BEM conjugate coupling on this surface.</span>
+<span class="sd">        Nr_wall_segments: Number of wall segments for BEM coupling.</span>
+<span class="sd">        segment_Omega: Rotational speed (rad/s) of the wall segment.</span>
+<span class="sd">        segment_xMin: Axial start position of the rotating segment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wall_subType</span><span class="p">:</span> <span class="n">WallSubtype</span> <span class="o">=</span> <span class="n">WallSubtype</span><span class="o">.</span><span class="n">SpecifiedWallHeatFlux</span>
+    <span class="n">surfID_wall</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">Twall_const</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">have_Twall_prof</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">filen_Twall_prof</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">Qwall_const</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">have_Qwall_prof</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">filen_Qwall_prof</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">BEM_coupled_surf</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">Nr_wall_segments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">segment_Omega</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">segment_xMin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="GIF">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.GIF">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GIF</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;General Interface (GIF) patch pair linking two non-conformal surfaces.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        GIFSurface1: Surface ID of the first GIF patch.</span>
+<span class="sd">        GIFSurface2: Surface ID of the second GIF patch.</span>
+<span class="sd">        Name1: Label for the first GIF surface.</span>
+<span class="sd">        Name2: Label for the second GIF surface.</span>
+<span class="sd">        Coordinates: Coordinate system used during interpolation.</span>
+<span class="sd">        Type: Interpolation type applied across the interface.</span>
+<span class="sd">        Order: Polynomial order of the interpolation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">GIFSurface1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">GIFSurface2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">Name1</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">Name2</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">Coordinates</span><span class="p">:</span> <span class="n">GIFCoordinate</span> <span class="o">=</span> <span class="n">GIFCoordinate</span><span class="o">.</span><span class="n">Cartesian</span>
+    <span class="n">Type</span><span class="p">:</span> <span class="n">GIFType</span> <span class="o">=</span> <span class="n">GIFType</span><span class="o">.</span><span class="n">Conjugate</span>
+    <span class="n">Order</span><span class="p">:</span> <span class="n">GIFOrder</span> <span class="o">=</span> <span class="n">GIFOrder</span><span class="o">.</span><span class="n">LinearOrder</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BCType</span> <span class="o">=</span> <span class="n">BoundaryConditionType</span><span class="o">.</span><span class="n">GIF</span></div>
+
+
+<div class="viewcode-block" id="BCGroup">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.BCGroup">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BCGroup</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Container grouping all boundary condition lists for a single case.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        Inlets: All inlet boundary conditions.</span>
+<span class="sd">        Outlets: All outlet boundary conditions.</span>
+<span class="sd">        SymmetricSlips: All symmetry and slip-wall boundary conditions.</span>
+<span class="sd">        Walls: All viscous wall boundary conditions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Inlets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">InletBC</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">Outlets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">OutletBC</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">SymmetricSlips</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SymmetricSlipBC</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">Walls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">WallBC</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span></div>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Job structures (mirror C#)</span>
+<span class="c1"># ----------------------------</span>
+<div class="viewcode-block" id="JobFiles">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.JobFiles">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobFiles</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;File path settings for all GlennHT input and output files.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        DcmpFILE: Domain decomposition file.</span>
+<span class="sd">        ConnFILE: Block connectivity file (``.ght_conn``).</span>
+<span class="sd">        BCSpecFILE: Boundary condition specification file (``.bcs``).</span>
+<span class="sd">        GridFile: Plot3D mesh file.</span>
+<span class="sd">        GridFileFormat: Format of the grid file (``&quot;formatted&quot;`` or</span>
+<span class="sd">            ``&quot;unformatted&quot;``).</span>
+<span class="sd">        Plot3DFileFormat: Format of Plot3D solution files.</span>
+<span class="sd">        SolnInFile: Restart solution file read at startup.</span>
+<span class="sd">        SolnInFileFormat: Format of the restart file.</span>
+<span class="sd">        SolnOutFile: Solution file written at the end of the run.</span>
+<span class="sd">        SolnOutFileFormat: Format of the output solution file.</span>
+<span class="sd">        residFILE: Residual history file with sub-iterations.</span>
+<span class="sd">        residFILE2: Residual history file without sub-iterations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DcmpFILE</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ddcmp.dat&quot;</span>
+    <span class="n">ConnFILE</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;connectivity.ght_conn&quot;</span>
+    <span class="n">BCSpecFILE</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;boundary_conditions.bcs&quot;</span>
+    <span class="n">GridFile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mesh.xyz&quot;</span>
+    <span class="n">GridFileFormat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;formatted&quot;</span>
+    <span class="n">Plot3DFileFormat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;formatted&quot;</span>
+    <span class="n">SolnInFile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;In.soln&quot;</span>
+    <span class="n">SolnInFileFormat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unformatted&quot;</span>
+    <span class="n">SolnOutFile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Out.soln&quot;</span>
+    <span class="n">SolnOutFileFormat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unformatted&quot;</span>
+    <span class="n">residFILE</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;his.subs&quot;</span>
+    <span class="n">residFILE2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;his.nosubs&quot;</span></div>
+
+
+<div class="viewcode-block" id="JobControl">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.JobControl">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobControl</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;High-level solver execution controls.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        mRunLevel: Solver run level (0 = normal solve).</span>
+<span class="sd">        LUNout: Fortran logical unit number for screen output.</span>
+<span class="sd">        RestartSoln: Read a restart solution when True.</span>
+<span class="sd">        SaveSoln: Write the final solution when True.</span>
+<span class="sd">        SaveTransientSoln: Save transient solution snapshots when True.</span>
+<span class="sd">        VerboseScreenOutput: Enable verbose logging to screen when True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mRunLevel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">LUNout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">RestartSoln</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">SaveSoln</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">SaveTransientSoln</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">VerboseScreenOutput</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="TurbModelInput">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.TurbModelInput">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TurbModelInput</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Turbulence model selection and resolution parameters.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        TbModelType: Turbulence model to activate.</span>
+<span class="sd">        PRNS_ResolutionParameter: Near-wall resolution parameter used by some</span>
+<span class="sd">            models.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">TbModelType</span><span class="p">:</span> <span class="n">TbModelType</span> <span class="o">=</span> <span class="n">TbModelType</span><span class="o">.</span><span class="n">K_OMEGA_TURB_MODEL</span>
+    <span class="n">PRNS_ResolutionParameter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+
+<div class="viewcode-block" id="Plot3DParameters">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.Plot3DParameters">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Plot3DParameters</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot3D output parameter set selection.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        Plot3DParameterSet: Named set controlling which flow variables are</span>
+<span class="sd">            written to the Plot3D solution file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Plot3DParameterSet</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Standard&quot;</span></div>
+
+
+<div class="viewcode-block" id="InitialCond">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.InitialCond">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InitialCond</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Non-dimensional initial flow conditions for the entire domain.</span>
+
+<span class="sd">    All values are non-dimensional (normalized by the reference quantities</span>
+<span class="sd">    defined in ``ReferenceCond``).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        P0: Initial total pressure ratio.</span>
+<span class="sd">        T0: Initial total temperature ratio.</span>
+<span class="sd">        Minit: Initial Mach number.</span>
+<span class="sd">        alfa: Initial flow angle (primary).</span>
+<span class="sd">        beta: Initial flow angle (secondary).</span>
+<span class="sd">        Tu: Initial turbulence intensity.</span>
+<span class="sd">        Ts: Initial turbulent length scale.</span>
+<span class="sd">        T0_solid: Initial solid-region temperature ratio.</span>
+<span class="sd">        annular_init: Annular geometry initialization parameter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">P0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">T0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">Minit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">alfa</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">Tu</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.05</span>
+    <span class="n">Ts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.05</span>
+    <span class="n">T0_solid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">annular_init</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+
+
+<div class="viewcode-block" id="TimeStpControl">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.TimeStpControl">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TimeStpControl</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Time-stepping and convergence controls.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        UnsteadyFlow: Enable time-accurate (unsteady) mode.</span>
+<span class="sd">        FullyImplicitDiscr: Use fully implicit temporal discretization.</span>
+<span class="sd">        EulerBackward: Use first-order backward Euler time integration.</span>
+<span class="sd">        CranckNicholson: Use Crank-Nicolson (second-order) time integration.</span>
+<span class="sd">        BlendedTime: Blend explicit and implicit time contributions.</span>
+<span class="sd">        TransientPlot3dFiles: Write Plot3D files at each physical time step.</span>
+<span class="sd">        have_previous_step: Indicates a previous time-step solution exists.</span>
+<span class="sd">        UseLowMPrecond: Enable low-Mach preconditioning.</span>
+<span class="sd">        pcMinRefMach: Minimum reference Mach for preconditioning.</span>
+<span class="sd">        dissRefMach: Reference Mach number for artificial dissipation scaling.</span>
+<span class="sd">        Implicitness: Blending factor between explicit (0) and implicit (1).</span>
+<span class="sd">        dt_unst: Physical time step size (seconds) for unsteady runs.</span>
+<span class="sd">        CFLn: CFL number for normal time advancement.</span>
+<span class="sd">        CFLr: CFL number for residual smoothing.</span>
+<span class="sd">        cst: Courant-number-like constant for the fluid solver.</span>
+<span class="sd">        cst_solid: Courant-number-like constant for the solid solver.</span>
+<span class="sd">        convergTolerance: Convergence criterion on the L2 residual.</span>
+<span class="sd">        nTimeSteps: Total number of physical time steps.</span>
+<span class="sd">        maxPseudoSteps: Maximum pseudo (inner) iterations per time step for</span>
+<span class="sd">            fluid.</span>
+<span class="sd">        maxPseudoSteps_solid: Maximum pseudo iterations per time step for</span>
+<span class="sd">            solid.</span>
+<span class="sd">        fully_coupled_solid: Solve fluid and solid simultaneously when True.</span>
+<span class="sd">        ReinitializeTime: Reset the physical time counter when True.</span>
+<span class="sd">        ResetTimeTo: Physical time value to reset to when ``ReinitializeTime``</span>
+<span class="sd">            is True.</span>
+<span class="sd">        nTransBegin: Physical time step index at which to start writing</span>
+<span class="sd">            transient files.</span>
+<span class="sd">        nfiles: Number of transient Plot3D snapshots to write.</span>
+<span class="sd">        ninterval: Interval (in time steps) between transient snapshots.</span>
+<span class="sd">        nHL: Number of harmonic levels for harmonic balance runs.</span>
+<span class="sd">        time_avg_start: Start time for time-averaging.</span>
+<span class="sd">        time_avg_end: End time for time-averaging.</span>
+<span class="sd">        restart_timeAvg: Restart time-averaging from zero when True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">UnsteadyFlow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">FullyImplicitDiscr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">EulerBackward</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">CranckNicholson</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">BlendedTime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">TransientPlot3dFiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">have_previous_step</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">UseLowMPrecond</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">pcMinRefMach</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0e-3</span>
+    <span class="n">dissRefMach</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0e-3</span>
+    <span class="n">Implicitness</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">dt_unst</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0e-8</span>
+    <span class="n">CFLn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">CFLr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.125</span>
+    <span class="n">cst</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.5</span>
+    <span class="n">cst_solid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">7.0</span>
+    <span class="n">convergTolerance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5e-5</span>
+    <span class="n">nTimeSteps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">maxPseudoSteps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">maxPseudoSteps_solid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">fully_coupled_solid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">ReinitializeTime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">ResetTimeTo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">nTransBegin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">nfiles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">ninterval</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">nHL</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">time_avg_start</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">time_avg_end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">restart_timeAvg</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SPDSchemeControl">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.SPDSchemeControl">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SPDSchemeControl</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Spatial discretization (SPD) scheme and artificial dissipation controls.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        NS_Central: Central-difference stencil flags for Navier-Stokes (e.g.</span>
+<span class="sd">            ``&quot;4*T&quot;``).</span>
+<span class="sd">        TB2_Upwind1: First-order upwind flags for two-equation turbulence.</span>
+<span class="sd">        NS_Upwind2: Second-order upwind flags for Navier-Stokes.</span>
+<span class="sd">        ScalrCoeff_ArtDiss: Use scalar coefficients for artificial dissipation.</span>
+<span class="sd">        useSecDiffArtDiss: Include second-difference artificial dissipation.</span>
+<span class="sd">        useFrthDiffArtDiss: Include fourth-difference artificial dissipation.</span>
+<span class="sd">        rk2: Second-stage Runge-Kutta artificial dissipation coefficients.</span>
+<span class="sd">        rk4: Fourth-stage Runge-Kutta artificial dissipation coefficients.</span>
+<span class="sd">        NS_Upwind1: Enable first-order upwind for Navier-Stokes.</span>
+<span class="sd">        use_AUSM_Chima: Use Chima&#39;s AUSM flux scheme.</span>
+<span class="sd">        use_AUSM_Liou_hTot: Use Liou&#39;s AUSM+ scheme with total enthalpy.</span>
+<span class="sd">        TB2_Central: Central-difference for two-equation turbulence transport.</span>
+<span class="sd">        TBRSM_Central: Central-difference for RSM turbulence transport.</span>
+<span class="sd">        TBRSM_Upwind1: First-order upwind for RSM turbulence transport.</span>
+<span class="sd">        constArtDiss: Use constant artificial dissipation coefficients.</span>
+<span class="sd">        scalarArtDiss: Use scalar (non-matrix) artificial dissipation.</span>
+<span class="sd">        MatrxCoeff_ArtDiss: Use matrix coefficients for artificial dissipation.</span>
+<span class="sd">        secDiffArtDiss: Apply second-difference dissipation term.</span>
+<span class="sd">        matrixArtDiss: Apply matrix-valued artificial dissipation.</span>
+<span class="sd">        frthDiffArtDiss: Apply fourth-difference dissipation term.</span>
+<span class="sd">        MachCutOff: Mach number below which dissipation is clipped.</span>
+<span class="sd">        ivanAlbada: Van Albada limiter flag (1 = enabled).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># GlennHT-style defaults (with shorthand preserved)</span>
+    <span class="n">NS_Central</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;4*T&quot;</span>
+    <span class="n">TB2_Upwind1</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;4*T&quot;</span>
+    <span class="n">NS_Upwind2</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;4*F&quot;</span>
+
+    <span class="n">ScalrCoeff_ArtDiss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">useSecDiffArtDiss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">useFrthDiffArtDiss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">rk2</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;4*0.12500&quot;</span>
+    <span class="n">rk4</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;4*0.032&quot;</span>
+
+    <span class="c1"># Keep other optional fields from your previous version</span>
+    <span class="n">NS_Upwind1</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">use_AUSM_Chima</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">use_AUSM_Liou_hTot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">TB2_Central</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">TBRSM_Central</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">TBRSM_Upwind1</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">constArtDiss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">scalarArtDiss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">MatrxCoeff_ArtDiss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">secDiffArtDiss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">matrixArtDiss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">frthDiffArtDiss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">MachCutOff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">ivanAlbada</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="RKSchemeControl">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.RKSchemeControl">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RKSchemeControl</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Runge-Kutta time-marching scheme and implicit residual smoothing settings.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        nStages: Number of Runge-Kutta stages.</span>
+<span class="sd">        RKCoeff: Comma-separated stage coefficients.</span>
+<span class="sd">        compute_pdiff_in_stage: Per-stage flags for pressure-difference update.</span>
+<span class="sd">        compute_adiss_in_stage: Per-stage flags for artificial dissipation</span>
+<span class="sd">            update.</span>
+<span class="sd">        export_import_after_stage: Per-stage flags for halo exchange.</span>
+<span class="sd">        use_implicit_residual_smoothing: Enable implicit residual smoothing</span>
+<span class="sd">            (``&quot;.T.&quot;`` or ``&quot;.F.&quot;``).</span>
+<span class="sd">        irs_neqs: Number of equations smoothed implicitly.</span>
+<span class="sd">        irs_use_GS: Use Gauss-Seidel sweeps for implicit smoothing.</span>
+<span class="sd">        n_GS_iterations: Number of Gauss-Seidel iterations per stage.</span>
+<span class="sd">        n_GlobalSweeps: Number of global smoothing sweeps.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nStages</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">RKCoeff</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0.25,0.3333333,0.5,1.,6*0&quot;</span>
+    <span class="n">compute_pdiff_in_stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;T,T,T,T,6*F&quot;</span>
+    <span class="n">compute_adiss_in_stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;T,T,T,T,6*F&quot;</span>
+    <span class="n">export_import_after_stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;T,T,T,T,6*F&quot;</span>
+    <span class="n">use_implicit_residual_smoothing</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.T.&quot;</span>
+    <span class="n">irs_neqs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">irs_use_GS</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">n_GS_iterations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">n_GlobalSweeps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="MGSchemeControl">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.MGSchemeControl">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MGSchemeControl</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Multigrid scheme settings for fluid and solid solvers.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        FinestLevel: Index of the finest grid level (0 = original mesh).</span>
+<span class="sd">        CoarsestLevel: Index of the coarsest grid level.</span>
+<span class="sd">        pre_mg_sweeps: Pre-smoothing sweeps on each level.</span>
+<span class="sd">        mg_sweeps: Number of multigrid V-cycle sweeps.</span>
+<span class="sd">        post_mg_sweeps: Post-smoothing sweeps on each level.</span>
+<span class="sd">        SVFinestLevel: Finest level for the scalar variable (turbulence) solver.</span>
+<span class="sd">        SVCoarsestLevel: Coarsest level for the scalar variable solver.</span>
+<span class="sd">        SVpre_mg_sweeps: Pre-smoothing sweeps for the scalar variable solver.</span>
+<span class="sd">        SVmg_sweeps: Multigrid sweeps for the scalar variable solver.</span>
+<span class="sd">        SVpost_mg_sweeps: Post-smoothing sweeps for the scalar variable solver.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">FinestLevel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">CoarsestLevel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">pre_mg_sweeps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">mg_sweeps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">post_mg_sweeps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">SVFinestLevel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">SVCoarsestLevel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">SVpre_mg_sweeps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">SVmg_sweeps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">SVpost_mg_sweeps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="GasPropertiesInput">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.GasPropertiesInput">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GasPropertiesInput</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gas model and thermophysical property selections.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        UseDryAir: Use the built-in dry-air property model when True.</span>
+<span class="sd">        Use_const_Cp: Treat specific heat as constant when True.</span>
+<span class="sd">        Use_const_trProp: Use constant transport properties (mu, k) when True.</span>
+<span class="sd">        Use_RefT: Evaluate properties at a reference temperature when True.</span>
+<span class="sd">        RefT_Properties: Reference temperature (K) for property evaluation.</span>
+<span class="sd">        const_cp: Constant specific heat at constant pressure (J/kg/K).</span>
+<span class="sd">        const_visc: Constant dynamic viscosity (Pa·s).</span>
+<span class="sd">        const_kth: Constant thermal conductivity (W/m/K).</span>
+<span class="sd">        Use_specialGas: Enable a user-defined special gas model when True.</span>
+<span class="sd">        SpecialGasMW: Molecular weight (kg/kmol) of the special gas.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">UseDryAir</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">Use_const_Cp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">Use_const_trProp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">Use_RefT</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">RefT_Properties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0E+99</span>
+    <span class="n">const_cp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0E+99</span>
+    <span class="n">const_visc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0E+99</span>
+    <span class="n">const_kth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0E+99</span>
+    <span class="n">Use_specialGas</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">SpecialGasMW</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0E+99</span></div>
+
+
+<div class="viewcode-block" id="ReferenceCond">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.ReferenceCond">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReferenceCond</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compact non-dimensional reference condition block written to the job file.</span>
+
+<span class="sd">    This dataclass is derived by the exporter from ``ReferenceCondFull`` and</span>
+<span class="sd">    is not intended to be populated directly by the user.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        useDimensionalVariables: Solve in dimensional units when True.</span>
+<span class="sd">        refLen: Reference length (m).</span>
+<span class="sd">        refP0: Reference total pressure (Pa).</span>
+<span class="sd">        refT0: Reference total temperature (K).</span>
+<span class="sd">        refRho0: Reference density (kg/m³).</span>
+<span class="sd">        refVel: Reference velocity (m/s).</span>
+<span class="sd">        refVisc: Reference dynamic viscosity (Pa·s).</span>
+<span class="sd">        refCond: Reference thermal conductivity (W/m/K).</span>
+<span class="sd">        refCp: Reference specific heat at constant pressure (J/kg/K).</span>
+<span class="sd">        MolW: Molecular weight (kg/kmol).</span>
+<span class="sd">        RgasUnv: Universal gas constant (J/kmol/K).</span>
+<span class="sd">        Rgas: Specific gas constant (J/kg/K).</span>
+<span class="sd">        gamma: Ratio of specific heats.</span>
+<span class="sd">        Re: Reference Reynolds number.</span>
+<span class="sd">        Pr: Prandtl number.</span>
+<span class="sd">        ndVisc: Non-dimensional viscosity (typically 1.0).</span>
+<span class="sd">        ndCond: Non-dimensional thermal conductivity (typically 1.0).</span>
+<span class="sd">        Omegab: Blade rotational speed (rad/s).</span>
+<span class="sd">        ReScalingFactor: Factor applied to scale the Reynolds number.</span>
+<span class="sd">        rho_solid: Solid material density (kg/m³).</span>
+<span class="sd">        cond_solid: Solid thermal conductivity (W/m/K).</span>
+<span class="sd">        Csp_solid: Solid specific heat (J/kg/K).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Derived (not user input) — kept for export</span>
+    <span class="n">useDimensionalVariables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">refLen</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">refP0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">101325.0</span>  <span class="c1"># Pa (total)</span>
+    <span class="n">refT0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">300.0</span>
+    <span class="n">refRho0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.1765823</span>
+    <span class="n">refVel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">293.4588</span>
+    <span class="n">refVisc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.84e-5</span>
+    <span class="n">refCond</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02636</span>
+    <span class="n">refCp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1004.5784</span>
+    <span class="n">MolW</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">28.964</span>
+    <span class="n">RgasUnv</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">8314.4126</span>
+    <span class="n">Rgas</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">287.06023</span>
+    <span class="n">gamma</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.4</span>
+    <span class="n">Re</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.8765e7</span>
+    <span class="n">Pr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.706</span>
+    <span class="n">ndVisc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">ndCond</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">Omegab</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">ReScalingFactor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">rho_solid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cond_solid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">Csp_solid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ReferenceCondFull">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.ReferenceCondFull">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReferenceCondFull</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Authoritative, physics-derived reference condition set.</span>
+
+<span class="sd">    Populated by ``populate_reference_from_inputs`` and used as the source of</span>
+<span class="sd">    truth when constructing the compact ``ReferenceCond`` block.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        reflen: Reference length (m).</span>
+<span class="sd">        refP0: Reference total pressure (Pa).</span>
+<span class="sd">        refT0: Reference total temperature (K).</span>
+<span class="sd">        refrho0: Reference density (kg/m³).</span>
+<span class="sd">        refVel: Reference velocity (m/s).</span>
+<span class="sd">        refvisc: Reference dynamic viscosity (Pa·s).</span>
+<span class="sd">        refcond: Reference thermal conductivity (W/m/K).</span>
+<span class="sd">        refCp: Reference specific heat at constant pressure (J/kg/K).</span>
+<span class="sd">        MolW: Molecular weight (kg/kmol).</span>
+<span class="sd">        RgasUnv: Universal gas constant (J/kmol/K).</span>
+<span class="sd">        Rgas: Specific gas constant (J/kg/K).</span>
+<span class="sd">        gamma: Ratio of specific heats.</span>
+<span class="sd">        Re: Reference Reynolds number.</span>
+<span class="sd">        Pr: Prandtl number.</span>
+<span class="sd">        ndVisc: Non-dimensional viscosity (typically 1.0).</span>
+<span class="sd">        ndCond: Non-dimensional thermal conductivity (typically 1.0).</span>
+<span class="sd">        Omegab: Blade rotational speed (rad/s).</span>
+<span class="sd">        ReScalingFactor: Factor applied to scale the Reynolds number.</span>
+<span class="sd">        rho_solid: Solid material density (kg/m³).</span>
+<span class="sd">        cond_solid: Solid thermal conductivity (W/m/K).</span>
+<span class="sd">        csp_solid: Solid specific heat (J/kg/K).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># User-/physics-derived, authoritative</span>
+    <span class="n">reflen</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">refP0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">refT0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">refrho0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">refVel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">refvisc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">refcond</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">refCp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">MolW</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">RgasUnv</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">Rgas</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">gamma</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">Re</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">Pr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ndVisc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ndCond</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">Omegab</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ReScalingFactor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">rho_solid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cond_solid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">csp_solid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Job">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.class_definitions.Job">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Job</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Top-level container for all GlennHT job configuration sections.</span>
+
+<span class="sd">    Each field corresponds to a named Fortran namelist block that is written</span>
+<span class="sd">    by :func:`~plot3d.glennht.export_functions.export_to_job_file`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        JobFiles: Input/output file paths.</span>
+<span class="sd">        JobControl: Solver execution controls.</span>
+<span class="sd">        TurbModelInput: Turbulence model selection.</span>
+<span class="sd">        Plot3DParameters: Plot3D output parameter set.</span>
+<span class="sd">        InitialCond: Non-dimensional initial conditions.</span>
+<span class="sd">        TimeStpControl: Time-stepping and convergence parameters.</span>
+<span class="sd">        SPDSchemeControl: Spatial discretization and dissipation settings.</span>
+<span class="sd">        RKSchemeControl: Runge-Kutta scheme parameters.</span>
+<span class="sd">        MGSchemeControl: Multigrid scheme parameters.</span>
+<span class="sd">        GasPropertiesInput: Gas model and property selections.</span>
+<span class="sd">        ReferenceCondFull: Authoritative physics-derived reference quantities;</span>
+<span class="sd">            populated by :func:`~plot3d.glennht.export_functions.populate_reference_from_inputs`.</span>
+<span class="sd">        ReferenceCond: Compact reference condition block derived from</span>
+<span class="sd">            ``ReferenceCondFull`` by the exporter; ``None`` until populated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">JobFiles</span><span class="p">:</span> <span class="n">JobFiles</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">JobFiles</span><span class="p">)</span>
+    <span class="n">JobControl</span><span class="p">:</span> <span class="n">JobControl</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">JobControl</span><span class="p">)</span>
+    <span class="n">TurbModelInput</span><span class="p">:</span> <span class="n">TurbModelInput</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">TurbModelInput</span><span class="p">)</span>
+    <span class="n">Plot3DParameters</span><span class="p">:</span> <span class="n">Plot3DParameters</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Plot3DParameters</span><span class="p">)</span>
+    <span class="n">InitialCond</span><span class="p">:</span> <span class="n">InitialCond</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">InitialCond</span><span class="p">)</span>
+    <span class="n">TimeStpControl</span><span class="p">:</span> <span class="n">TimeStpControl</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">TimeStpControl</span><span class="p">)</span>
+    <span class="n">SPDSchemeControl</span><span class="p">:</span> <span class="n">SPDSchemeControl</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">SPDSchemeControl</span><span class="p">)</span>
+    <span class="n">RKSchemeControl</span><span class="p">:</span> <span class="n">RKSchemeControl</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">RKSchemeControl</span><span class="p">)</span>
+    <span class="n">MGSchemeControl</span><span class="p">:</span> <span class="n">MGSchemeControl</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">MGSchemeControl</span><span class="p">)</span>
+    <span class="n">GasPropertiesInput</span><span class="p">:</span> <span class="n">GasPropertiesInput</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">GasPropertiesInput</span><span class="p">)</span>
+
+    <span class="c1"># Only carry the FULL reference; compact RefCond will be derived by the exporter</span>
+    <span class="n">ReferenceCondFull</span><span class="p">:</span> <span class="n">ReferenceCondFull</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ReferenceCondFull</span><span class="p">)</span>
+
+    <span class="c1"># Filled/derived later by exporter (kept optional to avoid being &quot;input&quot;)</span>
+    <span class="n">ReferenceCond</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ReferenceCond</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<span class="c1"># VolumeZone placeholder (dict-like)</span>
+<span class="n">VolumeZone</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

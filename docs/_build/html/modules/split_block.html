@@ -1,101 +1,225 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html lang="en" data-content_root="../">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Splitting Blocks &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
-    <title>Splitting Blocks &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
-    
-    <script src="../_static/documentation_options.js?v=514bbfa0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Periodicity" href="periodicity.html" />
-    <link rel="prev" title="Write" href="write.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="periodicity.html" title="Periodicity"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="write.html" title="Write"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Splitting Blocks</a></li> 
-      </ul>
-    </div>  
+    <link rel="next" title="Utils" href="utils.html" />
+    <link rel="prev" title="Read" href="read.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read.html">Read</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Splitting Blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.split_block.Direction"><code class="docutils literal notranslate"><span class="pre">Direction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.split_block.Direction.i"><code class="docutils literal notranslate"><span class="pre">Direction.i</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.split_block.Direction.j"><code class="docutils literal notranslate"><span class="pre">Direction.j</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.split_block.Direction.k"><code class="docutils literal notranslate"><span class="pre">Direction.k</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.split_block.max_aspect_ratio"><code class="docutils literal notranslate"><span class="pre">max_aspect_ratio()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.split_block.split_blocks"><code class="docutils literal notranslate"><span class="pre">split_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Splitting Blocks</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/split_block.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="module-plot3d.split_block">
-<span id="splitting-blocks"></span><h1>Splitting Blocks<a class="headerlink" href="#module-plot3d.split_block" title="Link to this heading">¶</a></h1>
-<p>Split blocks is combination of help from Dave Rigby and Tim Beach</p>
+<span id="splitting-blocks"></span><h1>Splitting Blocks<a class="headerlink" href="#module-plot3d.split_block" title="Link to this heading"></a></h1>
+<p>Utilities for splitting structured multi-block grids into smaller blocks.</p>
+<p>This module provides functions and enumerations used to divide Plot3D structured
+blocks along a chosen index direction (i, j, or k) while preserving the
+greatest common divisor (GCD) of the parent block’s cell counts.  Maintaining
+the GCD ensures that all child blocks remain compatible with the same multi-grid
+hierarchy used by the solver.</p>
+<p>Credits: Dave Rigby and Tim Beach.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="plot3d.split_block.Direction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.split_block.</span></span><span class="sig-name descname"><span class="pre">Direction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/split_block.html#Direction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.split_block.Direction" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.split_block.</span></span><span class="sig-name descname"><span class="pre">Direction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/split_block.html#Direction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.split_block.Direction" title="Link to this definition"></a></dt>
+<dd><p>Enumeration of the three structured-grid index directions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.split_block.Direction.i">
+<span class="sig-name descname"><span class="pre">i</span></span><a class="headerlink" href="#plot3d.split_block.Direction.i" title="Link to this definition"></a></dt>
+<dd><p>First index direction (IMAX axis).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.split_block.Direction.j">
+<span class="sig-name descname"><span class="pre">j</span></span><a class="headerlink" href="#plot3d.split_block.Direction.j" title="Link to this definition"></a></dt>
+<dd><p>Second index direction (JMAX axis).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.split_block.Direction.k">
+<span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#plot3d.split_block.Direction.k" title="Link to this definition"></a></dt>
+<dd><p>Third index direction (KMAX axis).</p>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.split_block.max_aspect_ratio">
-<span class="sig-prename descclassname"><span class="pre">plot3d.split_block.</span></span><span class="sig-name descname"><span class="pre">max_aspect_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/split_block.html#max_aspect_ratio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.split_block.max_aspect_ratio" title="Link to this definition">¶</a></dt>
-<dd><p>Finds the maximum cell aspect ratio</p>
+<span class="sig-prename descclassname"><span class="pre">plot3d.split_block.</span></span><span class="sig-name descname"><span class="pre">max_aspect_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">jx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/split_block.html#max_aspect_ratio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.split_block.max_aspect_ratio" title="Link to this definition"></a></dt>
+<dd><p>Compute the maximum cell aspect ratio sampled at the block corners.</p>
+<p>The aspect ratio at each corner is estimated by comparing the edge lengths
+along the i, j, and k directions to their neighbours one cell inward.  The
+function samples all eight block corners and returns the largest ratio found.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>np.ndarray</em>) – 3 dimensional Array containing X values. X[i,j,k]</p></li>
-<li><p><strong>Y</strong> (<em>np.ndarray</em>) – 3 dimensional Array containing X values. X[i,j,k]</p></li>
-<li><p><strong>Z</strong> (<em>np.ndarray</em>) – 3 dimensional Array containing X values. X[i,j,k]</p></li>
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – 3-D array of x-coordinates indexed as <code class="docutils literal notranslate"><span class="pre">X[i,</span> <span class="pre">j,</span> <span class="pre">k]</span></code>.</p></li>
+<li><p><strong>Y</strong> (<em>np.ndarray</em>) – 3-D array of y-coordinates indexed as <code class="docutils literal notranslate"><span class="pre">Y[i,</span> <span class="pre">j,</span> <span class="pre">k]</span></code>.</p></li>
+<li><p><strong>Z</strong> (<em>np.ndarray</em>) – 3-D array of z-coordinates indexed as <code class="docutils literal notranslate"><span class="pre">Z[i,</span> <span class="pre">j,</span> <span class="pre">k]</span></code>.</p></li>
+<li><p><strong>ix</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Size of the i-dimension (unused; inferred from <code class="docutils literal notranslate"><span class="pre">X.shape</span></code>).</p></li>
+<li><p><strong>jx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Size of the j-dimension (unused; inferred from <code class="docutils literal notranslate"><span class="pre">X.shape</span></code>).</p></li>
+<li><p><strong>kx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Size of the k-dimension (unused; inferred from <code class="docutils literal notranslate"><span class="pre">X.shape</span></code>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Maximum value of aspect ratio</p>
+<dd class="field-even"><p>Maximum aspect ratio across all sampled corner cells.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="plot3d.split_block.split_blocks">
-<span class="sig-prename descclassname"><span class="pre">plot3d.split_block.</span></span><span class="sig-name descname"><span class="pre">split_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncells_per_block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.split_block.Direction" title="plot3d.split_block.Direction"><span class="pre">Direction</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/split_block.html#split_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.split_block.split_blocks" title="Link to this definition">¶</a></dt>
-<dd><p>Split blocks is used to divide an array of blocks based on number of cells per block. This code maintains the greatest common denominator of the parent block. Number of cells per block is simply an estimate of how many you want. The actual number will change to meet the greatest common denominator (GCD). GCD of 4 means multigrid of 3 e.g. grid/4 (coarse), 2 (fine), and 1 (finest). If a direction is not specified then for each block the longest index either i,j, or k is used.</p>
-<blockquote>
-<div><dl>
-<dt>Wisdom from Dave Rigby:</dt><dd><p>For example, for radial equilibrium we must integrate across the span.  Some codes (GlennHT used to) would want a single block across the entire span.  In that case you would want some additional control.</p>
-<p>Another example might be if you would like a block to include the entire boundary layer.  In that case you might introduce an aspect ratio control.</p>
-</dd>
-</dl>
-</div></blockquote>
+<span class="sig-prename descclassname"><span class="pre">plot3d.split_block.</span></span><span class="sig-name descname"><span class="pre">split_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncells_per_block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plot3d.split_block.Direction" title="plot3d.split_block.Direction"><span class="pre">Direction</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/split_block.html#split_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.split_block.split_blocks" title="Link to this definition"></a></dt>
+<dd><p>Divide a list of structured blocks so that each child has roughly the target cell count.</p>
+<p>The split preserves the greatest common divisor (GCD) of the parent block’s
+cell counts so that all child blocks remain compatible with the same
+multi-grid hierarchy.  For example, a GCD of 4 supports three multigrid
+levels: grid/4 (coarse), grid/2 (medium), and grid/1 (finest).</p>
+<p><code class="docutils literal notranslate"><span class="pre">ncells_per_block</span></code> is a target, not a guarantee.  The actual count is
+adjusted to the nearest value that satisfies the GCD constraint.  Blocks
+whose total cell count is already at or below <code class="docutils literal notranslate"><span class="pre">ncells_per_block</span></code> are
+passed through unchanged.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Wisdom from Dave Rigby: additional controls such as integrating across
+the full span (radial equilibrium) or keeping the entire boundary layer
+inside a single block may require overriding the automatic direction
+selection via the <code class="docutils literal notranslate"><span class="pre">direction</span></code> argument.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – List of blocks</p></li>
-<li><p><strong>ncells_per_block</strong> (<em>int</em>) – number of cells desired per block</p></li>
-<li><p><strong>direction</strong> (<a class="reference internal" href="#plot3d.split_block.Direction" title="plot3d.split_block.Direction"><em>Direction</em></a>) – direction to split the blocks in. Direction.(i,j,k). Defaults to None. None means it will pick the direction for you based on which is greater IMAX, JMAX, or KMAX</p></li>
+<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – Input list of structured Plot3D blocks to split.</p></li>
+<li><p><strong>ncells_per_block</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Approximate target number of cells per child
+block after splitting.</p></li>
+<li><p><strong>direction</strong> (<a class="reference internal" href="#plot3d.split_block.Direction" title="plot3d.split_block.Direction"><em>Direction</em></a><em>, </em><em>optional</em>) – Index direction along which to split
+every block.  When <code class="docutils literal notranslate"><span class="pre">None</span></code> (the default), the direction with the
+largest index size (IMAX, JMAX, or KMAX) is chosen automatically
+for each block.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of blocks split in the specified direction</p>
+<dd class="field-even"><p>New list of blocks after splitting.  Blocks that were
+already smaller than <code class="docutils literal notranslate"><span class="pre">ncells_per_block</span></code> are included unmodified.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Blocks (List[<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block">Block</a>])</p>
+<dd class="field-odd"><p>List[<a class="reference internal" href="block.html#plot3d.block.Block" title="plot3d.block.Block">Block</a>]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If no valid GCD-preserving step size can be found for a
+    block in either the forward or backward search direction.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -103,77 +227,34 @@
 </section>
 
 
-            <div class="clearer"></div>
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="../index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Splitting Blocks</a><ul>
-<li><a class="reference internal" href="#plot3d.split_block.Direction"><code class="docutils literal notranslate"><span class="pre">Direction</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.split_block.max_aspect_ratio"><code class="docutils literal notranslate"><span class="pre">max_aspect_ratio()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.split_block.split_blocks"><code class="docutils literal notranslate"><span class="pre">split_blocks()</span></code></a></li>
-</ul>
-</li>
-</ul>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="read.html" class="btn btn-neutral float-left" title="Read" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="utils.html" class="btn btn-neutral float-right" title="Utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
   </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="write.html"
-                          title="previous chapter">Write</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="periodicity.html"
-                          title="next chapter">Periodicity</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/modules/split_block.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="periodicity.html" title="Periodicity"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="write.html" title="Write"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Splitting Blocks</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
-    </div>
-  </body>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

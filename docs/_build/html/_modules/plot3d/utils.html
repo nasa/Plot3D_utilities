@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plot3d.utils &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plot3d.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plot3d.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Shared utility functions for the plot3d library.</span>
+
+<span class="sd">Provides common helpers used across connectivity, periodicity, and verification</span>
+<span class="sd">modules, including distance calculations, face key generation, index scaling,</span>
+<span class="sd">and corner enumeration.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span>
+
+
+<div class="viewcode-block" id="euclidean_distance">
+<a class="viewcode-back" href="../../modules/utils.html#plot3d.utils.euclidean_distance">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">euclidean_distance</span><span class="p">(</span><span class="n">x1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                       <span class="n">x2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Euclidean distance between two 3D points.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x1: X coordinate of point 1.</span>
+<span class="sd">        y1: Y coordinate of point 1.</span>
+<span class="sd">        z1: Z coordinate of point 1.</span>
+<span class="sd">        x2: X coordinate of point 2.</span>
+<span class="sd">        y2: Y coordinate of point 2.</span>
+<span class="sd">        z2: Z coordinate of point 2.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The straight-line distance between the two points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span>
+    <span class="n">dz</span> <span class="o">=</span> <span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">+</span> <span class="n">dz</span> <span class="o">*</span> <span class="n">dz</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="face_key">
+<a class="viewcode-back" href="../../modules/utils.html#plot3d.utils.face_key">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">face_key</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a hashable key identifying a face by block index and IJK bounds.</span>
+
+<span class="sd">    Works with any object that has ``BlockIndex`` (or ``blockIndex``) and</span>
+<span class="sd">    ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``, ``JMAX``, ``KMAX`` attributes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        f: A Face-like object (from :class:`~plot3d.face.Face` or</span>
+<span class="sd">            :func:`~plot3d.facefunctions.create_face_from_diagonals`).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A 7-element tuple ``(block_index, IMIN, JMIN, KMIN, IMAX, JMAX, KMAX)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bi</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;BlockIndex&#39;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;blockIndex&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">bi</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">IMIN</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">JMIN</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">KMIN</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">KMAX</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="face_grid_dims">
+<a class="viewcode-back" href="../../modules/utils.html#plot3d.utils.face_grid_dims">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">face_grid_dims</span><span class="p">(</span><span class="n">imin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">imax</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">jmin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">jmax</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                   <span class="n">kmin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">kmax</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of non-zero face extents along each axis.</span>
+
+<span class="sd">    For a face defined by its IJK bounds, computes the extent</span>
+<span class="sd">    (max - min) along each axis where the face is not constant,</span>
+<span class="sd">    and returns them sorted smallest-first. Useful for checking whether</span>
+<span class="sd">    two faces have compatible grid dimensions (allowing transposition).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        imin: Minimum I index.</span>
+<span class="sd">        imax: Maximum I index.</span>
+<span class="sd">        jmin: Minimum J index.</span>
+<span class="sd">        jmax: Maximum J index.</span>
+<span class="sd">        kmin: Minimum K index.</span>
+<span class="sd">        kmax: Maximum K index.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Sorted list of non-zero extents. For example, a K-constant face</span>
+<span class="sd">        from ``(0, 0, 5)`` to ``(10, 20, 5)`` returns ``[10, 20]``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">imin</span> <span class="o">!=</span> <span class="n">imax</span><span class="p">:</span> <span class="n">dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imax</span> <span class="o">-</span> <span class="n">imin</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">jmin</span> <span class="o">!=</span> <span class="n">jmax</span><span class="p">:</span> <span class="n">dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">jmax</span> <span class="o">-</span> <span class="n">jmin</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kmin</span> <span class="o">!=</span> <span class="n">kmax</span><span class="p">:</span> <span class="n">dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kmax</span> <span class="o">-</span> <span class="n">kmin</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="divide_face_dict_indices">
+<a class="viewcode-back" href="../../modules/utils.html#plot3d.utils.divide_face_dict_indices">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">divide_face_dict_indices</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                              <span class="n">keys</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;IMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;JMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;KMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;JMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;KMAX&#39;</span><span class="p">),</span>
+                              <span class="n">nested_sides</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Divide face dictionary indices by a GCD factor using integer division.</span>
+
+<span class="sd">    This is the inverse of :func:`scale_face_dict_indices`. Used when</span>
+<span class="sd">    reducing a mesh to GCD resolution before matching, to scale face</span>
+<span class="sd">    indices down accordingly.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        records: List of dicts containing face indices to scale down.</span>
+<span class="sd">        gcd: Divisor applied to each index via ``//``.</span>
+<span class="sd">        keys: Which keys to divide within each record.</span>
+<span class="sd">        nested_sides: If provided (e.g. ``[&#39;block1&#39;, &#39;block2&#39;]``), divides keys</span>
+<span class="sd">            inside each nested sub-dict rather than at the top level.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nested_sides</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">side</span> <span class="ow">in</span> <span class="n">nested_sides</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                    <span class="n">rec</span><span class="p">[</span><span class="n">side</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">side</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">//</span> <span class="n">gcd</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="n">rec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">//</span> <span class="n">gcd</span></div>
+
+
+
+<div class="viewcode-block" id="enumerate_unique_corners">
+<a class="viewcode-back" href="../../modules/utils.html#plot3d.utils.enumerate_unique_corners">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">enumerate_unique_corners</span><span class="p">(</span><span class="n">I</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">J</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">K</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enumerate unique ``(i, j, k)`` corners from min/max index lists.</span>
+
+<span class="sd">    Given the ``[min, max]`` ranges along each axis, generates all</span>
+<span class="sd">    combinations and deduplicates them. When an axis has ``min == max``,</span>
+<span class="sd">    fewer than 8 corners are produced.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        I: ``[IMIN, IMAX]`` index range.</span>
+<span class="sd">        J: ``[JMIN, JMAX]`` index range.</span>
+<span class="sd">        K: ``[KMIN, KMAX]`` index range.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of unique ``(i, j, k)`` tuples (up to 8 corners).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">unique_corners</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">I</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                    <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                    <span class="n">unique_corners</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">unique_corners</span></div>
+
+
+
+<div class="viewcode-block" id="scale_face_dict_indices">
+<a class="viewcode-back" href="../../modules/utils.html#plot3d.utils.scale_face_dict_indices">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">scale_face_dict_indices</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                            <span class="n">keys</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;IMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;JMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;KMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;JMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;KMAX&#39;</span><span class="p">),</span>
+                            <span class="n">nested_sides</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Multiply face dictionary indices by a GCD factor.</span>
+
+<span class="sd">    Used to scale indices back to the original grid resolution after</span>
+<span class="sd">    performing matching at reduced (GCD) resolution.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        records: List of dicts containing face indices to scale up.</span>
+<span class="sd">        gcd: Factor to multiply each index by.</span>
+<span class="sd">        keys: Which keys to scale within each record.</span>
+<span class="sd">        nested_sides: If provided (e.g. ``[&#39;block1&#39;, &#39;block2&#39;]``), scales keys</span>
+<span class="sd">            inside each nested sub-dict rather than at the top level.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nested_sides</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">side</span> <span class="ow">in</span> <span class="n">nested_sides</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                    <span class="n">rec</span><span class="p">[</span><span class="n">side</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">side</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">gcd</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="n">rec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">gcd</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

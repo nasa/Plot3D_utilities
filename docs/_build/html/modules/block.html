@@ -1,142 +1,375 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html lang="en" data-content_root="../">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Block &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
-    <title>Block &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
-    
-    <script src="../_static/documentation_options.js?v=514bbfa0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Block Functions" href="blockfunctions.html" />
+    <link rel="next" title="Block Merging" href="block_merging.html" />
     <link rel="prev" title="Changelog" href="../notes/changelog.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="blockfunctions.html" title="Block Functions"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="../notes/changelog.html" title="Changelog"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Block</a></li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Block</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.block.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.X"><code class="docutils literal notranslate"><span class="pre">Block.X</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.Y"><code class="docutils literal notranslate"><span class="pre">Block.Y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.Z"><code class="docutils literal notranslate"><span class="pre">Block.Z</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.IMAX"><code class="docutils literal notranslate"><span class="pre">Block.IMAX</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.JMAX"><code class="docutils literal notranslate"><span class="pre">Block.JMAX</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.KMAX"><code class="docutils literal notranslate"><span class="pre">Block.KMAX</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.cx"><code class="docutils literal notranslate"><span class="pre">Block.cx</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.cy"><code class="docutils literal notranslate"><span class="pre">Block.cy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.cz"><code class="docutils literal notranslate"><span class="pre">Block.cz</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.__init__"><code class="docutils literal notranslate"><span class="pre">Block.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.copy"><code class="docutils literal notranslate"><span class="pre">Block.copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.scale"><code class="docutils literal notranslate"><span class="pre">Block.scale()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.shift"><code class="docutils literal notranslate"><span class="pre">Block.shift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.cylindrical"><code class="docutils literal notranslate"><span class="pre">Block.cylindrical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.cell_volumes"><code class="docutils literal notranslate"><span class="pre">Block.cell_volumes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.get_faces"><code class="docutils literal notranslate"><span class="pre">Block.get_faces()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot3d.block.Block.size"><code class="docutils literal notranslate"><span class="pre">Block.size</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.block.compute_gcd"><code class="docutils literal notranslate"><span class="pre">compute_gcd()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot3d.block.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Block</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/block.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="module-plot3d.block">
-<span id="block"></span><h1>Block<a class="headerlink" href="#module-plot3d.block" title="Link to this heading">¶</a></h1>
+<span id="block"></span><h1>Block<a class="headerlink" href="#module-plot3d.block" title="Link to this heading"></a></h1>
+<p>Block class and related utilities for Plot3D structured grids.</p>
+<p>A <a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> represents a single structured grid block in a multi-block
+Plot3D mesh.  Each block stores 3-D coordinate arrays <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code>, <code class="docutils literal notranslate"><span class="pre">Z</span></code> with
+shape <code class="docutils literal notranslate"><span class="pre">(IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code> and provides basic geometric operations (scale,
+shift, cylindrical conversion, cell volume computation).</p>
+<p>The module also provides <a class="reference internal" href="#plot3d.block.compute_gcd" title="plot3d.block.compute_gcd"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_gcd()</span></code></a> and <a class="reference internal" href="#plot3d.block.reduce_blocks" title="plot3d.block.reduce_blocks"><code class="xref py py-func docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a> for
+GCD-based mesh reduction used during connectivity and periodicity matching.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="plot3d.block.Block">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block" title="Link to this definition">¶</a></dt>
-<dd><p>Plot3D Block definition</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="plot3d.block.Block.cell_volumes">
-<span class="sig-name descname"><span class="pre">cell_volumes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.cell_volumes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.cell_volumes" title="Link to this definition">¶</a></dt>
-<dd><p>Compute volume of all cells</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block" title="Link to this definition"></a></dt>
+<dd><p>A single structured grid block in a Plot3D multi-block mesh.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.block.Block.X">
+<span class="sig-name descname"><span class="pre">X</span></span><a class="headerlink" href="#plot3d.block.Block.X" title="Link to this definition"></a></dt>
+<dd><p>3-D array of X coordinates with shape <code class="docutils literal notranslate"><span class="pre">(IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>volume of all cells</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>numpy.ndarray</p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Any, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)">numpy.dtype</a>[numpy._typing._array_like._ScalarT]]</p>
 </dd>
 </dl>
-<dl class="simple">
-<dt>Reference:</dt><dd><p>Davies, D.E. and Salmond, D.J., “Calculation of the Volume of a General Hexahedron for Flow Predicitons”, AIAA Journal, vol. 23, No. 6, pp. 954-956, June 1985.  It is (supposedly) exact for a hexahedral whose faces are bi-linear surfaces (i.e., the simplest surface that can be fit through the four nodes defining the face).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.block.Block.Y">
+<span class="sig-name descname"><span class="pre">Y</span></span><a class="headerlink" href="#plot3d.block.Block.Y" title="Link to this definition"></a></dt>
+<dd><p>3-D array of Y coordinates with shape <code class="docutils literal notranslate"><span class="pre">(IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Any, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)">numpy.dtype</a>[numpy._typing._array_like._ScalarT]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.block.Block.Z">
+<span class="sig-name descname"><span class="pre">Z</span></span><a class="headerlink" href="#plot3d.block.Block.Z" title="Link to this definition"></a></dt>
+<dd><p>3-D array of Z coordinates with shape <code class="docutils literal notranslate"><span class="pre">(IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Any, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)">numpy.dtype</a>[numpy._typing._array_like._ScalarT]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.block.Block.IMAX">
+<span class="sig-name descname"><span class="pre">IMAX</span></span><a class="headerlink" href="#plot3d.block.Block.IMAX" title="Link to this definition"></a></dt>
+<dd><p>Number of nodes in the I direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.block.Block.JMAX">
+<span class="sig-name descname"><span class="pre">JMAX</span></span><a class="headerlink" href="#plot3d.block.Block.JMAX" title="Link to this definition"></a></dt>
+<dd><p>Number of nodes in the J direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.block.Block.KMAX">
+<span class="sig-name descname"><span class="pre">KMAX</span></span><a class="headerlink" href="#plot3d.block.Block.KMAX" title="Link to this definition"></a></dt>
+<dd><p>Number of nodes in the K direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.block.Block.cx">
+<span class="sig-name descname"><span class="pre">cx</span></span><a class="headerlink" href="#plot3d.block.Block.cx" title="Link to this definition"></a></dt>
+<dd><p>X coordinate of the block centroid.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.block.Block.cy">
+<span class="sig-name descname"><span class="pre">cy</span></span><a class="headerlink" href="#plot3d.block.Block.cy" title="Link to this definition"></a></dt>
+<dd><p>Y coordinate of the block centroid.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plot3d.block.Block.cz">
+<span class="sig-name descname"><span class="pre">cz</span></span><a class="headerlink" href="#plot3d.block.Block.cz" title="Link to this definition"></a></dt>
+<dd><p>Z coordinate of the block centroid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.block.Block.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize a block from its coordinate arrays.</p>
+<p>When the module-level flag <code class="docutils literal notranslate"><span class="pre">plot3d.use_single_precision</span></code> is set,
+coordinates are cast to <code class="docutils literal notranslate"><span class="pre">float32</span></code>; otherwise they remain as provided
+(typically <code class="docutils literal notranslate"><span class="pre">float64</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – 3-D array of X coordinates, shape <code class="docutils literal notranslate"><span class="pre">(IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code>.</p></li>
+<li><p><strong>Y</strong> – 3-D array of Y coordinates, shape <code class="docutils literal notranslate"><span class="pre">(IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code>.</p></li>
+<li><p><strong>Z</strong> – 3-D array of Z coordinates, shape <code class="docutils literal notranslate"><span class="pre">(IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code>.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="plot3d.block.Block.cylindrical">
-<span class="sig-name descname"><span class="pre">cylindrical</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.cylindrical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.cylindrical" title="Link to this definition">¶</a></dt>
-<dd><p>Converts the block to cylindrical coordinate system. The rotation axis is assumed to be “x” direction</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="plot3d.block.Block.get_faces">
-<span class="sig-name descname"><span class="pre">get_faces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.get_faces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.get_faces" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a dictionary of the six faces of the block.
-Each face is a tuple of (X_face, Y_face, Z_face).</p>
+<dt class="sig sig-object py" id="plot3d.block.Block.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a></span></span><a class="reference internal" href="../_modules/plot3d/block.html#Block.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.copy" title="Link to this definition"></a></dt>
+<dd><p>Return an independent deep copy of this block.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.block.Block.scale">
-<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.scale" title="Link to this definition">¶</a></dt>
-<dd><p>Scales a mesh by a certain factor</p>
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.scale" title="Link to this definition"></a></dt>
+<dd><p>Uniformly scale all coordinates by a multiplicative factor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>factor</strong> (<em>float</em>) – _description_</p>
+<dd class="field-odd"><p><strong>factor</strong> – Scale factor applied to X, Y, and Z.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="plot3d.block.Block.shift">
-<span class="sig-name descname"><span class="pre">shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'z'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.shift" title="Link to this definition">¶</a></dt>
-<dd><p>shifts the blocks by a certain amount</p>
+<span class="sig-name descname"><span class="pre">shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'z'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.shift" title="Link to this definition"></a></dt>
+<dd><p>Translate the block along a single axis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>shift_amount</strong> (<em>float</em>) – _description_</p></li>
-<li><p><strong>direction</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_. Defaults to “z”.</p></li>
+<li><p><strong>shift_amount</strong> – Distance to shift.</p></li>
+<li><p><strong>direction</strong> – Axis to shift along (<code class="docutils literal notranslate"><span class="pre">'x'</span></code>, <code class="docutils literal notranslate"><span class="pre">'y'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'z'</span></code>).
+Defaults to <code class="docutils literal notranslate"><span class="pre">'z'</span></code>.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.block.Block.cylindrical">
+<span class="sig-name descname"><span class="pre">cylindrical</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.cylindrical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.cylindrical" title="Link to this definition"></a></dt>
+<dd><p>Convert to cylindrical coordinates assuming X is the rotation axis.</p>
+<p>Sets <code class="docutils literal notranslate"><span class="pre">self.r</span></code> (radius) and <code class="docutils literal notranslate"><span class="pre">self.theta</span></code> (azimuthal angle in radians)
+computed from Y and Z.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.block.Block.cell_volumes">
+<span class="sig-name descname"><span class="pre">cell_volumes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.cell_volumes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.cell_volumes" title="Link to this definition"></a></dt>
+<dd><p>Compute the volume of every hexahedral cell in the block.</p>
+<p>Uses the method of Davies and Salmond (AIAA J., vol. 23, No. 6,
+pp. 954-956, 1985) which is exact for hexahedra whose faces are
+bilinear surfaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Array of cell volumes with shape
+<code class="docutils literal notranslate"><span class="pre">(IMAX,</span> <span class="pre">JMAX,</span> <span class="pre">KMAX)</span></code>.  Volumes at boundary indices <code class="docutils literal notranslate"><span class="pre">[0,:,:]</span></code>,
+<code class="docutils literal notranslate"><span class="pre">[:,0,:]</span></code>, <code class="docutils literal notranslate"><span class="pre">[:,:,0]</span></code> are zero.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plot3d.block.Block.get_faces">
+<span class="sig-name descname"><span class="pre">get_faces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#Block.get_faces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.Block.get_faces" title="Link to this definition"></a></dt>
+<dd><p>Return the six boundary face coordinate arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Keys are <code class="docutils literal notranslate"><span class="pre">'imin'</span></code>, <code class="docutils literal notranslate"><span class="pre">'imax'</span></code>, <code class="docutils literal notranslate"><span class="pre">'jmin'</span></code>, <code class="docutils literal notranslate"><span class="pre">'jmax'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'kmin'</span></code>, <code class="docutils literal notranslate"><span class="pre">'kmax'</span></code>. Values are <code class="docutils literal notranslate"><span class="pre">(X_face,</span> <span class="pre">Y_face,</span> <span class="pre">Z_face)</span></code>
+tuples where each array is a 2-D slice of the block.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="plot3d.block.Block.size">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#plot3d.block.Block.size" title="Link to this definition">¶</a></dt>
-<dd><p>returns the total number of nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>number of nodes</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#plot3d.block.Block.size" title="Link to this definition"></a></dt>
+<dd><p>Total number of nodes in the block (<code class="docutils literal notranslate"><span class="pre">IMAX</span> <span class="pre">*</span> <span class="pre">JMAX</span> <span class="pre">*</span> <span class="pre">KMAX</span></code>).</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="plot3d.block.compute_gcd">
+<span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">compute_gcd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../_modules/plot3d/block.html#compute_gcd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.compute_gcd" title="Link to this definition"></a></dt>
+<dd><p>Compute the minimum GCD across all blocks’ dimensions.</p>
+<p>For each block, computes <code class="docutils literal notranslate"><span class="pre">gcd(IMAX-1,</span> <span class="pre">JMAX-1,</span> <span class="pre">KMAX-1)</span></code> and returns
+the minimum. This shared factor is used by <a class="reference internal" href="#plot3d.block.reduce_blocks" title="plot3d.block.reduce_blocks"><code class="xref py py-func docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a> to
+down-sample every block uniformly before connectivity or periodicity
+matching, then scale results back up.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>blocks</strong> – List of blocks to analyze.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The minimum GCD factor (always &gt;= 1).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="plot3d.block.reduce_blocks">
-<span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">reduce_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#reduce_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.reduce_blocks" title="Link to this definition">¶</a></dt>
-<dd><p>reduce the blocks by a factor of (factor)</p>
+<span class="sig-prename descclassname"><span class="pre">plot3d.block.</span></span><span class="sig-name descname"><span class="pre">reduce_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plot3d/block.html#reduce_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot3d.block.reduce_blocks" title="Link to this definition"></a></dt>
+<dd><p>Down-sample blocks by subsampling every <em>factor</em> indices.</p>
+<p>Each block’s X, Y, Z arrays are sliced with stride <code class="docutils literal notranslate"><span class="pre">factor</span></code> along
+all three axes, and <code class="docutils literal notranslate"><span class="pre">IMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">JMAX</span></code>, <code class="docutils literal notranslate"><span class="pre">KMAX</span></code> are updated to reflect
+the new shape.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This modifies blocks <strong>in-place</strong>. Pass copies
+(<code class="docutils literal notranslate"><span class="pre">[b.copy()</span> <span class="pre">for</span> <span class="pre">b</span> <span class="pre">in</span> <span class="pre">blocks]</span></code>) if the originals must be preserved.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="#plot3d.block.Block" title="plot3d.block.Block"><em>Block</em></a><em>]</em>) – list of blocks to reduce in size</p></li>
-<li><p><strong>factor</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of indicies to skip . Defaults to 2.</p></li>
+<li><p><strong>blocks</strong> – List of blocks to reduce. Modified in-place.</p></li>
+<li><p><strong>factor</strong> – Subsampling stride along each axis.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>[description]</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>[type]</p>
+<dd class="field-even"><p>The same list of blocks, now at reduced resolution.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -144,84 +377,34 @@ Each face is a tuple of (X_face, Y_face, Z_face).</p>
 </section>
 
 
-            <div class="clearer"></div>
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="../index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Block</a><ul>
-<li><a class="reference internal" href="#plot3d.block.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a><ul>
-<li><a class="reference internal" href="#plot3d.block.Block.cell_volumes"><code class="docutils literal notranslate"><span class="pre">Block.cell_volumes()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.block.Block.cylindrical"><code class="docutils literal notranslate"><span class="pre">Block.cylindrical()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.block.Block.get_faces"><code class="docutils literal notranslate"><span class="pre">Block.get_faces()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.block.Block.scale"><code class="docutils literal notranslate"><span class="pre">Block.scale()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.block.Block.shift"><code class="docutils literal notranslate"><span class="pre">Block.shift()</span></code></a></li>
-<li><a class="reference internal" href="#plot3d.block.Block.size"><code class="docutils literal notranslate"><span class="pre">Block.size</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#plot3d.block.reduce_blocks"><code class="docutils literal notranslate"><span class="pre">reduce_blocks()</span></code></a></li>
-</ul>
-</li>
-</ul>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../notes/changelog.html" class="btn btn-neutral float-left" title="Changelog" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="block_merging.html" class="btn btn-neutral float-right" title="Block Merging" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
   </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="../notes/changelog.html"
-                          title="previous chapter">Changelog</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="blockfunctions.html"
-                          title="next chapter">Block Functions</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/modules/block.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="blockfunctions.html" title="Block Functions"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="../notes/changelog.html" title="Changelog"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Block</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
-    </div>
-  </body>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

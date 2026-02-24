@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plot3d.glennht.export_functions &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plot3d.glennht.export_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plot3d.glennht.export_functions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># glennht_export_functions.py</span>
+<span class="sd">&quot;&quot;&quot;Export functions for writing GlennHT boundary condition and job input files.</span>
+
+<span class="sd">This module provides the functions needed to translate Python dataclass</span>
+<span class="sd">objects (defined in :mod:`~plot3d.glennht.class_definitions`) into the</span>
+<span class="sd">Fortran namelist format consumed by GlennHT.  The main public entry points</span>
+<span class="sd">are:</span>
+
+<span class="sd">- :func:`to_pa` — unit conversion for pressure values.</span>
+<span class="sd">- :func:`populate_reference_from_inputs` — compute reference conditions from</span>
+<span class="sd">  physical inlet/outlet data.</span>
+<span class="sd">- :func:`export_to_boundary_condition` — write a ``.bcs`` boundary condition</span>
+<span class="sd">  file.</span>
+<span class="sd">- :func:`export_to_job_file` — write a GlennHT job input file.</span>
+<span class="sd">- :func:`export_to_glennht_conn` — write a ``.ght_conn`` connectivity file.</span>
+<span class="sd">- :func:`summarize_contiguous` — summarize contiguous zone groupings.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">is_dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.class_definitions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Job</span><span class="p">,</span> <span class="n">BCGroup</span><span class="p">,</span> <span class="n">GIF</span><span class="p">,</span> <span class="n">VolumeZone</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Physics + units helpers</span>
+<span class="c1"># ============================================================</span>
+<span class="n">_AIR_MOLW_DEFAULT</span> <span class="o">=</span> <span class="mf">28.964</span>                 <span class="c1"># kg/kmol</span>
+<span class="n">_R_UNIV</span> <span class="o">=</span> <span class="mf">8314.4126</span>                        <span class="c1"># J/(kmol*K)</span>
+<span class="n">_SUTH</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mu0</span><span class="o">=</span><span class="mf">1.716e-5</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mf">273.15</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="mf">110.4</span><span class="p">)</span>  <span class="c1"># air</span>
+
+<span class="n">_PRESSURE_TO_PA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;pa&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;kpa&quot;</span><span class="p">:</span> <span class="mf">1e3</span><span class="p">,</span>
+    <span class="s2">&quot;mpa&quot;</span><span class="p">:</span> <span class="mf">1e6</span><span class="p">,</span>
+    <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="mf">1e5</span><span class="p">,</span>
+    <span class="s2">&quot;mbar&quot;</span><span class="p">:</span> <span class="mf">1e2</span><span class="p">,</span>
+    <span class="s2">&quot;atm&quot;</span><span class="p">:</span> <span class="mf">101325.0</span><span class="p">,</span>
+    <span class="s2">&quot;psi&quot;</span><span class="p">:</span> <span class="mf">6894.757293168</span><span class="p">,</span>
+<span class="p">}</span>
+
+<div class="viewcode-block" id="to_pa">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.to_pa">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_pa</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a pressure value from an arbitrary unit to Pascals.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value: Numeric pressure value.  Returns ``None`` if ``None`` is passed.</span>
+<span class="sd">        unit: Unit string (case-insensitive).  Supported values are ``&quot;Pa&quot;``,</span>
+<span class="sd">            ``&quot;kPa&quot;``, ``&quot;MPa&quot;``, ``&quot;bar&quot;``, ``&quot;mbar&quot;``, ``&quot;atm&quot;``, and</span>
+<span class="sd">            ``&quot;psi&quot;``.  Defaults to ``&quot;Pa&quot;`` when ``None``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pressure in Pascals, or ``None`` if ``value`` is ``None``.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If ``unit`` is not one of the recognised pressure units.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="n">unit</span> <span class="ow">or</span> <span class="s2">&quot;Pa&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="n">_PRESSURE_TO_PA</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">factor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unknown pressure unit &#39;</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Use one of: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">_PRESSURE_TO_PA</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">*</span> <span class="n">factor</span></div>
+
+
+<div class="viewcode-block" id="ideal_R">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.ideal_R">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ideal_R</span><span class="p">(</span><span class="n">molw</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the specific gas constant R = R_univ / MolW (J/kg/K).&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_R_UNIV</span> <span class="o">/</span> <span class="n">molw</span></div>
+
+
+<div class="viewcode-block" id="mach_from_p0_over_p">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.mach_from_p0_over_p">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mach_from_p0_over_p</span><span class="p">(</span><span class="n">p0_over_p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute isentropic Mach number from a total-to-static pressure ratio.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">p0_over_p</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">p0_over_p</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="p">(</span><span class="n">gamma</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">gamma</span>
+    <span class="n">term</span> <span class="o">=</span> <span class="n">p0_over_p</span> <span class="o">**</span> <span class="n">exp</span> <span class="o">-</span> <span class="mf">1.0</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">term</span> <span class="o">/</span> <span class="p">(</span><span class="n">gamma</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="T_from_T0">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.T_from_T0">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">T_from_T0</span><span class="p">(</span><span class="n">T0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">M</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return static temperature from total temperature and Mach number.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">T0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">gamma</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">M</span> <span class="o">*</span> <span class="n">M</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mu_suth">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.mu_suth">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mu_suth</span><span class="p">(</span><span class="n">T</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return dynamic viscosity (Pa·s) using Sutherland&#39;s law for air.&quot;&quot;&quot;</span>
+    <span class="n">mu0</span><span class="p">,</span> <span class="n">T0</span><span class="p">,</span> <span class="n">S</span> <span class="o">=</span> <span class="n">_SUTH</span><span class="p">[</span><span class="s2">&quot;mu0&quot;</span><span class="p">],</span> <span class="n">_SUTH</span><span class="p">[</span><span class="s2">&quot;T0&quot;</span><span class="p">],</span> <span class="n">_SUTH</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">mu0</span> <span class="o">*</span> <span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">T0</span><span class="p">)</span> <span class="o">**</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">T0</span> <span class="o">+</span> <span class="n">S</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="n">S</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="a_sound">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.a_sound">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">a_sound</span><span class="p">(</span><span class="n">T</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return speed of sound (m/s) for a perfect gas.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">R</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cp_from_gamma_R">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.cp_from_gamma_R">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cp_from_gamma_R</span><span class="p">(</span><span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return specific heat at constant pressure from gamma and R (J/kg/K).&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">R</span> <span class="o">/</span> <span class="p">(</span><span class="n">gamma</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pr_and_k">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.pr_and_k">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pr_and_k</span><span class="p">(</span><span class="n">mu</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">cp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pr_given</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">k_given</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve Prandtl number and thermal conductivity from partial inputs.</span>
+
+<span class="sd">    Exactly one of ``pr_given`` or ``k_given`` may be provided; if neither is</span>
+<span class="sd">    given the air default Prandtl number (0.706) is used.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mu: Dynamic viscosity (Pa·s).</span>
+<span class="sd">        cp: Specific heat at constant pressure (J/kg/K).</span>
+<span class="sd">        pr_given: Prandtl number, or ``None`` if not specified.</span>
+<span class="sd">        k_given: Thermal conductivity (W/m/K), or ``None`` if not specified.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A ``(Pr, k)`` tuple where ``Pr`` is the Prandtl number and ``k`` is the</span>
+<span class="sd">        thermal conductivity (W/m/K).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Pr = mu * cp / k</span>
+    <span class="k">if</span> <span class="n">pr_given</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">k_given</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pr_given</span><span class="p">,</span> <span class="p">(</span><span class="n">mu</span> <span class="o">*</span> <span class="n">cp</span><span class="p">)</span> <span class="o">/</span> <span class="n">pr_given</span>
+    <span class="k">if</span> <span class="n">pr_given</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">k_given</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">mu</span> <span class="o">*</span> <span class="n">cp</span><span class="p">)</span> <span class="o">/</span> <span class="n">k_given</span><span class="p">,</span> <span class="n">k_given</span>
+    <span class="n">pr_default</span> <span class="o">=</span> <span class="mf">0.706</span>
+    <span class="k">return</span> <span class="n">pr_default</span><span class="p">,</span> <span class="p">(</span><span class="n">mu</span> <span class="o">*</span> <span class="n">cp</span><span class="p">)</span> <span class="o">/</span> <span class="n">pr_default</span></div>
+
+
+<div class="viewcode-block" id="rpm_to_omegab">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.rpm_to_omegab">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rpm_to_omegab</span><span class="p">(</span><span class="n">rpm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert rotational speed from RPM to rad/s; returns 0.0 for None or 0.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rpm</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">rpm</span> <span class="o">/</span> <span class="mf">60.0</span><span class="p">)</span></div>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Small utilities</span>
+<span class="c1"># ============================================================</span>
+<div class="viewcode-block" id="ensure_extension">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.ensure_extension">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ensure_extension</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``path`` as a string, appending ``ext`` only if no suffix exists.&quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">suffix</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">ext</span><span class="p">))</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_asdict_soft</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coerce a dataclass, dict, or object to a plain dict, ignoring private attributes.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">asdict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)}</span>
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Formatting + namelist helpers</span>
+<span class="c1"># ============================================================</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_iter_fields</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield ``(name, value)`` pairs from a dataclass, dict, or plain object, skipping ``None``.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">asdict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fmt_bool</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a Python bool as a Fortran logical literal (``.TRUE.`` / ``.FALSE.``).&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;.TRUE.&quot;</span> <span class="k">if</span> <span class="n">v</span> <span class="k">else</span> <span class="s2">&quot;.FALSE.&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fmt_value</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursively format a Python value as a Fortran namelist token.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_fmt_bool</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="n">IntEnum</span><span class="p">,</span> <span class="n">Enum</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_fmt_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">inner</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">_fmt_value</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">_iter_fields</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">inner</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_export_namelist_block</span><span class="p">(</span><span class="n">header</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">exclude_names</span><span class="o">=</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render a Fortran namelist block from a dataclass, dict, or object.</span>
+
+<span class="sd">    The block is formatted as::</span>
+
+<span class="sd">        &amp;HEADER</span>
+<span class="sd">        key1=value1, key2=value2</span>
+<span class="sd">        &amp;END</span>
+
+<span class="sd">    ``None`` fields are silently skipped, as are any keys listed in</span>
+<span class="sd">    ``exclude_names`` and any key ending with ``_unit``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        header: Namelist block name written after the ``&amp;`` sigil.</span>
+<span class="sd">        obj: Source of key-value pairs; may be a dataclass, dict, or object</span>
+<span class="sd">            with a ``__dict__``.</span>
+<span class="sd">        exclude_names: Additional field names to suppress from the output.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A string containing the complete namelist block including newlines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pairs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_iter_fields</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">exclude_names</span> <span class="ow">or</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_unit&quot;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">_fmt_value</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">inner</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot; &amp;</span><span class="si">{</span><span class="n">header</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">inner</span><span class="si">}</span><span class="se">\n</span><span class="s2"> &amp;END</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># GIF + Volume Zone writers (dict/object inputs supported)</span>
+<span class="c1"># ============================================================</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_field</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``obj[name]`` for dicts or ``getattr(obj, name)`` for objects.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_field</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set ``obj[name]`` for dicts or ``setattr(obj, name, value)`` for objects.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">obj</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_first_field</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the first non-``None`` attribute from a sequence of candidate names.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">default</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_write_bsurf_spec</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">bc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a single ``&amp;BSurf_Spec`` namelist block to an open file object.&quot;&quot;&quot;</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot; &amp;BSurf_Spec</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;BSurfID=</span><span class="si">{</span><span class="n">_get_field</span><span class="p">(</span><span class="n">bc</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;SurfaceID&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;BCType=</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">_get_field</span><span class="p">(</span><span class="n">bc</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;BCType&#39;</span><span class="p">))</span><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;BSurfName=&#39;</span><span class="si">{</span><span class="n">_get_field</span><span class="p">(</span><span class="n">bc</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Name&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">bc</span><span class="p">,</span> <span class="s2">&quot;IsPostProcessing&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot;, BRefCond=T&quot;</span>
+    <span class="k">if</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">bc</span><span class="p">,</span> <span class="s2">&quot;IsCalculateMassFlow&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">bc</span><span class="p">,</span> <span class="s2">&quot;ToggleProcessSurface&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot;, BCalc=T&quot;</span>
+    <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> &amp;END</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_write_gif_pair</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">pair</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write ``&amp;BSurf_Spec`` blocks and a ``&amp;GIF_Spec`` block for one GIF pair.&quot;&quot;&quot;</span>
+    <span class="n">sid1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_first_field</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;GIFSurface1&quot;</span><span class="p">,</span> <span class="s2">&quot;id1&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">sid2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_first_field</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;GIFSurface2&quot;</span><span class="p">,</span> <span class="s2">&quot;id2&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">name1</span> <span class="o">=</span> <span class="n">_first_field</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Name1&quot;</span><span class="p">,</span> <span class="s2">&quot;name1&quot;</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;surface </span><span class="si">{</span><span class="n">sid1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">name2</span> <span class="o">=</span> <span class="n">_first_field</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Name2&quot;</span><span class="p">,</span> <span class="s2">&quot;name2&quot;</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;surface </span><span class="si">{</span><span class="n">sid2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">bctype</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_first_field</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;BCType&quot;</span><span class="p">,</span> <span class="s2">&quot;bctype&quot;</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot; &amp;BSurf_Spec</span><span class="se">\n</span><span class="s2">BSurfID=</span><span class="si">{</span><span class="n">sid1</span><span class="si">}</span><span class="s2">, BCType=</span><span class="si">{</span><span class="n">bctype</span><span class="si">}</span><span class="s2">, BSurfName=&#39;</span><span class="si">{</span><span class="n">name1</span><span class="si">}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2"> &amp;END</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot; &amp;BSurf_Spec</span><span class="se">\n</span><span class="s2">BSurfID=</span><span class="si">{</span><span class="n">sid2</span><span class="si">}</span><span class="s2">, BCType=</span><span class="si">{</span><span class="n">bctype</span><span class="si">}</span><span class="s2">, BSurfName=&#39;</span><span class="si">{</span><span class="n">name2</span><span class="si">}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2"> &amp;END</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; &amp;GIF_Spec</span><span class="se">\n</span><span class="s2">SurfID_1=</span><span class="si">{</span><span class="n">sid1</span><span class="si">}</span><span class="s2">, SurfID2=</span><span class="si">{</span><span class="n">sid2</span><span class="si">}</span><span class="se">\n</span><span class="s2"> &amp;END</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_write_vzconditions</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">vz</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a ``&amp;VZConditions`` namelist block for a fluid or solid volume zone.</span>
+
+<span class="sd">    Accepts a dict with keys ``contiguous_index`` and ``zone_type``</span>
+<span class="sd">    (``&quot;fluid&quot;`` or ``&quot;solid&quot;``) and writes a block with hard-coded GlennHT</span>
+<span class="sd">    defaults for the respective material.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vzid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_first_field</span><span class="p">(</span><span class="n">vz</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;contiguous_index&quot;</span><span class="p">,</span> <span class="s2">&quot;contiguous_id&quot;</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">ztype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">_get_field</span><span class="p">(</span><span class="n">vz</span><span class="p">,</span> <span class="s2">&quot;zone_type&quot;</span><span class="p">,</span> <span class="s2">&quot;fluid&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">vztype</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">ztype</span> <span class="o">==</span> <span class="s2">&quot;fluid&quot;</span> <span class="k">else</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="n">vztype</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Fluid default</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="s2">&quot; &amp;VZConditions</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;VZid=</span><span class="si">{</span><span class="n">vzid</span><span class="si">}</span><span class="s2">, VZtype=1, OmegaVZ=0., VZMaterialName=Air,</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Fluid_Tref_prop=0., Fluid_k_Tref=285., Fluid_amu_Tref=285., Fluid_expnt=.7,UseDryAir=.TRUE.,</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;!Fluid_cp=1002., Fluid_Pr=.7, Fluid_MW=28.964</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot; &amp;END</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Solid default</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="s2">&quot; &amp;VZConditions</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;VZid=</span><span class="si">{</span><span class="n">vzid</span><span class="si">}</span><span class="s2">, VZtype=2, OmegaVZ=0., VZMaterialName=CMC,</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Solid_Tref_prop=285., Solid_rho_Tref=2707. , Solid_condN_Tref=6.5, Solid_condT_Tref=6.5, Solid_condA_Tref=6.5,</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Solid_Csp_Tref=896.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot; &amp;END</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Reference population (physics-driven, builds RefCond from Full)</span>
+<span class="c1"># ============================================================</span>
+<div class="viewcode-block" id="populate_reference_from_inputs">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.populate_reference_from_inputs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">populate_reference_from_inputs</span><span class="p">(</span>
+    <span class="n">job</span><span class="p">:</span> <span class="n">Job</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">inlet_total_P0_Pa</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">reference_static_P_Pa</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">inlet_T0_K</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">refLen_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">MolW</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">Pr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">k_override_WmK</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rpm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rho_solid</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Derive and populate reference conditions from physical inlet/outlet data.</span>
+
+<span class="sd">    Computes all non-dimensional reference quantities (density, velocity,</span>
+<span class="sd">    viscosity, conductivity, Reynolds number, etc.) using isentropic relations</span>
+<span class="sd">    and Sutherland&#39;s law, then stores the results in both</span>
+<span class="sd">    ``job.ReferenceCondFull`` (authoritative) and a derived compact</span>
+<span class="sd">    ``job.ReferenceCond`` used for the job-file namelist.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        job: The :class:`~plot3d.glennht.class_definitions.Job` instance whose</span>
+<span class="sd">            ``ReferenceCondFull`` and ``ReferenceCond`` fields will be</span>
+<span class="sd">            populated in-place.</span>
+<span class="sd">        inlet_total_P0_Pa: Inlet total (stagnation) pressure in Pascals.</span>
+<span class="sd">        reference_static_P_Pa: Reference static pressure in Pascals used to</span>
+<span class="sd">            compute the reference Mach number.  Pass ``None`` to default to</span>
+<span class="sd">            zero Mach.</span>
+<span class="sd">        inlet_T0_K: Inlet total temperature in Kelvin.</span>
+<span class="sd">        refLen_m: Reference length in metres.</span>
+<span class="sd">        MolW: Molecular weight in kg/kmol.  Defaults to dry air (28.964).</span>
+<span class="sd">        gamma: Ratio of specific heats.  Defaults to 1.4.</span>
+<span class="sd">        Pr: Prandtl number.  When ``None``, derived from viscosity and</span>
+<span class="sd">            conductivity using the air default of 0.706.</span>
+<span class="sd">        k_override_WmK: Override thermal conductivity (W/m/K).  When provided,</span>
+<span class="sd">            Prandtl number is back-calculated.</span>
+<span class="sd">        rpm: Rotational speed in RPM; converted to rad/s for ``Omegab``.</span>
+<span class="sd">        rho_solid: Solid material density (kg/m³); stored as-is.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">glennht_export_classes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReferenceCond</span>  <span class="c1"># local import to avoid circular typing</span>
+
+    <span class="n">rcfull</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCondFull</span>
+    <span class="n">MolW</span>  <span class="o">=</span> <span class="n">MolW</span>  <span class="k">if</span> <span class="n">MolW</span>  <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="n">_AIR_MOLW_DEFAULT</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span> <span class="k">if</span> <span class="n">gamma</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="mf">1.4</span>
+    <span class="n">R</span>     <span class="o">=</span> <span class="n">ideal_R</span><span class="p">(</span><span class="n">MolW</span><span class="p">)</span>
+    <span class="n">T0</span>    <span class="o">=</span> <span class="n">inlet_T0_K</span> <span class="k">if</span> <span class="n">inlet_T0_K</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">rcfull</span><span class="o">.</span><span class="n">refT0</span> <span class="ow">or</span> <span class="mf">300.0</span><span class="p">)</span>
+
+    <span class="c1"># totals / length</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">refP0</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">inlet_total_P0_Pa</span><span class="p">)</span> <span class="k">if</span> <span class="n">inlet_total_P0_Pa</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">rcfull</span><span class="o">.</span><span class="n">refP0</span> <span class="ow">or</span> <span class="mf">101325.0</span><span class="p">)</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">reflen</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">refLen_m</span><span class="p">)</span> <span class="k">if</span> <span class="n">refLen_m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">rcfull</span><span class="o">.</span><span class="n">reflen</span> <span class="ow">or</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Mach from p0/p</span>
+    <span class="k">if</span> <span class="n">reference_static_P_Pa</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">rcfull</span><span class="o">.</span><span class="n">refP0</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">p0_over_p</span> <span class="o">=</span> <span class="n">rcfull</span><span class="o">.</span><span class="n">refP0</span> <span class="o">/</span> <span class="n">reference_static_P_Pa</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">mach_from_p0_over_p</span><span class="p">(</span><span class="n">p0_over_p</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># static temp, speed of sound, velocity</span>
+    <span class="n">T_static</span> <span class="o">=</span> <span class="n">T_from_T0</span><span class="p">(</span><span class="n">T0</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">a_sound</span><span class="p">(</span><span class="n">T_static</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+    <span class="n">refVel</span> <span class="o">=</span> <span class="n">M</span> <span class="o">*</span> <span class="n">a</span>
+
+    <span class="c1"># viscosity, density</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">mu_suth</span><span class="p">(</span><span class="n">T_static</span><span class="p">)</span>
+    <span class="n">Pref_static</span> <span class="o">=</span> <span class="n">reference_static_P_Pa</span> <span class="k">if</span> <span class="n">reference_static_P_Pa</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="n">rcfull</span><span class="o">.</span><span class="n">refP0</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">Pref_static</span> <span class="o">/</span> <span class="p">(</span><span class="n">R</span> <span class="o">*</span> <span class="n">T_static</span><span class="p">)</span>
+
+    <span class="c1"># cp, k, Pr</span>
+    <span class="n">cp</span> <span class="o">=</span> <span class="n">cp_from_gamma_R</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+    <span class="n">Pr_val</span><span class="p">,</span> <span class="n">k_val</span> <span class="o">=</span> <span class="n">pr_and_k</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">Pr</span><span class="p">,</span> <span class="n">k_override_WmK</span><span class="p">)</span>
+
+    <span class="c1"># Reynolds</span>
+    <span class="n">Re</span> <span class="o">=</span> <span class="p">(</span><span class="n">rho</span> <span class="o">*</span> <span class="n">refVel</span> <span class="o">*</span> <span class="n">rcfull</span><span class="o">.</span><span class="n">reflen</span> <span class="o">/</span> <span class="n">mu</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">refVel</span> <span class="ow">and</span> <span class="n">mu</span> <span class="ow">and</span> <span class="n">rcfull</span><span class="o">.</span><span class="n">reflen</span><span class="p">)</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+    <span class="c1"># fill Full</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">refT0</span>   <span class="o">=</span> <span class="n">T0</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">refrho0</span> <span class="o">=</span> <span class="n">rho</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">refVel</span>  <span class="o">=</span> <span class="n">refVel</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">refvisc</span> <span class="o">=</span> <span class="n">mu</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">refcond</span> <span class="o">=</span> <span class="n">k_val</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">refCp</span>   <span class="o">=</span> <span class="n">cp</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">MolW</span>    <span class="o">=</span> <span class="n">MolW</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">RgasUnv</span> <span class="o">=</span> <span class="n">_R_UNIV</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">Rgas</span>    <span class="o">=</span> <span class="n">R</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">gamma</span>   <span class="o">=</span> <span class="n">gamma</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">Re</span>      <span class="o">=</span> <span class="n">Re</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">Pr</span>      <span class="o">=</span> <span class="n">Pr_val</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">ndVisc</span>  <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">ndCond</span>  <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">Omegab</span>  <span class="o">=</span> <span class="n">rpm_to_omegab</span><span class="p">(</span><span class="n">rpm</span><span class="p">)</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">ReScalingFactor</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">rho_solid</span> <span class="o">=</span> <span class="n">rho_solid</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">cond_solid</span> <span class="o">=</span> <span class="mf">20.0</span>
+    <span class="n">rcfull</span><span class="o">.</span><span class="n">csp_solid</span>  <span class="o">=</span> <span class="mf">896.0</span>
+
+    <span class="c1"># compact RefCond derived from Full (stored back on the job)</span>
+    <span class="n">rc</span> <span class="o">=</span> <span class="n">ReferenceCond</span><span class="p">(</span>
+        <span class="n">useDimensionalVariables</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">refLen</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">reflen</span><span class="p">,</span>
+        <span class="n">refP0</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">refP0</span><span class="p">,</span>
+        <span class="n">refT0</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">refT0</span><span class="p">,</span>
+        <span class="n">refRho0</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">refrho0</span><span class="p">,</span>
+        <span class="n">refVel</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">refVel</span><span class="p">,</span>
+        <span class="n">refVisc</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">refvisc</span><span class="p">,</span>
+        <span class="n">refCond</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">refcond</span><span class="p">,</span>
+        <span class="n">refCp</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">refCp</span><span class="p">,</span>
+        <span class="n">MolW</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">MolW</span><span class="p">,</span>
+        <span class="n">RgasUnv</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">RgasUnv</span><span class="p">,</span>
+        <span class="n">Rgas</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">Rgas</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">gamma</span><span class="p">,</span>
+        <span class="n">Re</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">Re</span><span class="p">,</span>
+        <span class="n">Pr</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">Pr</span><span class="p">,</span>
+        <span class="n">ndVisc</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">ndCond</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">Omegab</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">Omegab</span><span class="p">,</span>
+        <span class="n">ReScalingFactor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">rho_solid</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">rho_solid</span><span class="p">,</span>
+        <span class="n">cond_solid</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">cond_solid</span><span class="p">,</span>
+        <span class="n">Csp_solid</span><span class="o">=</span><span class="n">rcfull</span><span class="o">.</span><span class="n">csp_solid</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCond</span> <span class="o">=</span> <span class="n">rc</span></div>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Boundary conditions export (.bcs) — robust defaults</span>
+<span class="c1"># ============================================================</span>
+<div class="viewcode-block" id="export_to_boundary_condition">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.export_to_boundary_condition">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">export_to_boundary_condition</span><span class="p">(</span>
+    <span class="n">file_path_to_write</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">job_settings</span><span class="p">:</span> <span class="n">Job</span><span class="p">,</span>
+    <span class="n">bc_group</span><span class="p">:</span> <span class="n">BCGroup</span><span class="p">,</span>
+    <span class="n">gif_pairs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+    <span class="n">volume_zones</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a GlennHT boundary condition file (``.bcs``) from Python objects.</span>
+
+<span class="sd">    Physical pressure and temperature values on inlet/outlet BCs are</span>
+<span class="sd">    normalized by the reference conditions in ``job_settings.ReferenceCondFull``</span>
+<span class="sd">    before being written.  A sidecar JSON debug file is also produced alongside</span>
+<span class="sd">    the ``.bcs`` file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path_to_write: Destination path for the ``.bcs`` file.  The</span>
+<span class="sd">            ``.bcs`` extension is appended automatically if absent.</span>
+<span class="sd">        job_settings: Job configuration container; its ``ReferenceCondFull``</span>
+<span class="sd">            field supplies the normalization quantities.</span>
+<span class="sd">        bc_group: Collection of all boundary condition objects (inlets,</span>
+<span class="sd">            outlets, slips, walls).</span>
+<span class="sd">        gif_pairs: List of GIF patch pairs; each entry may be a</span>
+<span class="sd">            :class:`~plot3d.glennht.class_definitions.GIF` dataclass or a plain</span>
+<span class="sd">            dict with keys ``id1``/``id2`` (or ``a``/``b``).</span>
+<span class="sd">        volume_zones: List of volume zone descriptors; each entry may be a</span>
+<span class="sd">            dataclass or a dict with at minimum ``contiguous_index`` and</span>
+<span class="sd">            ``zone_type`` keys.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None.  Writes the ``.bcs`` file and a ``.json`` sidecar to disk.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_path_to_write</span> <span class="o">=</span> <span class="n">ensure_extension</span><span class="p">(</span><span class="n">file_path_to_write</span><span class="p">,</span> <span class="s1">&#39;.bcs&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">file_path_to_write</span><span class="p">)</span>
+    <span class="n">json_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Sidecar JSON for debugging</span>
+    <span class="n">json_payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;inlets&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_asdict_soft</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bc_group</span><span class="o">.</span><span class="n">Inlets</span><span class="p">],</span>
+        <span class="s2">&quot;outlets&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_asdict_soft</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bc_group</span><span class="o">.</span><span class="n">Outlets</span><span class="p">],</span>
+        <span class="s2">&quot;slips&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_asdict_soft</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bc_group</span><span class="o">.</span><span class="n">SymmetricSlips</span><span class="p">],</span>
+        <span class="s2">&quot;walls&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_asdict_soft</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bc_group</span><span class="o">.</span><span class="n">Walls</span><span class="p">],</span>
+        <span class="s2">&quot;volume_zones&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_asdict_soft</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">volume_zones</span><span class="p">],</span>
+        <span class="s2">&quot;gif_pairs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_asdict_soft</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gif_pairs</span><span class="p">],</span>
+        <span class="s2">&quot;job_settings&quot;</span><span class="p">:</span> <span class="n">_asdict_soft</span><span class="p">(</span><span class="n">job_settings</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">json_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_payload</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+    <span class="c1"># ---- Robust reference defaults (use highest-pressure inlet if available)</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">job_settings</span><span class="o">.</span><span class="n">ReferenceCondFull</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reference_inlet</span><span class="p">(</span><span class="n">inlets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="n">best</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">best_pa</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">inlet</span> <span class="ow">in</span> <span class="n">inlets</span><span class="p">:</span>
+            <span class="n">p0</span> <span class="o">=</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;P0_const&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">p0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">phys_pa</span> <span class="o">=</span> <span class="n">to_pa</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;P0_const_unit&quot;</span><span class="p">,</span> <span class="s2">&quot;Pa&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">phys_pa</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">best_pa</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">phys_pa</span> <span class="o">&gt;</span> <span class="n">best_pa</span><span class="p">:</span>
+                <span class="n">best</span> <span class="o">=</span> <span class="n">inlet</span>
+                <span class="n">best_pa</span> <span class="o">=</span> <span class="n">phys_pa</span>
+        <span class="k">if</span> <span class="n">best</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">inlets</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">inlets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">best</span><span class="p">,</span> <span class="n">best_pa</span>
+
+    <span class="n">ref_inlet</span><span class="p">,</span> <span class="n">ref_inlet_pa</span> <span class="o">=</span> <span class="n">_reference_inlet</span><span class="p">(</span><span class="n">bc_group</span><span class="o">.</span><span class="n">Inlets</span><span class="p">)</span>
+
+    <span class="c1"># refLen: default 1.0 if missing</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="s2">&quot;reflen&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">ref</span><span class="o">.</span><span class="n">reflen</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># type: ignore</span>
+
+    <span class="c1"># refP0: from highest-pressure inlet (convert to Pa) if missing</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="s2">&quot;refP0&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ref_inlet_pa</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">ref</span><span class="o">.</span><span class="n">refP0</span> <span class="o">=</span> <span class="n">ref_inlet_pa</span>  <span class="c1"># type: ignore</span>
+
+    <span class="c1"># refT0: from first inlet if missing</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="s2">&quot;refT0&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ref_inlet</span> <span class="ow">and</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">ref_inlet</span><span class="p">,</span> <span class="s2">&quot;T0_const&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ref</span><span class="o">.</span><span class="n">refT0</span> <span class="o">=</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">ref_inlet</span><span class="p">,</span> <span class="s2">&quot;T0_const&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_dedupe_by_bc_id</span><span class="p">(</span><span class="n">objs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+        <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">unique</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">:</span>
+            <span class="n">sid</span> <span class="o">=</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;SurfaceID&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">sid</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+            <span class="n">unique</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">unique</span>
+
+    <span class="c1"># ---- Write .bcs file</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
+        <span class="c1"># INLETS (normalize to refP0, refT0, refLen)</span>
+        <span class="k">for</span> <span class="n">inlet</span> <span class="ow">in</span> <span class="n">_dedupe_by_bc_id</span><span class="p">(</span><span class="n">bc_group</span><span class="o">.</span><span class="n">Inlets</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;P0_const&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">phys_pa</span> <span class="o">=</span> <span class="n">to_pa</span><span class="p">(</span><span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;P0_const&quot;</span><span class="p">),</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;P0_const_unit&quot;</span><span class="p">,</span> <span class="s2">&quot;Pa&quot;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">phys_pa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ref</span><span class="o">.</span><span class="n">refP0</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="n">_set_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;P0_const&quot;</span><span class="p">,</span> <span class="n">phys_pa</span> <span class="o">/</span> <span class="n">ref</span><span class="o">.</span><span class="n">refP0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;T0_const&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ref</span><span class="o">.</span><span class="n">refT0</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">_set_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;T0_const&quot;</span><span class="p">,</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;T0_const&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">ref</span><span class="o">.</span><span class="n">refT0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;twall_hub&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ref</span><span class="o">.</span><span class="n">refT0</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">_set_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;twall_hub&quot;</span><span class="p">,</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;twall_hub&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">ref</span><span class="o">.</span><span class="n">refT0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;twall_case&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ref</span><span class="o">.</span><span class="n">refT0</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">_set_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;twall_case&quot;</span><span class="p">,</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;twall_case&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">ref</span><span class="o">.</span><span class="n">refT0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;Ts_const&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ref</span><span class="o">.</span><span class="n">reflen</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">_set_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;Ts_const&quot;</span><span class="p">,</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;Ts_const&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">ref</span><span class="o">.</span><span class="n">reflen</span><span class="p">)</span>
+            <span class="n">_write_bsurf_spec</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">inlet</span><span class="p">)</span>
+
+        <span class="c1"># OUTLETS (normalize back-pressure by refP0)</span>
+        <span class="k">for</span> <span class="n">outlet</span> <span class="ow">in</span> <span class="n">_dedupe_by_bc_id</span><span class="p">(</span><span class="n">bc_group</span><span class="o">.</span><span class="n">Outlets</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">outlet</span><span class="p">,</span> <span class="s2">&quot;Pback_const&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ref</span><span class="o">.</span><span class="n">refP0</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">phys_pa</span> <span class="o">=</span> <span class="n">to_pa</span><span class="p">(</span><span class="n">_get_field</span><span class="p">(</span><span class="n">outlet</span><span class="p">,</span> <span class="s2">&quot;Pback_const&quot;</span><span class="p">),</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">outlet</span><span class="p">,</span> <span class="s2">&quot;Pback_const_unit&quot;</span><span class="p">,</span> <span class="s2">&quot;Pa&quot;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">phys_pa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">_set_field</span><span class="p">(</span><span class="n">outlet</span><span class="p">,</span> <span class="s2">&quot;Pback_const&quot;</span><span class="p">,</span> <span class="n">phys_pa</span> <span class="o">/</span> <span class="n">ref</span><span class="o">.</span><span class="n">refP0</span><span class="p">)</span>
+            <span class="n">_write_bsurf_spec</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">outlet</span><span class="p">)</span>
+
+        <span class="c1"># SLIPS / WALLS</span>
+        <span class="k">for</span> <span class="n">slip</span> <span class="ow">in</span> <span class="n">_dedupe_by_bc_id</span><span class="p">(</span><span class="n">bc_group</span><span class="o">.</span><span class="n">SymmetricSlips</span><span class="p">):</span>
+            <span class="n">_write_bsurf_spec</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">slip</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">wall</span> <span class="ow">in</span> <span class="n">_dedupe_by_bc_id</span><span class="p">(</span><span class="n">bc_group</span><span class="o">.</span><span class="n">Walls</span><span class="p">):</span>
+            <span class="n">_write_bsurf_spec</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">wall</span><span class="p">)</span>
+
+        <span class="c1"># GIFS (dicts or dataclasses)</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">gif_pairs</span><span class="p">:</span>
+            <span class="n">_write_gif_pair</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">pair</span><span class="p">)</span>
+
+        <span class="c1"># VZConditions (dict templates)</span>
+        <span class="n">volume_zone_unique</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">vz</span> <span class="ow">in</span> <span class="n">volume_zones</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">_first_field</span><span class="p">(</span><span class="n">vz</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;contiguous_index&quot;</span><span class="p">,</span> <span class="s2">&quot;contiguous_id&quot;</span><span class="p">))</span>
+            <span class="n">volume_zone_unique</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">vz</span>
+        <span class="k">for</span> <span class="n">vz</span> <span class="ow">in</span> <span class="n">volume_zone_unique</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">vz</span><span class="p">,</span> <span class="s2">&quot;zone_type&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_write_vzconditions</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">vz</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;VZConditions&quot;</span><span class="p">,</span> <span class="n">vz</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">_sync_detail_surface_id</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sid</span> <span class="o">=</span> <span class="n">_get_field</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;SurfaceID&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_set_field</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
+
+        <span class="c1"># Detailed BC blocks (skip meta + *_unit)</span>
+        <span class="n">exclude</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;SurfaceID&quot;</span><span class="p">,</span> <span class="s2">&quot;BCType&quot;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">inlet</span> <span class="ow">in</span> <span class="n">bc_group</span><span class="o">.</span><span class="n">Inlets</span><span class="p">:</span>
+            <span class="n">_sync_detail_surface_id</span><span class="p">(</span><span class="n">inlet</span><span class="p">,</span> <span class="s2">&quot;surfID_inlet&quot;</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;! </span><span class="si">{</span><span class="n">inlet</span><span class="o">.</span><span class="n">Name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;INLET_BC&quot;</span><span class="p">,</span> <span class="n">inlet</span><span class="p">,</span> <span class="n">exclude_names</span><span class="o">=</span><span class="n">exclude</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">outlet</span> <span class="ow">in</span> <span class="n">bc_group</span><span class="o">.</span><span class="n">Outlets</span><span class="p">:</span>
+            <span class="n">_sync_detail_surface_id</span><span class="p">(</span><span class="n">outlet</span><span class="p">,</span> <span class="s2">&quot;surfID_outlet&quot;</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;! </span><span class="si">{</span><span class="n">outlet</span><span class="o">.</span><span class="n">Name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;OUTLET_BC&quot;</span><span class="p">,</span> <span class="n">outlet</span><span class="p">,</span> <span class="n">exclude_names</span><span class="o">=</span><span class="n">exclude</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">slip</span> <span class="ow">in</span> <span class="n">bc_group</span><span class="o">.</span><span class="n">SymmetricSlips</span><span class="p">:</span>
+            <span class="n">_sync_detail_surface_id</span><span class="p">(</span><span class="n">slip</span><span class="p">,</span> <span class="s2">&quot;surfID_symmetricSlip&quot;</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;! </span><span class="si">{</span><span class="n">slip</span><span class="o">.</span><span class="n">Name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;SLIP_BC&quot;</span><span class="p">,</span> <span class="n">slip</span><span class="p">,</span> <span class="n">exclude_names</span><span class="o">=</span><span class="n">exclude</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">wall</span> <span class="ow">in</span> <span class="n">bc_group</span><span class="o">.</span><span class="n">Walls</span><span class="p">:</span>
+            <span class="n">_sync_detail_surface_id</span><span class="p">(</span><span class="n">wall</span><span class="p">,</span> <span class="s2">&quot;surfID_wall&quot;</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;! </span><span class="si">{</span><span class="n">wall</span><span class="o">.</span><span class="n">Name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;WALL_BC&quot;</span><span class="p">,</span> <span class="n">wall</span><span class="p">,</span> <span class="n">exclude_names</span><span class="o">=</span><span class="n">exclude</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Job export (styled like your sample)</span>
+<span class="c1"># ============================================================</span>
+<div class="viewcode-block" id="export_to_job_file">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.export_to_job_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">export_to_job_file</span><span class="p">(</span>
+    <span class="n">job</span><span class="p">:</span> <span class="n">Job</span><span class="p">,</span>
+    <span class="n">file_path_to_write</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">exec_serial</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GlennHT.serial&quot;</span><span class="p">,</span>
+    <span class="n">exec_mpi</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>           <span class="c1"># optional: also print mpi line</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write all GlennHT job namelist blocks to a single job input file.</span>
+
+<span class="sd">    Each section of ``job`` is serialized as a Fortran namelist block.  If</span>
+<span class="sd">    ``job.ReferenceCond`` has not already been populated, this function</span>
+<span class="sd">    attempts to derive it from ``job.ReferenceCondFull`` via</span>
+<span class="sd">    :func:`populate_reference_from_inputs`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        job: Fully configured job object.</span>
+<span class="sd">        file_path_to_write: Destination path for the job file.</span>
+<span class="sd">        title: Optional run title written as a ``&amp;Title`` block at the top of</span>
+<span class="sd">            the file.</span>
+<span class="sd">        exec_serial: Path or name of the serial GlennHT executable written to</span>
+<span class="sd">            the footer.</span>
+<span class="sd">        exec_mpi: Optional path or name of the MPI GlennHT executable; when</span>
+<span class="sd">            provided a second ``execFILE`` line is appended.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None.  Writes the job file to disk.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">file_path_to_write</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot; &amp;Title</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; TheTitle=&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot; &amp;end</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Derive compact RefCond from Full if not already present</span>
+        <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCond</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCondFull</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Attempt a simple populate if Full has enough fields; otherwise leave as-is.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">populate_reference_from_inputs</span><span class="p">(</span>
+                    <span class="n">job</span><span class="p">,</span>
+                    <span class="n">inlet_total_P0_Pa</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCondFull</span><span class="o">.</span><span class="n">refP0</span><span class="p">,</span>
+                    <span class="n">reference_static_P_Pa</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">inlet_T0_K</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCondFull</span><span class="o">.</span><span class="n">refT0</span><span class="p">,</span>
+                    <span class="n">refLen_m</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCondFull</span><span class="o">.</span><span class="n">reflen</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="c1"># Best effort—job.ReferenceCond may remain None if insufficient data.</span>
+                <span class="k">pass</span>
+
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;JobFiles&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">JobFiles</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;JobControl&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">JobControl</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;TurbModelInput&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">TurbModelInput</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;Plot3DParameters&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">Plot3DParameters</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;InitialCond&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">InitialCond</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;TimeStpControl&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">TimeStpControl</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;SPDSchemeControl&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">SPDSchemeControl</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;RKSchemeControl&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">RKSchemeControl</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;MGSchemeControl&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">MGSchemeControl</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;GasPropertiesInput&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">GasPropertiesInput</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Prefer Full (authoritative); also print compact if present</span>
+        <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCond</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;ReferenceCond&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCond</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCondFull</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_export_namelist_block</span><span class="p">(</span><span class="s2">&quot;ReferenceCondFull&quot;</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">ReferenceCondFull</span><span class="p">));</span> <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Footer like your example</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;execFILE=&quot;</span><span class="si">{</span><span class="n">exec_serial</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">exec_mpi</span><span class="p">:</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;execFILE=&quot;</span><span class="si">{</span><span class="n">exec_mpi</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="summarize_contiguous">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.summarize_contiguous">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">summarize_contiguous</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Summarize block-to-contiguous-zone mappings from a list of volume zone records.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        records: List of dicts, each containing at minimum the keys</span>
+<span class="sd">            ``&quot;contiguous_index&quot;`` (int) and ``&quot;zone_type&quot;`` (str, e.g.</span>
+<span class="sd">            ``&quot;fluid&quot;`` or ``&quot;solid&quot;``).  Missing keys will raise</span>
+<span class="sd">            ``KeyError``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A dict with the following keys:</span>
+
+<span class="sd">        - ``&quot;num_unique_contiguous_indices&quot;`` (int): Total number of distinct</span>
+<span class="sd">          contiguous zone IDs.</span>
+<span class="sd">        - ``&quot;zone_types_by_id&quot;`` (dict): Maps each contiguous ID to a sorted</span>
+<span class="sd">          list of unique zone-type strings assigned to it.</span>
+<span class="sd">        - ``&quot;ids_with_multiple_zone_types&quot;`` (list): Sorted list of contiguous</span>
+<span class="sd">          IDs that have more than one zone type — likely a configuration error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">id_to_zone_types</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+        <span class="c1"># will raise KeyError if required keys are missing (helpful fail)</span>
+        <span class="n">cid</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;contiguous_index&quot;</span><span class="p">]</span>
+        <span class="n">zt</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;zone_type&quot;</span><span class="p">]</span>
+        <span class="n">id_to_zone_types</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">zt</span><span class="p">)</span>
+
+    <span class="n">zone_types_by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">cid</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">zts</span><span class="p">)</span> <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">zts</span> <span class="ow">in</span> <span class="n">id_to_zone_types</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">ids_with_multiple</span> <span class="o">=</span> <span class="p">[</span><span class="n">cid</span> <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">zts</span> <span class="ow">in</span> <span class="n">zone_types_by_id</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">zts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;num_unique_contiguous_indices&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">zone_types_by_id</span><span class="p">),</span>
+        <span class="s2">&quot;zone_types_by_id&quot;</span><span class="p">:</span> <span class="n">zone_types_by_id</span><span class="p">,</span>
+        <span class="s2">&quot;ids_with_multiple_zone_types&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ids_with_multiple</span><span class="p">),</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="export_to_glennht_conn">
+<a class="viewcode-back" href="../../../modules/glennht.html#plot3d.glennht.export_functions.export_to_glennht_conn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">export_to_glennht_conn</span><span class="p">(</span><span class="n">matches</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]],</span><span class="n">outer_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]],</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                           <span class="n">gif_pairs</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span><span class="n">gif_faces</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
+                               <span class="n">volume_zones</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">]]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a GlennHT connectivity file (``.ght_conn``) from match and zone data.</span>
+
+<span class="sd">    Block indices in the input dicts are assumed to be 0-based and are</span>
+<span class="sd">    incremented by 1 when written to the file (GlennHT uses 1-based indexing).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        matches: List of block-to-block face match records.  Each record is a</span>
+<span class="sd">            dict with keys ``&quot;block1&quot;`` and ``&quot;block2&quot;``, where each value is</span>
+<span class="sd">            a dict containing ``&quot;block_index&quot;``, ``&quot;IMIN&quot;``, ``&quot;JMIN&quot;``,</span>
+<span class="sd">            ``&quot;KMIN&quot;``, ``&quot;IMAX&quot;``, ``&quot;JMAX&quot;``, and ``&quot;KMAX&quot;`` (all 0-based).</span>
+<span class="sd">        outer_faces: List of non-matched (boundary) surface face records.</span>
+<span class="sd">            Each record must contain ``&quot;block_index&quot;``, ``&quot;IMIN&quot;``,</span>
+<span class="sd">            ``&quot;JMIN&quot;``, ``&quot;KMIN&quot;``, ``&quot;IMAX&quot;``, ``&quot;JMAX&quot;``, ``&quot;KMAX&quot;``</span>
+<span class="sd">            (0-based), and ``&quot;id&quot;`` (1-based surface ID).</span>
+<span class="sd">        filename: Destination path for the connectivity file.  The</span>
+<span class="sd">            ``.ght_conn`` extension is appended automatically if absent.</span>
+<span class="sd">        gif_pairs: List of GIF pair dicts, each with keys ``&quot;a&quot;`` and ``&quot;b&quot;``</span>
+<span class="sd">            holding the two surface IDs linked by the interface.</span>
+<span class="sd">        gif_faces: List of GIF face records in the same format as</span>
+<span class="sd">            ``outer_faces``; merged with ``outer_faces`` before writing.</span>
+<span class="sd">        volume_zones: List of volume zone dicts with at minimum</span>
+<span class="sd">            ``&quot;contiguous_index&quot;`` and ``&quot;zone_type&quot;`` keys; used to produce</span>
+<span class="sd">            the zone section of the connectivity file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None.  Writes the ``.ght_conn`` file to disk.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    
+    <span class="c1"># Print face matches</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;block1&#39;</span><span class="p">,</span><span class="s1">&#39;block2&#39;</span><span class="p">]</span>
+    <span class="n">nMatches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nMatches</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="c1"># Print number of matches </span>
+    <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>                        
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">:</span>
+            <span class="n">block_indx</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore # block1 and block2 are arbitrary names, the key is the block index </span>
+            <span class="n">block_IMIN</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+            <span class="n">block_JMIN</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+            <span class="n">block_KMIN</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+
+            <span class="n">block_IMAX</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+            <span class="n">block_JMAX</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+            <span class="n">block_KMAX</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">block_indx</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">block_IMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">block_JMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">block_KMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">block_IMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">block_JMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">block_KMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Print Surfaces </span>
+    <span class="c1"># Get total number of surfaces</span>
+    <span class="n">outer_faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">gif_faces</span><span class="p">)</span>
+    <span class="n">outer_faces</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">outer_faces</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">surface</span> <span class="ow">in</span> <span class="n">outer_faces</span><span class="p">:</span>
+        <span class="n">block_indx</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;block_index&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+        <span class="n">IMIN</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;IMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+        <span class="n">JMIN</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;JMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+        <span class="n">KMIN</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;KMIN&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+        
+        <span class="n">IMAX</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;IMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+        <span class="n">JMAX</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;JMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+        <span class="n">KMAX</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;KMAX&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># type: ignore</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>       <span class="c1"># type: ignore</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">block_indx</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">IMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">JMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">KMIN</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">IMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">JMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">KMAX</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="nb">id</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Print GIFs</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gif_pairs</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pairs</span> <span class="ow">in</span> <span class="n">gif_pairs</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pairs</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pairs</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> -2 1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># type: ignore</span>
+    
+    <span class="n">summary</span> <span class="o">=</span> <span class="n">summarize_contiguous</span><span class="p">(</span><span class="n">volume_zones</span><span class="p">)</span>
+    <span class="c1"># Print volume zones</span>
+    
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">summary</span><span class="p">[</span><span class="s1">&#39;num_unique_contiguous_indices&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Print what types of zones are there </span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">[</span><span class="s1">&#39;zone_types_by_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Print Zone Groups</span>
+    <span class="n">columns_to_print</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">volume_zones</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">columns_to_print</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;contiguous_index&quot;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;contiguous_index&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
+    
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">ensure_extension</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;.ght_conn&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># ---- Quick self-test / example usage -----------------------</span>
+<span class="c1"># ============================================================</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># Minimal smoke test (requires your glennht_export_classes.py definitions)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">glennht_export_classes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">Job</span><span class="p">,</span> <span class="n">InletBC</span><span class="p">,</span> <span class="n">OutletBC</span><span class="p">,</span> <span class="n">BoundaryConditionType</span><span class="p">,</span> <span class="n">BCGroup</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">()</span>
+
+    <span class="c1"># Populate physics from simple inputs (e.g., 60 bar total at inlet, 2 bar static outlet)</span>
+    <span class="n">populate_reference_from_inputs</span><span class="p">(</span>
+        <span class="n">job</span><span class="p">,</span>
+        <span class="n">inlet_total_P0_Pa</span> <span class="o">=</span> <span class="mf">60.0</span> <span class="o">*</span> <span class="mf">1e5</span><span class="p">,</span>
+        <span class="n">reference_static_P_Pa</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="mf">1e5</span><span class="p">,</span>
+        <span class="n">inlet_T0_K</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
+        <span class="n">refLen_m</span> <span class="o">=</span> <span class="mf">0.0254</span><span class="p">,</span>
+        <span class="n">rpm</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">rho_solid</span><span class="o">=</span><span class="mf">2707.0</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># BCs with physical inputs; exporter normalizes to reference</span>
+    <span class="n">inlet</span> <span class="o">=</span> <span class="n">InletBC</span><span class="p">(</span>
+        <span class="n">BCType</span><span class="o">=</span><span class="n">BoundaryConditionType</span><span class="o">.</span><span class="n">Inlet</span><span class="p">,</span> <span class="n">SurfaceID</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s2">&quot;Inlet-60bar&quot;</span><span class="p">,</span>
+        <span class="n">P0_const</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">P0_const_unit</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">T0_const</span><span class="o">=</span><span class="mf">300.0</span>
+    <span class="p">)</span>
+    <span class="n">outlet</span> <span class="o">=</span> <span class="n">OutletBC</span><span class="p">(</span>
+        <span class="n">BCType</span><span class="o">=</span><span class="n">BoundaryConditionType</span><span class="o">.</span><span class="n">Outlet</span><span class="p">,</span> <span class="n">SurfaceID</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s2">&quot;Outlet-2bar&quot;</span><span class="p">,</span>
+        <span class="n">Pback_const</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">Pback_const_unit</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span>
+    <span class="p">)</span>
+    <span class="n">bcg</span> <span class="o">=</span> <span class="n">BCGroup</span><span class="p">(</span><span class="n">Inlets</span><span class="o">=</span><span class="p">[</span><span class="n">inlet</span><span class="p">],</span> <span class="n">Outlets</span><span class="o">=</span><span class="p">[</span><span class="n">outlet</span><span class="p">],</span> <span class="n">SymmetricSlips</span><span class="o">=</span><span class="p">[],</span> <span class="n">Walls</span><span class="o">=</span><span class="p">[])</span>
+
+    <span class="n">gifs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;id1&quot;</span><span class="p">:</span> <span class="mi">101</span><span class="p">,</span> <span class="s2">&quot;id2&quot;</span><span class="p">:</span> <span class="mi">202</span><span class="p">,</span> <span class="s2">&quot;pty&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span>
+    <span class="p">]</span>
+    <span class="n">volume_zones</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;block_index&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;zone_type&quot;</span><span class="p">:</span> <span class="s2">&quot;fluid&quot;</span><span class="p">,</span> <span class="s2">&quot;contiguous_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;block_index&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;zone_type&quot;</span><span class="p">:</span> <span class="s2">&quot;solid&quot;</span><span class="p">,</span> <span class="s2">&quot;contiguous_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="n">export_to_boundary_condition</span><span class="p">(</span><span class="s2">&quot;boundary_conditions.bcs&quot;</span><span class="p">,</span> <span class="n">job</span><span class="p">,</span> <span class="n">bcg</span><span class="p">,</span> <span class="n">gifs</span><span class="o">=</span><span class="n">gifs</span><span class="p">,</span> <span class="n">volume_zones</span><span class="o">=</span><span class="n">volume_zones</span><span class="p">)</span>
+    <span class="n">export_to_job_file</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="s2">&quot;jobfile&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;SingleBlade&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,44 +1,122 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plot3d.split_block &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
-<html lang="en" data-content_root="../../">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plot3d.split_block &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
-    
-    <script src="../../_static/documentation_options.js?v=514bbfa0"></script>
-    <script src="../../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">plot3d.split_block</a></li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plot3d.split_block</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <h1>Source code for plot3d.split_block</h1><div class="highlight"><pre>
-<span></span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Split blocks is combination of help from Dave Rigby and Tim Beach </span>
-<span class="sd">&#39;&#39;&#39;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Utilities for splitting structured multi-block grids into smaller blocks.</span>
+
+<span class="sd">This module provides functions and enumerations used to divide Plot3D structured</span>
+<span class="sd">blocks along a chosen index direction (i, j, or k) while preserving the</span>
+<span class="sd">greatest common divisor (GCD) of the parent block&#39;s cell counts.  Maintaining</span>
+<span class="sd">the GCD ensures that all child blocks remain compatible with the same multi-grid</span>
+<span class="sd">hierarchy used by the solver.</span>
+
+<span class="sd">Credits: Dave Rigby and Tim Beach.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.face</span><span class="w"> </span><span class="kn">import</span> <span class="n">Face</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span>
@@ -50,6 +128,14 @@
 <div class="viewcode-block" id="Direction">
 <a class="viewcode-back" href="../../modules/split_block.html#plot3d.split_block.Direction">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Direction</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enumeration of the three structured-grid index directions.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        i: First index direction (IMAX axis).</span>
+<span class="sd">        j: Second index direction (JMAX axis).</span>
+<span class="sd">        k: Third index direction (KMAX axis).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">k</span> <span class="o">=</span> <span class="mi">2</span></div>
@@ -58,15 +144,22 @@
 <div class="viewcode-block" id="max_aspect_ratio">
 <a class="viewcode-back" href="../../modules/split_block.html#plot3d.split_block.max_aspect_ratio">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">max_aspect_ratio</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Z</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">ix</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">jx</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">kx</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds the maximum cell aspect ratio</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the maximum cell aspect ratio sampled at the block corners.</span>
+
+<span class="sd">    The aspect ratio at each corner is estimated by comparing the edge lengths</span>
+<span class="sd">    along the i, j, and k directions to their neighbours one cell inward.  The</span>
+<span class="sd">    function samples all eight block corners and returns the largest ratio found.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        X (np.ndarray): 3 dimensional Array containing X values. X[i,j,k]</span>
-<span class="sd">        Y (np.ndarray): 3 dimensional Array containing X values. X[i,j,k]</span>
-<span class="sd">        Z (np.ndarray): 3 dimensional Array containing X values. X[i,j,k]</span>
+<span class="sd">        X (np.ndarray): 3-D array of x-coordinates indexed as ``X[i, j, k]``.</span>
+<span class="sd">        Y (np.ndarray): 3-D array of y-coordinates indexed as ``Y[i, j, k]``.</span>
+<span class="sd">        Z (np.ndarray): 3-D array of z-coordinates indexed as ``Z[i, j, k]``.</span>
+<span class="sd">        ix (int): Size of the i-dimension (unused; inferred from ``X.shape``).</span>
+<span class="sd">        jx (int): Size of the j-dimension (unused; inferred from ``X.shape``).</span>
+<span class="sd">        kx (int): Size of the k-dimension (unused; inferred from ``X.shape``).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        float: Maximum value of aspect ratio </span>
+<span class="sd">        float: Maximum aspect ratio across all sampled corner cells.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="p">[</span><span class="n">ix</span><span class="p">,</span><span class="n">jx</span><span class="p">,</span><span class="n">kx</span><span class="p">]</span>  <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span> <span class="c1"># ix, jx, kx are the max values like IMAX, JMAX, KMAX</span>
     <span class="n">ix</span><span class="o">-=</span><span class="mi">1</span><span class="p">;</span> <span class="n">jx</span><span class="o">-=</span><span class="mi">1</span><span class="p">;</span> <span class="n">kx</span><span class="o">-=</span><span class="mi">1</span> <span class="c1"># Python is 0 index so need to subtract 1 from ix, iy, kx to reference the last value </span>
@@ -93,17 +186,17 @@
     
     <span class="n">ds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">)):</span>
-        <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sqrt</span><span class="p">((</span><span class="n">X</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">X</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
-                    <span class="p">(</span><span class="n">Y</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Y</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>  
-                    <span class="p">(</span><span class="n">Z</span><span class="p">(</span><span class="n">i2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Z</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sqrt</span><span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="n">i2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span><span class="o">-</span><span class="n">X</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
+                    <span class="p">(</span><span class="n">Y</span><span class="p">[</span><span class="n">i2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span><span class="o">-</span><span class="n">Y</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
+                    <span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">i2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span><span class="o">-</span><span class="n">Z</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                 <span class="p">)</span>
-        <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sqrt</span><span class="p">((</span><span class="n">X</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">X</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>  
-                    <span class="p">(</span><span class="n">Y</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Y</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>  
-                    <span class="p">(</span><span class="n">Z</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Z</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sqrt</span><span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span><span class="o">-</span><span class="n">X</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
+                    <span class="p">(</span><span class="n">Y</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span><span class="o">-</span><span class="n">Y</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
+                    <span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j2</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span><span class="o">-</span><span class="n">Z</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                 <span class="p">)</span>
-        <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sqrt</span><span class="p">((</span><span class="n">X</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k2</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">X</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> 
-                    <span class="p">(</span><span class="n">Y</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k2</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Y</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> 
-                    <span class="p">(</span><span class="n">Z</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k2</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">-</span><span class="n">Z</span><span class="p">(</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sqrt</span><span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k2</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span><span class="o">-</span><span class="n">X</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
+                    <span class="p">(</span><span class="n">Y</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k2</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span><span class="o">-</span><span class="n">Y</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
+                    <span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k2</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span><span class="o">-</span><span class="n">Z</span><span class="p">[</span><span class="n">i1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">j1</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">k1</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                 <span class="p">)</span>
     <span class="n">aspect</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
@@ -118,17 +211,29 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">denominator</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Searches for the right step size that leads to block splits with the same greatest common divisor. Same greatest common denominator means you will always have the same multi-grid when you solve. </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find a step size along one index direction that preserves the block GCD.</span>
+
+<span class="sd">    Starting from an initial guess of ``round(ncells_per_block / denominator)``,</span>
+<span class="sd">    the function walks forward or backward by one until it finds a step size</span>
+<span class="sd">    where both the step itself and the final remainder block are divisible by</span>
+<span class="sd">    ``greatest_common_divisor``.  This guarantees every child block shares the</span>
+<span class="sd">    same multi-grid hierarchy as the parent.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        total_cells (int): [description]</span>
-<span class="sd">        greatest_common_divisor (int): [description]</span>
-<span class="sd">        ncells_per_block (int): [description]</span>
-<span class="sd">        denominator (float): If the direction is &quot;i&quot; then denominator is JMAX*KMAX</span>
-<span class="sd">        direction (str, optional): &#39;forward&#39; or &#39;backward&#39; This chooses to increment step direction by +1 or -1. Defaults to &#39;forward&#39;.</span>
+<span class="sd">        total_cells (int): Total number of cells in the parent block</span>
+<span class="sd">            (``IMAX * JMAX * KMAX``).</span>
+<span class="sd">        greatest_common_divisor (int): GCD of ``(IMAX-1)``, ``(JMAX-1)``, and</span>
+<span class="sd">            ``(KMAX-1)`` for the parent block.</span>
+<span class="sd">        ncells_per_block (int): Target number of cells per child block.</span>
+<span class="sd">        denominator (float): Product of the two index dimensions *not* being</span>
+<span class="sd">            split (e.g. ``JMAX * KMAX`` when splitting along i).</span>
+<span class="sd">        direction (str, optional): Search direction; ``&#39;forward&#39;`` increments</span>
+<span class="sd">            the step size by +1 and ``&#39;backward&#39;`` decrements by -1.</span>
+<span class="sd">            Defaults to ``&#39;forward&#39;``.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        [type]: [description]</span>
+<span class="sd">        int: A valid step size along the split direction, or ``-1`` if no</span>
+<span class="sd">        valid step size is found within the search bounds.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">step_size</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">ncells_per_block</span><span class="o">/</span><span class="n">denominator</span><span class="p">)</span>     <span class="c1"># initial Guess</span>
     <span class="n">initial_guess</span> <span class="o">=</span> <span class="n">step_size</span>
@@ -155,22 +260,41 @@
 <div class="viewcode-block" id="split_blocks">
 <a class="viewcode-back" href="../../modules/split_block.html#plot3d.split_block.split_blocks">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">split_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">ncells_per_block</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">direction</span><span class="p">:</span><span class="n">Direction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split blocks is used to divide an array of blocks based on number of cells per block. This code maintains the greatest common denominator of the parent block. Number of cells per block is simply an estimate of how many you want. The actual number will change to meet the greatest common denominator (GCD). GCD of 4 means multigrid of 3 e.g. grid/4 (coarse), 2 (fine), and 1 (finest). If a direction is not specified then for each block the longest index either i,j, or k is used. </span>
-<span class="sd">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Divide a list of structured blocks so that each child has roughly the target cell count.</span>
 
-<span class="sd">        Wisdom from Dave Rigby:</span>
-<span class="sd">            For example, for radial equilibrium we must integrate across the span.  Some codes (GlennHT used to) would want a single block across the entire span.  In that case you would want some additional control.</span>
-<span class="sd"> </span>
-<span class="sd">            Another example might be if you would like a block to include the entire boundary layer.  In that case you might introduce an aspect ratio control.</span>
-<span class="sd">            </span>
+<span class="sd">    The split preserves the greatest common divisor (GCD) of the parent block&#39;s</span>
+<span class="sd">    cell counts so that all child blocks remain compatible with the same</span>
+<span class="sd">    multi-grid hierarchy.  For example, a GCD of 4 supports three multigrid</span>
+<span class="sd">    levels: grid/4 (coarse), grid/2 (medium), and grid/1 (finest).</span>
+
+<span class="sd">    ``ncells_per_block`` is a target, not a guarantee.  The actual count is</span>
+<span class="sd">    adjusted to the nearest value that satisfies the GCD constraint.  Blocks</span>
+<span class="sd">    whose total cell count is already at or below ``ncells_per_block`` are</span>
+<span class="sd">    passed through unchanged.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Wisdom from Dave Rigby: additional controls such as integrating across</span>
+<span class="sd">        the full span (radial equilibrium) or keeping the entire boundary layer</span>
+<span class="sd">        inside a single block may require overriding the automatic direction</span>
+<span class="sd">        selection via the ``direction`` argument.</span>
+
 <span class="sd">    Args:</span>
-<span class="sd">        blocks (List[Block]): List of blocks</span>
-<span class="sd">        ncells_per_block (int): number of cells desired per block </span>
-<span class="sd">        direction (Direction): direction to split the blocks in. Direction.(i,j,k). Defaults to None. None means it will pick the direction for you based on which is greater IMAX, JMAX, or KMAX</span>
+<span class="sd">        blocks (List[Block]): Input list of structured Plot3D blocks to split.</span>
+<span class="sd">        ncells_per_block (int): Approximate target number of cells per child</span>
+<span class="sd">            block after splitting.</span>
+<span class="sd">        direction (Direction, optional): Index direction along which to split</span>
+<span class="sd">            every block.  When ``None`` (the default), the direction with the</span>
+<span class="sd">            largest index size (IMAX, JMAX, or KMAX) is chosen automatically</span>
+<span class="sd">            for each block.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Blocks (List[Block]): list of blocks split in the specified direction </span>
-<span class="sd">    &quot;&quot;&quot;</span> 
+<span class="sd">        List[Block]: New list of blocks after splitting.  Blocks that were</span>
+<span class="sd">        already smaller than ``ncells_per_block`` are included unmodified.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If no valid GCD-preserving step size can be found for a</span>
+<span class="sd">            block in either the forward or backward search direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="n">direction_to_use</span> <span class="o">=</span> <span class="n">direction</span> <span class="c1"># store the user input variable </span>
     
@@ -180,7 +304,7 @@
         <span class="n">total_cells</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="o">*</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="o">*</span><span class="n">block</span><span class="o">.</span><span class="n">KMAX</span>
 
         <span class="k">if</span> <span class="n">direction</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span> 
-            <span class="n">indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="p">]))</span>
+            <span class="n">indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="p">]))</span>
             <span class="k">if</span> <span class="n">indx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">direction_to_use</span><span class="o">=</span><span class="n">Direction</span><span class="o">.</span><span class="n">i</span>
             <span class="k">elif</span> <span class="n">indx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -199,7 +323,7 @@
                 <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">step_size</span> <span class="o">=</span> <span class="n">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">,</span><span class="n">denominator</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
-                    <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;no valid step size found, do you have multi-block? gcd &gt; 1&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;no valid step size found, do you have multi-block? gcd &gt; 1&#39;</span><span class="p">)</span>
                 <span class="c1"># step_size-1 is the IMAX of the sub_blocks e.g. 0 to 92 this shows IMAX=93, (93-1) % 4 = 0 (good)</span>
                 
                 <span class="n">iprev</span> <span class="o">=</span> <span class="mi">0</span>
@@ -227,10 +351,10 @@
                 <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">step_size</span> <span class="o">=</span> <span class="n">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">,</span><span class="n">denominator</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
-                    <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;no valid step size found, do you have multi-block? gcd &gt; 1&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;no valid step size found, do you have multi-block? gcd &gt; 1&#39;</span><span class="p">)</span>
                 <span class="n">jprev</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">step_size</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="p">,</span><span class="n">step_size</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">block</span><span class="o">.</span><span class="n">IMAX</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">block</span><span class="o">.</span><span class="n">JMAX</span><span class="p">:</span>
                         <span class="k">break</span>
                     <span class="n">X</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span><span class="n">jprev</span><span class="p">:</span><span class="n">j</span><span class="p">,:]</span>      <span class="c1"># New X, Y, Z splits </span>
                     <span class="n">Y</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">Y</span><span class="p">[:,</span><span class="n">jprev</span><span class="p">:</span><span class="n">j</span><span class="p">,:]</span>
@@ -251,7 +375,7 @@
                 <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">step_size</span> <span class="o">=</span> <span class="n">__step_search</span><span class="p">(</span><span class="n">total_cells</span><span class="p">,</span><span class="n">greatest_common_divisor</span><span class="p">,</span><span class="n">ncells_per_block</span><span class="p">,</span><span class="n">denominator</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">step_size</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
-                    <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;no valid step size found, do you have multi-block? gcd &gt; 1&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;no valid step size found, do you have multi-block? gcd &gt; 1&#39;</span><span class="p">)</span>
                 <span class="n">kprev</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">step_size</span><span class="p">,</span><span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="p">,</span><span class="n">step_size</span><span class="p">):</span>
                     <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">block</span><span class="o">.</span><span class="n">KMAX</span><span class="p">:</span>
@@ -277,43 +401,31 @@
         
 </pre></div>
 
-            <div class="clearer"></div>
+           </div>
           </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">plot3d.split_block</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
-    </div>
-  </body>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

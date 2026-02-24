@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plot3d.gridpro.import_functions &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plot3d.gridpro.import_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plot3d.gridpro.import_functions</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">plot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_header</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]]:</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="read_gridpro_to_blocks">
+<a class="viewcode-back" href="../../../modules/gridpro.html#plot3d.gridpro.import_functions.read_gridpro_to_blocks">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_gridpro_to_blocks</span><span class="p">(</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+    <span class="n">comment_prefixes</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;//&quot;</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a structured GridPro text grid into Plot3D Block objects.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename: Path to the GridPro grid file.</span>
+<span class="sd">        encoding: Encoding to use while reading the text file.</span>
+<span class="sd">        comment_prefixes: Line prefixes that should be treated as comments.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If a block does not contain the expected number of floats.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[Block]: A list of Block objects representing each GridPro block.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># seek first header</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">st</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">st</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">pfx</span><span class="p">)</span> <span class="k">for</span> <span class="n">pfx</span> <span class="ow">in</span> <span class="n">comment_prefixes</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">_parse_header</span><span class="p">(</span><span class="n">st</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="c1"># main block loop</span>
+        <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">hdr</span> <span class="o">=</span> <span class="n">_parse_header</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hdr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">continue</span>
+
+            <span class="n">IMAX</span><span class="p">,</span> <span class="n">JMAX</span><span class="p">,</span> <span class="n">KMAX</span> <span class="o">=</span> <span class="n">hdr</span>
+            <span class="n">total_pts</span> <span class="o">=</span> <span class="n">IMAX</span> <span class="o">*</span> <span class="n">JMAX</span> <span class="o">*</span> <span class="n">KMAX</span>
+            <span class="n">expected</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">total_pts</span>
+
+            <span class="c1"># use tqdm for this block</span>
+            <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">total_pts</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;pts&quot;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Block (</span><span class="si">{</span><span class="n">IMAX</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">JMAX</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">KMAX</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+                <span class="c1"># np.fromfile reads ALL floats in one go</span>
+                <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">expected</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">expected</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">expected</span><span class="si">}</span><span class="s2"> floats for block </span><span class="si">{</span><span class="n">hdr</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="p">)</span>
+                <span class="c1"># update tqdm to 100%</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">total_pts</span><span class="p">)</span>
+
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">total_pts</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">IMAX</span><span class="p">,</span> <span class="n">JMAX</span><span class="p">,</span> <span class="n">KMAX</span><span class="p">)</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">IMAX</span><span class="p">,</span> <span class="n">JMAX</span><span class="p">,</span> <span class="n">KMAX</span><span class="p">)</span>
+            <span class="n">Z</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">IMAX</span><span class="p">,</span> <span class="n">JMAX</span><span class="p">,</span> <span class="n">KMAX</span><span class="p">)</span>
+
+            <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">))</span>  <span class="c1"># type: ignore[name-defined]</span>
+
+            <span class="c1"># advance to next header (skip blanks/comments)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">line</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">comment_prefixes</span><span class="p">)):</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">blocks</span></div>
+
+
+
+<div class="viewcode-block" id="read_gridpro_connectivity">
+<a class="viewcode-back" href="../../../modules/gridpro.html#plot3d.gridpro.import_functions.read_gridpro_connectivity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_gridpro_connectivity</span><span class="p">(</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">sb_zero_based_in_file</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>     <span class="c1"># False if sb1/sb2 are 1-based in file</span>
+    <span class="n">index_zero_based_in_file</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># False if IMIN..KMAX are 1-based in file</span>
+    <span class="n">inlet_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">outlet_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">wall_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">symm_slip_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">custom_bc_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse a GridPro connectivity file into plot3d.connectivity_fast-like structures.</span>
+
+<span class="sd">    Expected P-line layout (as provided):</span>
+<span class="sd">    ``P pid sb1 sf1 sb2 sf2 fmap L1i L1j L1k H1i H1j H1k L2i L2j L2k H2i H2j H2k pty lbid``</span>
+
+<span class="sd">    Boundary-condition IDs default to GridPro&#39;s PTY values but can be overridden</span>
+<span class="sd">    via the provided ``*_ids`` arguments (either a list of PTY ints or</span>
+<span class="sd">    ``{&quot;name&quot;: str, &quot;ids&quot;: [...]}``) or extended via</span>
+<span class="sd">    ``custom_bc_ids={&quot;name&quot;: [ids]}``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path: Path to the GridPro connectivity file.</span>
+<span class="sd">        sb_zero_based_in_file: Set False if ``sb1/sb2`` are 1-based in the file.</span>
+<span class="sd">        index_zero_based_in_file: Set False if IMIN..KMAX are 1-based in the file.</span>
+<span class="sd">        inlet_ids: PTY ids to treat as inlet; defaults to ``[5]``.</span>
+<span class="sd">            Pass a dict ``{&quot;name&quot;: &quot;...&quot;, &quot;ids&quot;: [...]}`` to rename the group, or</span>
+<span class="sd">            provide a mapping like ``{&quot;Inlet&quot;: [...], &quot;Pressure Inlet&quot;: [...]}``</span>
+<span class="sd">            to emit multiple named inlet groups. Each named group remembers its</span>
+<span class="sd">            base type in the returned ``bc_group`` mapping.</span>
+<span class="sd">        outlet_ids: PTY ids to treat as outlet; defaults to ``[6]`` (same dict</span>
+<span class="sd">            options as ``inlet_ids``).</span>
+<span class="sd">        wall_ids: PTY ids to treat as wall; defaults to ``[2]`` (same dict options).</span>
+<span class="sd">        symm_slip_ids: PTY ids to treat as symmetry/slip; defaults to ``[4]`` (same dict options).</span>
+<span class="sd">        custom_bc_ids: Optional mapping of ``group_name -&gt; [pty ids]`` for any</span>
+<span class="sd">            additional boundary-condition groupings (e.g., ``{&quot;cooling&quot;: [500]}``).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict[str, object]: A dictionary with keys:</span>
+<span class="sd">            - ``face_matches``: list of face-pair dictionaries for connected blocks.</span>
+<span class="sd">            - ``all_surfaces``: list of faces on the exterior (no neighbor).</span>
+<span class="sd">            - ``ungrouped_surfaces``: exterior faces whose PTY does not belong to any BC group.</span>
+<span class="sd">            - ``bc_group``: mapping of bc name to a metadata dict</span>
+<span class="sd">              ``{&quot;type&quot;: base_type, &quot;pty_ids&quot;: [...], &quot;faces&quot;: [...]}``. Each</span>
+<span class="sd">              face dict also includes ``bc_name`` (group label) and ``bc_type``.</span>
+<span class="sd">            - ``gif_faces``: list of faces tagged as GIF (pty 12..21 or 1000).</span>
+<span class="sd">            - ``periodic_faces``: list of paired periodic faces (pty 3).</span>
+<span class="sd">            - ``volume_zones``: list describing volume zone type per superblock.</span>
+<span class="sd">            - ``blocksizes``: list of per-superblock cell counts (I*J*K).</span>
+<span class="sd">            - ``patches``: pandas DataFrame of raw patch records.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Basic usage with defaults::</span>
+
+<span class="sd">            data = read_gridpro_connectivity(&quot;connectivity.dat&quot;)</span>
+<span class="sd">            inlet_faces = data[&quot;bc_group&quot;][&quot;inlet&quot;][&quot;faces&quot;]</span>
+
+<span class="sd">        Override built-in BC ids and add a custom group::</span>
+
+<span class="sd">            data = read_gridpro_connectivity(</span>
+<span class="sd">                &quot;connectivity.dat&quot;,</span>
+<span class="sd">                inlet_ids=[5, 105],</span>
+<span class="sd">                custom_bc_ids={&quot;cooling_hole1&quot;: [500]},</span>
+<span class="sd">            )</span>
+<span class="sd">            cooling_faces = data[&quot;bc_group&quot;][&quot;cooling_hole1&quot;][&quot;faces&quot;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ---------------------------- parsing ----------------------------</span>
+    <span class="n">superblock_ptys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">superblock_sizes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">patch_rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">sb_offset</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">sb_zero_based_in_file</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">idx_offset</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">index_zero_based_in_file</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># convert to 0-based if file is 1-based</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_patch</span><span class="p">(</span><span class="n">tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Expect at least 21 tokens: P + 20 fields</span>
+        <span class="c1"># P pid sb1 sf1 sb2 sf2 fmap  L1i L1j L1k  H1i H1j H1k  L2i L2j L2k  H2i H2j H2k  pty lbid</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">21</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patch line too short: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pid</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">sb1_raw</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">sf1</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">sb2_raw</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+            <span class="n">sf2</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+            
+            <span class="n">sb1</span> <span class="o">=</span> <span class="n">sb1_raw</span> <span class="o">-</span> <span class="mi">1</span>            <span class="c1"># 1..76 -&gt; 0..75</span>
+            <span class="n">sb2</span> <span class="o">=</span> <span class="p">(</span><span class="n">sb2_raw</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">sb2_raw</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>   <span class="c1"># 0 -&gt; -1 (no neighbor), 1..76 -&gt; 0..75</span>
+
+            <span class="n">fmap</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>  <span class="c1"># keep as string like &#39;012&#39;</span>
+
+            <span class="c1"># Triplets</span>
+            <span class="n">L1i</span><span class="p">,</span> <span class="n">L1j</span><span class="p">,</span> <span class="n">L1k</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>  <span class="o">+</span> <span class="n">idx_offset</span><span class="p">,</span>
+                              <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span>  <span class="o">+</span> <span class="n">idx_offset</span><span class="p">,</span>
+                              <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span>  <span class="o">+</span> <span class="n">idx_offset</span><span class="p">)</span>
+            <span class="n">H1i</span><span class="p">,</span> <span class="n">H1j</span><span class="p">,</span> <span class="n">H1k</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span> <span class="o">+</span> <span class="n">idx_offset</span><span class="p">,</span>
+                              <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">11</span><span class="p">])</span> <span class="o">+</span> <span class="n">idx_offset</span><span class="p">,</span>
+                              <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">12</span><span class="p">])</span> <span class="o">+</span> <span class="n">idx_offset</span><span class="p">)</span>
+            <span class="n">L2i</span><span class="p">,</span> <span class="n">L2j</span><span class="p">,</span> <span class="n">L2k</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">13</span><span class="p">])</span> <span class="o">+</span> <span class="n">idx_offset</span><span class="p">,</span>
+                              <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">14</span><span class="p">])</span> <span class="o">+</span> <span class="n">idx_offset</span><span class="p">,</span>
+                              <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">15</span><span class="p">])</span> <span class="o">+</span> <span class="n">idx_offset</span><span class="p">)</span>
+            <span class="n">H2i</span><span class="p">,</span> <span class="n">H2j</span><span class="p">,</span> <span class="n">H2k</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">16</span><span class="p">])</span> <span class="o">+</span> <span class="n">idx_offset</span><span class="p">,</span>
+                              <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">17</span><span class="p">])</span> <span class="o">+</span> <span class="n">idx_offset</span><span class="p">,</span>
+                              <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">18</span><span class="p">])</span> <span class="o">+</span> <span class="n">idx_offset</span><span class="p">)</span>
+
+            <span class="n">pty</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">19</span><span class="p">])</span>
+            <span class="n">lbid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">20</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to parse patch line: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+        <span class="n">patch_rows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;pid&quot;</span><span class="p">:</span> <span class="n">pid</span><span class="p">,</span> <span class="s2">&quot;sb1&quot;</span><span class="p">:</span> <span class="n">sb1</span><span class="p">,</span> <span class="s2">&quot;sf1&quot;</span><span class="p">:</span> <span class="n">sf1</span><span class="p">,</span> <span class="s2">&quot;sb2&quot;</span><span class="p">:</span> <span class="n">sb2</span><span class="p">,</span> <span class="s2">&quot;sf2&quot;</span><span class="p">:</span> <span class="n">sf2</span><span class="p">,</span>
+            <span class="s2">&quot;fmap&quot;</span><span class="p">:</span> <span class="n">fmap</span><span class="p">,</span>
+            <span class="s2">&quot;L1i&quot;</span><span class="p">:</span> <span class="n">L1i</span><span class="p">,</span> <span class="s2">&quot;L1j&quot;</span><span class="p">:</span> <span class="n">L1j</span><span class="p">,</span> <span class="s2">&quot;L1k&quot;</span><span class="p">:</span> <span class="n">L1k</span><span class="p">,</span> <span class="s2">&quot;H1i&quot;</span><span class="p">:</span> <span class="n">H1i</span><span class="p">,</span> <span class="s2">&quot;H1j&quot;</span><span class="p">:</span> <span class="n">H1j</span><span class="p">,</span> <span class="s2">&quot;H1k&quot;</span><span class="p">:</span> <span class="n">H1k</span><span class="p">,</span>
+            <span class="s2">&quot;L2i&quot;</span><span class="p">:</span> <span class="n">L2i</span><span class="p">,</span> <span class="s2">&quot;L2j&quot;</span><span class="p">:</span> <span class="n">L2j</span><span class="p">,</span> <span class="s2">&quot;L2k&quot;</span><span class="p">:</span> <span class="n">L2k</span><span class="p">,</span> <span class="s2">&quot;H2i&quot;</span><span class="p">:</span> <span class="n">H2i</span><span class="p">,</span> <span class="s2">&quot;H2j&quot;</span><span class="p">:</span> <span class="n">H2j</span><span class="p">,</span> <span class="s2">&quot;H2k&quot;</span><span class="p">:</span> <span class="n">H2k</span><span class="p">,</span>
+            <span class="s2">&quot;pty&quot;</span><span class="p">:</span> <span class="n">pty</span><span class="p">,</span> <span class="s2">&quot;lbid&quot;</span><span class="p">:</span> <span class="n">lbid</span>
+        <span class="p">})</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;//&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">toks</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">toks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;SB&quot;</span><span class="p">:</span>
+                <span class="n">superblock_ptys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]))</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">I_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="n">J_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="n">K_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+                    <span class="n">superblock_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">I_dim</span> <span class="o">*</span> <span class="n">J_dim</span> <span class="o">*</span> <span class="n">K_dim</span><span class="p">)</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                    <span class="n">superblock_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;P&quot;</span><span class="p">:</span>
+                <span class="n">parse_patch</span><span class="p">(</span><span class="n">toks</span><span class="p">)</span>
+
+    <span class="n">patches_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">patch_rows</span><span class="p">)</span>
+    <span class="n">patches_to_connectivity</span> <span class="o">=</span> <span class="n">patches_df</span><span class="p">[(</span><span class="n">patches_df</span><span class="p">[</span><span class="s1">&#39;sb1&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">patches_df</span><span class="p">[</span><span class="s1">&#39;sb2&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">patches_df</span><span class="p">[</span><span class="s1">&#39;pty&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)]</span>
+    
+
+    <span class="c1"># ---------------------------- helpers ----------------------------</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">face_dict</span><span class="p">(</span><span class="n">sb</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">imin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">jmin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">kmin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">imax</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">jmax</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">kmax</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pty</span><span class="p">:</span><span class="nb">int</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="c1"># Matches plot3d.connectivity_fast single-face dict shape</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;block_index&quot;</span><span class="p">:</span> <span class="n">sb</span><span class="p">,</span>
+            <span class="s2">&quot;IMIN&quot;</span><span class="p">:</span> <span class="n">imin</span><span class="p">,</span> <span class="s2">&quot;JMIN&quot;</span><span class="p">:</span> <span class="n">jmin</span><span class="p">,</span> <span class="s2">&quot;KMIN&quot;</span><span class="p">:</span> <span class="n">kmin</span><span class="p">,</span>
+            <span class="s2">&quot;IMAX&quot;</span><span class="p">:</span> <span class="n">imax</span><span class="p">,</span> <span class="s2">&quot;JMAX&quot;</span><span class="p">:</span> <span class="n">jmax</span><span class="p">,</span> <span class="s2">&quot;KMAX&quot;</span><span class="p">:</span> <span class="n">kmax</span><span class="p">,</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">pty</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">pair_dict</span><span class="p">(</span><span class="n">sb1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">r1</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">],</span>
+                  <span class="n">sb2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">r2</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="n">L1i</span><span class="p">,</span><span class="n">L1j</span><span class="p">,</span><span class="n">L1k</span><span class="p">,</span><span class="n">H1i</span><span class="p">,</span><span class="n">H1j</span><span class="p">,</span><span class="n">H1k</span> <span class="o">=</span> <span class="n">r1</span>
+        <span class="n">L2i</span><span class="p">,</span><span class="n">L2j</span><span class="p">,</span><span class="n">L2k</span><span class="p">,</span><span class="n">H2i</span><span class="p">,</span><span class="n">H2j</span><span class="p">,</span><span class="n">H2k</span> <span class="o">=</span> <span class="n">r2</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;block1&quot;</span><span class="p">:</span> <span class="n">face_dict</span><span class="p">(</span><span class="n">sb1</span><span class="p">,</span> <span class="n">L1i</span><span class="p">,</span> <span class="n">L1j</span><span class="p">,</span> <span class="n">L1k</span><span class="p">,</span> <span class="n">H1i</span><span class="p">,</span> <span class="n">H1j</span><span class="p">,</span> <span class="n">H1k</span><span class="p">),</span>
+            <span class="s2">&quot;block2&quot;</span><span class="p">:</span> <span class="n">face_dict</span><span class="p">(</span><span class="n">sb2</span><span class="p">,</span> <span class="n">L2i</span><span class="p">,</span> <span class="n">L2j</span><span class="p">,</span> <span class="n">L2k</span><span class="p">,</span> <span class="n">H2i</span><span class="p">,</span> <span class="n">H2j</span><span class="p">,</span> <span class="n">H2k</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="c1"># ------------------------- build outputs -------------------------</span>
+    <span class="c1"># Connections: sb2 != -1 (i.e., not &quot;none&quot;) and pty in {1,3}</span>
+    <span class="n">connections</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">patches_df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">sb2</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">pty</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)):</span>
+            <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">pair_dict</span><span class="p">(</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">sb1</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">L1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1k</span><span class="p">),</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">sb2</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">L2i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L2j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L2k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H2i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H2j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H2k</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="c1"># These are patches that should be in connectivity but aren&#39;t </span>
+    <span class="n">connectivity_to_check</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span> 
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">patches_to_connectivity</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> 
+        <span class="n">connectivity_to_check</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pair_dict</span><span class="p">(</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">sb1</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">L1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1k</span><span class="p">),</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">sb2</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">L2i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L2j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L2k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H2i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H2j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H2k</span><span class="p">),</span>
+                <span class="p">))</span>
+   
+    <span class="c1"># Boundary-condition groups (by pty)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bc_faces_for</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pty_vals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">bc_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">pty_vals</span><span class="p">)</span>
+        <span class="n">faces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">patches_df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">pty</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+                <span class="n">face</span> <span class="o">=</span> <span class="n">face_dict</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">sb1</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">pty</span><span class="p">)</span>
+                <span class="n">face</span><span class="p">[</span><span class="s2">&quot;bc_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>  <span class="c1"># type: ignore</span>
+                <span class="n">face</span><span class="p">[</span><span class="s2">&quot;bc_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bc_type</span>  <span class="c1"># type: ignore</span>
+                <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">faces</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">normalize_bc_arg</span><span class="p">(</span>
+        <span class="n">arg</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
+        <span class="n">bc_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">default_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">coerce_ids</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[]</span>
+            <span class="c1"># Allow nested {&quot;ids&quot;: [...]} dictionaries to be passed directly</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">coerce_ids</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ids&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">values</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[(</span><span class="n">bc_type</span><span class="p">,</span> <span class="n">coerce_ids</span><span class="p">(</span><span class="n">default_ids</span><span class="p">))]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="c1"># Support legacy {&quot;name&quot;: str, &quot;ids&quot;: [...]} as well as</span>
+            <span class="c1"># {&quot;CustomName&quot;: [...], &quot;AnotherName&quot;: [...]} mappings.</span>
+            <span class="k">if</span> <span class="s2">&quot;ids&quot;</span> <span class="ow">in</span> <span class="n">arg</span> <span class="ow">or</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+                <span class="n">ids</span> <span class="o">=</span> <span class="n">coerce_ids</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ids&quot;</span><span class="p">,</span> <span class="n">default_ids</span><span class="p">))</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">bc_type</span><span class="p">)</span> <span class="ow">or</span> <span class="n">bc_type</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[(</span><span class="n">name</span><span class="p">,</span> <span class="n">ids</span><span class="p">)]</span>
+
+            <span class="n">normalized</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">ids_val</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">ids_list</span> <span class="o">=</span> <span class="n">coerce_ids</span><span class="p">(</span><span class="n">ids_val</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ids_list</span><span class="p">:</span>
+                    <span class="n">normalized</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">ids_list</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">normalized</span>
+
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">coerce_ids</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">bc_type</span><span class="p">,</span> <span class="n">ids</span><span class="p">)]</span>
+
+    <span class="n">bc_group</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">grouped_bc_ids</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_bc_group</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">bc_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">normalized_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ids</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">})</span>
+        <span class="n">faces</span> <span class="o">=</span> <span class="n">bc_faces_for</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">normalized_ids</span><span class="p">,</span> <span class="n">bc_type</span><span class="p">)</span> <span class="k">if</span> <span class="n">normalized_ids</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">faces</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">bc_group</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">bc_type</span><span class="p">,</span>
+            <span class="s2">&quot;pty_ids&quot;</span><span class="p">:</span> <span class="n">normalized_ids</span><span class="p">,</span>
+            <span class="s2">&quot;faces&quot;</span><span class="p">:</span> <span class="n">faces</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">grouped_bc_ids</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">normalized_ids</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">bc_type</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;inlet&quot;</span><span class="p">,</span> <span class="n">normalize_bc_arg</span><span class="p">(</span><span class="n">inlet_ids</span><span class="p">,</span> <span class="s2">&quot;inlet&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">5</span><span class="p">])),</span>
+        <span class="p">(</span><span class="s2">&quot;outlet&quot;</span><span class="p">,</span> <span class="n">normalize_bc_arg</span><span class="p">(</span><span class="n">outlet_ids</span><span class="p">,</span> <span class="s2">&quot;outlet&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">6</span><span class="p">])),</span>
+        <span class="p">(</span><span class="s2">&quot;symm_slip&quot;</span><span class="p">,</span> <span class="n">normalize_bc_arg</span><span class="p">(</span><span class="n">symm_slip_ids</span><span class="p">,</span> <span class="s2">&quot;symm_slip&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">])),</span>
+        <span class="p">(</span><span class="s2">&quot;wall&quot;</span><span class="p">,</span> <span class="n">normalize_bc_arg</span><span class="p">(</span><span class="n">wall_ids</span><span class="p">,</span> <span class="s2">&quot;wall&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">])),</span>
+    <span class="p">]:</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">ids</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+            <span class="n">add_bc_group</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">bc_type</span><span class="p">)</span>
+
+    <span class="c1"># add any user-defined boundary groups keyed by name -&gt; list of pty ids</span>
+    <span class="k">if</span> <span class="n">custom_bc_ids</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">ids</span> <span class="ow">in</span> <span class="n">custom_bc_ids</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">add_bc_group</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ids</span> <span class="ow">or</span> <span class="p">[],</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="c1"># Outer faces: sb2 == -1 (means &#39;0&#39; in file when sb_zero_based_in_file=False; or literal 0 if already zero-based)</span>
+    <span class="c1"># To cover both cases, treat original token value 0 as &quot;no neighbor&quot;.</span>
+    <span class="c1"># Since we already applied sb_offset, &quot;no neighbor&quot; now appears as -1.</span>
+    <span class="n">all_surfaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ungrouped_surfaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">patches_df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">sb2</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">face</span> <span class="o">=</span> <span class="n">face_dict</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">sb1</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">pty</span><span class="p">)</span>
+            <span class="n">all_surfaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">pty</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">grouped_bc_ids</span><span class="p">:</span>
+                <span class="n">ungrouped_surfaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+    <span class="c1"># Periodic faces: pty == 3 (explicit pairs)</span>
+    <span class="n">periodic_faces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">patches_df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">pty</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">sb2</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">periodic_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">pair_dict</span><span class="p">(</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">sb1</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">L1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1k</span><span class="p">),</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">sb2</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">L2i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L2j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L2k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H2i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H2j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H2k</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            
+    <span class="c1"># GIF faces grouped by sf1 for pty in 12..21 or == 1000</span>
+    <span class="n">gif_faces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">patches_df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="c1">#? This is how we identify gifs inside of a grid pro connectivity file. </span>
+<span class="c1">#? If the PTY is between 12 and 21 these are gifs</span>
+        <span class="k">if</span> <span class="p">(</span><span class="mi">12</span> <span class="o">&lt;=</span> <span class="n">p</span><span class="o">.</span><span class="n">pty</span> <span class="o">&lt;=</span> <span class="mi">21</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">pty</span> <span class="o">==</span> <span class="mi">1000</span><span class="p">):</span>
+            <span class="n">face_temp</span> <span class="o">=</span> <span class="n">face_dict</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">sb1</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">L1k</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1i</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1j</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">H1k</span><span class="p">)</span>
+            <span class="n">face_temp</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">pty</span>  <span class="c1"># type: ignore</span>
+            <span class="n">gif_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face_temp</span><span class="p">)</span>
+
+    <span class="c1"># Volume zones (unique superblock ptys; odd→fluid, even→solid) with contiguous ids</span>
+    <span class="n">volume_zones</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prevZoneType</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">cid</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="nb">id</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">superblock_ptys</span><span class="p">):</span>
+        <span class="n">zone</span> <span class="o">=</span> <span class="s2">&quot;fluid&quot;</span> <span class="k">if</span> <span class="p">(</span><span class="n">v</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;solid&quot;</span>
+        <span class="k">if</span> <span class="n">zone</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">prevZoneType</span><span class="p">:</span>
+            <span class="n">cid</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">prevZoneType</span> <span class="o">=</span> <span class="n">zone</span>
+        <span class="n">volume_zones</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;block_index&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span> <span class="s2">&quot;zone_type&quot;</span><span class="p">:</span> <span class="n">zone</span><span class="p">,</span> <span class="s2">&quot;contiguous_index&quot;</span><span class="p">:</span> <span class="n">cid</span><span class="p">})</span>
+        
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;face_matches&quot;</span><span class="p">:</span> <span class="n">connections</span><span class="p">,</span>
+        <span class="s2">&quot;all_surfaces&quot;</span><span class="p">:</span> <span class="n">all_surfaces</span><span class="p">,</span>
+        <span class="s2">&quot;ungrouped_surfaces&quot;</span><span class="p">:</span> <span class="n">ungrouped_surfaces</span><span class="p">,</span>
+        <span class="s2">&quot;bc_group&quot;</span><span class="p">:</span> <span class="n">bc_group</span><span class="p">,</span>
+        <span class="s2">&quot;gif_faces&quot;</span><span class="p">:</span> <span class="n">gif_faces</span><span class="p">,</span>
+        <span class="s2">&quot;periodic_faces&quot;</span><span class="p">:</span> <span class="n">periodic_faces</span><span class="p">,</span>
+        <span class="s2">&quot;volume_zones&quot;</span><span class="p">:</span> <span class="n">volume_zones</span><span class="p">,</span>
+        <span class="s2">&quot;blocksizes&quot;</span><span class="p">:</span> <span class="n">superblock_sizes</span><span class="p">,</span>
+        <span class="s2">&quot;connectivity_to_check&quot;</span><span class="p">:</span> <span class="n">connectivity_to_check</span><span class="p">,</span>
+        <span class="s2">&quot;patches&quot;</span><span class="p">:</span> <span class="n">patches_df</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="bc_faces_by_type">
+<a class="viewcode-back" href="../../../modules/gridpro.html#plot3d.gridpro.import_functions.bc_faces_by_type">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bc_faces_by_type</span><span class="p">(</span>
+    <span class="n">bc_group</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">bc_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">unique</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect faces for a specific boundary-condition type across all named groups.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bc_group: Mapping returned by :func:`read_gridpro_connectivity` (supports</span>
+<span class="sd">            both the legacy ``{name: [faces]}`` and the new</span>
+<span class="sd">            ``{name: {&quot;type&quot;: ..., &quot;faces&quot;: [...]}}`` shapes).</span>
+<span class="sd">        bc_type: Base BC type (``&quot;inlet&quot;``, ``&quot;outlet&quot;``, ``&quot;wall&quot;``, ``&quot;symm_slip&quot;``).</span>
+<span class="sd">        unique: When True, keep only the first face per unique ``id``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of face dictionaries belonging to the requested base type.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">faces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="p">(</span><span class="n">bc_type</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">bc_group</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">entry_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">entry_faces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;faces&quot;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
+            <span class="n">entry_faces</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;faces&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[]</span>
+            <span class="n">entry_type</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bc_type&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">entry_faces</span> <span class="o">=</span> <span class="n">entry</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="n">entry_faces</span><span class="p">:</span>
+            <span class="n">ftype</span> <span class="o">=</span> <span class="n">entry_type</span> <span class="ow">or</span> <span class="n">face</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bc_type&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">face</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bc_name&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ftype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">ftype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="n">target</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">fid</span> <span class="o">=</span> <span class="n">face</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unique</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">fid</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fid</span><span class="p">)</span>
+            <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">faces</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

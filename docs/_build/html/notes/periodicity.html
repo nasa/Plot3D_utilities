@@ -1,59 +1,140 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html lang="en" data-content_root="../">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Periodicity &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
-    <title>Periodicity &#8212; Plot3D 1.6.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
-    
-    <script src="../_static/documentation_options.js?v=514bbfa0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Exporting to GlennHT Connectivity Files" href="exporting.html" />
     <link rel="prev" title="Block to Block Connectivity" href="connectivity.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="exporting.html" title="Exporting to GlennHT Connectivity Files"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="connectivity.html" title="Block to Block Connectivity"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Periodicity</a></li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Periodicity</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/notes/periodicity.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="periodicity">
-<h1>Periodicity<a class="headerlink" href="#periodicity" title="Link to this heading">¶</a></h1>
-<p>The domain above has a periodicity on the side walls and from block 1 to block 2 on the suction side. Plot3D library can find periodic surfaces. Periodic surfaces can only be found by rotation about the x-axis. The user also needs to specify which direction is periodic either <em>i</em>, <em>j</em>, or <em>k</em>. Combinations of outer faces are searched to find the ones that are periodic when rotated about the x-axis and in the “k” direction (default option). Below is an example on how to find periodic surfaces.</p>
+<h1>Periodicity<a class="headerlink" href="#periodicity" title="Link to this heading"></a></h1>
+<p>Periodicity is when you rotate a mesh sector about an axis and one side lines up with the other – like a slice of pie that tiles into a full circle. Plot3D library can find periodic surfaces using <code class="docutils literal notranslate"><span class="pre">rotated_periodicity</span></code>. It detects which outer faces match after rotation by a given angle about any axis (x, y, or z).</p>
+<dl class="simple">
+<dt>The function automatically:</dt><dd><ul class="simple">
+<li><p>Reduces the mesh by GCD for faster matching</p></li>
+<li><p>Detects angular boundary faces to narrow the search space</p></li>
+<li><p>Applies geometric pre-checks to reject non-matching pairs cheaply</p></li>
+<li><p>Tries both +angle and -angle rotations for robustness</p></li>
+</ul>
+</dd>
+</dl>
+<p>The matching algorithm has multiple phases:</p>
+<p><strong>Phase 2</strong> – Main greedy loop with centroid precheck. Each unmatched face is tested against rotated candidates. Partial matches produce split faces that re-enter the pool. Runs until convergence with no iteration limit.</p>
+<p><strong>Phase 3</strong> – Relaxed matching without centroid precheck. Uses 5x tolerance (5e-6) to catch wavy-surface faces rejected by the centroid filter. Also runs until convergence with <strong>no iteration limit</strong> (earlier versions had a hardcoded limit of 50 iterations which was insufficient for large meshes needing 100+ iterations).</p>
+<p>You can optionally filter by <code class="docutils literal notranslate"><span class="pre">periodic_direction</span></code> (‘i’, ‘j’, or ‘k’) to only check faces on a constant index plane.</p>
 <p>In this example we will use the file  <a class="reference external" href="https://nasa-public-data.s3.amazonaws.com/plot3d_utilities/PahtCascade-ASCII.xyz">PahtCascade-ASCII</a></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span><span class="w"> </span><span class="nn">plot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">periodicity</span><span class="p">,</span> <span class="n">connectivity</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span><span class="w"> </span><span class="nn">plot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_plot3D</span><span class="p">,</span> <span class="n">read_plot3D</span><span class="p">,</span> <span class="n">rotated_periodicity</span><span class="p">,</span> <span class="n">connectivity_fast</span>
 <span class="linenos">2</span>
 <span class="linenos">3</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">read_plot3D</span><span class="p">(</span><span class="s1">&#39;PahtCascade-ASCII.xyz&#39;</span><span class="p">,</span> <span class="n">binary</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
-<span class="linenos">4</span><span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces_formatted</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
-<span class="linenos">5</span><span class="n">periodic_surfaces</span><span class="p">,</span> <span class="n">outer_faces_to_keep</span> <span class="o">=</span> <span class="n">periodicity</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">outer_faces</span><span class="p">,</span><span class="n">face_matches</span><span class="p">,</span><span class="n">periodic_direction</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span><span class="n">rotation_axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">nblades</span><span class="o">=</span><span class="mi">55</span><span class="p">)</span>
-<span class="linenos">6</span><span class="c1"># Append periodic surfaces to face_matches</span>
-<span class="linenos">7</span><span class="n">face_matches</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">periodic_surfaces</span><span class="p">)</span>
+<span class="linenos">4</span><span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces</span> <span class="o">=</span> <span class="n">connectivity_fast</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+<span class="linenos">5</span><span class="n">periodic_surfaces</span><span class="p">,</span> <span class="n">outer_faces_to_keep</span><span class="p">,</span> <span class="n">periodic_faces</span><span class="p">,</span> <span class="n">outer_faces</span> <span class="o">=</span> <span class="n">rotated_periodicity</span><span class="p">(</span>
+<span class="linenos">6</span>    <span class="n">blocks</span><span class="p">,</span> <span class="n">face_matches</span><span class="p">,</span> <span class="n">outer_faces</span><span class="p">,</span>
+<span class="linenos">7</span>    <span class="n">nblades</span><span class="o">=</span><span class="mi">55</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">periodic_direction</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="linenos">8</span><span class="c1"># Append periodic surfaces to face_matches</span>
+<span class="linenos">9</span><span class="n">face_matches</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">periodic_surfaces</span><span class="p">)</span>
 </pre></div>
 </div>
 <figure class="align-center">
@@ -68,65 +149,34 @@
 </section>
 
 
-            <div class="clearer"></div>
+           </div>
           </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="connectivity.html" class="btn btn-neutral float-left" title="Block to Block Connectivity" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="exporting.html" class="btn btn-neutral float-right" title="Exporting to GlennHT Connectivity Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="connectivity.html"
-                          title="previous chapter">Block to Block Connectivity</a></p>
+    </section>
   </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="exporting.html"
-                          title="next chapter">Exporting to GlennHT Connectivity Files</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/notes/periodicity.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="exporting.html" title="Exporting to GlennHT Connectivity Files"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="connectivity.html" title="Block to Block Connectivity"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Plot3D 1.6.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Periodicity</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2025, Paht Juangphanich.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
-    </div>
-  </body>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

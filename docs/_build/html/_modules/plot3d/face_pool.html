@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plot3d.face_pool &mdash; Plot3D 1.8.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=269e6701"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Plot3D
+          </a>
+              <div class="version">
+                1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Information:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/plot3d.html">Plot3D Data Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/reading_writing.html">Reading and Writing Plot3D Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/connectivity.html">Block to Block Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/exporting.html">Exporting to GlennHT Connectivity Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/split-blocks.html">Split Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block.html">Block</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/block_merging.html">Block Merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/blockfunctions.html">Block Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/differencing.html">Differencing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face.html">Face</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/face_pool.html">Face Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/facefunctions.html">Face Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/graph.html">Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/listfunctions.html">List Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/periodicity.html">Periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/point_match.html">Point Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/read.html">Read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/split_block.html">Splitting Blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/write.html">Write</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Subpackages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/glennht.html">GlennHT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/gridpro.html">GridPro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/pointwise.html">Pointwise</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Plot3D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plot3d.face_pool</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plot3d.face_pool</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;FacePool: Theta-bucketed spatial index for rotational periodicity matching.</span>
+
+<span class="sd">Ported from the Rust ``face_pool.rs`` implementation in plot3d-rs. Provides</span>
+<span class="sd">O(log N) candidate lookup via binary search on theta-sorted face centroids,</span>
+<span class="sd">with axial/radial overlap pre-checks to reject non-overlapping faces.</span>
+
+<span class="sd">The key idea: for rotational periodicity, we only need to check faces whose</span>
+<span class="sd">angular position (theta) is within ``rotation_angle`` of the query face.</span>
+<span class="sd">By sorting faces by theta and using binary search, we reduce candidate</span>
+<span class="sd">selection from O(N) linear scan to O(log N + k) where k is the number of</span>
+<span class="sd">candidates in the angular window.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">bisect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.face</span><span class="w"> </span><span class="kn">import</span> <span class="n">Face</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.facefunctions</span><span class="w"> </span><span class="kn">import</span> <span class="n">_to_theta</span><span class="p">,</span> <span class="n">_to_radius</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">face_key</span> <span class="k">as</span> <span class="n">_utils_face_key</span>
+
+
+<div class="viewcode-block" id="CylindricalFaceInfo">
+<a class="viewcode-back" href="../../modules/face_pool.html#plot3d.face_pool.CylindricalFaceInfo">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CylindricalFaceInfo</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cylindrical coordinate extents for a single face.&quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;theta_centroid&#39;</span><span class="p">,</span> <span class="s1">&#39;axial_centroid&#39;</span><span class="p">,</span> <span class="s1">&#39;radial_centroid&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;theta_min&#39;</span><span class="p">,</span> <span class="s1">&#39;theta_max&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;axial_min&#39;</span><span class="p">,</span> <span class="s1">&#39;axial_max&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;radial_min&#39;</span><span class="p">,</span> <span class="s1">&#39;radial_max&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="CylindricalFaceInfo.__init__">
+<a class="viewcode-back" href="../../modules/face_pool.html#plot3d.face_pool.CylindricalFaceInfo.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">face</span><span class="p">:</span> <span class="n">Face</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">face</span><span class="o">.</span><span class="n">nvertex</span>
+        <span class="n">xs</span> <span class="o">=</span> <span class="n">face</span><span class="o">.</span><span class="n">x</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">ys</span> <span class="o">=</span> <span class="n">face</span><span class="o">.</span><span class="n">y</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">zs</span> <span class="o">=</span> <span class="n">face</span><span class="o">.</span><span class="n">z</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+
+        <span class="c1"># Centroid in cylindrical coords</span>
+        <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span> <span class="o">=</span> <span class="n">face</span><span class="o">.</span><span class="n">cx</span><span class="p">,</span> <span class="n">face</span><span class="o">.</span><span class="n">cy</span><span class="p">,</span> <span class="n">face</span><span class="o">.</span><span class="n">cz</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">theta_centroid</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_to_theta</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axial_centroid</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_axial_coord</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radial_centroid</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_to_radius</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">))</span>
+
+        <span class="c1"># Extent from all face grid points (not just corners)</span>
+        <span class="n">pts</span> <span class="o">=</span> <span class="n">face</span><span class="o">.</span><span class="n">grid_points</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pts</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">thetas</span> <span class="o">=</span> <span class="n">_to_theta</span><span class="p">(</span><span class="n">pts</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">rotation_axis</span><span class="p">)</span>
+            <span class="n">axials</span> <span class="o">=</span> <span class="n">_axial_array</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">)</span>
+            <span class="n">radials</span> <span class="o">=</span> <span class="n">_to_radius</span><span class="p">(</span><span class="n">pts</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">rotation_axis</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">thetas</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">thetas</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">axial_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axials</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">axial_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axials</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">radial_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">radials</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">radial_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">radials</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Fallback to vertex-only extents</span>
+            <span class="n">thetas</span> <span class="o">=</span> <span class="n">_to_theta</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">)</span>
+            <span class="n">axials</span> <span class="o">=</span> <span class="n">_axial_array_verts</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">)</span>
+            <span class="n">radials</span> <span class="o">=</span> <span class="n">_to_radius</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">thetas</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">thetas</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">axial_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axials</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">axial_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axials</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">radial_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">radials</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">radial_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">radials</span><span class="p">))</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_axial_coord</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract the axial coordinate along the rotation axis.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rotation_axis</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">rotation_axis</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_axial_array</span><span class="p">(</span><span class="n">pts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract axial coordinate array from (N,3) points.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rotation_axis</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">rotation_axis</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_axial_array_verts</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract axial coordinate array from separate x,y,z arrays.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rotation_axis</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">rotation_axis</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="FacePool">
+<a class="viewcode-back" href="../../modules/face_pool.html#plot3d.face_pool.FacePool">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FacePool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Theta-sorted face pool for efficient rotational candidate lookup.</span>
+
+<span class="sd">    Faces are indexed by their cylindrical theta centroid. Finding candidates</span>
+<span class="sd">    for a given target theta is done via binary search + linear scan within</span>
+<span class="sd">    the angular tolerance window, with axial/radial overlap checks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="FacePool.__init__">
+<a class="viewcode-back" href="../../modules/face_pool.html#plot3d.face_pool.FacePool.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">faces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">],</span> <span class="n">blocks</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the face pool from a list of faces.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            faces: List of Face objects to index</span>
+<span class="sd">            blocks: List of Block objects (indexed by face.blockIndex)</span>
+<span class="sd">            rotation_axis: &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Face</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span> <span class="o">=</span> <span class="n">rotation_axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_blocks</span> <span class="o">=</span> <span class="n">blocks</span>
+
+        <span class="c1"># Compute cylindrical info for each face</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cyl_info</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CylindricalFaceInfo</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cyl_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CylindricalFaceInfo</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">blocks</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">],</span> <span class="n">rotation_axis</span><span class="p">))</span>
+
+        <span class="c1"># Build theta-sorted index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_theta_sorted</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">)),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cyl_info</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">theta_centroid</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_theta_keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cyl_info</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">theta_centroid</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta_sorted</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Track consumed faces</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_face_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">Face</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_utils_face_key</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_consumed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">consume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_face_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">consume_face</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">face</span><span class="p">:</span> <span class="n">Face</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_face_key</span><span class="p">(</span><span class="n">face</span><span class="p">))</span>
+
+<div class="viewcode-block" id="FacePool.active_indices">
+<a class="viewcode-back" href="../../modules/face_pool.html#plot3d.face_pool.FacePool.active_indices">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">active_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return indices of faces that haven&#39;t been consumed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">))</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_consumed</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="FacePool.add_face">
+<a class="viewcode-back" href="../../modules/face_pool.html#plot3d.face_pool.FacePool.add_face">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_face</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">face</span><span class="p">:</span> <span class="n">Face</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a new face to the pool (e.g., a split remnant).&quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">CylindricalFaceInfo</span><span class="p">(</span><span class="n">face</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocks</span><span class="p">[</span><span class="n">face</span><span class="o">.</span><span class="n">blockIndex</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cyl_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+        <span class="c1"># Insert into theta-sorted index (maintain sorted order)</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_theta_keys</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">theta_centroid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_theta_sorted</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_theta_keys</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">theta_centroid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FacePool.find_candidates">
+<a class="viewcode-back" href="../../modules/face_pool.html#plot3d.face_pool.FacePool.find_candidates">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_candidates</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">target_theta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">axial_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">radial_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">theta_tol</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find face indices within theta_tol of target_theta with axial/radial overlap.</span>
+
+<span class="sd">        Uses binary search for O(log N) initial lookup, then linear scan</span>
+<span class="sd">        within the angular window. Handles theta wrapping at +/- pi.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target_theta: Target angular position (radians)</span>
+<span class="sd">            axial_range: (min, max) axial extent of the query face</span>
+<span class="sd">            radial_range: (min, max) radial extent of the query face</span>
+<span class="sd">            theta_tol: Angular tolerance (radians)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of face pool indices that are candidates for matching</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_scan_range</span><span class="p">(</span><span class="n">theta_lo</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">theta_hi</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Scan the theta-sorted array for faces in [theta_lo, theta_hi].&quot;&quot;&quot;</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_theta_keys</span><span class="p">,</span> <span class="n">theta_lo</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">start</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_theta_sorted</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">theta_hi</span><span class="p">:</span>
+                <span class="n">pool_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta_sorted</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_consumed</span><span class="p">(</span><span class="n">pool_idx</span><span class="p">):</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cyl_info</span><span class="p">[</span><span class="n">pool_idx</span><span class="p">]</span>
+                    <span class="c1"># Check axial overlap (10% margin)</span>
+                    <span class="n">axial_margin</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">axial_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">axial_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mf">1e-12</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">axial_max</span> <span class="o">&lt;</span> <span class="n">axial_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">axial_margin</span> <span class="ow">or</span>
+                            <span class="n">info</span><span class="o">.</span><span class="n">axial_min</span> <span class="o">&gt;</span> <span class="n">axial_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">axial_margin</span><span class="p">):</span>
+                        <span class="c1"># Check radial overlap (10% margin)</span>
+                        <span class="n">radial_margin</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">radial_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">radial_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mf">1e-12</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">radial_max</span> <span class="o">&lt;</span> <span class="n">radial_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">radial_margin</span> <span class="ow">or</span>
+                                <span class="n">info</span><span class="o">.</span><span class="n">radial_min</span> <span class="o">&gt;</span> <span class="n">radial_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">radial_margin</span><span class="p">):</span>
+                            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pool_idx</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">theta_lo</span> <span class="o">=</span> <span class="n">target_theta</span> <span class="o">-</span> <span class="n">theta_tol</span>
+        <span class="n">theta_hi</span> <span class="o">=</span> <span class="n">target_theta</span> <span class="o">+</span> <span class="n">theta_tol</span>
+
+        <span class="c1"># Main scan</span>
+        <span class="n">_scan_range</span><span class="p">(</span><span class="n">theta_lo</span><span class="p">,</span> <span class="n">theta_hi</span><span class="p">)</span>
+
+        <span class="c1"># Handle theta wrapping at ±π</span>
+        <span class="k">if</span> <span class="n">theta_lo</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
+            <span class="n">_scan_range</span><span class="p">(</span><span class="n">theta_lo</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">theta_hi</span> <span class="o">&gt;</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
+            <span class="n">_scan_range</span><span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">theta_hi</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="FacePool.find_rotational_candidates">
+<a class="viewcode-back" href="../../modules/face_pool.html#plot3d.face_pool.FacePool.find_rotational_candidates">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_rotational_candidates</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">face_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">rotation_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">theta_tol</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find candidate faces that could match face_idx after rotation.</span>
+
+<span class="sd">        Looks for faces at theta ± rotation_angle from the given face&#39;s</span>
+<span class="sd">        theta centroid, with axial/radial overlap filtering.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            face_idx: Index of the source face in this pool</span>
+<span class="sd">            rotation_angle: Rotation angle in radians</span>
+<span class="sd">            theta_tol: Angular search tolerance in radians</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Sorted, deduplicated list of candidate face indices</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cyl_info</span><span class="p">[</span><span class="n">face_idx</span><span class="p">]</span>
+        <span class="n">axial_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">axial_min</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">axial_max</span><span class="p">)</span>
+        <span class="n">radial_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">radial_min</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">radial_max</span><span class="p">)</span>
+
+        <span class="c1"># Search forward rotation</span>
+        <span class="n">target_fwd</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">theta_centroid</span> <span class="o">+</span> <span class="n">rotation_angle</span>
+        <span class="n">cands_fwd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_candidates</span><span class="p">(</span><span class="n">target_fwd</span><span class="p">,</span> <span class="n">axial_range</span><span class="p">,</span> <span class="n">radial_range</span><span class="p">,</span> <span class="n">theta_tol</span><span class="p">)</span>
+
+        <span class="c1"># Search backward rotation</span>
+        <span class="n">target_rev</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">theta_centroid</span> <span class="o">-</span> <span class="n">rotation_angle</span>
+        <span class="n">cands_rev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_candidates</span><span class="p">(</span><span class="n">target_rev</span><span class="p">,</span> <span class="n">axial_range</span><span class="p">,</span> <span class="n">radial_range</span><span class="p">,</span> <span class="n">theta_tol</span><span class="p">)</span>
+
+        <span class="c1"># Merge, deduplicate, sort</span>
+        <span class="n">all_cands</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cands_fwd</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">cands_rev</span><span class="p">)</span>
+        <span class="n">all_cands</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">face_idx</span><span class="p">)</span>  <span class="c1"># Don&#39;t match against self</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_cands</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Paht Juangphanich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
