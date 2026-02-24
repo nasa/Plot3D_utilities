@@ -1,14 +1,39 @@
+"""Block merging for structured grids via face matching.
+
+This module provides functions to merge structured grid blocks (Plot3D format)
+by detecting and aligning matching faces between adjacent blocks. It supports
+arbitrary face-pair combinations (e.g., imax-jmin, jmax-imin) through
+transposition and flipping of block geometry arrays, and groups blocks into
+nxnxn cube clusters for batch merging using connectivity graph information.
+"""
 from typing import Dict, List, Set, Tuple
-import numpy as np 
+import numpy as np
 from .block import Block
 from .blockfunctions import find_matching_faces, build_connectivity_graph, standardize_block_orientation
 from .write import write_plot3D
 
 
 def rotate_block_to_align_faces(X, Y, Z, face_from: str, face_to: str):
-    """
-    Rotate block2 geometry so that face_from aligns with face_to.
-    Currently supports: jmax → imin.
+    """Rotate block geometry arrays so that ``face_from`` aligns with ``face_to``.
+
+    Currently only the ``jmax`` -> ``imin`` rotation is implemented.
+
+    Args:
+        X (numpy.ndarray): X-coordinate array of shape ``(ni, nj, nk)``.
+        Y (numpy.ndarray): Y-coordinate array of shape ``(ni, nj, nk)``.
+        Z (numpy.ndarray): Z-coordinate array of shape ``(ni, nj, nk)``.
+        face_from (str): Name of the source face on the block being rotated
+            (e.g. ``'jmax'``).
+        face_to (str): Name of the target face on the receiving block
+            (e.g. ``'imin'``).
+
+    Returns:
+        tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]: The rotated
+        ``(X, Y, Z)`` arrays with the same element count but reordered axes.
+
+    Raises:
+        NotImplementedError: If the requested ``(face_from, face_to)``
+            combination is not yet supported.
     """
     if (face_from, face_to) == ('jmax', 'imin'):
         Xr = np.transpose(X, (1, 0, 2))
@@ -21,15 +46,25 @@ def rotate_block_to_align_faces(X, Y, Z, face_from: str, face_to: str):
     raise NotImplementedError(f"Rotation from {face_from} to {face_to} not implemented.")
 
 def combine_2_blocks_mixed_pairing(block1, block2, tol=1e-8):
-    """
-    Combine block1 and block2 by matching and aligning any pair of faces, including cross-axis combinations.
-    Automatically transposes and flips block2, and flips block1 if necessary to maintain monotonic physical direction.
+    """Merge two structured blocks by matching and aligning any pair of faces.
 
-    This version generalizes the direction check to detect which of X, Y, or Z is varying most along the stacking axis,
-    and uses that to determine whether block1 needs to be flipped before concatenation.
+    Detects the matching face pair between ``block1`` and ``block2``, then
+    transposes and flips ``block2`` so that its coordinate arrays align with
+    ``block1`` along the stacking axis. If the dominant physical step direction
+    is inconsistent between the two blocks, ``block1`` is also flipped before
+    concatenation. Cross-axis face combinations (e.g. ``imax``-``jmin``) are
+    handled by transposing the index axes of ``block2``.
+
+    Args:
+        block1 (Block): The first structured block. May be flipped in-place
+            along the stacking axis when physical directions are inconsistent.
+        block2 (Block): The second structured block whose geometry is
+            transposed and flipped to match ``block1``.
+        tol (float, optional): Coordinate tolerance used by
+            :func:`find_matching_faces`. Defaults to ``1e-8``.
 
     Returns:
-        Block: The merged block with physically consistent orientation.
+        Block: A new :class:`Block` containing the merged, standardised grid.
     """
     face1, face2, flip_flags = find_matching_faces(block1, block2, tol=tol)
     if face1 is None or flip_flags is None:
@@ -121,24 +156,28 @@ def combine_2_blocks_mixed_pairing(block1, block2, tol=1e-8):
 
 
 def combine_blocks_mixed_pairs(blocks: List[Block], tol: float = 1e-8, max_tries: int = 4) -> Tuple[List[Block], List[int]]:
-    """
-    Combine as many blocks as possible from a group of up to 8 blocks via face matching.
+    """Merge as many blocks as possible from a group via greedy face matching.
 
-    Parameters
-    ----------
-    blocks : List[Block]
-        List of up to 8 Block objects.
-    tol : float
-        Tolerance for face matching.
-    max_tries : int
-        Number of passes to try merging the blocks further.
+    Iterates over all block pairs in ``blocks`` and merges any pair whose
+    faces match within ``tol``. Passes are repeated up to ``max_tries`` times
+    to allow chains of merges to complete.
 
-    Returns
-    -------
-    merged_blocks : List[Block]
-        List of successfully merged Block objects (1 or more).
-    used_indices : List[int]
-        Indices of blocks that were used in any successful merge.
+    Args:
+        blocks (List[Block]): Input blocks to merge, typically up to 8 blocks
+            forming a cube cluster.
+        tol (float, optional): Coordinate tolerance passed to
+            :func:`find_matching_faces`. Defaults to ``1e-8``.
+        max_tries (int, optional): Maximum number of greedy merge passes.
+            Defaults to ``4``.
+
+    Returns:
+        tuple[List[Block], List[int]]: A 2-tuple containing:
+
+            - **merged_blocks** (``List[Block]``): Resulting blocks after all
+              possible merges; may still contain more than one element if some
+              blocks could not be joined.
+            - **used_indices** (``List[int]``): Indices (into the original
+              ``blocks`` list) of every block consumed during merging.
     """
     from itertools import combinations
 
@@ -207,25 +246,32 @@ def combine_nxnxn_cubes_mixed_pairs(
     cube_size: int = 2,
     tol: float = 1e-8
 ) -> List[Tuple[Block, Set[int]]]:
-    """
-    Find and combine all non-overlapping nxnxn cube groups of blocks
-    using face connectivity data and return the merged components.
+    """Find and merge all non-overlapping nxnxn cube groups of blocks.
 
-    Parameters
-    ----------
-    blocks : List[Block]
-        All input block objects.
-    connectivities : List of face match metadata pairs
-        Face connectivity between blocks.
-    cube_size : int
-        Size of the cube (e.g. 2 for 2x2x2, 4 for 4x4x4).
-    tol : float
-        Face match tolerance.
+    Builds a connectivity graph from ``connectivities``, then repeatedly seeds
+    BFS from unvisited block indices to gather candidate groups of exactly
+    ``cube_size**3`` connected blocks. Each valid group is forwarded to
+    :func:`combine_blocks_mixed_pairs`. Blocks that cannot be grouped or merged
+    are appended individually to the result.
 
-    Returns
-    -------
-    List[Tuple[Block, Set[int]]]
-        A list of merged Block objects and their source block indices.
+    Args:
+        blocks (List[Block]): All input block objects indexed consistently with
+            ``connectivities``.
+        connectivities (List[List[Dict]]): Face match metadata produced by the
+            connectivity analysis, used to build the block adjacency graph.
+        cube_size (int, optional): Side length of the block cube to attempt
+            (e.g. ``2`` for 2x2x2 = 8 blocks, ``4`` for 4x4x4 = 64 blocks).
+            Defaults to ``2``.
+        tol (float, optional): Coordinate tolerance forwarded to
+            :func:`combine_blocks_mixed_pairs`. Defaults to ``1e-8``.
+
+    Returns:
+        List[Tuple[Block, Set[int]]]: Each entry is a 2-tuple of:
+
+            - **merged_block** (``Block``): The merged (or unmerged single)
+              block.
+            - **source_indices** (``Set[int]``): Indices into ``blocks`` of
+              every original block that contributed to ``merged_block``.
     """
     from itertools import product
 

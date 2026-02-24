@@ -1,10 +1,28 @@
-"""Shared utility functions used by connectivity and periodicity modules."""
+"""Shared utility functions for the plot3d library.
+
+Provides common helpers used across connectivity, periodicity, and verification
+modules, including distance calculations, face key generation, index scaling,
+and corner enumeration.
+"""
 import math
 from typing import List, Tuple, Dict
 
 
-def euclidean_distance(x1, y1, z1, x2, y2, z2) -> float:
-    """Euclidean distance between two 3D points."""
+def euclidean_distance(x1: float, y1: float, z1: float,
+                       x2: float, y2: float, z2: float) -> float:
+    """Compute the Euclidean distance between two 3D points.
+
+    Args:
+        x1: X coordinate of point 1.
+        y1: Y coordinate of point 1.
+        z1: Z coordinate of point 1.
+        x2: X coordinate of point 2.
+        y2: Y coordinate of point 2.
+        z2: Z coordinate of point 2.
+
+    Returns:
+        The straight-line distance between the two points.
+    """
     dx = x2 - x1
     dy = y2 - y1
     dz = z2 - z1
@@ -14,17 +32,40 @@ def euclidean_distance(x1, y1, z1, x2, y2, z2) -> float:
 def face_key(f) -> Tuple:
     """Return a hashable key identifying a face by block index and IJK bounds.
 
-    Works with any object having BlockIndex/blockIndex and IMIN/JMIN/KMIN/IMAX/JMAX/KMAX
-    attributes (Face objects from both face.py and facefunctions.py).
+    Works with any object that has ``BlockIndex`` (or ``blockIndex``) and
+    ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``, ``JMAX``, ``KMAX`` attributes.
+
+    Args:
+        f: A Face-like object (from :class:`~plot3d.face.Face` or
+            :func:`~plot3d.facefunctions.create_face_from_diagonals`).
+
+    Returns:
+        A 7-element tuple ``(block_index, IMIN, JMIN, KMIN, IMAX, JMAX, KMAX)``.
     """
     bi = getattr(f, 'BlockIndex', getattr(f, 'blockIndex', 0))
     return (bi, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX)
 
 
-def face_grid_dims(imin, imax, jmin, jmax, kmin, kmax) -> List[int]:
-    """Return sorted list of non-zero face extents along each axis.
+def face_grid_dims(imin: int, imax: int, jmin: int, jmax: int,
+                   kmin: int, kmax: int) -> List[int]:
+    """Return the sorted list of non-zero face extents along each axis.
 
-    E.g. a K-constant face from (0,0,5) to (10,20,5) returns [10, 20].
+    For a face defined by its IJK bounds, computes the extent
+    (max - min) along each axis where the face is not constant,
+    and returns them sorted smallest-first. Useful for checking whether
+    two faces have compatible grid dimensions (allowing transposition).
+
+    Args:
+        imin: Minimum I index.
+        imax: Maximum I index.
+        jmin: Minimum J index.
+        jmax: Maximum J index.
+        kmin: Minimum K index.
+        kmax: Maximum K index.
+
+    Returns:
+        Sorted list of non-zero extents. For example, a K-constant face
+        from ``(0, 0, 5)`` to ``(10, 20, 5)`` returns ``[10, 20]``.
     """
     dims = []
     if imin != imax: dims.append(imax - imin)
@@ -36,14 +77,18 @@ def face_grid_dims(imin, imax, jmin, jmax, kmin, kmax) -> List[int]:
 def divide_face_dict_indices(records: List[Dict], gcd: int,
                               keys=('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX'),
                               nested_sides=None):
-    """Divide face dictionary indices by a GCD factor (integer division).
+    """Divide face dictionary indices by a GCD factor using integer division.
+
+    This is the inverse of :func:`scale_face_dict_indices`. Used when
+    reducing a mesh to GCD resolution before matching, to scale face
+    indices down accordingly.
 
     Args:
         records: List of dicts containing face indices to scale down.
-        gcd: Factor to divide each index by.
-        keys: Which keys to scale within each record.
-        nested_sides: If provided (e.g. ['block1', 'block2']), scale keys
-            inside each nested dict rather than at the top level.
+        gcd: Divisor applied to each index via ``//``.
+        keys: Which keys to divide within each record.
+        nested_sides: If provided (e.g. ``['block1', 'block2']``), divides keys
+            inside each nested sub-dict rather than at the top level.
     """
     for rec in records:
         if nested_sides:
@@ -56,15 +101,19 @@ def divide_face_dict_indices(records: List[Dict], gcd: int,
 
 
 def enumerate_unique_corners(I: list, J: list, K: list) -> List[Tuple[int, int, int]]:
-    """Enumerate unique (i, j, k) corners from min/max index lists.
+    """Enumerate unique ``(i, j, k)`` corners from min/max index lists.
+
+    Given the ``[min, max]`` ranges along each axis, generates all
+    combinations and deduplicates them. When an axis has ``min == max``,
+    fewer than 8 corners are produced.
 
     Args:
-        I: [IMIN, IMAX]
-        J: [JMIN, JMAX]
-        K: [KMIN, KMAX]
+        I: ``[IMIN, IMAX]`` index range.
+        J: ``[JMIN, JMAX]`` index range.
+        K: ``[KMIN, KMAX]`` index range.
 
     Returns:
-        List of unique (i, j, k) tuples (up to 8 corners, fewer when indices coincide).
+        List of unique ``(i, j, k)`` tuples (up to 8 corners).
     """
     unique_corners = []
     seen = set()
@@ -81,14 +130,17 @@ def enumerate_unique_corners(I: list, J: list, K: list) -> List[Tuple[int, int, 
 def scale_face_dict_indices(records: List[Dict], gcd: int,
                             keys=('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX'),
                             nested_sides=None):
-    """Scale face dictionary indices by a GCD factor.
+    """Multiply face dictionary indices by a GCD factor.
+
+    Used to scale indices back to the original grid resolution after
+    performing matching at reduced (GCD) resolution.
 
     Args:
-        records: List of dicts containing face indices to scale.
+        records: List of dicts containing face indices to scale up.
         gcd: Factor to multiply each index by.
         keys: Which keys to scale within each record.
-        nested_sides: If provided (e.g. ['block1', 'block2']), scale keys
-            inside each nested dict rather than at the top level.
+        nested_sides: If provided (e.g. ``['block1', 'block2']``), scales keys
+            inside each nested sub-dict rather than at the top level.
     """
     for rec in records:
         if nested_sides:

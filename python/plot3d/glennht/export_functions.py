@@ -1,4 +1,20 @@
 # glennht_export_functions.py
+"""Export functions for writing GlennHT boundary condition and job input files.
+
+This module provides the functions needed to translate Python dataclass
+objects (defined in :mod:`~plot3d.glennht.class_definitions`) into the
+Fortran namelist format consumed by GlennHT.  The main public entry points
+are:
+
+- :func:`to_pa` — unit conversion for pressure values.
+- :func:`populate_reference_from_inputs` — compute reference conditions from
+  physical inlet/outlet data.
+- :func:`export_to_boundary_condition` — write a ``.bcs`` boundary condition
+  file.
+- :func:`export_to_job_file` — write a GlennHT job input file.
+- :func:`export_to_glennht_conn` — write a ``.ght_conn`` connectivity file.
+- :func:`summarize_contiguous` — summarize contiguous zone groupings.
+"""
 from __future__ import annotations
 from collections import defaultdict
 import math
@@ -29,6 +45,20 @@ _PRESSURE_TO_PA = {
 }
 
 def to_pa(value: float | None, unit: str | None) -> float | None:
+    """Convert a pressure value from an arbitrary unit to Pascals.
+
+    Args:
+        value: Numeric pressure value.  Returns ``None`` if ``None`` is passed.
+        unit: Unit string (case-insensitive).  Supported values are ``"Pa"``,
+            ``"kPa"``, ``"MPa"``, ``"bar"``, ``"mbar"``, ``"atm"``, and
+            ``"psi"``.  Defaults to ``"Pa"`` when ``None``.
+
+    Returns:
+        Pressure in Pascals, or ``None`` if ``value`` is ``None``.
+
+    Raises:
+        ValueError: If ``unit`` is not one of the recognised pressure units.
+    """
     if value is None:
         return None
     u = (unit or "Pa").strip().lower()
@@ -41,9 +71,11 @@ def to_pa(value: float | None, unit: str | None) -> float | None:
     return float(value) * factor
 
 def ideal_R(molw: float) -> float:
+    """Return the specific gas constant R = R_univ / MolW (J/kg/K)."""
     return _R_UNIV / molw
 
 def mach_from_p0_over_p(p0_over_p: float, gamma: float) -> float:
+    """Compute isentropic Mach number from a total-to-static pressure ratio."""
     if p0_over_p is None or p0_over_p <= 1.0:
         return 0.0
     exp = (gamma - 1.0) / gamma
@@ -51,19 +83,38 @@ def mach_from_p0_over_p(p0_over_p: float, gamma: float) -> float:
     return math.sqrt(max(0.0, 2.0 * term / (gamma - 1.0)))
 
 def T_from_T0(T0: float, M: float, gamma: float) -> float:
+    """Return static temperature from total temperature and Mach number."""
     return T0 / (1.0 + 0.5 * (gamma - 1.0) * M * M)
 
 def mu_suth(T: float) -> float:
+    """Return dynamic viscosity (Pa·s) using Sutherland's law for air."""
     mu0, T0, S = _SUTH["mu0"], _SUTH["T0"], _SUTH["S"]
     return mu0 * (T / T0) ** 1.5 * (T0 + S) / (T + S)
 
 def a_sound(T: float, gamma: float, R: float) -> float:
+    """Return speed of sound (m/s) for a perfect gas."""
     return math.sqrt(gamma * R * T)
 
 def cp_from_gamma_R(gamma: float, R: float) -> float:
+    """Return specific heat at constant pressure from gamma and R (J/kg/K)."""
     return gamma * R / (gamma - 1.0)
 
 def pr_and_k(mu: float, cp: float, pr_given: float | None, k_given: float | None) -> tuple[float, float]:
+    """Resolve Prandtl number and thermal conductivity from partial inputs.
+
+    Exactly one of ``pr_given`` or ``k_given`` may be provided; if neither is
+    given the air default Prandtl number (0.706) is used.
+
+    Args:
+        mu: Dynamic viscosity (Pa·s).
+        cp: Specific heat at constant pressure (J/kg/K).
+        pr_given: Prandtl number, or ``None`` if not specified.
+        k_given: Thermal conductivity (W/m/K), or ``None`` if not specified.
+
+    Returns:
+        A ``(Pr, k)`` tuple where ``Pr`` is the Prandtl number and ``k`` is the
+        thermal conductivity (W/m/K).
+    """
     # Pr = mu * cp / k
     if pr_given is not None and k_given is None:
         return pr_given, (mu * cp) / pr_given
@@ -73,6 +124,7 @@ def pr_and_k(mu: float, cp: float, pr_given: float | None, k_given: float | None
     return pr_default, (mu * cp) / pr_default
 
 def rpm_to_omegab(rpm: float | None) -> float:
+    """Convert rotational speed from RPM to rad/s; returns 0.0 for None or 0."""
     if rpm in (None, 0):
         return 0.0
     return 2.0 * math.pi * (rpm / 60.0)
@@ -81,12 +133,14 @@ def rpm_to_omegab(rpm: float | None) -> float:
 # Small utilities
 # ============================================================
 def ensure_extension(path: str | pathlib.Path, ext: str) -> str:
+    """Return ``path`` as a string, appending ``ext`` only if no suffix exists."""
     p = pathlib.Path(path)
     if p.suffix:
         return str(p)
     return str(p.with_suffix(ext))
 
 def _asdict_soft(x):
+    """Coerce a dataclass, dict, or object to a plain dict, ignoring private attributes."""
     if is_dataclass(x):
         return asdict(x)
     if isinstance(x, dict):
@@ -97,6 +151,7 @@ def _asdict_soft(x):
 # Formatting + namelist helpers
 # ============================================================
 def _iter_fields(obj: Any) -> Iterable[Tuple[str, Any]]:
+    """Yield ``(name, value)`` pairs from a dataclass, dict, or plain object, skipping ``None``."""
     if is_dataclass(obj):
         for k, v in asdict(obj).items():
             if v is not None:
@@ -111,10 +166,11 @@ def _iter_fields(obj: Any) -> Iterable[Tuple[str, Any]]:
                 yield k, v
 
 def _fmt_bool(v: bool) -> str:
-    # For the detailed blocks, your style uses .TRUE./.FALSE.
+    """Format a Python bool as a Fortran logical literal (``.TRUE.`` / ``.FALSE.``)."""
     return ".TRUE." if v else ".FALSE."
 
 def _fmt_value(v: Any) -> str:
+    """Recursively format a Python value as a Fortran namelist token."""
     from enum import Enum, IntEnum
     if isinstance(v, bool):
         return _fmt_bool(v)
@@ -132,12 +188,25 @@ def _fmt_value(v: Any) -> str:
     return f"'{str(v)}'"
 
 def _export_namelist_block(header: str, obj: Any, *, exclude_names=()) -> str:
-    """
-    Create a Fortran namelist block like:
-      &HEADER
-      key1=..., key2=...
-      &END
-    Skips None, excludes any field in exclude_names and *_unit.
+    """Render a Fortran namelist block from a dataclass, dict, or object.
+
+    The block is formatted as::
+
+        &HEADER
+        key1=value1, key2=value2
+        &END
+
+    ``None`` fields are silently skipped, as are any keys listed in
+    ``exclude_names`` and any key ending with ``_unit``.
+
+    Args:
+        header: Namelist block name written after the ``&`` sigil.
+        obj: Source of key-value pairs; may be a dataclass, dict, or object
+            with a ``__dict__``.
+        exclude_names: Additional field names to suppress from the output.
+
+    Returns:
+        A string containing the complete namelist block including newlines.
     """
     pairs = []
     for k, v in _iter_fields(obj):
@@ -151,17 +220,20 @@ def _export_namelist_block(header: str, obj: Any, *, exclude_names=()) -> str:
 # GIF + Volume Zone writers (dict/object inputs supported)
 # ============================================================
 def _get_field(obj: Any, name: str, default: Any = None) -> Any:
+    """Return ``obj[name]`` for dicts or ``getattr(obj, name)`` for objects."""
     if isinstance(obj, dict):
         return obj.get(name, default)
     return getattr(obj, name, default)
 
 def _set_field(obj: Any, name: str, value: Any) -> None:
+    """Set ``obj[name]`` for dicts or ``setattr(obj, name, value)`` for objects."""
     if isinstance(obj, dict):
         obj[name] = value
     else:
         setattr(obj, name, value)
 
 def _first_field(obj: Any, names: Iterable[str], default: Any = None) -> Any:
+    """Return the first non-``None`` attribute from a sequence of candidate names."""
     for name in names:
         value = _get_field(obj, name)
         if value is not None:
@@ -169,6 +241,7 @@ def _first_field(obj: Any, names: Iterable[str], default: Any = None) -> Any:
     return default
 
 def _write_bsurf_spec(w, bc):
+    """Write a single ``&BSurf_Spec`` namelist block to an open file object."""
     line = (
         f" &BSurf_Spec\n"
         f"BSurfID={_get_field(bc, 'SurfaceID')}, "
@@ -182,6 +255,7 @@ def _write_bsurf_spec(w, bc):
     w.write(line + "\n &END\n\n")
 
 def _write_gif_pair(w, pair: Any) -> None:
+    """Write ``&BSurf_Spec`` blocks and a ``&GIF_Spec`` block for one GIF pair."""
     sid1 = int(_first_field(pair, ("GIFSurface1", "id1", "a"), 0))
     sid2 = int(_first_field(pair, ("GIFSurface2", "id2", "b"), 0))
     name1 = _first_field(pair, ("Name1", "name1"), f"surface {sid1}")
@@ -196,10 +270,11 @@ def _write_gif_pair(w, pair: Any) -> None:
     w.write(f" &GIF_Spec\nSurfID_1={sid1}, SurfID2={sid2}\n &END\n\n")
 
 def _write_vzconditions(w, vz: Any) -> None:
-    """
-    Convert inputs like:
-      {"block_index": 1, "zone_type": "fluid"|"solid", "contiguous_index": 1}
-    to the GHT namelist you showed (defaults baked in).
+    """Write a ``&VZConditions`` namelist block for a fluid or solid volume zone.
+
+    Accepts a dict with keys ``contiguous_index`` and ``zone_type``
+    (``"fluid"`` or ``"solid"``) and writes a block with hard-coded GlennHT
+    defaults for the respective material.
     """
     vzid = int(_first_field(vz, ("contiguous_index", "contiguous_id"), 0))
     ztype = str(_get_field(vz, "zone_type", "fluid")).strip().lower()
@@ -241,7 +316,33 @@ def populate_reference_from_inputs(
     rpm: float | None = None,
     rho_solid: float | None = None,
 ):
-    """Fill job.ReferenceCondFull from physics and then mirror into job.ReferenceCond."""
+    """Derive and populate reference conditions from physical inlet/outlet data.
+
+    Computes all non-dimensional reference quantities (density, velocity,
+    viscosity, conductivity, Reynolds number, etc.) using isentropic relations
+    and Sutherland's law, then stores the results in both
+    ``job.ReferenceCondFull`` (authoritative) and a derived compact
+    ``job.ReferenceCond`` used for the job-file namelist.
+
+    Args:
+        job: The :class:`~plot3d.glennht.class_definitions.Job` instance whose
+            ``ReferenceCondFull`` and ``ReferenceCond`` fields will be
+            populated in-place.
+        inlet_total_P0_Pa: Inlet total (stagnation) pressure in Pascals.
+        reference_static_P_Pa: Reference static pressure in Pascals used to
+            compute the reference Mach number.  Pass ``None`` to default to
+            zero Mach.
+        inlet_T0_K: Inlet total temperature in Kelvin.
+        refLen_m: Reference length in metres.
+        MolW: Molecular weight in kg/kmol.  Defaults to dry air (28.964).
+        gamma: Ratio of specific heats.  Defaults to 1.4.
+        Pr: Prandtl number.  When ``None``, derived from viscosity and
+            conductivity using the air default of 0.706.
+        k_override_WmK: Override thermal conductivity (W/m/K).  When provided,
+            Prandtl number is back-calculated.
+        rpm: Rotational speed in RPM; converted to rad/s for ``Omegab``.
+        rho_solid: Solid material density (kg/m³); stored as-is.
+    """
     from glennht_export_classes import ReferenceCond  # local import to avoid circular typing
 
     rcfull = job.ReferenceCondFull
@@ -336,6 +437,30 @@ def export_to_boundary_condition(
     gif_pairs: List[Any],
     volume_zones: List[Any],
 ):
+    """Write a GlennHT boundary condition file (``.bcs``) from Python objects.
+
+    Physical pressure and temperature values on inlet/outlet BCs are
+    normalized by the reference conditions in ``job_settings.ReferenceCondFull``
+    before being written.  A sidecar JSON debug file is also produced alongside
+    the ``.bcs`` file.
+
+    Args:
+        file_path_to_write: Destination path for the ``.bcs`` file.  The
+            ``.bcs`` extension is appended automatically if absent.
+        job_settings: Job configuration container; its ``ReferenceCondFull``
+            field supplies the normalization quantities.
+        bc_group: Collection of all boundary condition objects (inlets,
+            outlets, slips, walls).
+        gif_pairs: List of GIF patch pairs; each entry may be a
+            :class:`~plot3d.glennht.class_definitions.GIF` dataclass or a plain
+            dict with keys ``id1``/``id2`` (or ``a``/``b``).
+        volume_zones: List of volume zone descriptors; each entry may be a
+            dataclass or a dict with at minimum ``contiguous_index`` and
+            ``zone_type`` keys.
+
+    Returns:
+        None.  Writes the ``.bcs`` file and a ``.json`` sidecar to disk.
+    """
     file_path_to_write = ensure_extension(file_path_to_write, '.bcs')
     path = pathlib.Path(file_path_to_write)
     json_path = path.with_suffix(".json")
@@ -481,6 +606,26 @@ def export_to_job_file(
     exec_serial: str = "GlennHT.serial",
     exec_mpi: str | None = None,           # optional: also print mpi line
 ):
+    """Write all GlennHT job namelist blocks to a single job input file.
+
+    Each section of ``job`` is serialized as a Fortran namelist block.  If
+    ``job.ReferenceCond`` has not already been populated, this function
+    attempts to derive it from ``job.ReferenceCondFull`` via
+    :func:`populate_reference_from_inputs`.
+
+    Args:
+        job: Fully configured job object.
+        file_path_to_write: Destination path for the job file.
+        title: Optional run title written as a ``&Title`` block at the top of
+            the file.
+        exec_serial: Path or name of the serial GlennHT executable written to
+            the footer.
+        exec_mpi: Optional path or name of the MPI GlennHT executable; when
+            provided a second ``execFILE`` line is appended.
+
+    Returns:
+        None.  Writes the job file to disk.
+    """
     path = pathlib.Path(file_path_to_write)
     with path.open("w", encoding="utf-8") as w:
         if title:
@@ -526,12 +671,23 @@ def export_to_job_file(
             w.write(f'execFILE="{exec_mpi}"\n')
 
 def summarize_contiguous(records: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """
-    Given a list of dicts with keys: 'block_index', 'zone_type', 'contiguous_id',
-    return:
-      - num_unique_contiguous_ids: int
-      - zone_types_by_id: {contiguous_id: [unique zone types]}
-      - ids_with_multiple_zone_types: [ids that have >1 zone type]
+    """Summarize block-to-contiguous-zone mappings from a list of volume zone records.
+
+    Args:
+        records: List of dicts, each containing at minimum the keys
+            ``"contiguous_index"`` (int) and ``"zone_type"`` (str, e.g.
+            ``"fluid"`` or ``"solid"``).  Missing keys will raise
+            ``KeyError``.
+
+    Returns:
+        A dict with the following keys:
+
+        - ``"num_unique_contiguous_indices"`` (int): Total number of distinct
+          contiguous zone IDs.
+        - ``"zone_types_by_id"`` (dict): Maps each contiguous ID to a sorted
+          list of unique zone-type strings assigned to it.
+        - ``"ids_with_multiple_zone_types"`` (list): Sorted list of contiguous
+          IDs that have more than one zone type — likely a configuration error.
     """
     id_to_zone_types = defaultdict(set)
 
@@ -551,14 +707,35 @@ def summarize_contiguous(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:List[Dict[str,int]],filename:str, 
+def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:List[Dict[str,int]],filename:str,
                            gif_pairs:List[List[Dict[str, int]]],gif_faces:List[List[Dict[str, int]]],
                                volume_zones:List[Dict[str,Any]]):
-    """Exports the connectivity to GlennHT format 
+    """Write a GlennHT connectivity file (``.ght_conn``) from match and zone data.
+
+    Block indices in the input dicts are assumed to be 0-based and are
+    incremented by 1 when written to the file (GlennHT uses 1-based indexing).
 
     Args:
-        matches (Dict[str,Dict[int,str]]): Any matching faces between blocks 
-        outer_faces (Dict[str,int]): Non matching faces of all blocks or surfaces to consider 
+        matches: List of block-to-block face match records.  Each record is a
+            dict with keys ``"block1"`` and ``"block2"``, where each value is
+            a dict containing ``"block_index"``, ``"IMIN"``, ``"JMIN"``,
+            ``"KMIN"``, ``"IMAX"``, ``"JMAX"``, and ``"KMAX"`` (all 0-based).
+        outer_faces: List of non-matched (boundary) surface face records.
+            Each record must contain ``"block_index"``, ``"IMIN"``,
+            ``"JMIN"``, ``"KMIN"``, ``"IMAX"``, ``"JMAX"``, ``"KMAX"``
+            (0-based), and ``"id"`` (1-based surface ID).
+        filename: Destination path for the connectivity file.  The
+            ``.ght_conn`` extension is appended automatically if absent.
+        gif_pairs: List of GIF pair dicts, each with keys ``"a"`` and ``"b"``
+            holding the two surface IDs linked by the interface.
+        gif_faces: List of GIF face records in the same format as
+            ``outer_faces``; merged with ``outer_faces`` before writing.
+        volume_zones: List of volume zone dicts with at minimum
+            ``"contiguous_index"`` and ``"zone_type"`` keys; used to produce
+            the zone section of the connectivity file.
+
+    Returns:
+        None.  Writes the ``.ght_conn`` file to disk.
     """
     lines = list()
     

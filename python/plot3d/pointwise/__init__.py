@@ -1,3 +1,10 @@
+"""Pointwise mesh import and GlennHT export utilities.
+
+Provides parsers for Pointwise ``.inp`` connectivity files and ``.fvbnd``
+boundary files, plus convenience wrappers that combine Pointwise boundary
+data with Plot3D connectivity to produce GlennHT-format ``.ght_conn`` and
+``.bcs`` output files.
+"""
 from .import_functions import (
     Plot3DInp,
     BlockDecl,

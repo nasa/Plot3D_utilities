@@ -17,9 +17,11 @@ job:
 
 pages:
   stage: deploy
+  image: python:3.11
   script:
     - pip install poetry
     - cd python
+    - poetry install --with docs
     - poetry run sphinx-build -b html ../docs ../docs/_build/html
     - cd ../
     - mkdir .public
@@ -29,6 +31,7 @@ pages:
     paths:
       - public
   only:
+    - main
     - master
     - plot3d
   tags: [plot3d]

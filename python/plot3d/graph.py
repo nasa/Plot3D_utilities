@@ -1,4 +1,13 @@
-# graph.py  (inside plot3d package)
+"""Graph construction and METIS-based partitioning utilities for Plot3D meshes.
+
+This module converts face-match connectivity data (output of ``connectivity_fast``)
+into a weighted block-adjacency graph, partitions that graph with METIS via
+``pymetis``, and writes the resulting partition assignment to a DDCMP input file.
+
+Note:
+    ``pymetis`` is an optional dependency.  On Windows it is skipped at install
+    time; METIS-based partitioning is therefore only available on Linux/macOS.
+"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -28,32 +37,39 @@ def build_weighted_graph_from_face_matches(
     aggregate: str = "sum",
     ignore_self_matches: bool = True,
 ) -> Tuple[Dict[int, List[int]], Dict[int, Dict[int, int]]]:
-    """
-    Convert connectivity_fast face_matches into adjacency + weights.
-    
-    Note:
-        Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.
-    
-    Why this matters:
-        connectivity_fast can return more than one face between the same pair of blocks 
-        (e.g. a block is split and has two non-contiguous interfaces with its neighbor).
-        Each face gives a weight = dI * dJ * dK (number of shared nodes).
-        METIS expects one edge per block-pair, with a single weight.
-        So if there are multiple faces, we must decide how to merge them. That’s what aggregate does.
-        
-    Args:
-        face_matches (List[dict]): Output from connectivity_fast
-        n_blocks (int): number of blocks in a mesh 
-        aggregate (str, optional): 'sum'|'max'|'min'. Controls how weights are combined. Defaults to "sum".
-        ignore_self_matches (bool, optional): ignores self matching (i==j). Defaults to True.
+    """Convert ``connectivity_fast`` face matches into a weighted block-adjacency graph.
 
-    Raises:
-        ValueError: if aggregate is not one of 'sum','max','min'
+    ``connectivity_fast`` can return more than one face between the same pair of
+    blocks (e.g. when a block has two non-contiguous interfaces with its
+    neighbor).  Each face contributes a weight equal to ``dI * dJ * dK`` (the
+    number of shared nodes on that face).  Because METIS expects exactly one
+    edge per block-pair, multiple faces between the same pair are merged
+    according to *aggregate*.
+
+    Args:
+        face_matches: Output from ``connectivity_fast``.  Each element is a
+            dict containing ``block1`` and ``block2`` sub-dicts with keys
+            ``block_index``, ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``, ``JMAX``,
+            and ``KMAX``.
+        n_blocks: Total number of blocks in the mesh.
+        aggregate: Strategy for merging multiple face weights between the same
+            block pair.  Must be one of ``’sum’``, ``’max’``, or ``’min’``.
+            Defaults to ``’sum’``.
+        ignore_self_matches: If ``True``, face matches where both sides belong
+            to the same block are discarded.  Defaults to ``True``.
 
     Returns:
-        Tuple[Dict[int, List[int]], Dict[int, Dict[int, int]]]: 
-            * adj_list (Dict[int, List[int]]): Neighbors for each block.
-            * edge_w   (Dict[int, Dict[int, int]]): Edge weights (u->v).
+        A two-element tuple ``(adj_list, edge_w)`` where:
+
+        - **adj_list** (``Dict[int, List[int]]``): Sorted neighbor list for
+          each block index.
+        - **edge_w** (``Dict[int, Dict[int, int]]``): Mapping
+          ``edge_w[u][v]`` -> integer edge weight for the undirected edge
+          between blocks *u* and *v*.
+
+    Raises:
+        ValueError: If *aggregate* is not one of ``’sum’``, ``’max’``,
+            or ``’min’``.
     """
     if aggregate not in {"sum", "max", "min"}:
         raise ValueError("aggregate must be one of {'sum','max','min'}")
@@ -104,13 +120,27 @@ def csr_from_adj_and_weights(
     adj_list: Dict[int, List[int]],
     edge_w: Dict[int, Dict[int, int]],
 ) -> Tuple[List[int], List[int], List[int]]:
-    """
-    Build CSR arrays (xadj, adjncy, eweights) from adjacency + weights.
+    """Build CSR arrays from an adjacency list and edge-weight mapping.
+
+    Produces the three arrays required by METIS/pymetis in Compressed Sparse
+    Row (CSR) format.
+
+    Args:
+        adj_list: Neighbor list for each block index, keyed by block index.
+            Neighbors must be sorted (as returned by
+            :func:`build_weighted_graph_from_face_matches`).
+        edge_w: Edge weights, where ``edge_w[u][v]`` is the integer weight of
+            the undirected edge between blocks *u* and *v*.
 
     Returns:
-        xadj (List[int]): prefix sum of neighbors
-        adjncy (List[int]): flattened neighbor list
-        eweights (List[int]): edge weights aligned with adjncy
+        A three-element tuple ``(xadj, adjncy, eweights)`` where:
+
+        - **xadj** (``List[int]``): Row-pointer array of length
+          ``n_blocks + 1``; ``xadj[u]`` is the index in *adjncy* where
+          block *u*'s neighbors begin.
+        - **adjncy** (``List[int]``): Flattened neighbor indices.
+        - **eweights** (``List[int]``): Edge weights aligned element-wise
+          with *adjncy*.
     """
     xadj: List[int] = [0]
     adjncy: List[int] = []
@@ -135,19 +165,30 @@ def _metis_part_graph_compat(
     vwgt: Optional[List[int]] = None,
     eweights: Optional[List[int]] = None,
 ):
-    """
-    Call pymetis.part_graph in a way that's compatible with multiple pymetis versions.
-    Tries keyword names first, then falls back to positional args.
+    """Call ``pymetis.part_graph`` compatibly across multiple pymetis versions.
+
+    Different builds of pymetis use different parameter names (e.g. ``vwgt``
+    vs. ``vweights``, ``eweights`` vs. ``adjwgt``).  This wrapper inspects the
+    live signature and uses keyword arguments when available, falling back to
+    the older positional calling convention otherwise.
 
     Args:
-        nparts (int): number of partitions
-        xadj (List[int]): CSR row pointer
-        adjncy (List[int]): CSR neighbor list
-        vwgt (Optional[List[int]]): vertex weights
-        eweights (Optional[List[int]]): edge weights
+        nparts: Number of desired partitions.
+        xadj: CSR row-pointer array (see :func:`csr_from_adj_and_weights`).
+        adjncy: CSR neighbor-index array.
+        vwgt: Per-vertex (block) weights, or ``None`` to weight all vertices
+            equally.
+        eweights: Per-edge weights aligned with *adjncy*, or ``None`` to
+            weight all edges equally.
 
     Returns:
-        (edgecut, parts)
+        A two-element tuple ``(edgecut, parts)`` as returned by
+        ``pymetis.part_graph``, where *edgecut* is the total cut weight and
+        *parts* is a list of 0-based partition IDs, one per block.
+
+    Raises:
+        RuntimeError: If ``pymetis`` is not installed or is unavailable on
+            the current platform.
     """
     if not HAS_PYMETIS:
         raise RuntimeError(
@@ -188,27 +229,45 @@ def partition_from_face_matches(
     aggregate: str = "sum",
     ignore_self_matches: bool = True,
 ) -> Tuple[List[int], Dict[int, List[int]], Dict[int, Dict[int, int]]]:
-    """
-    Partition a graph derived from `face_matches` using pymetis.
-    
-    Note:
-        Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.
-    
-    Why this matters:
-        connectivity_fast can return more than one face between the same pair of blocks 
-        (e.g. a block is split and has two non-contiguous interfaces with its neighbor).
-        Each face gives a weight = dI * dJ * dK (number of shared nodes).
-        METIS expects one edge per block-pair, with a single weight.
-        So if there are multiple faces, we must decide how to merge them. That’s what aggregate does.
+    """Partition a block-connectivity graph into *nparts* parts using METIS.
 
-    Returns
-    -------
-    parts : List[int]
-        Partition id (0-based) for each block.
-    adj_list : Dict[int, List[int]]
-        Adjacency list used for the partitioning.
-    edge_w : Dict[int, Dict[int, int]]
-        Edge weights.
+    Builds a weighted adjacency graph from *face_matches* (see
+    :func:`build_weighted_graph_from_face_matches`), converts it to CSR format,
+    and calls METIS via :func:`_metis_part_graph_compat`.
+
+    When *favor_blocksize* is ``True``, each block’s vertex weight is set to
+    its node count so that METIS balances computational work rather than simply
+    counting blocks.
+
+    Args:
+        face_matches: Output from ``connectivity_fast``.  Each element is a
+            dict with ``block1`` and ``block2`` sub-dicts describing the shared
+            face extents and block indices.
+        block_sizes: Number of nodes in each block (used as vertex weights when
+            *favor_blocksize* is ``True``).
+        nparts: Desired number of partitions.
+        favor_blocksize: If ``True``, use block node counts as METIS vertex
+            weights so that partitions balance computational load.
+            Defaults to ``True``.
+        aggregate: Strategy for merging multiple face weights between the same
+            block pair.  One of ``’sum’``, ``’max’``, or ``’min’``.
+            Defaults to ``’sum’``.
+        ignore_self_matches: If ``True``, self-matching faces (same block on
+            both sides) are discarded before building the graph.
+            Defaults to ``True``.
+
+    Returns:
+        A three-element tuple ``(parts, adj_list, edge_w)`` where:
+
+        - **parts** (``List[int]``): 0-based partition ID for each block.
+        - **adj_list** (``Dict[int, List[int]]``): Adjacency list used for
+          the partitioning.
+        - **edge_w** (``Dict[int, Dict[int, int]]``): Edge weights used for
+          the partitioning.
+
+    Raises:
+        RuntimeError: If ``pymetis`` is not installed or is unavailable on
+            the current platform.
     """
     if not HAS_PYMETIS:
         raise RuntimeError(
@@ -248,12 +307,32 @@ def write_ddcmp(
     edge_weights: Optional[Dict[int, Dict[int, int]]] = None,
     filename: str = "ddcmp.dat",
 ) -> None:
-    """
-    Writes ddcmp.dat and ddcmp_info.txt.
+    """Write DDCMP partition files from a METIS partition assignment.
 
-    Notes:
-        * parts are 0-based in memory, but written 1-based in the file (to match your C#).
-        * edge_weights affects the per-partition 'edge_work' if provided.
+    Produces two output files in the directory of *filename*:
+
+    - **ddcmp.dat** -- main partition assignment file consumed by downstream
+      C# / Fortran solvers.  Block and processor indices are written
+      **1-based** even though *parts* is 0-based in memory.
+    - **ddcmp_info.txt** -- human-readable summary reporting block counts,
+      communication work, edge work, and volume-node counts per partition.
+
+    Args:
+        parts: 0-based partition ID for each block, as returned by
+            :func:`partition_from_face_matches`.
+        blocksizes: Number of nodes in each block; used to compute per-partition
+            volume-node totals.
+        adj_list: Block-adjacency list (keyed by block index) used to identify
+            cross-partition edges.
+        edge_weights: Optional edge-weight mapping ``edge_weights[u][v]``
+            used to compute per-partition edge work.  If ``None``, every
+            cross-partition edge counts as weight 1.
+        filename: Path to the primary output file.  The info file is written
+            to the same directory with the name ``ddcmp_info.txt``.
+            Defaults to ``'ddcmp.dat'``.
+
+    Returns:
+        None
     """
     n_proc = (max(parts) + 1) if parts else 0
     n_isp = n_proc

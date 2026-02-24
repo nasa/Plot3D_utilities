@@ -15,7 +15,7 @@ except ModuleNotFoundError:  # pragma: no cover - fallback for older runtimes
 
 import plot3d
 project = 'Plot3D'
-copyright = '2025, Paht Juangphanich'
+copyright = '2025-2026, Paht Juangphanich'
 author = 'Paht Juangphanich <paht.juangphanich@nasa.gov>'
 _pyproject_path = Path(__file__).resolve().parents[1] / 'python' / 'pyproject.toml'
 try:
@@ -38,9 +38,17 @@ html_static_path = ['_static']
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
               'sphinx.ext.doctest',
+              'sphinx.ext.intersphinx',
               'sphinx.ext.mathjax',
               'sphinx.ext.viewcode',
               'sphinx.ext.napoleon']
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+}
+
+autodoc_member_order = 'bysource'
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -53,7 +61,7 @@ autosummary_generate = True
 
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = False
+napoleon_include_init_with_doc = True
 napoleon_include_private_with_doc = False
 napoleon_include_special_with_doc = False
 napoleon_use_admonition_for_examples = False
@@ -68,7 +76,6 @@ napoleon_custom_sections = None
 def setup(app):
     def skip(app, what, name, obj, skip, options):
         members = [
-            '__init__',
             '__repr__',
             '__weakref__',
             '__dict__',

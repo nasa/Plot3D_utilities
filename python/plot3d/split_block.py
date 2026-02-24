@@ -1,6 +1,13 @@
-'''
-Split blocks is combination of help from Dave Rigby and Tim Beach 
-'''
+"""Utilities for splitting structured multi-block grids into smaller blocks.
+
+This module provides functions and enumerations used to divide Plot3D structured
+blocks along a chosen index direction (i, j, or k) while preserving the
+greatest common divisor (GCD) of the parent block's cell counts.  Maintaining
+the GCD ensures that all child blocks remain compatible with the same multi-grid
+hierarchy used by the solver.
+
+Credits: Dave Rigby and Tim Beach.
+"""
 
 from .face import Face
 from .block import Block
@@ -10,20 +17,35 @@ from math import gcd, sqrt
 import numpy as np 
 
 class Direction(Enum):
+    """Enumeration of the three structured-grid index directions.
+
+    Attributes:
+        i: First index direction (IMAX axis).
+        j: Second index direction (JMAX axis).
+        k: Third index direction (KMAX axis).
+    """
+
     i = 0
     j = 1
     k = 2
 
 def max_aspect_ratio(X:np.ndarray,Y:np.ndarray,Z:np.ndarray,ix:int,jx:int,kx:int):
-    """Finds the maximum cell aspect ratio
+    """Compute the maximum cell aspect ratio sampled at the block corners.
+
+    The aspect ratio at each corner is estimated by comparing the edge lengths
+    along the i, j, and k directions to their neighbours one cell inward.  The
+    function samples all eight block corners and returns the largest ratio found.
 
     Args:
-        X (np.ndarray): 3 dimensional Array containing X values. X[i,j,k]
-        Y (np.ndarray): 3 dimensional Array containing X values. X[i,j,k]
-        Z (np.ndarray): 3 dimensional Array containing X values. X[i,j,k]
+        X (np.ndarray): 3-D array of x-coordinates indexed as ``X[i, j, k]``.
+        Y (np.ndarray): 3-D array of y-coordinates indexed as ``Y[i, j, k]``.
+        Z (np.ndarray): 3-D array of z-coordinates indexed as ``Z[i, j, k]``.
+        ix (int): Size of the i-dimension (unused; inferred from ``X.shape``).
+        jx (int): Size of the j-dimension (unused; inferred from ``X.shape``).
+        kx (int): Size of the k-dimension (unused; inferred from ``X.shape``).
 
     Returns:
-        float: Maximum value of aspect ratio 
+        float: Maximum aspect ratio across all sampled corner cells.
     """
     [ix,jx,kx]  = X.shape # ix, jx, kx are the max values like IMAX, JMAX, KMAX
     ix-=1; jx-=1; kx-=1 # Python is 0 index so need to subtract 1 from ix, iy, kx to reference the last value 
@@ -74,17 +96,29 @@ def max_aspect_ratio(X:np.ndarray,Y:np.ndarray,Z:np.ndarray,ix:int,jx:int,kx:int
 
 
 def __step_search(total_cells:int,greatest_common_divisor:int,ncells_per_block:int,denominator:float,direction:str='forward'):
-    """Searches for the right step size that leads to block splits with the same greatest common divisor. Same greatest common denominator means you will always have the same multi-grid when you solve. 
+    """Find a step size along one index direction that preserves the block GCD.
+
+    Starting from an initial guess of ``round(ncells_per_block / denominator)``,
+    the function walks forward or backward by one until it finds a step size
+    where both the step itself and the final remainder block are divisible by
+    ``greatest_common_divisor``.  This guarantees every child block shares the
+    same multi-grid hierarchy as the parent.
 
     Args:
-        total_cells (int): [description]
-        greatest_common_divisor (int): [description]
-        ncells_per_block (int): [description]
-        denominator (float): If the direction is "i" then denominator is JMAX*KMAX
-        direction (str, optional): 'forward' or 'backward' This chooses to increment step direction by +1 or -1. Defaults to 'forward'.
+        total_cells (int): Total number of cells in the parent block
+            (``IMAX * JMAX * KMAX``).
+        greatest_common_divisor (int): GCD of ``(IMAX-1)``, ``(JMAX-1)``, and
+            ``(KMAX-1)`` for the parent block.
+        ncells_per_block (int): Target number of cells per child block.
+        denominator (float): Product of the two index dimensions *not* being
+            split (e.g. ``JMAX * KMAX`` when splitting along i).
+        direction (str, optional): Search direction; ``'forward'`` increments
+            the step size by +1 and ``'backward'`` decrements by -1.
+            Defaults to ``'forward'``.
 
     Returns:
-        [type]: [description]
+        int: A valid step size along the split direction, or ``-1`` if no
+        valid step size is found within the search bounds.
     """
     step_size = round(ncells_per_block/denominator)     # initial Guess
     initial_guess = step_size
@@ -109,22 +143,41 @@ def __step_search(total_cells:int,greatest_common_divisor:int,ncells_per_block:i
     return step_size
 
 def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=None):
-    """Split blocks is used to divide an array of blocks based on number of cells per block. This code maintains the greatest common denominator of the parent block. Number of cells per block is simply an estimate of how many you want. The actual number will change to meet the greatest common denominator (GCD). GCD of 4 means multigrid of 3 e.g. grid/4 (coarse), 2 (fine), and 1 (finest). If a direction is not specified then for each block the longest index either i,j, or k is used. 
-    
+    """Divide a list of structured blocks so that each child has roughly the target cell count.
 
-        Wisdom from Dave Rigby:
-            For example, for radial equilibrium we must integrate across the span.  Some codes (GlennHT used to) would want a single block across the entire span.  In that case you would want some additional control.
- 
-            Another example might be if you would like a block to include the entire boundary layer.  In that case you might introduce an aspect ratio control.
-            
+    The split preserves the greatest common divisor (GCD) of the parent block's
+    cell counts so that all child blocks remain compatible with the same
+    multi-grid hierarchy.  For example, a GCD of 4 supports three multigrid
+    levels: grid/4 (coarse), grid/2 (medium), and grid/1 (finest).
+
+    ``ncells_per_block`` is a target, not a guarantee.  The actual count is
+    adjusted to the nearest value that satisfies the GCD constraint.  Blocks
+    whose total cell count is already at or below ``ncells_per_block`` are
+    passed through unchanged.
+
+    Note:
+        Wisdom from Dave Rigby: additional controls such as integrating across
+        the full span (radial equilibrium) or keeping the entire boundary layer
+        inside a single block may require overriding the automatic direction
+        selection via the ``direction`` argument.
+
     Args:
-        blocks (List[Block]): List of blocks
-        ncells_per_block (int): number of cells desired per block 
-        direction (Direction): direction to split the blocks in. Direction.(i,j,k). Defaults to None. None means it will pick the direction for you based on which is greater IMAX, JMAX, or KMAX
+        blocks (List[Block]): Input list of structured Plot3D blocks to split.
+        ncells_per_block (int): Approximate target number of cells per child
+            block after splitting.
+        direction (Direction, optional): Index direction along which to split
+            every block.  When ``None`` (the default), the direction with the
+            largest index size (IMAX, JMAX, or KMAX) is chosen automatically
+            for each block.
 
     Returns:
-        Blocks (List[Block]): list of blocks split in the specified direction 
-    """ 
+        List[Block]: New list of blocks after splitting.  Blocks that were
+        already smaller than ``ncells_per_block`` are included unmodified.
+
+    Raises:
+        ValueError: If no valid GCD-preserving step size can be found for a
+            block in either the forward or backward search direction.
+    """
     
     direction_to_use = direction # store the user input variable 
     

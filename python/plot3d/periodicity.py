@@ -1,3 +1,25 @@
+"""Rotational and translational periodicity matching for structured multi-block meshes.
+
+This module provides algorithms to detect periodic face pairs between blocks
+in a Plot3D multi-block structured grid. Two types of periodicity are supported:
+
+**Rotational periodicity** (``rotated_periodicity``):
+    Identifies outer faces that match after rotation by a given angle about
+    a coordinate axis (x, y, or z). Uses a three-phase algorithm with
+    ``FacePool`` theta bucketing for efficient candidate selection:
+
+    - Phase 1: Full-face corner matching (fast, O(N log N)).
+    - Phase 2: Split-face matching with corner pre-checks (iterative).
+    - Phase 3: Relaxed-tolerance matching for wavy-surface faces.
+
+**Translational periodicity** (``translational_periodicity``):
+    Identifies outer faces that match after translation by a fixed distance
+    along a coordinate axis. Uses bounding-face detection, adaptive node
+    tolerances, and orthogonal-plane pre-checks to efficiently pair faces.
+
+Both algorithms support GCD-based mesh reduction for faster processing and
+automatically scale results back to the original grid resolution.
+"""
 from typing import List, Dict, Tuple, Optional
 import warnings
 import numpy as np
@@ -15,7 +37,18 @@ from .utils import (euclidean_distance, enumerate_unique_corners, scale_face_dic
 from tqdm import tqdm
 
 def _scale_dicts_down(dicts: List[Dict], gcd: int, keys=('IMIN','JMIN','KMIN','IMAX','JMAX','KMAX')):
-    """Scale dictionary face indices down by GCD factor."""
+    """Scale dictionary face indices down by a GCD factor.
+
+    Divides each index key in every dictionary by ``gcd`` using integer
+    division. This is used to convert face indices from the original grid
+    resolution to the GCD-reduced resolution.
+
+    Args:
+        dicts: List of face dictionaries containing index keys.
+        gcd: Greatest common divisor factor to divide indices by.
+        keys: Tuple of dictionary keys to scale. Defaults to
+            ``('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX')``.
+    """
     for d in dicts:
         for k in keys:
             if k in d:
@@ -23,16 +56,23 @@ def _scale_dicts_down(dicts: List[Dict], gcd: int, keys=('IMIN','JMIN','KMIN','I
 
 
 def create_rotation_matrix(rotation_angle:float, rotation_axis:str="x"):
-    """Creates a rotation matrix given an angle and axis 
+    """Create a 3x3 rotation matrix for a given angle and axis.
+
+    Constructs a standard right-hand rotation matrix that rotates
+    coordinates about one of the three principal axes.
 
     Args:
-        rotation_angle (float): Rotation angle in radians
-        rotation_axis (str, optional): Axis of rotation "x", "y", or "z". Defaults to "x".
+        rotation_angle: Rotation angle in radians.
+        rotation_axis: Axis of rotation: ``'x'``, ``'y'``, or ``'z'``.
+            Defaults to ``'x'``.
 
     Returns:
-        np.ndarray: 3x3 rotation matrix 
+        numpy.ndarray: A 3x3 rotation matrix.
+
+    Raises:
+        ValueError: If ``rotation_axis`` is not ``'x'``, ``'y'``, or ``'z'``.
     """
-    
+
     if rotation_axis=='x':
         rotation_matrix = np.array([[1,0,0],
                             [0,cos(rotation_angle),-sin(rotation_angle)],
@@ -58,10 +98,29 @@ def _faces_could_match_rotationally(
     rotation_axis: str,
     tol_rel: float = 0.1,
 ) -> bool:
-    """Cheap geometric pre-checks to reject obviously non-matching face pairs.
+    """Perform cheap geometric pre-checks to reject non-matching face pairs.
 
-    Checks (in order of cost): same const_type, axial overlap,
-    radial overlap, rotated centroid proximity.
+    Applies a series of inexpensive tests in order of increasing cost to
+    quickly eliminate face pairs that cannot be periodic matches. The checks
+    performed are:
+
+    1. Both faces must be planar (have a valid ``const_type``).
+    2. Axial extents along the rotation axis must overlap.
+    3. Radial extents (distance from rotation axis) must overlap.
+    4. Rotated centroid of ``face1`` must be within 1.5x the diagonal
+       length of the target face.
+
+    Args:
+        face1: Source face to be rotated.
+        face2: Target face to compare against.
+        rotation_matrix: 3x3 rotation matrix to apply to ``face1``.
+        rotation_axis: Axis of rotation: ``'x'``, ``'y'``, or ``'z'``.
+        tol_rel: Relative tolerance as a fraction of the span used for
+            axial and radial overlap checks. Defaults to ``0.1``.
+
+    Returns:
+        bool: ``True`` if the face pair passes all pre-checks and could
+        potentially be a rotational match; ``False`` otherwise.
     """
     # 1. Each face must be planar (constant on some axis), but not necessarily the same one
     if face1.const_type == -1 or face2.const_type == -1:
@@ -109,21 +168,27 @@ def _faces_could_match_rotationally(
 
 def _count_rotated_corners_on_face(face_a: Face, face_b: Face, block_b: Block,
                                     rotation_matrix: np.ndarray, tol: float = 1e-6) -> int:
-    """Count how many corners of face_a, after rotation, land on face_b's grid.
+    """Count how many corners of a face land on another face's grid after rotation.
 
-    Ported from Rust ``count_rotated_corners_on_face``. Used as a cheap
-    pre-check: if fewer than 2 rotated corners hit face_b, the expensive
-    full intersection is skipped.
+    Rotates the corner vertices of ``face_a`` using the given rotation matrix,
+    then checks how many of those rotated corners are within ``tol`` of any
+    grid point on ``face_b``. This serves as a cheap pre-check: if fewer than
+    2 rotated corners hit ``face_b``, the expensive full intersection is skipped.
+
+    Note:
+        Ported from the Rust ``count_rotated_corners_on_face`` implementation.
 
     Args:
-        face_a: source face whose corners will be rotated
-        face_b: target face to check against
-        block_b: block containing face_b
-        rotation_matrix: 3x3 rotation matrix
-        tol: Euclidean distance tolerance
+        face_a: Source face whose corners will be rotated.
+        face_b: Target face to check against.
+        block_b: Block containing ``face_b``, used to extract grid points.
+        rotation_matrix: 3x3 rotation matrix to apply to ``face_a`` corners.
+        tol: Euclidean distance tolerance for considering a corner matched.
+            Defaults to ``1e-6``.
 
     Returns:
-        Number of face_a corners (0-4) that match face_b grid points after rotation
+        int: Number of ``face_a`` corners (0 to 4) that match ``face_b``
+        grid points after rotation.
     """
     pts_b = face_b.grid_points(block_b)
     if pts_b.size == 0:
@@ -147,19 +212,29 @@ def _count_rotated_corners_on_face(face_a: Face, face_b: Face, block_b: Block,
 
 def _full_face_match_rotated(face_a: Face, face_b: Face, rotation_matrix: np.ndarray,
                               tol: float = 1e-6) -> bool:
-    """Check if all corners of face_a after rotation match face_b's corners bijectively.
+    """Check if all corners of two faces match bijectively after rotation.
 
-    Ported from Rust ``full_face_match_transformed``. Used in Phase 1 to quickly
-    identify full-face periodic matches without expensive node-by-node intersection.
+    Rotates all corners of ``face_a`` and checks whether each rotated corner
+    maps to a unique corner of ``face_b`` within the given tolerance. Both
+    faces must have the same number of vertices and matching grid dimensions
+    (allowing transposition).
+
+    This is used in Phase 1 of periodic matching to quickly identify full-face
+    periodic matches without expensive node-by-node intersection.
+
+    Note:
+        Ported from the Rust ``full_face_match_transformed`` implementation.
 
     Args:
-        face_a: source face whose corners will be rotated
-        face_b: target face to check against
-        rotation_matrix: 3x3 rotation matrix
-        tol: Euclidean distance tolerance
+        face_a: Source face whose corners will be rotated.
+        face_b: Target face to compare against.
+        rotation_matrix: 3x3 rotation matrix to apply to ``face_a`` corners.
+        tol: Euclidean distance tolerance for corner matching.
+            Defaults to ``1e-6``.
 
     Returns:
-        True if all corners match bijectively after rotation
+        bool: ``True`` if all corners match bijectively after rotation;
+        ``False`` otherwise.
     """
     n_a = face_a.nvertex
     n_b = face_b.nvertex
@@ -196,32 +271,47 @@ def _match_periodic_faces(
     rotation_axis: str,
     periodic_direction: Optional[str] = None,
 ) -> Tuple[List[Dict], List[Dict], List[Tuple], List[Face]]:
-    """Core matching engine for rotated_periodicity().
+    """Run the three-phase rotational periodicity matching engine.
 
-    Uses a three-phase algorithm with FacePool theta bucketing for O(log N)
-    candidate selection:
+    This is the core matching algorithm used by ``rotated_periodicity``. It
+    operates on GCD-reduced blocks and faces, using ``FacePool`` theta
+    bucketing for O(log N) candidate selection per face.
 
-    **Phase 1**: Full-face matching using FacePool theta bucketing. For each
-    face, find candidates at theta +/- rotation_angle, try full face match.
+    The three phases are:
 
-    **Phase 2**: Split-face matching with corner pre-check. Uses FacePool
-    to find candidates, then checks if >= 2 rotated corners land on the
-    candidate face before attempting expensive intersection. Iterates until
-    no new matches are found (no iteration limit).
-
-    **Phase 3**: Relaxed matching without pre-checks. Uses 5x tolerance
-    to catch wavy-surface faces. Runs until convergence.
+    - **Phase 1** -- Full-face matching via corner comparison. For each face,
+      find candidates at theta +/- ``rotation_angle`` and attempt a bijective
+      corner match. No expensive node-by-node intersection is needed.
+    - **Phase 2** -- Split-face matching with corner pre-check. Uses
+      ``FacePool`` to find candidates, checks if at least 2 rotated corners
+      land on the candidate face, then performs full intersection. Iterates
+      until convergence (no iteration limit).
+    - **Phase 3** -- Relaxed matching without pre-checks. Uses 5x tolerance
+      (``5e-6``) to catch wavy-surface faces. Runs until convergence.
 
     Args:
-        blocks: reduced blocks
-        outer_faces_all: outer faces as Face objects (at reduced scale)
-        matched_faces_all: matched faces as Face objects (at reduced scale)
-        rotation_matrices: list of rotation matrices to try (1 or 2)
-        rotation_axis: 'x', 'y', or 'z'
-        periodic_direction: 'i', 'j', or 'k' to filter faces (None = any)
+        blocks: List of GCD-reduced blocks.
+        outer_faces_all: Outer faces as ``Face`` objects at reduced scale.
+        matched_faces_all: Already-matched connectivity faces as ``Face``
+            objects at reduced scale, used for exclusion.
+        rotation_matrices: List of rotation matrices to try (typically
+            ``[+angle, -angle]``).
+        rotation_axis: Axis of rotation: ``'x'``, ``'y'``, or ``'z'``.
+        periodic_direction: If provided, only check faces whose constant
+            index matches the given direction (``'i'``, ``'j'``, or ``'k'``).
+            ``None`` means check all directions. Defaults to ``None``.
 
     Returns:
-        (periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all)
+        tuple: A 4-tuple containing:
+
+            - **periodic_faces_export** (*List[Dict]*): Periodic face pairs
+              as export-ready dictionaries.
+            - **outer_faces_export** (*List[Dict]*): Remaining unmatched
+              outer faces as dictionaries.
+            - **periodic_faces** (*List[Tuple]*): Periodic face pairs as
+              tuples of ``Face`` objects.
+            - **outer_faces_final** (*List[Face]*): Remaining unmatched
+              outer faces as ``Face`` objects.
     """
     from .face_pool import FacePool
 
@@ -231,6 +321,16 @@ def _match_periodic_faces(
         caches[idx] = {}
 
     def get_rotated(matrix_idx: int, block_index: int) -> Block:
+        """Retrieve a rotated block from cache, computing it lazily if needed.
+
+        Args:
+            matrix_idx: Index into ``rotation_matrices`` selecting which
+                rotation to apply.
+            block_index: Index of the block to rotate.
+
+        Returns:
+            Block: The rotated block.
+        """
         cache = caches[matrix_idx]
         if block_index not in cache:
             cache[block_index] = rotate_block(blocks[block_index], rotation_matrices[matrix_idx])
@@ -517,7 +617,22 @@ def _match_periodic_faces(
 
 
 def _scale_results_up(periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all, gcd_to_use):
-    """Scale reduced-resolution results back to original grid resolution."""
+    """Scale GCD-reduced results back to the original grid resolution.
+
+    Multiplies all face index values (IMIN, JMIN, KMIN, IMAX, JMAX, KMAX)
+    and Face I/J/K attributes by the GCD factor to restore original-scale
+    indices. Operates in-place on all four result containers.
+
+    Args:
+        periodic_faces_export: List of periodic face-pair dictionaries with
+            nested ``'block1'`` and ``'block2'`` sub-dicts.
+        outer_faces_export: List of remaining outer face dictionaries.
+        periodic_faces: List of periodic face-pair tuples containing
+            ``Face`` objects.
+        outer_faces_all: List of remaining outer ``Face`` objects.
+        gcd_to_use: GCD factor to multiply indices by. If ``<= 1``, this
+            function returns immediately with no changes.
+    """
     if gcd_to_use <= 1:
         return
 
@@ -541,37 +656,50 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
                         rotation_angle:float|None=None, rotation_axis:str = "x",
                         periodic_direction:str|None=None, nblades:int | None=None,
                         ReduceMesh:bool=True):
-    """Find rotational periodicity between outer faces by rotating blocks.
+    """Find rotationally periodic face pairs between blocks.
 
-    Detects which outer faces match after rotation by the given angle about the
-    specified axis. Automatically reduces the mesh by GCD for faster matching,
-    uses angular boundary detection to narrow candidates, and applies geometric
-    pre-checks to reject non-matching pairs cheaply.
+    Detects which outer faces match after rotation by the given angle about
+    the specified axis. Automatically reduces the mesh by GCD for faster
+    matching, uses angular boundary detection to narrow candidates, and
+    applies geometric pre-checks to reject non-matching pairs cheaply.
 
-    Tries both +angle and -angle rotations for robustness.
+    Both ``+angle`` and ``-angle`` rotations are tried for robustness.
 
     Args:
-        blocks (List[Block]): List of blocks (do not duplicate and pass in!).
-        matched_faces (List[Dict[str,int]]): Matched faces from connectivity.
-        outer_faces (List[Dict[str,int]]): Outer faces in dictionary form.
-        rotation_angle (float, optional): Rotation angle in degrees. Either this
-            or ``nblades`` must be provided. If both are given, ``rotation_angle``
-            takes precedence.
-        rotation_axis (str, optional): Axis of rotation: 'x', 'y', or 'z'. Defaults to 'x'.
-        periodic_direction (str, optional): Filter to only check faces with a constant
-            'i', 'j', or 'k' index. None means check all directions. Defaults to None.
-        nblades (int, optional): Number of blades. Used to compute
-            ``rotation_angle = 360.0 / nblades`` when ``rotation_angle`` is not provided.
-        ReduceMesh (bool, optional): If True, reduces the mesh by GCD for faster matching.
-            Defaults to True.
+        blocks: List of blocks. Do not duplicate before passing in; the
+            function copies internally when reducing.
+        matched_faces: Matched faces from connectivity, as dictionaries
+            with keys ``'block_index'``, ``'IMIN'``, ``'JMIN'``, etc.
+        outer_faces: Outer (unmatched) faces in dictionary form.
+        rotation_angle: Rotation angle in degrees. Either this or
+            ``nblades`` must be provided. If both are given,
+            ``rotation_angle`` takes precedence.
+        rotation_axis: Axis of rotation: ``'x'``, ``'y'``, or ``'z'``.
+            Defaults to ``'x'``.
+        periodic_direction: Filter to only check faces with a constant
+            ``'i'``, ``'j'``, or ``'k'`` index. ``None`` means check all
+            directions. Defaults to ``None``.
+        nblades: Number of blades. Used to compute
+            ``rotation_angle = 360.0 / nblades`` when ``rotation_angle``
+            is not provided.
+        ReduceMesh: If ``True``, reduces the mesh by GCD for faster
+            matching. Defaults to ``True``.
 
     Returns:
-        (Tuple): containing
+        tuple: A 4-tuple containing:
 
-            - **periodic_faces_export** (List[Dict[str,int]]): periodic face pairs as dicts
-            - **outer_faces_export** (List[Dict[str,int]]): remaining outer faces as dicts
-            - **periodic_faces** (List[Tuple[Face,Face]]): periodic face pairs as Face objects
-            - **outer_faces_all** (List[Face]): remaining outer faces as Face objects
+            - **periodic_faces_export** (*List[Dict[str, int]]*): Periodic
+              face pairs as export-ready dictionaries.
+            - **outer_faces_export** (*List[Dict[str, int]]*): Remaining
+              outer faces as dictionaries.
+            - **periodic_faces** (*List[Tuple[Face, Face]]*): Periodic face
+              pairs as ``Face`` objects.
+            - **outer_faces_all** (*List[Face]*): Remaining outer faces as
+              ``Face`` objects.
+
+    Raises:
+        ValueError: If neither ``rotation_angle`` nor ``nblades`` is
+            provided.
 
     Example::
 
@@ -624,77 +752,70 @@ def translational_periodicity(
     min_shared_abs: int = 4,
     stride_u: int = 1,
     stride_v: int = 1,
-    ) -> Tuple[ 
-               List[Dict[str, Dict[str, int]]], 
-               List[Tuple[Face, Face, Dict[str, str]]], 
+    ) -> Tuple[
+               List[Dict[str, Dict[str, int]]],
+               List[Tuple[Face, Face, Dict[str, str]]],
                List[Dict[str,int]]
             ]:
-    """
-    Detect translational periodicity between block faces along a given axis.
+    """Find translationally periodic face pairs between blocks along a given axis.
 
-    This function takes a set of outer block faces and attempts to identify 
-    periodic counterparts across the domain in the specified translational 
-    direction ('x', 'y', or 'z'). It works by:
+    Detects which outer block faces are periodic counterparts across the domain
+    in the specified translational direction (``'x'``, ``'y'``, or ``'z'``).
+    The algorithm proceeds as follows:
 
-      1. **Bounding faces:** Uses `find_bounding_faces` to identify candidate 
-         lower/upper faces for the given axis.
-      2. **Grid reduction:** Reduces blocks to their greatest common divisor 
-         (GCD) resolution to make indexing consistent across blocks.
-      3. **Shifting:** Creates shifted copies of all blocks in both positive 
-         and negative directions along the periodic axis.
-      4. **Precheck in orthogonal plane:** Uses a fast projection test 
-         (orthogonal to the periodic axis) to determine whether two faces 
-         could possibly match. This greatly reduces false negatives when 
-         spacing/tolerances differ slightly.
-      5. **Node-based match:** Calls `Face.touches_by_nodes` on candidate 
-         pairs to check shared node positions, with an adaptive tolerance 
-         based on the in-plane spacing of each face.
-      6. **Pairing:** Records each valid pair of periodic faces, their 
-         IJK index mappings (min→min or min→max), and removes matched faces 
-         from the outer-face list.
-      7. **Scaling back:** Rescales reduced indices back to the original grid 
-         spacing so results are consistent with input block resolution.
+    1. **Bounding faces**: Uses ``find_bounding_faces`` to identify candidate
+       lower/upper faces for the given axis.
+    2. **Grid reduction**: Reduces blocks to their GCD resolution for
+       consistent indexing across blocks.
+    3. **Shifting**: Creates shifted copies of all blocks in both positive
+       and negative directions along the periodic axis.
+    4. **Orthogonal-plane precheck**: Uses a fast projection test orthogonal
+       to the periodic axis to determine whether two faces could match.
+    5. **Node-based match**: Calls ``Face.touches_by_nodes`` on candidate
+       pairs with an adaptive tolerance based on in-plane spacing.
+    6. **Pairing**: Records each valid periodic pair with IJK index mappings
+       and removes matched faces from the outer-face list.
+    7. **Scaling back**: Rescales reduced indices to original grid spacing.
 
     Args:
-        blocks (List[Block]): List of blocks.
-        outer_faces (List[Dict[str,int]]): Outer faces represented as 
-            dictionaries (with IMIN, JMIN, KMIN, IMAX, JMAX, KMAX).
-        delta (float, optional): Periodicity spacing along the chosen axis. 
-            If None, it is inferred from the global block min/max extent.
-        translational_direction (str, optional): Axis to check ('x','y','z'). 
-            Default is 'z'.
-        node_tol_xyz (float, optional): Absolute coordinate tolerance for 
-            node-matching. If None, tolerance is computed adaptively based 
-            on median in-plane spacing of candidate faces.
-        min_shared_frac (float, optional): Minimum fraction of nodes that must 
-            overlap for two faces to be considered periodic. Default 0.02.
-        min_shared_abs (int, optional): Minimum absolute number of shared nodes. 
-            Default 4.
-        stride_u (int, optional): Subsampling stride along the first face index 
-            direction. Default 1 (no skipping).
-        stride_v (int, optional): Subsampling stride along the second face index 
-            direction. Default 1 (no skipping).
+        blocks: List of blocks.
+        outer_faces: Outer faces as dictionaries with keys ``'block_index'``,
+            ``'IMIN'``, ``'JMIN'``, ``'KMIN'``, ``'IMAX'``, ``'JMAX'``,
+            ``'KMAX'``.
+        delta: Periodicity spacing along the chosen axis. If ``None``, it is
+            inferred from the global block min/max extent.
+        translational_direction: Axis to check: ``'x'``, ``'y'``, or
+            ``'z'``. Defaults to ``'z'``.
+        node_tol_xyz: Absolute coordinate tolerance for node matching. If
+            ``None``, tolerance is computed adaptively based on median
+            in-plane spacing of candidate faces.
+        min_shared_frac: Minimum fraction of nodes that must overlap for
+            two faces to be considered periodic. Defaults to ``0.02``.
+        min_shared_abs: Minimum absolute number of shared nodes.
+            Defaults to ``4``.
+        stride_u: Subsampling stride along the first face index direction.
+            Defaults to ``1`` (no skipping).
+        stride_v: Subsampling stride along the second face index direction.
+            Defaults to ``1`` (no skipping).
 
     Returns:
-        Tuple[
-            List[Dict[str, Dict[str,int]]], 
-            List[Tuple[Face, Face, Dict[str,str]]], 
-            List[Dict[str,int]]
-        ]:
-            - **periodic_faces_export**: Export-ready dictionaries describing 
-              each periodic pair (block indices, face extents, index mapping, 
-              and match mode).
-            - **periodic_pairs**: Matched periodic face pairs as `Face` objects 
-              with IJK mapping.
-            - **outer_faces_remaining**: Updated list of outer faces with 
-              periodic ones removed (preserving any existing `id` fields).
+        tuple: A 3-tuple containing:
 
-    Notes:
-        - Works for periodicity in **x**, **y**, or **z** directions.
-        - The adaptive tolerance makes the method robust to small spacing 
-          differences between blocks.
-        - The orthogonal-plane precheck avoids expensive node comparisons 
-          when faces clearly do not align.
+            - **periodic_faces_export** (*List[Dict[str, Dict[str, int]]]*):
+              Export-ready dictionaries describing each periodic pair,
+              including block indices, face extents, index mapping, and
+              match mode.
+            - **periodic_pairs** (*List[Tuple[Face, Face, Dict[str, str]]]*):
+              Matched periodic face pairs as ``Face`` objects with IJK
+              mapping dictionaries.
+            - **outer_faces_remaining** (*List[Dict[str, int]]*): Updated
+              list of outer faces with periodic ones removed, preserving
+              any existing ``'id'`` fields.
+
+    Note:
+        The adaptive tolerance makes the method robust to small spacing
+        differences between blocks. The orthogonal-plane precheck avoids
+        expensive node comparisons when faces clearly do not align.
     """
     # 0) lower/upper via your finder (dicts at original scale)
     lower_connected_faces, upper_connected_faces, _, _ = find_bounding_faces(
@@ -722,6 +843,15 @@ def translational_periodicity(
 
     # 3) Shifted copies
     def shift_blocks(bb: List[Block], amount: float) -> List[Block]:
+        """Create shifted copies of all blocks along the periodic axis.
+
+        Args:
+            bb: List of blocks to shift.
+            amount: Distance to shift along the periodic axis.
+
+        Returns:
+            List[Block]: New block copies shifted by ``amount``.
+        """
         cp = [b.copy() for b in bb]
         for b in cp:
             b.shift(amount, axis)
@@ -731,20 +861,42 @@ def translational_periodicity(
     blocks_dn = shift_blocks(blocks_r, -d_axis)
 
     def B(which: str, idx: int) -> Block:
+        """Retrieve a block from the original, shifted-up, or shifted-down set.
+
+        Args:
+            which: Block set identifier: ``'orig'``, ``'up'``, or ``'dn'``.
+            idx: Block index within the set.
+
+        Returns:
+            Block: The requested block.
+        """
         return {"orig": blocks_r, "up": blocks_up, "dn": blocks_dn}[which][idx]
 
     # 4) Helpers for adaptive tolerance
     def _median_inplane_spacing(face: Face, block: Block) -> float:
-        """Median edge length on the face (in-plane)."""
+        """Compute the median edge length on a face in its plane.
+
+        Calculates edge lengths along both in-plane directions of the face
+        and returns the median value, which is used to set adaptive
+        matching tolerances.
+
+        Args:
+            face: The face to measure.
+            block: The block containing the face.
+
+        Returns:
+            float: Median in-plane edge length. Returns ``1.0`` if the
+            face has no edges (degenerate).
+        """
         I0,I1,J0,J1,K0,K1 = face.IMIN,face.IMAX,face.JMIN,face.JMAX,face.KMIN,face.KMAX
         X,Y,Z = block.X, block.Y, block.Z
-        if face.const_type == 0:  # I const → vary (J,K)
+        if face.const_type == 0:  # I const -> vary (J,K)
             i = I0
             x = X[i,J0:J1+1,K0:K1+1]; y = Y[i,J0:J1+1,K0:K1+1]; z = Z[i,J0:J1+1,K0:K1+1]
-        elif face.const_type == 1:  # J const → vary (I,K)
+        elif face.const_type == 1:  # J const -> vary (I,K)
             j = J0
             x = X[I0:I1+1,j,K0:K1+1]; y = Y[I0:I1+1,j,K0:K1+1]; z = Z[I0:I1+1,j,K0:K1+1]
-        else:  # K const → vary (I,J)
+        else:  # K const -> vary (I,J)
             k = K0
             x = X[I0:I1+1,J0:J1+1,k]; y = Y[I0:I1+1,J0:J1+1,k]; z = Z[I0:I1+1,J0:J1+1,k]
         s = []
@@ -758,7 +910,19 @@ def translational_periodicity(
         return float(np.median(np.concatenate([v.ravel() for v in s])))
 
     def _pair_tol(fA: Face, fB: Face) -> float:
-        """Adaptive absolute tolerance per pair (use global override if provided)."""
+        """Compute adaptive absolute tolerance for a face pair.
+
+        Uses approximately 3% of the larger face's median in-plane spacing,
+        with a floor of ``1e-4``. If ``node_tol_xyz`` was provided to the
+        outer function, that value is returned directly.
+
+        Args:
+            fA: First face of the candidate pair.
+            fB: Second face of the candidate pair.
+
+        Returns:
+            float: Absolute coordinate tolerance for node matching.
+        """
         if node_tol_xyz is not None:
             return float(node_tol_xyz)
         sA = _median_inplane_spacing(fA, B("orig", fA.BlockIndex))
@@ -769,9 +933,25 @@ def translational_periodicity(
     # 5) General orthogonal-plane precheck (works for x/y/z periodicity)
     def _orthogonal_precheck(fA: Face, fB: Face, bA: Block, bB: Block,
                              d_axis_local: float, tol: float, axis_local: str) -> bool:
-        """
-        Shift face A along 'axis_local' by d_axis_local, then compare projections onto the
-        orthogonal plane within tolerance. Requires both absolute and fractional overlap.
+        """Perform a fast orthogonal-plane overlap test between two faces.
+
+        Shifts ``fA`` along the periodic axis by ``d_axis_local``, then
+        projects both faces onto the plane orthogonal to that axis. Grid
+        points are quantized by ``tol`` and set-intersected. The test
+        passes if at least ``min_shared_abs`` (or ``min_shared_frac`` of
+        the smaller face) quantized points overlap.
+
+        Args:
+            fA: First face (will be shifted).
+            fB: Second face (unchanged).
+            bA: Block containing ``fA``.
+            bB: Block containing ``fB``.
+            d_axis_local: Distance to shift ``fA`` along the periodic axis.
+            tol: Quantization tolerance for the orthogonal projection.
+            axis_local: Periodic axis: ``'x'``, ``'y'``, or ``'z'``.
+
+        Returns:
+            bool: ``True`` if sufficient orthogonal-plane overlap exists.
         """
         PA = fA.grid_points(bA, stride_u=1, stride_v=1)
         PB = fB.grid_points(bB, stride_u=1, stride_v=1)
@@ -799,6 +979,24 @@ def translational_periodicity(
 
     # 6) Node-sharing matcher using per-pair tol + precheck
     def faces_match(fL: Face, fU: Face) -> Tuple[bool, str]:
+        """Determine whether two faces are a translational periodic match.
+
+        Tries multiple shift directions (lower-up, upper-down) with both
+        orthogonal-plane prechecks and full node-based matching. Returns
+        on the first successful match strategy.
+
+        Args:
+            fL: Lower-boundary face candidate.
+            fU: Upper-boundary face candidate.
+
+        Returns:
+            tuple: A 2-tuple of:
+
+                - **matched** (*bool*): ``True`` if the faces are periodic.
+                - **mode** (*str*): Description of which matching strategy
+                  succeeded (e.g., ``'lower_up_vs_upper_orig'``), or an
+                  empty string if no match.
+        """
         bl, bu = fL.BlockIndex, fU.BlockIndex
         tol_pair = _pair_tol(fL, fU)
 
@@ -834,6 +1032,19 @@ def translational_periodicity(
 
     # 7) Index mapping
     def mapping_minmax(fA: Face, fB: Face) -> Dict[str, str]:
+        """Determine the IJK index mapping direction between two periodic faces.
+
+        For each axis (I, J, K), determines whether the min index of ``fA``
+        maps to the min or max index of ``fB`` based on the closer alignment.
+
+        Args:
+            fA: First face of the periodic pair.
+            fB: Second face of the periodic pair.
+
+        Returns:
+            Dict[str, str]: Mapping for each axis, e.g.,
+            ``{'I': 'min->min', 'J': 'min->max', 'K': 'min->min'}``.
+        """
         out = {}
         for ax in ("I","J","K"):
             Amin, Amax = getattr(fA, ax+"MIN"), getattr(fA, ax+"MAX")
@@ -871,7 +1082,7 @@ def translational_periodicity(
                                "IMAX": fU.IMAX, "JMAX": fU.JMAX, "KMAX": fU.KMAX},
                     "mapping": m,
                     "mode": mode
-                    }) # type: ignore  
+                    }) # type: ignore
                 upper_pool.pop(j)
                 break  # move to next fL
 
@@ -907,45 +1118,53 @@ def translational_periodicity(
     return periodic_export, periodic_pairs, outer_faces_remaining
 
 def linear_real_transform(face1:Face,face2:Face) -> Tuple:
-    """Computes the rotation angle from Face1 to Face2. This can be used to check if the faces are periodic 
-        This function assumes the rotation axis is in the "x" direction. This is good for faces within the same block 
+    """Compute the rotation angle and matrix from one face to another.
 
-    Reference:
-        - Linear Real Transforms from GlennHT https://gitlab.grc.nasa.gov/lte-turbo/GlennHT/-/blob/master/src/M_ccMBMesh.F See computeLRT
-        
+    Calculates the rotation that transforms the diagonal vector of ``face1``
+    into the diagonal vector of ``face2``. This is useful for verifying
+    whether two faces within the same block are periodic. Assumes the
+    rotation axis is in the x-direction.
+
+    Note:
+        Based on the Linear Real Transform (LRT) computation from GlennHT.
+        See ``M_ccMBMesh.F`` / ``computeLRT`` at
+        https://gitlab.grc.nasa.gov/lte-turbo/GlennHT.
+
     Args:
-        Face1 (Face): Face to rotate
-        Face2 (Face): Face to rotate to
+        face1: Source face whose diagonal defines the "from" direction.
+        face2: Target face whose diagonal defines the "to" direction.
 
     Returns:
-        (tuple): tuple containing:
+        tuple: A 2-tuple containing:
 
-            - **ang** (float): rotation angle
-            - **rotation_matrix** (numpy.ndarray): Rotation matrix 3x3
-        
+            - **ang** (*float*): Rotation angle in radians. Positive
+              follows the right-hand rule about the x-axis. Zero if the
+              faces are already aligned.
+            - **rotation_matrix** (*numpy.ndarray*): 3x3 rotation matrix.
+              A zero matrix if no rotation is needed (``ang == 0``).
     """
 
-    cTo3,cTo1 = face1.get_corners() 
+    cTo3,cTo1 = face1.get_corners()
     cFrom3,cFrom1 = face2.get_corners()
 
     dTo  = np.array(cTo3).transpose() - np.array(cTo1).transpose()                      # difference in corner points = diagonal vector for Face 1
     ldTo=np.sqrt(np.sum(dTo*dTo))
     if ldTo > 0:
         dTo=dTo/ldTo
-    
+
     dFrom = np.array(cFrom3).transpose() - np.array(cFrom1).transpose()                 # difference in corner points = diagonal vector for Face 2
     ldFrom = np.sqrt(np.sum(dFrom*dFrom))
     if( ldFrom > 0 ):
         dFrom=dFrom/ldFrom
-    
+
     dotprod = np.sum(dTo * dFrom)
-    
+
     if( abs(dotprod-1) < 1E-10 ): # Case of no rotation
         ang = 0
 
         rotation_matrix  = np.zeros(shape=(3,3))
     else:
-        #Compute the angle of rotation  
+        #Compute the angle of rotation
         cosAng=(dTo[1]*dFrom[1]+dTo[2]*dFrom[2])/sqrt(dTo[1]*dTo[1]+dTo[2]*dTo[2])/sqrt(dFrom[1]*dFrom[1]+dFrom[2]*dFrom[2])
         sinAng=(dTo[2]*dFrom[1]-dTo[1]*dFrom[2])/sqrt(dTo[1]*dTo[1]+dTo[2]*dTo[2])/sqrt(dFrom[1]*dFrom[1]+dFrom[2]*dFrom[2])
         ang=acos(cosAng)
@@ -958,26 +1177,34 @@ def linear_real_transform(face1:Face,face2:Face) -> Tuple:
     return ang, rotation_matrix
 
 def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:float=1E-6):
-    """General function to find periodicity within a given block.
+    """Check two faces for periodic intersection and produce matched/split faces.
 
-    Steps:
-        - 1: Take the face with the shorter diagonal.
-        - 2: Rotate the shorter face by angle 360/nblades.
-        - 3: Check to see if faces intersect
+    Orders the faces so that the shorter-diagonal face is checked against the
+    longer one, then calls ``get_face_intersection`` to find node-level matches.
+    If at least 4 matching nodes are found, constructs periodic face pairs from
+    the matched region and returns any split (leftover) faces.
 
     Args:
-        face1 (Face): An arbitrary face
-        face2 (Face): An arbitrary face
-        block1 (Block): block 1 cooresponding to face 1
-        block2 (Block): block 2 cooresponding to face 2
+        face1: First face to check.
+        face2: Second face to check.
+        block1: Block corresponding to ``face1``. For rotational periodicity,
+            this should be the rotated copy of the block.
+        block2: Block corresponding to ``face2``.
+        tol: Euclidean distance tolerance for node matching.
+            Defaults to ``1e-6``.
 
     Returns:
-        (tuple): containing
+        tuple: A 3-tuple containing:
 
-            - **match_rows** (List[Dict]): List of point matches for periodic surfaces
-            - **periodic_surface** (List[Face]):  These are faces that are periodic
-            - **split_surfaces** (List[Face]): Some blocks may have periodic faces with other blocks. But the faces may need to be split so say you pair a small face with a larger face. The split surfaces should be treated as an outer face
-
+            - **match_rows** (*List[Dict]*): List of point-match dictionaries
+              from ``get_face_intersection``, each containing ``'i1'``,
+              ``'j1'``, ``'k1'``, ``'i2'``, ``'j2'``, ``'k2'`` keys.
+            - **periodic_faces** (*List[Face]*): The two faces forming the
+              periodic pair (in the original argument order), or an empty
+              list if no match was found.
+            - **split_faces** (*List[Face]*): Leftover face fragments that
+              were not part of the matched region. These should be treated
+              as outer faces for subsequent matching passes.
     """
 
     periodic_faces = list()
@@ -1017,11 +1244,26 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
 
 def periodicity(blocks, outer_faces, matched_faces, periodic_direction='k',
                 rotation_axis='x', nblades=55):
-    """Deprecated. Use rotated_periodicity() instead.
+    """Find rotational periodicity (deprecated).
 
-    Note: argument order differs from rotated_periodicity —
-    this function takes (blocks, outer_faces, matched_faces)
-    while rotated_periodicity takes (blocks, matched_faces, outer_faces).
+    .. deprecated::
+        Use ``rotated_periodicity()`` instead.
+
+    Note:
+        The argument order differs from ``rotated_periodicity``. This function
+        takes ``(blocks, outer_faces, matched_faces)`` while
+        ``rotated_periodicity`` takes ``(blocks, matched_faces, outer_faces)``.
+
+    Args:
+        blocks: List of blocks.
+        outer_faces: Outer faces in dictionary form.
+        matched_faces: Matched faces from connectivity.
+        periodic_direction: Direction to filter faces by. Defaults to ``'k'``.
+        rotation_axis: Axis of rotation. Defaults to ``'x'``.
+        nblades: Number of blades. Defaults to ``55``.
+
+    Returns:
+        tuple: Same return type as ``rotated_periodicity``.
     """
     warnings.warn(
         "periodicity() is deprecated. Use rotated_periodicity(blocks, matched_faces, "
@@ -1034,11 +1276,27 @@ def periodicity(blocks, outer_faces, matched_faces, periodic_direction='k',
 
 def periodicity_fast(blocks, outer_faces, matched_faces, periodic_direction='k',
                      rotation_axis='x', nblades=55):
-    """Deprecated. Use rotated_periodicity() instead.
+    """Find rotational periodicity with mesh reduction (deprecated).
 
-    Note: argument order differs from rotated_periodicity —
-    this function takes (blocks, outer_faces, matched_faces)
-    while rotated_periodicity takes (blocks, matched_faces, outer_faces).
+    .. deprecated::
+        Use ``rotated_periodicity()`` instead. Mesh reduction via GCD is
+        enabled by default in ``rotated_periodicity``.
+
+    Note:
+        The argument order differs from ``rotated_periodicity``. This function
+        takes ``(blocks, outer_faces, matched_faces)`` while
+        ``rotated_periodicity`` takes ``(blocks, matched_faces, outer_faces)``.
+
+    Args:
+        blocks: List of blocks.
+        outer_faces: Outer faces in dictionary form.
+        matched_faces: Matched faces from connectivity.
+        periodic_direction: Direction to filter faces by. Defaults to ``'k'``.
+        rotation_axis: Axis of rotation. Defaults to ``'x'``.
+        nblades: Number of blades. Defaults to ``55``.
+
+    Returns:
+        tuple: Same return type as ``rotated_periodicity``.
     """
     warnings.warn(
         "periodicity_fast() is deprecated. Use rotated_periodicity(blocks, matched_faces, "
@@ -1051,27 +1309,37 @@ def periodicity_fast(blocks, outer_faces, matched_faces, periodic_direction='k',
 
 
 def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, rotation_axis: str = 'x', tol: float = 1E-6):
-    """Verifies that the diagonal corners of periodic face_matches are spatially
-    consistent after rotating block1 by ±theta about the given axis.
+    """Verify that periodic face matches are spatially consistent after rotation.
 
-    For each face_match, rotates block1 by +theta (and if needed -theta) and checks
-    that the rotated lower/upper corner coordinates match block2's lower/upper
-    corners within tolerance. If the stored diagonal doesn't match, tries all
-    permutations of block2's face corners. If a valid permutation is found,
-    the face_match is corrected and added to the verified list.
+    For each face match, rotates block1 by ``+theta`` (and ``-theta`` if
+    needed) and checks that the rotated lower/upper corner coordinates match
+    block2's corners within tolerance. If the stored diagonal does not match,
+    tries all permutations of block2's face corners. If a valid permutation
+    is found, the face match is corrected and added to the verified list.
 
     Uses GCD reduction for efficient coordinate lookups.
 
     Args:
-        blocks (List[Block]): List of all blocks (original full-resolution)
-        face_matches (list): List of face_match dicts from periodicity or rotated_periodicity
-        theta (float): Rotation angle in degrees
-        rotation_axis (str, optional): Axis of rotation 'x', 'y', or 'z'. Defaults to 'x'.
-        tol (float, optional): Euclidean distance tolerance. Defaults to 1E-6.
+        blocks: List of all blocks at original full resolution.
+        face_matches: List of face-match dictionaries from
+            ``rotated_periodicity`` or ``periodicity``, each containing
+            ``'block1'`` and ``'block2'`` sub-dicts with ``'block_index'``,
+            ``'IMIN'``, ``'JMIN'``, ``'KMIN'``, ``'IMAX'``, ``'JMAX'``,
+            ``'KMAX'`` keys.
+        theta: Rotation angle in degrees.
+        rotation_axis: Axis of rotation: ``'x'``, ``'y'``, or ``'z'``.
+            Defaults to ``'x'``.
+        tol: Euclidean distance tolerance for corner matching.
+            Defaults to ``1e-6``.
 
     Returns:
-        (list): verified face_matches whose diagonals are confirmed or corrected
-        (list): mismatched face_matches where no corner permutation matched
+        tuple: A 2-tuple containing:
+
+            - **verified** (*list*): Face matches whose diagonal corners
+              are confirmed or corrected to be consistent after rotation.
+            - **mismatched** (*list*): Face matches where no corner
+              permutation matched within tolerance. Diagnostic information
+              is printed to stdout for each mismatch.
     """
     # Compute GCD and reduce blocks
     gcd_to_use = compute_gcd(blocks)

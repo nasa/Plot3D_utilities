@@ -1,3 +1,19 @@
+"""Plot3D multi-block structured grid toolkit.
+
+Provides readers, writers, connectivity/periodicity matching, block splitting,
+graph partitioning, and boundary-condition export for Plot3D (``.p3d``,
+``.xyz``) mesh files.  Supports binary, ASCII, and Fortran-unformatted formats.
+
+Subpackages:
+    glennht: GlennHT boundary-condition and job-file export.
+    gridpro: GridPro grid and connectivity importers.
+    pointwise: Pointwise ``.inp`` / ``.fvbnd`` importers and GlennHT export.
+
+Attributes:
+    use_single_precision (bool): When ``True``, all :class:`Block` coordinate
+        arrays are stored as ``float32`` instead of ``float64``.  Defaults to
+        ``False``.
+"""
 from __future__ import absolute_import
 
 use_single_precision = False

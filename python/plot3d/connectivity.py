@@ -1,3 +1,32 @@
+"""Three-phase connectivity detection for multi-block Plot3D structured meshes.
+
+This module implements a three-phase algorithm to detect face connectivity
+between blocks in a multi-block Plot3D mesh:
+
+**Phase 1** (fast full-face corner matching):
+    For each candidate block pair (identified by axis-aligned bounding box
+    overlap via ``candidate_neighbor_pairs``), an O(1) corner-based comparison
+    is attempted. If all four corner vertices of two faces match bijectively
+    within tolerance, the faces are declared a full 1:1 match and the expensive
+    point-by-point search is skipped entirely. An interior-point verification
+    step rejects false positives from curved surfaces that share corners but
+    diverge internally.
+
+**Phase 2** (slow partial/split-face matching):
+    When Phase 1 does not produce a match, a point-by-point intersection
+    search is performed. If a partial overlap is found, the original faces
+    are split into matched and remnant sub-faces. Remnant sub-faces re-enter
+    the face pool and the process iterates until no new matches are found.
+
+**Phase 3** (fresh-face validation):
+    After Phases 1-2 converge, some outer faces may remain unmatched because
+    the neighboring block's face pool was consumed by an earlier pair. Each
+    remaining face is re-checked against *fresh* (un-consumed) outer faces of
+    neighboring blocks. Axis-aligned bounding boxes computed from **all** face
+    nodes (not just corners) provide fast pre-filtering before invoking the
+    full intersection test. This catches curved or skewed faces whose interior
+    extents exceed their corner coordinates.
+"""
 from .block import Block, compute_gcd, reduce_blocks
 from .face import Face
 from .facefunctions import create_face_from_diagonals, split_face, get_outer_faces
@@ -12,33 +41,51 @@ from typing import List, Dict, Tuple
 from .point_match import point_match
 
 
-def find_matching_blocks(block1:Block,block2:Block,block1_outer:List[Face], block2_outer:List[Face],tol:float=1E-6):  
-    """Takes two blocks and finds all matching pairs
+def find_matching_blocks(block1:Block,block2:Block,block1_outer:List[Face], block2_outer:List[Face],tol:float=1E-6):
+    """Find all matching face pairs between two blocks.
+
+    Iteratively compares outer faces of ``block1`` against outer faces of
+    ``block2``. When a match (full or partial) is found, the matched faces
+    are removed from their respective pools and any split remnants are added
+    back. Iteration continues until no new matches are discovered.
 
     Args:
-        block1 (Block): Any plot3d Block that is not the same as block2
-        block2 (Block): Any plot3d Block that is not the same as block1
-        block1_outer (List[Face]): outer faces for block 1. 
-        block2_outer (List[Face]): Outer faces for block 2
-        tol (float, Optional): tolerance to use. Defaults to 1E-6
-    
-    Note:
-        This function was changed to be given an input of outer faces for block 1 and block 2. Outer faces can change and we should use the updated value
+        block1 (Block): First Plot3D block. Must not be the same object as
+            ``block2``.
+        block2 (Block): Second Plot3D block. Must not be the same object as
+            ``block1``.
+        block1_outer (List[Face]): Current outer (unmatched) faces for
+            ``block1``. This list is modified in place.
+        block2_outer (List[Face]): Current outer (unmatched) faces for
+            ``block2``. This list is modified in place.
+        tol (float, optional): Euclidean distance tolerance for node matching.
+            Defaults to ``1E-6``.
+
     Returns:
-        (tuple): containing
-            - **df** (pandas.DataFrame): corners of matching pair as block1_corners,block2_corners ([imin,jmin,kmin],[imax,jmax,kmax]), ([imin,jmin,kmin],[imax,jmax,kmax])
-            - **block1_outer** (List[Face]):
-            - **block2_outer** (List[Face]): 
+        tuple: A 3-element tuple containing:
+
+            - **block_match_indices** (List[List[Dict]]): Each element is a
+              list of match dicts (keys ``i1``, ``j1``, ``k1``, ``i2``,
+              ``j2``, ``k2``) representing one matched face pair.
+            - **block1_outer** (List[Face]): Updated outer faces for
+              ``block1`` with matched faces removed and split remnants added.
+            - **block2_outer** (List[Face]): Updated outer faces for
+              ``block2`` with matched faces removed and split remnants added.
+
+    Note:
+        The ``block1_outer`` and ``block2_outer`` lists are modified in place.
+        Callers should pass the most up-to-date outer face lists because
+        earlier matching iterations may have consumed or split faces.
     """
     # Check to see if outer face of block 1 matches any of the outer faces of block 2
     block_match_indices = list()
 
     block1_split_faces = list()
-    block2_split_faces = list() 
+    block2_split_faces = list()
     # Create a dataframe for block1 and block 2 inner matches, add to df later
     # df,split_faces1,split_faces2 = get_face_intersection(block1_outer[3],block2_outer[4],block1,block2,tol=1E-6)
 
-    # Checks the nodes of the outer faces to see if any of them match 
+    # Checks the nodes of the outer faces to see if any of them match
     match = True
     while match:
         match = False
@@ -64,21 +111,25 @@ def find_matching_blocks(block1:Block,block2:Block,block1_outer:List[Face], bloc
             block1_split_faces.clear()
             block2_split_faces.clear()
 
-    return block_match_indices, block1_outer, block2_outer # Remove duplicates using set and list 
+    return block_match_indices, block1_outer, block2_outer # Remove duplicates using set and list
 
 def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
-    """Takes a block (T) and selects X,Y,Z from the block given a face's dimensions
-        theres really no good way to do this in python 
-        
+    """Select a 2-D slice from a 3-D array along a constant-index axis.
+
+    Given a 3-D array (e.g. a block's ``X``, ``Y``, or ``Z`` coordinate
+    array) and index ranges for each dimension, returns the 2-D sub-array
+    corresponding to a face. Exactly one dimension should have equal min/max
+    values, indicating the constant axis.
+
     Args:
-        T (np.ndarray): arbitrary array so say a full matrix containing X
-        dim1 (tuple): 20,50 this selects X in the i direction from i=20 to 50
-        dim2 (tuple): 40,60 this selects X in the j direction from j=40 to 60
-        dim3 (tuple): 10,20 this selects X in the k direction from k=10 to 20
+        T (np.ndarray): 3-D array indexed as ``T[i, j, k]``.
+        dim1 (tuple): ``(imin, imax)`` index range for the first dimension.
+        dim2 (tuple): ``(jmin, jmax)`` index range for the second dimension.
+        dim3 (tuple): ``(kmin, kmax)`` index range for the third dimension.
 
     Returns:
-        np.ndarray: returns X or Y or Z given some range of I,J,K
-
+        np.ndarray: 2-D sub-array extracted from ``T``. If no dimension is
+        constant, returns a 3-D sub-array using half-open slicing.
     """
     if dim1[0] == dim1[1]:
         return T[ dim1[0], dim2[0]:dim2[1]+1, dim3[0]:dim3[1]+1 ]
@@ -86,29 +137,39 @@ def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
         return T[ dim1[0]:dim1[1]+1, dim2[0], dim3[0]:dim3[1]+1 ]
     if dim3[0] == dim3[1]:
         return T[ dim1[0]:dim1[1]+1, dim2[0]:dim2[1]+1, dim3[0] ]
-    
+
     return T[dim1[0]:dim1[1], dim2[0]:dim2[1], dim3[0]:dim3[1]]
 
 def _try_full_face_corner_match(face1, face2, block1, block2,
                                 I1, J1, K1, I2, J2, K2, tol):
-    """O(1) full face match using corner coordinates only.
+    """Attempt an O(1) full-face match using corner coordinates only.
 
-    Compares the 4 corner XYZ coordinates of face1 against the 4 corners of
-    face2. If all corners match bijectively within *tol*, the faces are a full
-    match and we can skip the expensive point-by-point search entirely.
+    Compares the four corner XYZ coordinates of ``face1`` against the four
+    corners of ``face2``. If all corners match bijectively within ``tol``,
+    the faces are a full match and the expensive point-by-point search can
+    be skipped entirely.
 
-    Handles all 8 possible orientations (flips/transposes) because matching is
-    done by spatial proximity, not by index ordering.
+    All eight possible orientations (flips and transposes) are handled
+    because matching is performed by spatial proximity, not index ordering.
 
     Args:
-        face1, face2: Face objects
-        block1, block2: Block objects containing the faces
-        I1, J1, K1: [min, max] index ranges for face1
-        I2, J2, K2: [min, max] index ranges for face2
-        tol (float): matching tolerance
+        face1 (Face): First face to compare.
+        face2 (Face): Second face to compare.
+        block1 (Block): Block containing ``face1``.
+        block2 (Block): Block containing ``face2``.
+        I1 (list): ``[IMIN, IMAX]`` index range for ``face1``.
+        J1 (list): ``[JMIN, JMAX]`` index range for ``face1``.
+        K1 (list): ``[KMIN, KMAX]`` index range for ``face1``.
+        I2 (list): ``[IMIN, IMAX]`` index range for ``face2``.
+        J2 (list): ``[JMIN, JMAX]`` index range for ``face2``.
+        K2 (list): ``[KMIN, KMAX]`` index range for ``face2``.
+        tol (float): Euclidean distance tolerance for corner matching.
 
     Returns:
-        List of dicts with keys i1,j1,k1,i2,j2,k2 (4 corner rows) if full match, or None.
+        list: A list of four dicts with keys ``i1``, ``j1``, ``k1``,
+        ``i2``, ``j2``, ``k2`` representing the corner-to-corner mapping
+        if a full match is found. Returns ``None`` if the faces do not
+        fully match.
     """
     # 1. Dimension check — face grid sizes must match (allowing transpose)
     d1 = face_grid_dims(I1[0], I1[1], J1[0], J1[1], K1[0], K1[1])
@@ -118,7 +179,7 @@ def _try_full_face_corner_match(face1, face2, block1, block2,
 
     # 2. Extract 4 corner (i,j,k,x,y,z) tuples for each face
     def _face_corners(block, I, J, K):
-        """Get the 4 corner vertices of a face, based on which axis is constant."""
+        """Get the four corner vertices of a face based on the constant axis."""
         corners = []
         if I[0] == I[1]:       # I-constant face
             i = I[0]
@@ -177,23 +238,31 @@ def _try_full_face_corner_match(face1, face2, block1, block2,
 
 
 def _verify_match_interior(block1, block2, I1, J1, K1, I2, J2, K2, tol):
-    """Verify a corner-based match by checking that interior nodes are spatially coincident.
+    """Verify a corner-based match by sampling an interior node.
 
-    After corner matching succeeds, samples the center point of face1 and
-    checks whether any node on face2 is within tolerance. This rejects false
-    positives where corners happen to coincide but interior nodes diverge
-    (e.g. curved surfaces that share corners but bow in different directions).
+    After a corner match succeeds, this function samples the center point of
+    ``face1`` and checks whether any node on ``face2`` is within tolerance.
+    This rejects false positives where corners happen to coincide but interior
+    nodes diverge (e.g. curved surfaces that share corners but bow in
+    different directions).
 
-    Mirrors Rust's ``verify_match_interior``.
+    Mirrors the Rust implementation ``verify_match_interior``.
 
     Args:
-        block1, block2: Block objects containing the faces
-        I1, J1, K1: [min, max] index ranges for face1
-        I2, J2, K2: [min, max] index ranges for face2
-        tol: matching tolerance
+        block1 (Block): Block containing the first face.
+        block2 (Block): Block containing the second face.
+        I1 (list): ``[IMIN, IMAX]`` index range for face 1.
+        J1 (list): ``[JMIN, JMAX]`` index range for face 1.
+        K1 (list): ``[KMIN, KMAX]`` index range for face 1.
+        I2 (list): ``[IMIN, IMAX]`` index range for face 2.
+        J2 (list): ``[JMIN, JMAX]`` index range for face 2.
+        K2 (list): ``[KMIN, KMAX]`` index range for face 2.
+        tol (float): Euclidean distance tolerance for matching.
 
     Returns:
-        True if the interior check passes (or face is too small to have interior points)
+        bool: ``True`` if the interior check passes (i.e. a face 2 node is
+        found near the center of face 1), or if the face is too small to
+        have a distinct interior point. ``False`` otherwise.
     """
     # Find center index for face1
     ic1 = (I1[0] + I1[1]) // 2
@@ -219,22 +288,39 @@ def _verify_match_interior(block1, block2, I1, J1, K1, I2, J2, K2, tol):
 
 
 def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:float=1E-6):
-    """Get the index of the intersection between two faces located on two different blocks
-        Face1 needs to be the smaller face.
+    """Compute the intersection between two exterior faces on different blocks.
+
+    Uses a two-tier strategy:
+
+    1. **Fast path** -- Attempts an O(1) full-face corner match via
+       ``_try_full_face_corner_match``, verified by an interior-node sample.
+    2. **Slow path** -- Falls back to point-by-point matching when the fast
+       path fails or when the faces partially overlap. Matched indices are
+       filtered for contiguity (``_filter_block_increasing``) and checked
+       against edge-only degeneracy (``_check_edge``). If the match is
+       partial, the original faces are split into matched and remnant
+       sub-faces.
 
     Args:
-        face1 (Face): An exterior face
-        face2 (Face): An exterior face from a different block
-        block1 (Block): block containing face1
-        block2 (Block): block containing face2
-        tol (float): matching tolerance
+        face1 (Face): An exterior face from ``block1``.
+        face2 (Face): An exterior face from ``block2``.
+        block1 (Block): Block containing ``face1``.
+        block2 (Block): Block containing ``face2``.
+        tol (float, optional): Euclidean distance tolerance for node
+            matching. Defaults to ``1E-6``.
 
     Returns:
-        (Tuple): containing
+        tuple: A 3-element tuple containing:
 
-            - (List[Dict]): list of match dicts with keys i1,j1,k1,i2,j2,k2
-            - (List[Face]): any split faces from block 1
-            - (List[Face]): any split faces from block 2
+            - **match_location** (List[Dict]): List of match dicts with keys
+              ``i1``, ``j1``, ``k1``, ``i2``, ``j2``, ``k2``. Empty if no
+              valid face intersection is found.
+            - **split_faces1** (List[Face]): Remnant sub-faces from
+              ``block1`` created by splitting ``face1`` around the matched
+              region. Empty if no split occurred.
+            - **split_faces2** (List[Face]): Remnant sub-faces from
+              ``block2`` created by splitting ``face2`` around the matched
+              region. Empty if no split occurred.
     """
 
     match_location = list()
@@ -365,24 +451,29 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
     return match_location, split_faces1, split_faces2
 
 def _filter_block_increasing(matches: List[Dict], key1: str) -> List[Dict]:
-    """Filters match results to ensure key1 values are monotonically increasing.
+    """Filter match results to keep only contiguous increasing index values.
 
-    Removes rows where the specified key doesn't form a contiguous increasing
-    sequence. This handles the edge-matching case where face2 touches face1
-    at two disconnected edges.
+    Removes rows where the specified key does not form a contiguous
+    increasing sequence. This handles edge-matching cases where ``face2``
+    touches ``face1`` at two disconnected edges.
 
-    When there are exactly 2 unique values, they are always kept regardless of
-    gap size. This handles the case where a small face (e.g. 2 nodes wide after
-    GCD reduction) matches a large face — the matching indices on the large face
-    may span a wide gap (e.g. [0, 113]) but are still a valid match. The
-    _check_edge() call upstream has already verified this isn't a degenerate edge.
+    When there are exactly two unique values, they are always kept regardless
+    of gap size. This handles the case where a small face (e.g. 2 nodes wide
+    after GCD reduction) matches a large face -- the matching indices on the
+    large face may span a wide gap (e.g. ``[0, 113]``) but are still a valid
+    match. The ``_check_edge`` call upstream has already verified this is not
+    a degenerate edge.
 
     Args:
-        matches: list of match dicts with keys i1,j1,k1,i2,j2,k2
-        key1: key that should be in increasing order
+        matches (List[Dict]): List of match dicts with keys ``i1``, ``j1``,
+            ``k1``, ``i2``, ``j2``, ``k2``.
+        key1 (str): Dictionary key whose values should form a contiguous
+            increasing sequence (e.g. ``'j1'``, ``'k2'``).
 
     Returns:
-        Filtered list of match dicts
+        List[Dict]: Filtered list of match dicts containing only rows whose
+        ``key1`` value belongs to a contiguous run. Returns an empty list
+        if there is only one unique value (edge-matching condition).
     """
     if len(matches) == 0:
         return matches
@@ -408,13 +499,19 @@ def _filter_block_increasing(matches: List[Dict], key1: str) -> List[Dict]:
 
 
 def _check_edge(matches: List[Dict]) -> bool:
-    """Check if the match results represent an edge instead of a face.
+    """Determine whether matched indices describe an edge rather than a face.
+
+    An intersection is considered an edge (not a face) when two or more of
+    the three index dimensions (I, J, K) are constant across all matched
+    points, meaning the match is one-dimensional.
 
     Args:
-        matches: list of match dicts with keys i1,j1,k1,i2,j2,k2
+        matches (List[Dict]): List of match dicts with keys ``i1``, ``j1``,
+            ``k1``, ``i2``, ``j2``, ``k2``.
 
     Returns:
-        True if the intersection is an edge, False if it's a face
+        bool: ``True`` if the intersection is an edge (degenerate),
+        ``False`` if it spans a two-dimensional face.
     """
     i1_min = min(m['i1'] for m in matches)
     j1_min = min(m['j1'] for m in matches)
@@ -425,21 +522,24 @@ def _check_edge(matches: List[Dict]) -> bool:
 
     edge_matches = int(i1_min == i1_max) + int(j1_min == j1_max) + int(k1_min == k1_max)
     return edge_matches >= 2
-    
-def candidate_neighbor_pairs(blocks:List[Block], tol:float=1e-6):
-    """Return (i, j) pairs of block indices whose bounding boxes overlap or touch.
 
-    Two blocks can only share a face if their axis-aligned bounding boxes (AABBs)
-    overlap or touch. This replaces the old centroid-distance approach which could
+def candidate_neighbor_pairs(blocks:List[Block], tol:float=1e-6):
+    """Return block index pairs whose bounding boxes overlap or nearly touch.
+
+    Two blocks can only share a face if their axis-aligned bounding boxes
+    (AABBs) overlap or are within ``tol`` of touching. This spatial
+    pre-filter replaces the older centroid-distance approach, which could
     miss neighbors for irregularly shaped blocks (L-shaped, elongated, etc.).
 
     Args:
-        blocks (List[Block]): list of all your blocks
-        tol (float): AABB expansion tolerance. Blocks whose bounding boxes are
-            within this distance of touching are still considered candidates.
+        blocks (List[Block]): All blocks in the multi-block mesh.
+        tol (float, optional): AABB expansion tolerance. Blocks whose
+            bounding boxes are within this distance of touching are still
+            considered candidates. Defaults to ``1e-6``.
 
     Returns:
-        List[Tuple[int,int]]: candidate block pairs (i, j) with i < j
+        List[Tuple[int, int]]: Candidate block pairs ``(i, j)`` with
+        ``i < j``.
     """
     n = len(blocks)
     # Precompute axis-aligned bounding boxes: [xmin, xmax, ymin, ymax, zmin, zmax]
@@ -464,23 +564,31 @@ def candidate_neighbor_pairs(blocks:List[Block], tol:float=1e-6):
                 aabbs[j, 5] + tol >= aabbs[i, 4]):
                 pairs.append((i, j))
     return pairs
-    
-def connectivity_fast(blocks:List[Block]):
-    """GCD-accelerated connectivity detection.
 
-    Down-samples all blocks by their minimum GCD, runs the three-phase
-    connectivity algorithm (see :func:`connectivity`), then scales indices
-    back to the original resolution.
+def connectivity_fast(blocks:List[Block]):
+    """Run GCD-accelerated connectivity detection.
+
+    Down-samples all blocks by their minimum GCD (greatest common divisor of
+    grid dimensions minus one), runs the three-phase connectivity algorithm
+    via ``connectivity``, then scales the resulting indices back to the
+    original resolution.
+
+    This is the recommended entry point for large meshes where GCD reduction
+    significantly decreases the number of nodes to compare.
 
     Args:
-        blocks (List[Block]): Lists of blocks you want to find the connectivity for
+        blocks (List[Block]): All blocks to find connectivity for.
 
     Returns:
-        (List[Dict]): All matching faces formatted as a list of
-            ``{ 'block1': {'block_index', 'IMIN', ...}, 'block2': ... }``
-        (List[Dict]): All exterior surfaces formatted as a list of
-            ``{ 'block_index', 'IMIN', ..., 'id' }``
+        tuple: A 2-element tuple containing:
 
+            - **face_matches** (List[Dict]): All matching face pairs. Each
+              dict has keys ``block1`` and ``block2``, each containing
+              ``block_index``, ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``,
+              ``JMAX``, ``KMAX``.
+            - **outer_faces_formatted** (List[Dict]): All remaining exterior
+              surfaces. Each dict has keys ``block_index``, ``IMIN``,
+              ``JMIN``, ``KMIN``, ``IMAX``, ``JMAX``, ``KMAX``, ``id``.
     """
     gcd_to_use = compute_gcd(blocks)
     print(f"gcd to use {gcd_to_use}")
@@ -496,28 +604,35 @@ def connectivity_fast(blocks:List[Block]):
 def connectivity(blocks:List[Block]):
     """Detect face connectivity between blocks using a three-phase algorithm.
 
-    **Phase 1-2** (in ``find_matching_blocks``): For each candidate block pair
-    (identified by AABB overlap), faces are matched iteratively. Phase 1 uses
-    O(1) corner matching for full 1:1 faces. Phase 2 handles partial/split
-    faces via point-by-point intersection, creating remnant sub-faces that
-    re-enter the pool until convergence.
+    **Phase 1-2** (in ``find_matching_blocks``): For each candidate block
+    pair (identified by AABB overlap), faces are matched iteratively.
+    Phase 1 uses O(1) corner matching for full 1:1 faces. Phase 2 handles
+    partial/split faces via point-by-point intersection, creating remnant
+    sub-faces that re-enter the pool until convergence.
 
-    **Phase 3** (fresh-face validation): After Phase 1-2 converge, remaining
-    unmatched faces are re-checked against *fresh* outer faces of neighbor
-    blocks. Axis-aligned bounding boxes (AABBs) computed from **all face
-    nodes** (not just corners) are used for fast pre-filtering before calling
-    ``get_face_intersection``. This catches edge cases where curved or skewed
-    faces have interior extents beyond their corner coordinates.
+    **Phase 3** (fresh-face validation): After Phases 1-2 converge,
+    remaining unmatched faces are re-checked against *fresh* outer faces of
+    neighbor blocks. Axis-aligned bounding boxes computed from **all** face
+    nodes (not just corners) are used for fast pre-filtering before calling
+    ``get_face_intersection``. This catches edge cases where curved or
+    skewed faces have interior extents beyond their corner coordinates.
+
+    After all three phases, self-matching faces within the same block are
+    detected and appended. Duplicate and subsumed outer faces are pruned.
 
     Args:
-        blocks (List[Block]): List of all blocks in multi-block plot3d mesh
+        blocks (List[Block]): All blocks in the multi-block Plot3D mesh.
 
     Returns:
-        (List[Dict]): All matching faces formatted as a list of
-            ``{ 'block1': {'block_index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'}, 'block2': ... }``
-        (List[Dict]): All exterior surfaces formatted as a list of
-            ``{ 'block_index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX', 'id' }``
+        tuple: A 2-element tuple containing:
 
+            - **face_matches** (List[Dict]): All matching face pairs. Each
+              dict has keys ``block1`` and ``block2``, each containing
+              ``block_index``, ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``,
+              ``JMAX``, ``KMAX``, and ``id``.
+            - **outer_faces_formatted** (List[Dict]): All remaining exterior
+              surfaces. Each dict has keys ``block_index``, ``IMIN``,
+              ``JMIN``, ``KMIN``, ``IMAX``, ``JMAX``, ``KMAX``, ``id``.
     """
 
     face_matches = list()
@@ -702,28 +817,37 @@ def connectivity(blocks:List[Block]):
                                     })
 
     # Update the outer faces
-    outer_faces_formatted = list() # This will contain 
-    id = 1 
-    for face in outer_faces:        
+    outer_faces_formatted = list() # This will contain
+    id = 1
+    for face in outer_faces:
         outer_faces_formatted.append({ 'IMIN':min(face.I), 'JMIN':min(face.J), 'KMIN':min(face.K),
                             'IMAX':max(face.I), 'JMAX':max(face.J), 'KMAX':max(face.K),
                             'id':id, 'block_index':face.BlockIndex })
         id += 1
 
-    return face_matches, outer_faces_formatted  
+    return face_matches, outer_faces_formatted
 
 def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
-    """Makes sure the diagonal of face 1 match the diagonal of face 2
+    """Convert a matched face pair into a structured connectivity dictionary.
+
+    Determines which corner of ``face2`` corresponds to the lower-left and
+    upper-right corners of ``face1`` by finding the nearest spatial match
+    among the four corners of ``face2``. This ensures the diagonal
+    representation is consistent regardless of face orientation.
 
     Args:
-        face1 (Face): Face 1 with block index 
-        face2 (Face): Face 2 with block index
-        block1 (Block): Block 1 
-        block2 (Block): Block 2 
-    
-    Returns:
-        (dict): dictionary describing the corner matches 
+        face1 (Face): Matched face on ``block1``. Must have ``BlockIndex``
+            set.
+        face2 (Face): Matched face on ``block2``. Must have ``BlockIndex``
+            set.
+        block1 (Block): Block containing ``face1``.
+        block2 (Block): Block containing ``face2``.
 
+    Returns:
+        dict: A dictionary with keys ``block1`` and ``block2``, each
+        containing ``block_index``, ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``,
+        ``JMAX``, ``KMAX``, and ``id``. The lower/upper corners of
+        ``block2`` are reordered to spatially match those of ``block1``.
     """
     match = {
             'block1':{
@@ -739,7 +863,7 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
                             'id':face2.id
                         }
                 }
-            
+
     I1 = [face1.IMIN,face1.IMAX]
     J1 = [face1.JMIN,face1.JMAX]
     K1 = [face1.KMIN,face1.KMAX]
@@ -797,24 +921,39 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
 
 
 def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E-6):
-    """Verifies that the diagonal corners of face_matches are spatially consistent.
+    """Verify that face match diagonals are spatially consistent.
 
-    For each face_match, checks that block1's lower corner coordinates match
-    block2's lower corner coordinates (and similarly for upper corners) within
-    the specified tolerance. If the stored diagonal doesn't match, tries all
-    permutations of block2's face corners. If a valid permutation is found,
-    the face_match is corrected and added to the verified list.
+    For each entry in ``face_matches``, checks that the lower-corner
+    coordinates of ``block1`` match the lower-corner coordinates of
+    ``block2`` (and similarly for upper corners) within the specified
+    tolerance. If the stored diagonal does not match, all permutations of
+    ``block2``'s face corners are tried. If a valid permutation is found,
+    the face match is corrected and added to the verified list.
 
-    Uses GCD reduction (same as connectivity_fast) for efficient coordinate lookups.
+    Uses GCD reduction (same as ``connectivity_fast``) for efficient
+    coordinate lookups on large meshes.
 
     Args:
-        blocks (List[Block]): List of all blocks (original full-resolution)
-        face_matches (list): List of face_match dicts from connectivity or periodicity
-        tol (float, optional): Euclidean distance tolerance. Defaults to 1E-6.
+        blocks (List[Block]): All blocks at original full resolution.
+        face_matches (list): List of face match dicts produced by
+            ``connectivity`` or ``connectivity_fast``. Each dict has keys
+            ``block1`` and ``block2`` with sub-keys ``block_index``,
+            ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``, ``JMAX``, ``KMAX``.
+        tol (float, optional): Euclidean distance tolerance for corner
+            comparison. Defaults to ``1E-6``.
 
     Returns:
-        (list): verified face_matches whose diagonals are confirmed or corrected
-        (list): mismatched face_matches where no corner permutation matched
+        tuple: A 2-element tuple containing:
+
+            - **verified** (list): Face matches whose diagonals are confirmed
+              or corrected to be spatially consistent.
+            - **mismatched** (list): Face matches where no corner permutation
+              produced a match within tolerance.
+
+    Note:
+        Mismatched entries are printed to stdout with detailed diagnostic
+        information including block indices, corner coordinates, and closest
+        distances.
     """
     # Compute GCD and reduce blocks
     gcd_to_use = compute_gcd(blocks)

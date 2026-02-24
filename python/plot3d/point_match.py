@@ -1,31 +1,42 @@
-import numpy as np 
+"""Point matching for structured grid face intersection.
+
+Provides a vectorized point-to-grid matching function used by the connectivity
+algorithm to find which grid node on face 2 corresponds to a given (x, y, z)
+coordinate from face 1.
+"""
+import numpy as np
 
 
-def point_match(x:float, y:float, z:float, X2:np.ndarray, Y2:np.ndarray, Z2:np.ndarray, tol:float=1E-6):
-    """Checks to see if x,y,z is present in a Face
-        x,y,z are the point that you want to match in Face defined using X2,Y2,Z2
+def point_match(x: float, y: float, z: float,
+                X2: np.ndarray, Y2: np.ndarray, Z2: np.ndarray,
+                tol: float = 1E-6):
+    """Find the grid index on a face whose coordinates match a query point.
+
+    Computes the Euclidean distance from ``(x, y, z)`` to every node in the
+    2D grid defined by ``X2, Y2, Z2`` and returns the ``(p, q)`` indices of
+    the closest node if it is within tolerance.
 
     Args:
-        x (float): Block 1 face coordinate.  
-        y (float): Block 1 face coordinate 
-        z (float): Block 1 face coordinate 
-        X2 (np.ndarray): X(i,j,k)
-        Y2 (np.ndarray): Y(i,j,k)
-        Z2 (np.ndarray): Z(i,j,k)
-        tol (float, optional): Matching tolerance. If the distance between points x,y,z and X2[i,j,k],Y2[i,j,k],Z2[i,j,k] . Defaults to 1E-6.
+        x: X coordinate of the query point.
+        y: Y coordinate of the query point.
+        z: Z coordinate of the query point.
+        X2: 2D array of X coordinates on the target face, shape ``(Nu, Nv)``.
+        Y2: 2D array of Y coordinates on the target face, shape ``(Nu, Nv)``.
+        Z2: 2D array of Z coordinates on the target face, shape ``(Nu, Nv)``.
+        tol: Maximum Euclidean distance for a valid match. Defaults to ``1e-6``.
 
     Returns:
-        (tuple[int,int]): Face indicies where the match occurs 
+        ``[p, q]`` indices into ``X2/Y2/Z2`` where the match was found, or
+        ``[-1, -1]`` if no node is within tolerance.
     """
     dx = x - X2
     dy = y - Y2
     dz = z - Z2
-    d = np.sqrt(dx* dx + dy* dy + dz* dz)    
+    d = np.sqrt(dx * dx + dy * dy + dz * dz)
     val = np.amin(d)
     location = np.where(d == val)
-        
+
     if val < tol:
         return [location[0][0], location[1][0]]
-    
-    return [-1,-1]
-    
+
+    return [-1, -1]

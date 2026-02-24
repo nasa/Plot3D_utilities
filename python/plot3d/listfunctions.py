@@ -1,15 +1,21 @@
+"""List utility functions for deduplication and pair enumeration."""
+
 
 def unique_pairs(listOfItems=[]):
-    """Checks if an item is not already in the list 
-    
+    """Yield unique unordered pairs from a list of 2-tuples.
+
+    Filters out self-pairs ``(x, x)`` and duplicate reversed pairs
+    so that ``(1, 2)`` and ``(2, 1)`` are treated as the same pair.
+
     Args:
-        listOfItems (list): list of combinations e.g. (1,2),(3,4),(2,1)
+        listOfItems: Iterable of ``(x, y)`` tuples.
 
     Yields:
-        unique pair: [description]
+        ``(x, y)`` pairs where ``x != y`` and the reversed pair has not
+        already been yielded. Uses a set for O(1) duplicate lookups.
     """
-    seen = set()  #use set to keep track of already seen items, sets provide O(1) lookup  
-    for x,y in listOfItems:
-        if x!=y and (y,x) not in seen:
-            seen.add((x,y)) 
-            yield x,y
+    seen = set()
+    for x, y in listOfItems:
+        if x != y and (y, x) not in seen:
+            seen.add((x, y))
+            yield x, y

@@ -31,21 +31,33 @@ docstrings and type hints from the ``plot3d`` package.
    notes/changelog
 
 .. toctree::
-   :glob:
    :maxdepth: 1
-   :caption: Contents
+   :caption: API Reference
 
    modules/block
+   modules/block_merging
    modules/blockfunctions
    modules/connectivity
    modules/differencing
    modules/face
+   modules/face_pool
    modules/facefunctions
    modules/graph
-   modules/read
-   modules/write
-   modules/split_block
+   modules/listfunctions
    modules/periodicity
+   modules/point_match
+   modules/read
+   modules/split_block
+   modules/utils
+   modules/write
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Subpackages
+
+   modules/glennht
+   modules/gridpro
+   modules/pointwise
 
 Indices and tables
 ==================

@@ -1,15 +1,38 @@
+"""Face manipulation utilities for Plot3D structured grids.
+
+This module provides functions for comparing, matching, splitting, and
+searching block faces in multi-block structured grids. It includes
+routines for identifying outer (boundary) faces, locating bounding faces
+along translational or angular directions, and converting between
+dictionary and ``Face`` object representations.
+"""
 from typing import Dict, List, Optional, Tuple
 from .listfunctions import unique_pairs
 from .block import Block, compute_gcd, reduce_blocks
-from .face import Face 
+from .face import Face
 import numpy.typing as npt
 import numpy as np
 import math
 
 def faces_match(face1: Tuple[npt.NDArray, npt.NDArray, npt.NDArray],face2: Tuple[npt.NDArray, npt.NDArray, npt.NDArray],tol: float = 1e-12) -> Tuple[bool, Optional[Tuple[bool, bool]]]:
-    """
-    Compare two block faces and return whether they match and the flip required on face2 to match face1.
-    Returns (True, (flip_ud, flip_lr)) if matching, otherwise (False, None).
+    """Compare two block faces and determine whether they match geometrically.
+
+    Each face is represented as a tuple of ``(X, Y, Z)`` 2-D arrays. The
+    function tests all four combinations of up/down and left/right flips
+    on ``face2`` and checks whether the corner coordinates agree with
+    ``face1`` within the specified tolerance.
+
+    Args:
+        face1: Tuple of ``(X, Y, Z)`` arrays for the first face.
+        face2: Tuple of ``(X, Y, Z)`` arrays for the second face.
+        tol: Absolute tolerance for comparing corner coordinates.
+            Defaults to ``1e-12``.
+
+    Returns:
+        A tuple ``(matched, flip_flags)`` where *matched* is ``True`` if
+        the faces match and *flip_flags* is a ``(flip_ud, flip_lr)`` tuple
+        indicating the flips applied to ``face2``. Returns
+        ``(False, None)`` when no orientation produces a match.
     """
     def get_corners(X, Y, Z):
         return np.array([
@@ -40,10 +63,23 @@ def faces_match(face1: Tuple[npt.NDArray, npt.NDArray, npt.NDArray],face2: Tuple
                 return True, (flip_ud, flip_lr)
 
     return False, None
+
 def find_matching_faces(block1, block2, tol=1e-8):
-    """
-    Returns a tuple (face1_name, face2_name, flip_flags) if a matching face is found.
-    Otherwise returns (None, None, None).
+    """Find a shared face between two blocks.
+
+    Iterates over all six faces of each block and returns the first pair
+    that matches geometrically (see ``faces_match``).
+
+    Args:
+        block1: First ``Block`` to compare.
+        block2: Second ``Block`` to compare.
+        tol: Absolute tolerance for the face comparison. Defaults to
+            ``1e-8``.
+
+    Returns:
+        A tuple ``(face1_name, face2_name, flip_flags)`` for the first
+        matching pair found. Returns ``(None, None, None)`` if no faces
+        match.
     """
     faces1 = block1.get_faces()
     faces2 = block2.get_faces()
@@ -56,40 +92,47 @@ def find_matching_faces(block1, block2, tol=1e-8):
 
 
 def get_outer_faces(block1:Block):
-    """Get the outer faces of a block
+    """Identify the outer (boundary) faces of a single block.
+
+    Builds the six bounding faces from the block's corner vertices and
+    determines which faces are unique (outer) versus which pairs share
+    identical vertex positions (interior/collapsed).
 
     Args:
-        block1 (Block): A plot3D block
+        block1: A Plot3D ``Block`` whose outer faces are to be found.
 
     Returns:
-        List[Face]: Non matching faces of the block 
-        List[(Face,Face)]: Matching faces inside the block 
+        A tuple ``(non_matching, matching)`` where *non_matching* is a
+        list of ``Face`` objects that have no duplicate within the block
+        (guaranteed exterior faces) and *matching* is a list of
+        ``(Face, Face)`` tuples representing interior face pairs that
+        share the same vertex positions.
     """
     I = [0,block1.IMAX-1]               # Python index starts at 0, need to subtract 1 for it to get the i,j,k
     J = [0,block1.JMAX-1]
     K = [0,block1.KMAX-1]
-    # Create the outer faces        
+    # Create the outer faces
     faces = list()
     face = Face(4)
     i=I[0]
     for j in J:
         for k in K:
             face.add_vertex(block1.X[i,j,k], block1.Y[i,j,k], block1.Z[i,j,k],i,j,k)
-    
+
     faces.append(face)
     face = Face(4)
     i=I[1]
     for j in J:
         for k in K:
             face.add_vertex(block1.X[i,j,k], block1.Y[i,j,k], block1.Z[i,j,k],i,j,k)
-    
+
     faces.append(face)
     face = Face(4)
     j=J[0]
     for i in I:
         for k in K:
             face.add_vertex(block1.X[i,j,k], block1.Y[i,j,k], block1.Z[i,j,k],i,j,k)
-    
+
     faces.append(face)
     face = Face(4)
     j=J[1]
@@ -103,7 +146,7 @@ def get_outer_faces(block1:Block):
     for i in I:
         for j in J:
             face.add_vertex(block1.X[i,j,k], block1.Y[i,j,k], block1.Z[i,j,k],i,j,k)
-    
+
     faces.append(face)
     face = Face(4)
     k=K[1]
@@ -122,28 +165,34 @@ def get_outer_faces(block1:Block):
                 matching.append((i,j))
                 matchFound = True
         if not matchFound:
-            non_matching.append(faces[i]) # these are guaranteed to be exterior 
+            non_matching.append(faces[i]) # these are guaranteed to be exterior
     matching = list(unique_pairs(matching))
     matching = [(faces[i],faces[j]) for i,j in matching]
-    
-    # Make sure normals do not intersect 
+
+    # Make sure normals do not intersect
     # block_center_to_face_center =  block1.cx
     return non_matching, matching # these should be the outer faces
-    
+
 def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int) -> Face:
-    """Creates a face on a block given a the diagonals defined as (IMIN,JMIN,KMIN), (IMAX, JMAX, KMAX)
+    """Create a ``Face`` on a block from two diagonal corner indices.
+
+    Exactly one of the index pairs ``(imin, imax)``, ``(jmin, jmax)``, or
+    ``(kmin, kmax)`` must be equal, which determines the orientation of the
+    resulting 2-D face. The four vertices are generated by iterating over
+    the two free index dimensions.
 
     Args:
-        block (Block): Block to create a face on 
-        imin (int): Lower Corner IMIN
-        jmin (int): Lower Corner JMIN
-        kmin (int): Lower Corner KMIN
-        imax (int): Upper Corner IMAX
-        jmax (int): Upper Corner JMAX
-        kmax (int): Upper Corner
+        block: The ``Block`` on which to create the face.
+        imin: Lower corner I index.
+        jmin: Lower corner J index.
+        kmin: Lower corner K index.
+        imax: Upper corner I index.
+        jmax: Upper corner J index.
+        kmax: Upper corner K index.
 
     Returns:
-        (Face): Face created from diagonals 
+        A ``Face`` object with four vertices populated from the block's
+        coordinate arrays.
     """
     newFace = Face(4)           # This is because two of the corners either imin or imax can be equal
     if imin==imax:
@@ -176,7 +225,16 @@ def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,j
 AxisMap = {"x": 0, "y": 1, "z": 2}
 
 def _face_axis_extreme(face: Face, axis: str) -> Tuple[float, float]:
-    """Return (vmin, vmax) of the face along axis ∈ {'x','y','z'} using stored vertices."""
+    """Return the min and max coordinate of a face along a given axis.
+
+    Args:
+        face: The ``Face`` whose vertex coordinates are inspected.
+        axis: Axis label, one of ``'x'``, ``'y'``, or ``'z'``.
+
+    Returns:
+        A tuple ``(vmin, vmax)`` of the minimum and maximum coordinate
+        values along the specified axis.
+    """
     if axis == "x":
         arr = face.x[:face.nvertex]
     elif axis == "y":
@@ -186,7 +244,16 @@ def _face_axis_extreme(face: Face, axis: str) -> Tuple[float, float]:
     return float(np.min(arr)), float(np.max(arr))
 
 def _global_axis_extreme(blocks: List[Block], axis: str) -> Tuple[float, float]:
-    """Global (min, max) along axis across all blocks."""
+    """Compute the global coordinate range along an axis across all blocks.
+
+    Args:
+        blocks: List of ``Block`` objects to scan.
+        axis: Axis label, one of ``'x'``, ``'y'``, or ``'z'``.
+
+    Returns:
+        A tuple ``(global_min, global_max)`` of the extreme coordinate
+        values across every block.
+    """
     vals = []
     idx = AxisMap[axis]
     for b in blocks:
@@ -198,7 +265,24 @@ def _global_axis_extreme(blocks: List[Block], axis: str) -> Tuple[float, float]:
 
 def _select_seed_faces(outer_faces: List[Face], blocks: List[Block],
                        axis: str, side: str, tol_abs: float) -> List[Face]:
-    """Pick all outer faces whose face extreme equals the global extreme within tol."""
+    """Select outer faces whose extreme coordinate matches the global extreme.
+
+    These seed faces serve as starting points for the BFS boundary
+    collection in ``_bfs_collect_boundary``.
+
+    Args:
+        outer_faces: Candidate outer ``Face`` objects.
+        blocks: List of all ``Block`` objects (used to compute global
+            extremes).
+        axis: Axis label, one of ``'x'``, ``'y'``, or ``'z'``.
+        side: Which extreme to target: ``'min'`` or ``'max'``.
+        tol_abs: Absolute tolerance for comparing the face extreme to
+            the global extreme.
+
+    Returns:
+        A list of ``Face`` objects whose relevant extreme is within
+        ``tol_abs`` of the global extreme along the given axis and side.
+    """
     gmin, gmax = _global_axis_extreme(blocks, axis)
     target = gmin if side == "min" else gmax
     seeds: List[Face] = []
@@ -218,9 +302,33 @@ def _bfs_collect_boundary(seed_faces: List[Face],
                           node_tol_xyz: float,
                           min_shared_abs: int = 2,
                           min_shared_frac: float = 0.005) -> List[Face]:
-    """
-    Flood-fill over outer faces: neighbors share nodes (not just centroids)
-    and lie on the same extreme plane (within tol_abs).
+    """Flood-fill over outer faces to collect a connected boundary patch.
+
+    Starting from the seed faces, this performs a breadth-first search
+    through outer faces that lie on the same extreme plane and share
+    grid nodes with at least one already-visited face.
+
+    Args:
+        seed_faces: Initial ``Face`` objects to start the flood fill.
+        all_outer_faces: Complete pool of outer ``Face`` objects to
+            search through.
+        blocks: List of all ``Block`` objects (used for node coordinate
+            lookups and global extreme computation).
+        axis: Axis label, one of ``'x'``, ``'y'``, or ``'z'``.
+        side: Which extreme plane to collect: ``'min'`` or ``'max'``.
+        tol_abs: Absolute tolerance for determining whether a face lies
+            on the extreme plane.
+        node_tol_xyz: Absolute tolerance for node-level coordinate
+            matching when testing face adjacency.
+        min_shared_abs: Minimum number of shared nodes required for two
+            faces to be considered neighbors. Defaults to ``2``.
+        min_shared_frac: Minimum fraction of shared nodes (relative to
+            the smaller face) required for adjacency. Defaults to
+            ``0.005``.
+
+    Returns:
+        A list of ``Face`` objects forming the connected boundary patch
+        reachable from the seed faces.
     """
     # index faces by (block, IMIN..KMAX) for visited bookkeeping
     def key(f: Face) -> Tuple[int,int,int,int,int,int,int]:
@@ -275,20 +383,32 @@ def find_bounding_faces(blocks: List[Block],
                         side: str = "both",
                         tol_rel: float = 1e-8,
                         node_tol_xyz: float = 1e-6) -> Tuple[List[Dict[str,int]], List[Dict[str,int]],List[Face], List[Face]]:
-    """
-    Find *outer* bounding faces at the global min/max of a given direction ('x','y','z').
-    Uses node-sharing BFS to gather continuous boundary patches across blocks.
+    """Find outer bounding faces at the global min/max of a given direction.
+
+    Reduces the mesh by its GCD for alignment, identifies seed faces at
+    the global extremes, then uses node-sharing BFS
+    (``_bfs_collect_boundary``) to gather continuous boundary patches
+    across multiple blocks. The resulting face indices are scaled back to
+    the original grid resolution before being returned.
 
     Args:
-        blocks: list of Block
-        outer_faces: optional precomputed outer faces (dict form)
-        direction: 'x','y','z'
-        side: 'both' | 'min' | 'max'
-        tol_rel: relative tolerance against global extreme value
-        node_tol_xyz: absolute node matching tolerance (geometry units)
+        blocks: List of ``Block`` objects comprising the mesh.
+        outer_faces: Precomputed outer faces in dictionary form. Pass an
+            empty list to have them computed automatically.
+        direction: Axis along which to find bounding faces, one of
+            ``'x'``, ``'y'``, or ``'z'``. Defaults to ``'z'``.
+        side: Which boundary to find: ``'both'``, ``'min'``, or
+            ``'max'``. Defaults to ``'both'``.
+        tol_rel: Relative tolerance for comparing face coordinates to
+            global extremes. Defaults to ``1e-8``.
+        node_tol_xyz: Absolute tolerance for node-level coordinate
+            matching during BFS adjacency checks. Defaults to ``1e-6``.
 
     Returns:
-        lower_connected_faces_export, upper_connected_faces_export, lower_connected_faces, upper_connected_faces
+        A tuple ``(lower_export, upper_export, lower_faces, upper_faces)``
+        where the ``*_export`` entries are lists of face dictionaries
+        (suitable for JSON serialization) and the ``*_faces`` entries are
+        lists of ``Face`` objects at the original grid scale.
     """
     # 1) Reduce by GCD so grids line up
     gcd_to_use = compute_gcd(blocks)
@@ -380,12 +500,23 @@ def find_bounding_faces(blocks: List[Block],
 
 
 def _to_theta(x, y, z, rotation_axis: str):
-    """Compute angular position (theta) about the given rotation axis.
+    """Compute the angular position (theta) about a given rotation axis.
 
-    Conventions match Block.cylindrical() for x-axis:
-        x-axis: theta = atan2(Y, Z)
-        y-axis: theta = atan2(Z, X)
-        z-axis: theta = atan2(Y, X)
+    The convention matches ``Block.cylindrical()`` for each axis:
+
+    - x-axis: ``theta = atan2(Y, Z)``
+    - y-axis: ``theta = atan2(Z, X)``
+    - z-axis: ``theta = atan2(Y, X)``
+
+    Args:
+        x: X coordinate(s), scalar or array.
+        y: Y coordinate(s), scalar or array.
+        z: Z coordinate(s), scalar or array.
+        rotation_axis: Axis of rotation, one of ``'x'``, ``'y'``, or
+            ``'z'``.
+
+    Returns:
+        The angular position(s) in radians, same shape as the inputs.
     """
     if rotation_axis == "x":
         return np.arctan2(y, z)
@@ -396,7 +527,18 @@ def _to_theta(x, y, z, rotation_axis: str):
 
 
 def _to_radius(x, y, z, rotation_axis: str):
-    """Compute radial distance from the given rotation axis."""
+    """Compute the radial distance from a given rotation axis.
+
+    Args:
+        x: X coordinate(s), scalar or array.
+        y: Y coordinate(s), scalar or array.
+        z: Z coordinate(s), scalar or array.
+        rotation_axis: Axis of rotation, one of ``'x'``, ``'y'``, or
+            ``'z'``.
+
+    Returns:
+        The radial distance(s), same shape as the inputs.
+    """
     if rotation_axis == "x":
         return np.sqrt(y * y + z * z)
     elif rotation_axis == "y":
@@ -406,7 +548,17 @@ def _to_radius(x, y, z, rotation_axis: str):
 
 
 def _global_theta_extreme(blocks: List[Block], rotation_axis: str) -> Tuple[float, float]:
-    """Global (theta_min, theta_max) across all blocks."""
+    """Compute the global angular range across all blocks.
+
+    Args:
+        blocks: List of ``Block`` objects to scan.
+        rotation_axis: Axis of rotation, one of ``'x'``, ``'y'``, or
+            ``'z'``.
+
+    Returns:
+        A tuple ``(theta_min, theta_max)`` in radians across every
+        block's grid points.
+    """
     thetas = []
     for b in blocks:
         theta = _to_theta(b.X.ravel(), b.Y.ravel(), b.Z.ravel(), rotation_axis)
@@ -416,7 +568,17 @@ def _global_theta_extreme(blocks: List[Block], rotation_axis: str) -> Tuple[floa
 
 
 def _face_theta_extreme(face: Face, rotation_axis: str) -> Tuple[float, float]:
-    """Return (theta_min, theta_max) of the face's stored vertices."""
+    """Return the angular range of a face's stored vertices.
+
+    Args:
+        face: The ``Face`` whose vertices are inspected.
+        rotation_axis: Axis of rotation, one of ``'x'``, ``'y'``, or
+            ``'z'``.
+
+    Returns:
+        A tuple ``(theta_min, theta_max)`` in radians for the face's
+        vertices.
+    """
     n = face.nvertex
     theta = _to_theta(face.x[:n], face.y[:n], face.z[:n], rotation_axis)
     return float(theta.min()), float(theta.max())
@@ -428,20 +590,27 @@ def find_angular_bounding_faces(
     rotation_axis: str = "x",
     tol_rel: float = 1e-6,
 ) -> Tuple[List[Dict[str, int]], List[Dict[str, int]], List[Face], List[Face]]:
-    """Find outer faces on the angular (theta) min/max boundaries of an annular domain.
+    """Find outer faces on the angular min/max boundaries of an annular domain.
 
-    This is the rotational analog of find_bounding_faces() for translational periodicity.
-    Works for any rotation axis (x, y, or z).
+    This is the rotational analog of ``find_bounding_faces`` for
+    translational periodicity. It classifies outer faces whose vertices
+    all lie at the global theta minimum or maximum. Works for any
+    rotation axis.
 
     Args:
-        blocks: list of Block
-        outer_faces: outer faces in dict form (at original scale)
-        rotation_axis: 'x', 'y', or 'z'
-        tol_rel: relative tolerance for theta comparison
+        blocks: List of ``Block`` objects comprising the mesh.
+        outer_faces: Outer faces in dictionary form (at original scale).
+        rotation_axis: Axis of rotation, one of ``'x'``, ``'y'``, or
+            ``'z'``. Defaults to ``'x'``.
+        tol_rel: Relative tolerance for angular comparison, scaled by the
+            global theta range. Defaults to ``1e-6``.
 
     Returns:
-        (lower_theta_export, upper_theta_export, lower_theta_faces, upper_theta_faces)
-        Returns empty lists if the domain is non-annular (theta range > pi).
+        A tuple ``(lower_export, upper_export, lower_faces, upper_faces)``
+        where the ``*_export`` entries are lists of face dictionaries and
+        the ``*_faces`` entries are lists of ``Face`` objects. Returns
+        four empty lists if the domain is non-annular (theta range
+        exceeds pi or is negligible).
     """
     axis = rotation_axis.lower().strip()
     assert axis in ("x", "y", "z")
@@ -480,24 +649,28 @@ def find_angular_bounding_faces(
 
 
 def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray,centroid:np.ndarray,translational_direction:str="x",minvalue:bool=True):
-    """Find the closest block to an extreme in the x,y, or z direction and returns the targeting point. 
-    Target point is the reference point where we want the closest block and the closest face 
+    """Find the block closest to a directional extreme and return a target point.
+
+    Computes a target point offset beyond the global min or max extent
+    along the specified axis, then selects the block whose centroid is
+    nearest to that target. This is useful for identifying boundary blocks
+    for translational periodicity.
 
     Args:
-        x (np.ndarray): x coordinate of all the blocks' centroid
-        y (np.ndarray): y coordinate of all the blocks' centroid
-        z (np.ndarray): z coordinate of all the blocks' centroid
-        centroid (np.ndarray): centroid (cx,cy,cz)
-        translational_direction (str, optional): Axis along which to search ('x', 'y', or 'z'). Defaults to "x".
-        minvalue (bool, optional): If True, find block nearest the minimum extent; if False, the maximum. Defaults to True.
+        blocks: List of ``Block`` objects in the mesh.
+        x: Array of X centroid coordinates for all blocks.
+        y: Array of Y centroid coordinates for all blocks.
+        z: Array of Z centroid coordinates for all blocks.
+        centroid: Reference centroid as ``(cx, cy, cz)``.
+        translational_direction: Axis along which to search, one of
+            ``'x'``, ``'y'``, or ``'z'``. Defaults to ``'x'``.
+        minvalue: If ``True``, find the block nearest the minimum extent;
+            if ``False``, the maximum. Defaults to ``True``.
 
     Returns:
-        (tuple): containing
-
-            *selected block index* (int): index of closest block
-            *target_x* (float): this is the x value where selected block is closest to
-            *target_y* (float): this is the y value where selected block is closest to
-            *target_z* (float): this is the z value where selected block is closest to
+        A tuple ``(selected_block_index, target_x, target_y, target_z)``
+        where *selected_block_index* is the index of the closest block
+        and ``target_*`` are the coordinates of the offset target point.
     """
     cx = centroid[0]; cy = centroid[1]; cz = centroid[2]
     target_x = cx; target_y = cy; target_z = cz
@@ -509,10 +682,10 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
         dx = xmax - xmin
         if minvalue:
             target_x = xmin - dx*0.5
-            selected_block_indx = np.argmin(np.sqrt((target_x-x)**2 + (cy-y)**2 + (cz-z)**2))            
+            selected_block_indx = np.argmin(np.sqrt((target_x-x)**2 + (cy-y)**2 + (cz-z)**2))
         else:
             target_x = xmax + dx*0.5
-            selected_block_indx = np.argmin(np.sqrt((target_x-x)**2 + (cy-y)**2 + (cz-z)**2))            
+            selected_block_indx = np.argmin(np.sqrt((target_x-x)**2 + (cy-y)**2 + (cz-z)**2))
         target_y= cy
         target_z = cz
     elif translational_direction=="y":
@@ -537,41 +710,47 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
         dz = zmax - zmin
         if minvalue:
             target_z = zmin - dz*0.5
-            selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (target_z-z)**2))            
+            selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (target_z-z)**2))
         else:
             target_z = zmax + dz*0.5
             selected_block_indx = np.argmin(np.sqrt((cx-x)**2 + (cy-y)**2 + (target_z-z)**2))
         target_x = cx
         target_y = cy
 
-    return selected_block_indx,target_x,target_y,target_z 
+    return selected_block_indx,target_x,target_y,target_z
 
 
 def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int):
-    """Splits a face with another face within the same block 
-        picture the split as a two rectangles inside each other
+    """Split a face into up to four sub-faces around an inner rectangular region.
 
-    Args:
-        face_to_split (Face): Face on the block to be split 
-        block (Block): Block the split is occuring on 
-        imin (int): IMIN index of the split (diagonals)
-        jmin (int): JMIN index of the split (diagonals)
-        kmin (int): KMIN index of the split (diagonals) 
-        imax (int): IMAX index of the split
-        jmax (int): JMAX index of the split
-        kmax (int): KMAX index of the split 
+    Given a face and an inner rectangle defined by diagonal indices, this
+    produces the surrounding sub-faces (top, bottom, left, right) while
+    excluding the center region and any degenerate edges. The split
+    orientation depends on which index pair is constant (I, J, or K).
 
-    :: 
+    ::
 
                     left face    top face     right face
          ________       __          __            __
         |   __   |     |  |        |__|          |  |     __
-        |  |__|  |     |  |         __           |  |    |__|  face_to_split/center face 
+        |  |__|  |     |  |         __           |  |    |__|  face_to_split/center face
         |________|     |__|        |__|          |__|
                                 bottom face
 
+    Args:
+        face_to_split: The ``Face`` to be subdivided.
+        block: The ``Block`` on which the face resides.
+        imin: Lower I index of the inner rectangle.
+        jmin: Lower J index of the inner rectangle.
+        kmin: Lower K index of the inner rectangle.
+        imax: Upper I index of the inner rectangle.
+        jmax: Upper J index of the inner rectangle.
+        kmax: Upper K index of the inner rectangle.
+
     Returns:
-        [List[Faces]]: List of unique faces from the split 
+        A list of ``Face`` objects representing the non-degenerate
+        sub-faces surrounding the center rectangle. The center face
+        itself is excluded.
     """
     center_face = create_face_from_diagonals(block,
             imin=imin,imax=imax,
@@ -585,7 +764,7 @@ def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:i
                 jmin=face_to_split.JMIN,jmax=face_to_split.JMAX,
                 kmin=kmin, kmax=kmax)
 
-        
+
         right_face = create_face_from_diagonals(block,
                 imin=imax, imax=face_to_split.IMAX,
                 jmin=face_to_split.JMIN, jmax=face_to_split.JMAX,
@@ -595,11 +774,11 @@ def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:i
             imin=imin,imax=imax,
             jmin=jmax,jmax=face_to_split.JMAX,
             kmin=kmin,kmax=kmax)
-        
+
         bottom_face = create_face_from_diagonals(block,
             imin=imin,imax=imax,
             jmin=face_to_split.JMIN,jmax=jmin,
-            kmin=kmin,kmax=kmax)  
+            kmin=kmin,kmax=kmax)
 
     elif (imin==imax):
         # In the picture above Horizontal = j, vertical = k
@@ -624,7 +803,7 @@ def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:i
             kmin=face_to_split.KMIN,kmax=kmin)
 
     elif (jmin==jmax):
-        # In the picture above Horizontal = i, vertical = k 
+        # In the picture above Horizontal = i, vertical = k
         left_face = create_face_from_diagonals(block,
             imin=face_to_split.IMIN,imax=imin,
             jmin=jmin,jmax=jmax,
@@ -634,31 +813,34 @@ def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:i
             imin=imax,imax=face_to_split.IMAX,
             jmin=jmin,jmax=jmax,
             kmin=face_to_split.KMIN,kmax=face_to_split.KMAX)
-        
+
         top_face = create_face_from_diagonals(block,
             imin=imin,imax=imax,
             jmin=jmin,jmax=jmax,
             kmin=kmax,kmax=face_to_split.KMAX)
-        
+
         bottom_face = create_face_from_diagonals(block,
             imin=imin, imax=imax,
             jmin=jmin, jmax=jmax,
             kmin=face_to_split.KMIN, kmax=kmin)
-    
+
     faces = [top_face,bottom_face,left_face,right_face]
     faces = [f for f in faces if not f.isEdge and not f.index_equals(center_face)] # Remove edges
-    [f.set_block_index(face_to_split.blockIndex) for f in faces] 
-    return faces 
+    [f.set_block_index(face_to_split.blockIndex) for f in faces]
+    return faces
 
 def find_face_nearest_point(faces:List[Face], x:float,y:float,z:float):
-    """Find a face nearest to a given point
+    """Find the face whose centroid is nearest to a given point.
 
     Args:
-        blocks (List[Block]): List of blocks
-        faces (List[Face]): List of faces
-        x (float): x coordinate of a reference point
-        y (float): y coordinate of a reference point
-        z (float): z coordinate of a reference point
+        faces: List of ``Face`` objects to search.
+        x: X coordinate of the reference point.
+        y: Y coordinate of the reference point.
+        z: Z coordinate of the reference point.
+
+    Returns:
+        The index into *faces* of the face with the smallest Euclidean
+        distance from its centroid to ``(x, y, z)``.
     """
     n = list(range(len(faces)))
     dv = list()
@@ -671,19 +853,27 @@ def find_face_nearest_point(faces:List[Face], x:float,y:float,z:float):
     return face_index
 
 def outer_face_dict_to_list(blocks:List[Block],outer_faces:List[Dict[str,int]],gcd:int=1) -> List[Face]:
-    """Converts a list of dictionary face representations to a list of faces. Use this only for outer faces 
+    """Convert a list of outer-face dictionaries to ``Face`` objects.
+
+    Each dictionary is expected to contain ``'block_index'``, ``'IMIN'``,
+    ``'JMIN'``, ``'KMIN'``, ``'IMAX'``, ``'JMAX'``, ``'KMAX'``, and
+    optionally ``'id'``. Index values are divided by the GCD before face
+    construction so that the resulting faces align with a GCD-reduced
+    block list.
 
     Args:
-        blocks (List[Block]): List of blocks
-        outer_faces (List[Dict[str,int]]): List of outer faces represented as a dictionary 
-        gcd (int, optional): Greatst common divisor. Defaults to 1.
+        blocks: List of ``Block`` objects (possibly GCD-reduced).
+        outer_faces: List of dictionaries, each describing one outer face.
+        gcd: Greatest common divisor used to scale down face indices.
+            Defaults to ``1`` (no scaling).
 
     Returns:
-        List[Face]: List of Face objects 
+        A list of ``Face`` objects corresponding to the input
+        dictionaries.
     """
     outer_faces_all = list()
     for o in outer_faces:
-        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd), int(o['JMIN']/gcd), 
+        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd), int(o['JMIN']/gcd),
             int(o['KMIN']/gcd), int(o['IMAX']/gcd), int(o['JMAX']/gcd), int(o['KMAX']/gcd))
         if 'id' in o.keys():
             face.id = o['id']
@@ -693,23 +883,32 @@ def outer_face_dict_to_list(blocks:List[Block],outer_faces:List[Dict[str,int]],g
     return outer_faces_all
 
 def match_faces_dict_to_list(blocks:List[Block],matched_faces:List[Dict[str,int]],gcd:int=1):
-    """Converts a list of dictionaries representing matched faces to a list of Faces
+    """Convert a list of matched-face dictionaries to ``Face`` objects.
+
+    Each dictionary is expected to contain ``'block1'`` and ``'block2'``
+    sub-dictionaries, each with ``'block_index'``, ``'IMIN'``..``'KMAX'``,
+    and optionally ``'id'``. The function creates two ``Face`` objects per
+    entry (one for each side of the match) and returns them all in a flat
+    list.
 
     Args:
-        blocks (List[Block]): List of blocks 
-        matched_faces (List[Dict[str,int]]): List of matched faces represented as a dictionary 
-        gcd (int, optional): GCD factor to scale down face indices. Defaults to 1 (no scaling).
+        blocks: List of ``Block`` objects (possibly GCD-reduced).
+        matched_faces: List of dictionaries, each describing a pair of
+            matched faces.
+        gcd: GCD factor to scale down face indices. Defaults to ``1``
+            (no scaling).
 
     Returns:
-        List[Face]: Face objects built from the matched-face dictionaries.
+        A flat list of ``Face`` objects, with two entries per matched-face
+        dictionary (one for ``'block1'``, one for ``'block2'``).
     """
-    matched_faces_all = list() 
+    matched_faces_all = list()
     for _,m in enumerate(matched_faces):
-        face1 = create_face_from_diagonals(blocks[m['block1']['block_index']], 
-                            int(m['block1']['IMIN']/gcd), int(m['block1']['JMIN']/gcd), int(m['block1']['KMIN']/gcd), 
+        face1 = create_face_from_diagonals(blocks[m['block1']['block_index']],
+                            int(m['block1']['IMIN']/gcd), int(m['block1']['JMIN']/gcd), int(m['block1']['KMIN']/gcd),
                             int(m['block1']['IMAX']/gcd), int(m['block1']['JMAX']/gcd), int(m['block1']['KMAX']/gcd))
-        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], 
-                            int(m['block2']['IMIN']/gcd), int(m['block2']['JMIN']/gcd), int(m['block2']['KMIN']/gcd), 
+        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']],
+                            int(m['block2']['IMIN']/gcd), int(m['block2']['JMIN']/gcd), int(m['block2']['KMIN']/gcd),
                             int(m['block2']['IMAX']/gcd), int(m['block2']['JMAX']/gcd), int(m['block2']['KMAX']/gcd))
         face1.set_block_index(m['block1']['block_index'])
         if 'id' in m['block1'].keys():
