@@ -719,6 +719,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
     elif rotation_angle is None:
         raise ValueError("Either rotation_angle (degrees) or nblades must be provided.")
 
+    original_blocks = blocks  # preserve reference before GCD reduction
     gcd_to_use = 1
     if ReduceMesh:
         gcd_to_use = compute_gcd(blocks)
@@ -739,6 +740,13 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
     del blocks, matched_faces_all
 
     _scale_results_up(periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all, gcd_to_use)
+
+    # Verify and correct diagonal corner ordering
+    if periodic_faces_export:
+        verified, mismatched = verify_periodicity(original_blocks, periodic_faces_export, rotation_angle, rotation_axis, tol=1e-4)
+        if mismatched:
+            print(f"verify_periodicity: {len(mismatched)} mismatched periodic faces could not be corrected")
+        periodic_faces_export = verified + mismatched
 
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 

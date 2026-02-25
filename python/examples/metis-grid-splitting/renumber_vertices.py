@@ -7,7 +7,6 @@ import numpy.typing as npt
 import networkx as nx
 import pickle
 from glennht_con import export_to_glennht_conn
-import json
 
 
 def reindex_vertices(v:npt.NDArray,G:nx.graph.Graph):
@@ -15,16 +14,6 @@ def reindex_vertices(v:npt.NDArray,G:nx.graph.Graph):
     nodes = np.array(list(G.nodes()))
     
     nx.relabel_nodes(G,mapping)
-
-class NpEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.floating):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return super(NpEncoder, self).default(obj)
 
 if not os.path.exists('./VSPT_Binary.xyz'):
     blocks = read_plot3D('VSPT_ASCII.xyz',binary=False,read_double=False)
@@ -57,12 +46,6 @@ if not os.path.exists('./VSPT_Binary.xyz'):
                         "block_sizes":block_sizes
                     },f)
     
-    with open('connectivity-julia.json','w') as f:
-        json.dump({
-                        "face_matches":face_matches,
-                        "outer_faces":outer_faces_to_keep,
-                        "block_sizes":block_sizes
-                    },f,cls=NpEncoder)    
     write_plot3D('VSPT_Binary.xyz',blocks,binary=True)    # Writing plot3D to binary file
     
 # # blocks = read_plot3D('VSPT_Binary.xyz',binary=True)

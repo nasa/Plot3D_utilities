@@ -599,6 +599,13 @@ def connectivity_fast(blocks:List[Block]):
     # scale it up
     scale_face_dict_indices(face_matches, gcd_to_use, nested_sides=['block1', 'block2'])
     scale_face_dict_indices(outer_faces_formatted, gcd_to_use)
+
+    # Verify and correct diagonal corner ordering
+    verified, mismatched = verify_connectivity(blocks, face_matches, tol=1e-6)
+    if mismatched:
+        print(f"verify_connectivity: {len(mismatched)} mismatched faces could not be corrected")
+    face_matches = verified + mismatched
+
     return face_matches, outer_faces_formatted
 
 def connectivity(blocks:List[Block]):
@@ -824,6 +831,12 @@ def connectivity(blocks:List[Block]):
                             'IMAX':max(face.I), 'JMAX':max(face.J), 'KMAX':max(face.K),
                             'id':id, 'block_index':face.BlockIndex })
         id += 1
+
+    # Verify and correct diagonal corner ordering
+    verified, mismatched = verify_connectivity(blocks, face_matches, tol=1e-6)
+    if mismatched:
+        print(f"verify_connectivity: {len(mismatched)} mismatched faces could not be corrected")
+    face_matches = verified + mismatched
 
     return face_matches, outer_faces_formatted
 
