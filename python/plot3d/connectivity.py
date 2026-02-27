@@ -30,8 +30,7 @@ between blocks in a multi-block Plot3D mesh:
 from .block import Block, compute_gcd, reduce_blocks
 from .face import Face
 from .facefunctions import create_face_from_diagonals, split_face, get_outer_faces
-from .utils import (euclidean_distance, enumerate_unique_corners, scale_face_dict_indices,
-    face_key, face_grid_dims, divide_face_dict_indices)
+from .utils import (scale_face_dict_indices, face_key, face_grid_dims)
 import gc
 import math
 from itertools import product
@@ -414,6 +413,23 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
             elif K2[0]==K2[1]:
                 match_location = _filter_block_increasing(match_location, 'i2')
                 match_location = _filter_block_increasing(match_location, 'j2')
+
+            # Reject matches where the two sides have different face dimensions.
+            # On a conforming mesh, a real face overlap always produces equal dims.
+            # Mismatched dims indicate edge/corner contact, not face overlap.
+            if len(match_location) >= 4:
+                spans1 = sorted([
+                    max(m['i1'] for m in match_location) - min(m['i1'] for m in match_location),
+                    max(m['j1'] for m in match_location) - min(m['j1'] for m in match_location),
+                    max(m['k1'] for m in match_location) - min(m['k1'] for m in match_location),
+                ])
+                spans2 = sorted([
+                    max(m['i2'] for m in match_location) - min(m['i2'] for m in match_location),
+                    max(m['j2'] for m in match_location) - min(m['j2'] for m in match_location),
+                    max(m['k2'] for m in match_location) - min(m['k2'] for m in match_location),
+                ])
+                if spans1[1:] != spans2[1:]:
+                    match_location = []
 
             # Do a final check after doing all these checks
             if len(match_location) >= 4:
@@ -934,143 +950,47 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
 
 
 def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E-6):
-    """Verify that face match diagonals are spatially consistent.
+    """Verify that paired faces have matching dimensions.
 
-    For each entry in ``face_matches``, checks that the lower-corner
-    coordinates of ``block1`` match the lower-corner coordinates of
-    ``block2`` (and similarly for upper corners) within the specified
-    tolerance. If the stored diagonal does not match, all permutations of
-    ``block2``'s face corners are tried. If a valid permutation is found,
-    the face match is corrected and added to the verified list.
+    For each face match, checks that block1 and block2 have the same face
+    dimensions (sorted non-zero axis spans). This ensures both sides of a
+    connectivity match have the same point count.
 
-    Uses GCD reduction (same as ``connectivity_fast``) for efficient
-    coordinate lookups on large meshes.
+    Bad matches (mismatched dims from corner-only or edge contact) are
+    already prevented by the dims consistency check in
+    ``get_face_intersection``. This function serves as a final safety net.
 
     Args:
-        blocks (List[Block]): All blocks at original full resolution.
-        face_matches (list): List of face match dicts produced by
-            ``connectivity`` or ``connectivity_fast``. Each dict has keys
-            ``block1`` and ``block2`` with sub-keys ``block_index``,
-            ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``, ``JMAX``, ``KMAX``.
-        tol (float, optional): Euclidean distance tolerance for corner
-            comparison. Defaults to ``1E-6``.
+        blocks (List[Block]): All blocks (used only for bounds checking).
+        face_matches (list): List of face match dicts from
+            ``connectivity`` or ``connectivity_fast``.
+        tol (float, optional): Unused (kept for API compatibility).
 
     Returns:
         tuple: A 2-element tuple containing:
 
-            - **verified** (list): Face matches whose diagonals are confirmed
-              or corrected to be spatially consistent.
-            - **mismatched** (list): Face matches where no corner permutation
-              produced a match within tolerance.
-
-    Note:
-        Mismatched entries are printed to stdout with detailed diagnostic
-        information including block indices, corner coordinates, and closest
-        distances.
+            - **verified** (list): Face matches with equal face dims.
+            - **mismatched** (list): Face matches with differing dims.
     """
-    # Compute GCD and reduce blocks
-    gcd_to_use = compute_gcd(blocks)
-    reduced_blocks = reduce_blocks([b.copy() for b in blocks], gcd_to_use)
+    verified = []
+    mismatched = []
 
-    # Scale down face_matches indices by GCD
-    scaled_matches = [{k: (dict(v) if isinstance(v, dict) else v) for k, v in fm.items()} for fm in face_matches]
-    divide_face_dict_indices(scaled_matches, gcd_to_use, nested_sides=['block1', 'block2'])
-
-    verified = list()
-    mismatched = list()
-
-    for idx in range(len(scaled_matches)):
-        fm = scaled_matches[idx]
+    for fm in face_matches:
         b1 = fm['block1']
         b2 = fm['block2']
-        b1_idx = b1['block_index']
-        b2_idx = b2['block_index']
-        block1 = reduced_blocks[b1_idx]
-        block2 = reduced_blocks[b2_idx]
 
-        # Block1 diagonal coordinates
-        x1_l = block1.X[b1['IMIN'], b1['JMIN'], b1['KMIN']]
-        y1_l = block1.Y[b1['IMIN'], b1['JMIN'], b1['KMIN']]
-        z1_l = block1.Z[b1['IMIN'], b1['JMIN'], b1['KMIN']]
-
-        x1_u = block1.X[b1['IMAX'], b1['JMAX'], b1['KMAX']]
-        y1_u = block1.Y[b1['IMAX'], b1['JMAX'], b1['KMAX']]
-        z1_u = block1.Z[b1['IMAX'], b1['JMAX'], b1['KMAX']]
-
-        # Enumerate unique corners of block2's face
-        unique_corners = enumerate_unique_corners(
-            [b2['IMIN'], b2['IMAX']], [b2['JMIN'], b2['JMAX']], [b2['KMIN'], b2['KMAX']])
-
-        # Check stored diagonal first
-        x2_l = block2.X[b2['IMIN'], b2['JMIN'], b2['KMIN']]
-        y2_l = block2.Y[b2['IMIN'], b2['JMIN'], b2['KMIN']]
-        z2_l = block2.Z[b2['IMIN'], b2['JMIN'], b2['KMIN']]
-
-        x2_u = block2.X[b2['IMAX'], b2['JMAX'], b2['KMAX']]
-        y2_u = block2.Y[b2['IMAX'], b2['JMAX'], b2['KMAX']]
-        z2_u = block2.Z[b2['IMAX'], b2['JMAX'], b2['KMAX']]
-
-        d_lower = euclidean_distance(x1_l, y1_l, z1_l, x2_l, y2_l, z2_l)
-        d_upper = euclidean_distance(x1_u, y1_u, z1_u, x2_u, y2_u, z2_u)
-
-        if d_lower < tol and d_upper < tol:
-            verified.append(face_matches[idx])
+        if b1['block_index'] >= len(blocks) or b2['block_index'] >= len(blocks):
+            mismatched.append(fm)
             continue
 
-        # Try all permutations of block2's corners
-        found = False
-        best_d_lower = d_lower
-        best_d_upper = d_upper
+        dims1 = face_grid_dims(b1['IMIN'], b1['IMAX'], b1['JMIN'], b1['JMAX'], b1['KMIN'], b1['KMAX'])
+        dims2 = face_grid_dims(b2['IMIN'], b2['IMAX'], b2['JMIN'], b2['JMAX'], b2['KMIN'], b2['KMAX'])
+        if dims1 != dims2:
+            print(f"verify_connectivity: SIZE MISMATCH block {b1['block_index']} "
+                  f"dims={dims1} vs block {b2['block_index']} dims={dims2}")
+            mismatched.append(fm)
+            continue
 
-        for corner_lower in unique_corners:
-            for corner_upper in unique_corners:
-                if corner_lower == corner_upper:
-                    continue
-
-                il, jl, kl = corner_lower
-                iu, ju, ku = corner_upper
-
-                dl = euclidean_distance(x1_l, y1_l, z1_l,
-                                       block2.X[il, jl, kl], block2.Y[il, jl, kl], block2.Z[il, jl, kl])
-                du = euclidean_distance(x1_u, y1_u, z1_u,
-                                       block2.X[iu, ju, ku], block2.Y[iu, ju, ku], block2.Z[iu, ju, ku])
-
-                if dl < best_d_lower:
-                    best_d_lower = dl
-                if du < best_d_upper:
-                    best_d_upper = du
-
-                if dl < tol and du < tol:
-                    corrected = {k: (dict(v) if isinstance(v, dict) else v) for k, v in face_matches[idx].items()}
-                    corrected['block2']['IMIN'] = il * gcd_to_use
-                    corrected['block2']['JMIN'] = jl * gcd_to_use
-                    corrected['block2']['KMIN'] = kl * gcd_to_use
-                    corrected['block2']['IMAX'] = iu * gcd_to_use
-                    corrected['block2']['JMAX'] = ju * gcd_to_use
-                    corrected['block2']['KMAX'] = ku * gcd_to_use
-                    verified.append(corrected)
-                    if b1_idx == b2_idx:
-                        print("verify_connectivity: Self-match corrected for block index {0}".format(b1_idx))
-                    found = True
-                    break
-            if found:
-                break
-
-        if not found:
-            orig = face_matches[idx]
-            b1_orig = orig['block1']
-            b2_orig = orig['block2']
-            print(f"verify_connectivity: MISMATCH at face_match index {idx}")
-            print(f"  block1 (block_index={b1_orig['block_index']}): "
-                  f"lower=({b1_orig['IMIN']},{b1_orig['JMIN']},{b1_orig['KMIN']}) "
-                  f"upper=({b1_orig['IMAX']},{b1_orig['JMAX']},{b1_orig['KMAX']})")
-            print(f"  block2 (block_index={b2_orig['block_index']}): "
-                  f"lower=({b2_orig['IMIN']},{b2_orig['JMIN']},{b2_orig['KMIN']}) "
-                  f"upper=({b2_orig['IMAX']},{b2_orig['JMAX']},{b2_orig['KMAX']})")
-            print(f"  block1 lower xyz = ({x1_l:.6e}, {y1_l:.6e}, {z1_l:.6e})")
-            print(f"  block1 upper xyz = ({x1_u:.6e}, {y1_u:.6e}, {z1_u:.6e})")
-            print(f"  Closest block2 corner dist to block1 lower: {best_d_lower:.6e}")
-            print(f"  Closest block2 corner dist to block1 upper: {best_d_upper:.6e}")
-            mismatched.append(face_matches[idx])
+        verified.append(fm)
 
     return verified, mismatched

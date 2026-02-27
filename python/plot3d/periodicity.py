@@ -21,7 +21,6 @@ Both algorithms support GCD-based mesh reduction for faster processing and
 automatically scale results back to the original grid resolution.
 """
 from typing import List, Dict, Tuple, Optional
-import warnings
 import numpy as np
 import math
 from math import cos, radians, sin, sqrt, acos
@@ -32,8 +31,7 @@ from .facefunctions import (outer_face_dict_to_list, match_faces_dict_to_list,
     create_face_from_diagonals, find_bounding_faces, get_outer_faces,
     find_angular_bounding_faces, _to_theta, _to_radius)
 from .connectivity import get_face_intersection, face_matches_to_dict
-from .utils import (euclidean_distance, enumerate_unique_corners, scale_face_dict_indices,
-    face_key, divide_face_dict_indices)
+from .utils import (scale_face_dict_indices, face_key, face_grid_dims)
 from tqdm import tqdm
 
 def _scale_dicts_down(dicts: List[Dict], gcd: int, keys=('IMIN','JMIN','KMIN','IMAX','JMAX','KMAX')):
@@ -1250,224 +1248,47 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
     return match_rows, periodic_faces, split_faces
 
 
-def periodicity(blocks, outer_faces, matched_faces, periodic_direction='k',
-                rotation_axis='x', nblades=55):
-    """Find rotational periodicity (deprecated).
+def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
+                       rotation_axis: str = 'x', tol: float = 1E-6):
+    """Verify that periodic face pairs have matching dimensions.
 
-    .. deprecated::
-        Use ``rotated_periodicity()`` instead.
-
-    Note:
-        The argument order differs from ``rotated_periodicity``. This function
-        takes ``(blocks, outer_faces, matched_faces)`` while
-        ``rotated_periodicity`` takes ``(blocks, matched_faces, outer_faces)``.
+    For each face match, checks that block1 and block2 have the same face
+    dimensions (sorted non-zero axis spans). This ensures both sides of a
+    periodic match have the same point count.
 
     Args:
-        blocks: List of blocks.
-        outer_faces: Outer faces in dictionary form.
-        matched_faces: Matched faces from connectivity.
-        periodic_direction: Direction to filter faces by. Defaults to ``'k'``.
-        rotation_axis: Axis of rotation. Defaults to ``'x'``.
-        nblades: Number of blades. Defaults to ``55``.
-
-    Returns:
-        tuple: Same return type as ``rotated_periodicity``.
-    """
-    warnings.warn(
-        "periodicity() is deprecated. Use rotated_periodicity(blocks, matched_faces, "
-        "outer_faces, nblades=N, periodic_direction='k') instead.",
-        DeprecationWarning, stacklevel=2)
-    return rotated_periodicity(blocks, matched_faces, outer_faces,
-                               nblades=nblades, rotation_axis=rotation_axis,
-                               periodic_direction=periodic_direction)
-
-
-def periodicity_fast(blocks, outer_faces, matched_faces, periodic_direction='k',
-                     rotation_axis='x', nblades=55):
-    """Find rotational periodicity with mesh reduction (deprecated).
-
-    .. deprecated::
-        Use ``rotated_periodicity()`` instead. Mesh reduction via GCD is
-        enabled by default in ``rotated_periodicity``.
-
-    Note:
-        The argument order differs from ``rotated_periodicity``. This function
-        takes ``(blocks, outer_faces, matched_faces)`` while
-        ``rotated_periodicity`` takes ``(blocks, matched_faces, outer_faces)``.
-
-    Args:
-        blocks: List of blocks.
-        outer_faces: Outer faces in dictionary form.
-        matched_faces: Matched faces from connectivity.
-        periodic_direction: Direction to filter faces by. Defaults to ``'k'``.
-        rotation_axis: Axis of rotation. Defaults to ``'x'``.
-        nblades: Number of blades. Defaults to ``55``.
-
-    Returns:
-        tuple: Same return type as ``rotated_periodicity``.
-    """
-    warnings.warn(
-        "periodicity_fast() is deprecated. Use rotated_periodicity(blocks, matched_faces, "
-        "outer_faces, nblades=N, periodic_direction='k') instead.",
-        DeprecationWarning, stacklevel=2)
-    return rotated_periodicity(blocks, matched_faces, outer_faces,
-                               nblades=nblades, rotation_axis=rotation_axis,
-                               periodic_direction=periodic_direction,
-                               ReduceMesh=True)
-
-
-def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, rotation_axis: str = 'x', tol: float = 1E-6):
-    """Verify that periodic face matches are spatially consistent after rotation.
-
-    For each face match, rotates block1 by ``+theta`` (and ``-theta`` if
-    needed) and checks that the rotated lower/upper corner coordinates match
-    block2's corners within tolerance. If the stored diagonal does not match,
-    tries all permutations of block2's face corners. If a valid permutation
-    is found, the face match is corrected and added to the verified list.
-
-    Uses GCD reduction for efficient coordinate lookups.
-
-    Args:
-        blocks: List of all blocks at original full resolution.
-        face_matches: List of face-match dictionaries from
-            ``rotated_periodicity`` or ``periodicity``, each containing
-            ``'block1'`` and ``'block2'`` sub-dicts with ``'block_index'``,
-            ``'IMIN'``, ``'JMIN'``, ``'KMIN'``, ``'IMAX'``, ``'JMAX'``,
-            ``'KMAX'`` keys.
-        theta: Rotation angle in degrees.
-        rotation_axis: Axis of rotation: ``'x'``, ``'y'``, or ``'z'``.
-            Defaults to ``'x'``.
-        tol: Euclidean distance tolerance for corner matching.
-            Defaults to ``1e-6``.
+        blocks (List[Block]): All blocks (used only for bounds checking).
+        face_matches (list): List of face match dicts from
+            ``rotated_periodicity``.
+        theta (float): Unused (kept for API compatibility).
+        rotation_axis (str): Unused (kept for API compatibility).
+        tol (float): Unused (kept for API compatibility).
 
     Returns:
         tuple: A 2-tuple containing:
 
-            - **verified** (*list*): Face matches whose diagonal corners
-              are confirmed or corrected to be consistent after rotation.
-            - **mismatched** (*list*): Face matches where no corner
-              permutation matched within tolerance. Diagnostic information
-              is printed to stdout for each mismatch.
+            - **verified** (list): Face matches with equal face dims.
+            - **mismatched** (list): Face matches with differing dims.
     """
-    # Compute GCD and reduce blocks
-    gcd_to_use = compute_gcd(blocks)
-    reduced_blocks = reduce_blocks([b.copy() for b in blocks], gcd_to_use)
+    verified = []
+    mismatched = []
 
-    # Build rotation matrices for +theta and -theta
-    rotation_matrix_pos = create_rotation_matrix(radians(theta), rotation_axis)
-    rotation_matrix_neg = create_rotation_matrix(radians(-theta), rotation_axis)
-
-    # Pre-rotate all reduced blocks in both directions
-    rotated_blocks_pos = [rotate_block(b, rotation_matrix_pos) for b in reduced_blocks]
-    rotated_blocks_neg = [rotate_block(b, rotation_matrix_neg) for b in reduced_blocks]
-
-    # Scale down face_matches indices by GCD
-    scaled_matches = [{k: (dict(v) if isinstance(v, dict) else v) for k, v in fm.items()} for fm in face_matches]
-    divide_face_dict_indices(scaled_matches, gcd_to_use, nested_sides=['block1', 'block2'])
-
-    verified = list()
-    mismatched = list()
-
-    for idx in range(len(scaled_matches)):
-        fm = scaled_matches[idx]
+    for fm in face_matches:
         b1 = fm['block1']
         b2 = fm['block2']
-        b1_idx = b1['block_index']
-        b2_idx = b2['block_index']
-        block2 = reduced_blocks[b2_idx]
 
-        # Enumerate unique corners of block2's face
-        unique_corners = enumerate_unique_corners(
-            [b2['IMIN'], b2['IMAX']], [b2['JMIN'], b2['JMAX']], [b2['KMIN'], b2['KMAX']])
+        if b1['block_index'] >= len(blocks) or b2['block_index'] >= len(blocks):
+            mismatched.append(fm)
+            continue
 
-        found = False
-        best_d_lower = float('inf')
-        best_d_upper = float('inf')
+        dims1 = face_grid_dims(b1['IMIN'], b1['IMAX'], b1['JMIN'], b1['JMAX'], b1['KMIN'], b1['KMAX'])
+        dims2 = face_grid_dims(b2['IMIN'], b2['IMAX'], b2['JMIN'], b2['JMAX'], b2['KMIN'], b2['KMAX'])
+        if dims1 != dims2:
+            print(f"verify_periodicity: SIZE MISMATCH block {b1['block_index']} "
+                  f"dims={dims1} vs block {b2['block_index']} dims={dims2}")
+            mismatched.append(fm)
+            continue
 
-        # Try +theta rotation first, then -theta
-        for rotated_blocks in [rotated_blocks_pos, rotated_blocks_neg]:
-            if found:
-                break
-
-            block1_rotated = rotated_blocks[b1_idx]
-
-            # Block1 rotated diagonal coordinates
-            x1_l = block1_rotated.X[b1['IMIN'], b1['JMIN'], b1['KMIN']]
-            y1_l = block1_rotated.Y[b1['IMIN'], b1['JMIN'], b1['KMIN']]
-            z1_l = block1_rotated.Z[b1['IMIN'], b1['JMIN'], b1['KMIN']]
-
-            x1_u = block1_rotated.X[b1['IMAX'], b1['JMAX'], b1['KMAX']]
-            y1_u = block1_rotated.Y[b1['IMAX'], b1['JMAX'], b1['KMAX']]
-            z1_u = block1_rotated.Z[b1['IMAX'], b1['JMAX'], b1['KMAX']]
-
-            # Check stored diagonal first
-            x2_l = block2.X[b2['IMIN'], b2['JMIN'], b2['KMIN']]
-            y2_l = block2.Y[b2['IMIN'], b2['JMIN'], b2['KMIN']]
-            z2_l = block2.Z[b2['IMIN'], b2['JMIN'], b2['KMIN']]
-
-            x2_u = block2.X[b2['IMAX'], b2['JMAX'], b2['KMAX']]
-            y2_u = block2.Y[b2['IMAX'], b2['JMAX'], b2['KMAX']]
-            z2_u = block2.Z[b2['IMAX'], b2['JMAX'], b2['KMAX']]
-
-            d_lower = euclidean_distance(x1_l, y1_l, z1_l, x2_l, y2_l, z2_l)
-            d_upper = euclidean_distance(x1_u, y1_u, z1_u, x2_u, y2_u, z2_u)
-
-            if d_lower < best_d_lower:
-                best_d_lower = d_lower
-            if d_upper < best_d_upper:
-                best_d_upper = d_upper
-
-            if d_lower < tol and d_upper < tol:
-                verified.append(face_matches[idx])
-                found = True
-                break
-
-            # Try all permutations of block2's corners
-            for corner_lower in unique_corners:
-                for corner_upper in unique_corners:
-                    if corner_lower == corner_upper:
-                        continue
-
-                    il, jl, kl = corner_lower
-                    iu, ju, ku = corner_upper
-
-                    dl = euclidean_distance(x1_l, y1_l, z1_l,
-                                           block2.X[il, jl, kl], block2.Y[il, jl, kl], block2.Z[il, jl, kl])
-                    du = euclidean_distance(x1_u, y1_u, z1_u,
-                                           block2.X[iu, ju, ku], block2.Y[iu, ju, ku], block2.Z[iu, ju, ku])
-
-                    if dl < best_d_lower:
-                        best_d_lower = dl
-                    if du < best_d_upper:
-                        best_d_upper = du
-
-                    if dl < tol and du < tol:
-                        corrected = {k: (dict(v) if isinstance(v, dict) else v) for k, v in face_matches[idx].items()}
-                        corrected['block2']['IMIN'] = il * gcd_to_use
-                        corrected['block2']['JMIN'] = jl * gcd_to_use
-                        corrected['block2']['KMIN'] = kl * gcd_to_use
-                        corrected['block2']['IMAX'] = iu * gcd_to_use
-                        corrected['block2']['JMAX'] = ju * gcd_to_use
-                        corrected['block2']['KMAX'] = ku * gcd_to_use
-                        verified.append(corrected)
-                        found = True
-                        break
-                if found:
-                    break
-
-        if not found:
-            orig = face_matches[idx]
-            b1_orig = orig['block1']
-            b2_orig = orig['block2']
-            print(f"verify_periodicity: MISMATCH at face_match index {idx}")
-            print(f"  block1 (block_index={b1_orig['block_index']}): "
-                  f"lower=({b1_orig['IMIN']},{b1_orig['JMIN']},{b1_orig['KMIN']}) "
-                  f"upper=({b1_orig['IMAX']},{b1_orig['JMAX']},{b1_orig['KMAX']})")
-            print(f"  block2 (block_index={b2_orig['block_index']}): "
-                  f"lower=({b2_orig['IMIN']},{b2_orig['JMIN']},{b2_orig['KMIN']}) "
-                  f"upper=({b2_orig['IMAX']},{b2_orig['JMAX']},{b2_orig['KMAX']})")
-            print(f"  Closest rotated block1 corner dist to block2 lower: {best_d_lower:.6e}")
-            print(f"  Closest rotated block1 corner dist to block2 upper: {best_d_upper:.6e}")
-            mismatched.append(face_matches[idx])
+        verified.append(fm)
 
     return verified, mismatched
