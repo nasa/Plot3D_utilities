@@ -1248,28 +1248,49 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
     return match_rows, periodic_faces, split_faces
 
 
+def _extract_face_points_per(block: Block, rec: dict) -> np.ndarray:
+    """Extract all spatial (x, y, z) points on a face defined by a face record dict."""
+    i_lo = min(rec['IMIN'], rec['IMAX'])
+    i_hi = min(max(rec['IMIN'], rec['IMAX']), block.IMAX - 1)
+    j_lo = min(rec['JMIN'], rec['JMAX'])
+    j_hi = min(max(rec['JMIN'], rec['JMAX']), block.JMAX - 1)
+    k_lo = min(rec['KMIN'], rec['KMAX'])
+    k_hi = min(max(rec['KMIN'], rec['KMAX']), block.KMAX - 1)
+
+    x = block.X[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
+    y = block.Y[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
+    z = block.Z[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
+    return np.column_stack([x.ravel(), y.ravel(), z.ravel()])
+
+
 def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
                        rotation_axis: str = 'x', tol: float = 1E-6):
-    """Verify that periodic face pairs have matching dimensions.
+    """Verify that every grid point on each periodic face pair matches after rotation.
 
-    For each face match, checks that block1 and block2 have the same face
-    dimensions (sorted non-zero axis spans). This ensures both sides of a
-    periodic match have the same point count.
+    For each match, extracts all interior grid points from both faces on the
+    full-resolution blocks, rotates face1 points by ±theta, sorts both
+    point sets lexicographically, and checks that every point pairs up
+    within ``tol`` Euclidean distance.
 
     Args:
-        blocks (List[Block]): All blocks (used only for bounds checking).
+        blocks (List[Block]): Full-resolution blocks.
         face_matches (list): List of face match dicts from
             ``rotated_periodicity``.
-        theta (float): Unused (kept for API compatibility).
-        rotation_axis (str): Unused (kept for API compatibility).
-        tol (float): Unused (kept for API compatibility).
+        theta (float): Rotation angle in radians.
+        rotation_axis (str): Axis of rotation: ``'x'``, ``'y'``, or ``'z'``.
+        tol (float): Euclidean distance tolerance.  Defaults to 1e-6.
 
     Returns:
         tuple: A 2-tuple containing:
 
-            - **verified** (list): Face matches with equal face dims.
-            - **mismatched** (list): Face matches with differing dims.
+            - **verified** (list): Matches with all interior points coincident
+              after rotation.
+            - **mismatched** (list): Matches with at least one non-matching point.
     """
+    rot_pos = create_rotation_matrix(theta, rotation_axis)
+    rot_neg = create_rotation_matrix(-theta, rotation_axis)
+    tol2 = tol * tol
+
     verified = []
     mismatched = []
 
@@ -1281,14 +1302,31 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
             mismatched.append(fm)
             continue
 
-        dims1 = face_grid_dims(b1['IMIN'], b1['IMAX'], b1['JMIN'], b1['JMAX'], b1['KMIN'], b1['KMAX'])
-        dims2 = face_grid_dims(b2['IMIN'], b2['IMAX'], b2['JMIN'], b2['JMAX'], b2['KMIN'], b2['KMAX'])
-        if dims1 != dims2:
-            print(f"verify_periodicity: SIZE MISMATCH block {b1['block_index']} "
-                  f"dims={dims1} vs block {b2['block_index']} dims={dims2}")
+        pts1 = _extract_face_points_per(blocks[b1['block_index']], b1)
+        pts2 = _extract_face_points_per(blocks[b2['block_index']], b2)
+
+        if pts1.shape[0] != pts2.shape[0]:
             mismatched.append(fm)
             continue
 
-        verified.append(fm)
+        # Sort face2 points lexicographically
+        order2 = np.lexsort((pts2[:, 2], pts2[:, 1], pts2[:, 0]))
+        pts2_s = pts2[order2]
+
+        # Try +theta rotation, then -theta
+        found = False
+        for rot in [rot_pos, rot_neg]:
+            pts1_rot = pts1 @ rot.T  # Apply rotation
+            order1 = np.lexsort((pts1_rot[:, 2], pts1_rot[:, 1], pts1_rot[:, 0]))
+            pts1_s = pts1_rot[order1]
+
+            dists2 = np.sum((pts1_s - pts2_s) ** 2, axis=1)
+            if np.all(dists2 < tol2):
+                verified.append(fm)
+                found = True
+                break
+
+        if not found:
+            mismatched.append(fm)
 
     return verified, mismatched

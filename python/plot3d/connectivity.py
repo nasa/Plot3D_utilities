@@ -414,22 +414,9 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                 match_location = _filter_block_increasing(match_location, 'i2')
                 match_location = _filter_block_increasing(match_location, 'j2')
 
-            # Reject matches where the two sides have different face dimensions.
-            # On a conforming mesh, a real face overlap always produces equal dims.
-            # Mismatched dims indicate edge/corner contact, not face overlap.
-            if len(match_location) >= 4:
-                spans1 = sorted([
-                    max(m['i1'] for m in match_location) - min(m['i1'] for m in match_location),
-                    max(m['j1'] for m in match_location) - min(m['j1'] for m in match_location),
-                    max(m['k1'] for m in match_location) - min(m['k1'] for m in match_location),
-                ])
-                spans2 = sorted([
-                    max(m['i2'] for m in match_location) - min(m['i2'] for m in match_location),
-                    max(m['j2'] for m in match_location) - min(m['j2'] for m in match_location),
-                    max(m['k2'] for m in match_location) - min(m['k2'] for m in match_location),
-                ])
-                if spans1[1:] != spans2[1:]:
-                    match_location = []
+            # NOTE: dims consistency check removed — is_edge + filter_block_increasing
+            # already reject degenerate matches; verify_connectivity checks all
+            # interior points as the authoritative validation.
 
             # Do a final check after doing all these checks
             if len(match_location) >= 4:
@@ -949,31 +936,48 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
     return match
 
 
+def _extract_face_points(block: Block, rec: dict) -> np.ndarray:
+    """Extract all spatial (x, y, z) points on a face defined by a face record dict.
+
+    Returns an (N, 3) array of all grid points in the rectangle bounded by
+    the record's IMIN/IMAX, JMIN/JMAX, KMIN/KMAX, clamped to block dims.
+    """
+    i_lo = min(rec['IMIN'], rec['IMAX'])
+    i_hi = min(max(rec['IMIN'], rec['IMAX']), block.IMAX - 1)
+    j_lo = min(rec['JMIN'], rec['JMAX'])
+    j_hi = min(max(rec['JMIN'], rec['JMAX']), block.JMAX - 1)
+    k_lo = min(rec['KMIN'], rec['KMAX'])
+    k_hi = min(max(rec['KMIN'], rec['KMAX']), block.KMAX - 1)
+
+    x = block.X[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
+    y = block.Y[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
+    z = block.Z[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
+    return np.column_stack([x.ravel(), y.ravel(), z.ravel()])
+
+
 def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E-6):
-    """Verify that paired faces have matching dimensions.
+    """Verify that every grid point on each face pair is spatially coincident.
 
-    For each face match, checks that block1 and block2 have the same face
-    dimensions (sorted non-zero axis spans). This ensures both sides of a
-    connectivity match have the same point count.
-
-    Bad matches (mismatched dims from corner-only or edge contact) are
-    already prevented by the dims consistency check in
-    ``get_face_intersection``. This function serves as a final safety net.
+    For each match, extracts all interior grid points from both faces on the
+    full-resolution blocks, sorts them lexicographically, and checks that
+    every point on face1 has a corresponding point on face2 within ``tol``
+    Euclidean distance.
 
     Args:
-        blocks (List[Block]): All blocks (used only for bounds checking).
+        blocks (List[Block]): Full-resolution blocks.
         face_matches (list): List of face match dicts from
             ``connectivity`` or ``connectivity_fast``.
-        tol (float, optional): Unused (kept for API compatibility).
+        tol (float, optional): Euclidean distance tolerance.  Defaults to 1e-6.
 
     Returns:
         tuple: A 2-element tuple containing:
 
-            - **verified** (list): Face matches with equal face dims.
-            - **mismatched** (list): Face matches with differing dims.
+            - **verified** (list): Matches with all interior points coincident.
+            - **mismatched** (list): Matches with at least one non-matching point.
     """
     verified = []
     mismatched = []
+    tol2 = tol * tol
 
     for fm in face_matches:
         b1 = fm['block1']
@@ -983,14 +987,23 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
             mismatched.append(fm)
             continue
 
-        dims1 = face_grid_dims(b1['IMIN'], b1['IMAX'], b1['JMIN'], b1['JMAX'], b1['KMIN'], b1['KMAX'])
-        dims2 = face_grid_dims(b2['IMIN'], b2['IMAX'], b2['JMIN'], b2['JMAX'], b2['KMIN'], b2['KMAX'])
-        if dims1 != dims2:
-            print(f"verify_connectivity: SIZE MISMATCH block {b1['block_index']} "
-                  f"dims={dims1} vs block {b2['block_index']} dims={dims2}")
+        pts1 = _extract_face_points(blocks[b1['block_index']], b1)
+        pts2 = _extract_face_points(blocks[b2['block_index']], b2)
+
+        if pts1.shape[0] != pts2.shape[0]:
             mismatched.append(fm)
             continue
 
-        verified.append(fm)
+        # Sort lexicographically by (x, y, z)
+        order1 = np.lexsort((pts1[:, 2], pts1[:, 1], pts1[:, 0]))
+        order2 = np.lexsort((pts2[:, 2], pts2[:, 1], pts2[:, 0]))
+        pts1_s = pts1[order1]
+        pts2_s = pts2[order2]
+
+        dists2 = np.sum((pts1_s - pts2_s) ** 2, axis=1)
+        if np.all(dists2 < tol2):
+            verified.append(fm)
+        else:
+            mismatched.append(fm)
 
     return verified, mismatched
