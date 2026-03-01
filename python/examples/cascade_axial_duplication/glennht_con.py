@@ -14,13 +14,13 @@ def export_to_glennht_conn(matches:dict,block_surfaces:dict,filename:str):
         for match in matches:                        
             for block in blocks:
                 block_indx = match[block]['block_index']+1 # block1 and block2 are arbitrary names, the key is the block index 
-                block_IMIN = match[block]['IMIN']+1
-                block_JMIN = match[block]['JMIN']+1
-                block_KMIN = match[block]['KMIN']+1
+                block_IMIN = match[block]['lb'][0]+1
+                block_JMIN = match[block]['lb'][1]+1
+                block_KMIN = match[block]['lb'][2]+1
 
-                block_IMAX = match[block]['IMAX']+1
-                block_JMAX = match[block]['JMAX']+1
-                block_KMAX = match[block]['KMAX']+1
+                block_IMAX = match[block]['ub'][0]+1
+                block_JMAX = match[block]['ub'][1]+1
+                block_KMAX = match[block]['ub'][2]+1
 
                 fp.write(f"{block_indx:3d}\t{block_IMIN:5d} {block_JMIN:5d} {block_KMIN:5d}\t{block_IMAX:5d} {block_JMAX:5d} {block_KMAX:5d}\n")
         # Print Surfaces 
@@ -29,13 +29,13 @@ def export_to_glennht_conn(matches:dict,block_surfaces:dict,filename:str):
         lines = list()
         for surface in block_surfaces:
             block_indx = surface['block_index']+1
-            IMIN = surface['IMIN']+1
-            JMIN = surface['JMIN']+1
-            KMIN = surface['KMIN']+1
-            
-            IMAX = surface['IMAX']+1
-            JMAX = surface['JMAX']+1
-            KMAX = surface['KMAX']+1
+            IMIN = surface['lb'][0]+1
+            JMIN = surface['lb'][1]+1
+            KMIN = surface['lb'][2]+1
+
+            IMAX = surface['ub'][0]+1
+            JMAX = surface['ub'][1]+1
+            KMAX = surface['ub'][2]+1
             lines.append(f"{block_indx:3d}\t{IMIN:5d} {JMIN:5d} {KMIN:5d}\t{IMAX:5d} {JMAX:5d} {KMAX:5d}\t{id:4d}\n")
             id += 1
              

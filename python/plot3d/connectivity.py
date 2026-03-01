@@ -222,20 +222,20 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
             if len(df)>=4:       # Greater than 4 because match can occur with simply 4 corners but the interior doesn't match. 
                 # Check for Split faces
                 ## Block 1
-                main_face = create_face_from_diagonals(block1,imin=I1[0],imax=I1[1], jmin=J1[0],jmax=J1[1],kmin=K1[0],kmax=K1[1])
-                imin, jmin, kmin = df['i1'].min(), df['j1'].min(), df['k1'].min()
-                imax, jmax, kmax = df['i1'].max(), df['j1'].max(), df['k1'].max()
-                if int(imin==imax) + int(jmin==jmax) + int(kmin==kmax)==1:
-                    split_faces1 = split_face(main_face,block1,imin=imin,imax=imax,jmin=jmin,jmax=jmax,kmin=kmin,kmax=kmax)
+                main_face = create_face_from_diagonals(block1,[I1[0],J1[0],K1[0]],[I1[1],J1[1],K1[1]])
+                ilb, jlb, klb = df['i1'].min(), df['j1'].min(), df['k1'].min()
+                iub, jub, kub = df['i1'].max(), df['j1'].max(), df['k1'].max()
+                if int(ilb==iub) + int(jlb==jub) + int(klb==kub)==1:
+                    split_faces1 = split_face(main_face,block1,ilb=ilb,iub=iub,jlb=jlb,jub=jub,klb=klb,kub=kub)
                     [s.set_block_index(face1.blockIndex) for s in split_faces1]
                     [s.set_face_id(face1.id) for s in split_faces1]
 
                 ## Block 2
-                main_face = create_face_from_diagonals(block2,imin=I2[0],imax=I2[1], jmin=J2[0],jmax=J2[1],kmin=K2[0],kmax=K2[1])
-                imin, jmin, kmin = df['i2'].min(), df['j2'].min(), df['k2'].min()
-                imax, jmax, kmax = df['i2'].max(), df['j2'].max(), df['k2'].max()
-                if int(imin==imax) + int(jmin==jmax) + int(kmin==kmax)==1:
-                    split_faces2 = split_face(main_face,block2,imin=imin,imax=imax,jmin=jmin,jmax=jmax,kmin=kmin,kmax=kmax)
+                main_face = create_face_from_diagonals(block2,[I2[0],J2[0],K2[0]],[I2[1],J2[1],K2[1]])
+                ilb, jlb, klb = df['i2'].min(), df['j2'].min(), df['k2'].min()
+                iub, jub, kub = df['i2'].max(), df['j2'].max(), df['k2'].max()
+                if int(ilb==iub) + int(jlb==jub) + int(klb==kub)==1:
+                    split_faces2 = split_face(main_face,block2,ilb=ilb,iub=iub,jlb=jlb,jub=jub,klb=klb,kub=kub)
                     [s.set_block_index(face2.blockIndex) for s in split_faces2]
                     [s.set_face_id(face2.id) for s in split_faces2]
 
@@ -341,8 +341,8 @@ def connectivity_fast(blocks:List[Block]):
         blocks (List[Block]): Lists of blocks you want to find the connectivity for
 
     Returns:
-        (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'} }
-        (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'surfaces': [{'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX', 'ID'}] }
+        (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'lb', 'ub'} }
+        (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'lb', 'ub', 'id' }
         
     """
     gcd_array = list()
@@ -358,26 +358,12 @@ def connectivity_fast(blocks:List[Block]):
     face_matches, outer_faces_formatted = connectivity(new_blocks)
     # scale it up
     for i in range(len(face_matches)):
-        face_matches[i]['block1']['IMIN'] *= gcd_to_use
-        face_matches[i]['block1']['JMIN'] *= gcd_to_use
-        face_matches[i]['block1']['KMIN'] *= gcd_to_use
-        face_matches[i]['block1']['IMAX'] *= gcd_to_use
-        face_matches[i]['block1']['JMAX'] *= gcd_to_use
-        face_matches[i]['block1']['KMAX'] *= gcd_to_use
-
-        face_matches[i]['block2']['IMIN'] *= gcd_to_use
-        face_matches[i]['block2']['JMIN'] *= gcd_to_use
-        face_matches[i]['block2']['KMIN'] *= gcd_to_use
-        face_matches[i]['block2']['IMAX'] *= gcd_to_use
-        face_matches[i]['block2']['JMAX'] *= gcd_to_use
-        face_matches[i]['block2']['KMAX'] *= gcd_to_use
+        for side in ['block1', 'block2']:
+            face_matches[i][side]['lb'] = [x * gcd_to_use for x in face_matches[i][side]['lb']]
+            face_matches[i][side]['ub'] = [x * gcd_to_use for x in face_matches[i][side]['ub']]
     for j in range(len(outer_faces_formatted)):
-        outer_faces_formatted[j]['IMIN'] *= gcd_to_use
-        outer_faces_formatted[j]['JMIN'] *= gcd_to_use
-        outer_faces_formatted[j]['KMIN'] *= gcd_to_use
-        outer_faces_formatted[j]['IMAX'] *= gcd_to_use
-        outer_faces_formatted[j]['JMAX'] *= gcd_to_use
-        outer_faces_formatted[j]['KMAX'] *= gcd_to_use
+        outer_faces_formatted[j]['lb'] = [x * gcd_to_use for x in outer_faces_formatted[j]['lb']]
+        outer_faces_formatted[j]['ub'] = [x * gcd_to_use for x in outer_faces_formatted[j]['ub']]
     return face_matches, outer_faces_formatted
 
 def connectivity(blocks:List[Block]):
@@ -387,8 +373,8 @@ def connectivity(blocks:List[Block]):
         blocks (List[Block]): List of all blocks in multi-block plot3d mesh
 
     Returns:
-        (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX'} }
-        (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'surfaces': [{'IMIN', 'JMIN','KMIN', 'IMAX','JMAX','KMAX', 'ID'}] }
+        (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'lb', 'ub'} }
+        (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'lb', 'ub', 'id' }
 
     """
 
@@ -413,12 +399,14 @@ def connectivity(blocks:List[Block]):
         # Update connectivity for blocks with matching faces 
         if (len(df_matches)>0):
             for df in df_matches:
-                matches_to_remove.append(create_face_from_diagonals(block=blocks[i],imin=df['i1'].min(),jmin=df['j1'].min(),kmin=df['k1'].min(),
-                                                                                    imax=df['i1'].max(),jmax=df['j1'].max(),kmax=df['k1'].max()))
+                matches_to_remove.append(create_face_from_diagonals(blocks[i],
+                    [df['i1'].min(),df['j1'].min(),df['k1'].min()],
+                    [df['i1'].max(),df['j1'].max(),df['k1'].max()]))
                 matches_to_remove[-1].set_block_index(i)
 
-                matches_to_remove.append(create_face_from_diagonals(block=blocks[j],imin=df['i2'].min(),jmin=df['j2'].min(),kmin=df['k2'].min(),
-                                                                                    imax=df['i2'].max(),jmax=df['j2'].max(),kmax=df['k2'].max()))
+                matches_to_remove.append(create_face_from_diagonals(blocks[j],
+                    [df['i2'].min(),df['j2'].min(),df['k2'].min()],
+                    [df['i2'].max(),df['j2'].max(),df['k2'].max()]))
                 matches_to_remove[-1].set_block_index(j)
                 
                 face1 = matches_to_remove[-2]
@@ -454,30 +442,35 @@ def connectivity(blocks:List[Block]):
     # Find self-matches: Do any faces of, for example, block1 match another face in block 1
     for i in range(len(blocks)):
         _,self_matches = get_outer_faces(blocks[i]) 
-        for match in self_matches: # Append to face matches 
+        for match in self_matches: # Append to face matches
             face_matches.append({'block1':{
-                                            'block_index':i,'IMIN':match[0].I.min(),'JMIN':match[0].J.min(),'KMIN':match[0].K.min(),
-                                            'IMAX':match[0].I.max(),'JMAX':match[0].J.max(),'KMAX':match[0].K.max()
+                                            'block_index':i,
+                                            'lb':[int(match[0].I.min()),int(match[0].J.min()),int(match[0].K.min())],
+                                            'ub':[int(match[0].I.max()),int(match[0].J.max()),int(match[0].K.max())]
                                         },
                                     'block2':{
-                                            'block_index':i,'IMIN':match[1].I.min(),'JMIN':match[1].J.min(),'KMIN':match[1].K.min(),
-                                            'IMAX':match[1].I.max(),'JMAX':match[1].J.max(),'KMAX':match[1].K.max()
+                                            'block_index':i,
+                                            'lb':[int(match[1].I.min()),int(match[1].J.min()),int(match[1].K.min())],
+                                            'ub':[int(match[1].I.max()),int(match[1].J.max()),int(match[1].K.max())]
                                         },
                                     'match':pd.DataFrame([{
-                                            'block_index':i,'IMIN':match[0].I.min(),'JMIN':match[0].J.min(),'KMIN':match[0].K.min(),
-                                            'IMAX':match[0].I.max(),'JMAX':match[0].J.max(),'KMAX':match[0].K.max()
+                                            'block_index':i,
+                                            'lb':[int(match[0].I.min()),int(match[0].J.min()),int(match[0].K.min())],
+                                            'ub':[int(match[0].I.max()),int(match[0].J.max()),int(match[0].K.max())]
                                         },{
-                                            'block_index':i,'IMIN':match[1].I.min(),'JMIN':match[1].J.min(),'KMIN':match[1].K.min(),
-                                            'IMAX':match[1].I.max(),'JMAX':match[1].J.max(),'KMAX':match[1].K.max()
+                                            'block_index':i,
+                                            'lb':[int(match[1].I.min()),int(match[1].J.min()),int(match[1].K.min())],
+                                            'ub':[int(match[1].I.max()),int(match[1].J.max()),int(match[1].K.max())]
                                         }])
                                     })
 
     # Update the outer faces
     outer_faces_formatted = list() # This will contain 
     id = 1 
-    for face in outer_faces:        
-        outer_faces_formatted.append({ 'IMIN':min(face.I), 'JMIN':min(face.J), 'KMIN':min(face.K),
-                            'IMAX':max(face.I), 'JMAX':max(face.J), 'KMAX':max(face.K),
+    for face in outer_faces:
+        outer_faces_formatted.append({
+                            'lb':[int(min(face.I)), int(min(face.J)), int(min(face.K))],
+                            'ub':[int(max(face.I)), int(max(face.J)), int(max(face.K))],
                             'id':id, 'block_index':face.BlockIndex })
         id += 1
 
@@ -499,14 +492,14 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
     match = {
             'block1':{
                             'block_index':face1.BlockIndex,
-                            'IMIN':-1,'JMIN':-1,'KMIN':-1,  # Lower Corner
-                            'IMAX':-1,'JMAX':-1,'KMAX':-1,   # Upper Corner
+                            'lb':[-1,-1,-1],  # Lower Corner
+                            'ub':[-1,-1,-1],   # Upper Corner
                             'id':face1.id
                         },
                 'block2':{
                             'block_index':face2.BlockIndex,
-                            'IMIN':-1,'JMIN':-1,'KMIN':-1,  # Lower Corner
-                            'IMAX':-1,'JMAX':-1,'KMAX':-1,   # Upper Corner
+                            'lb':[-1,-1,-1],  # Lower Corner
+                            'ub':[-1,-1,-1],   # Upper Corner
                             'id':face2.id
                         }
                 }
@@ -535,12 +528,8 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
                 search_results.append({'I':p,'J':q,'K':r,'d':math.sqrt(dx*dx + dy*dy + dz*dz)})    
     df = pd.DataFrame(search_results)
     df = df.sort_values(by=['d'])
-    match['block1']['IMIN'] = face1.IMIN
-    match['block1']['JMIN'] = face1.JMIN
-    match['block1']['KMIN'] = face1.KMIN
-    match['block2']['IMIN'] = int(df.iloc[0]['I'])
-    match['block2']['JMIN'] = int(df.iloc[0]['J'])
-    match['block2']['KMIN'] = int(df.iloc[0]['K'])
+    match['block1']['lb'] = [face1.IMIN, face1.JMIN, face1.KMIN]
+    match['block2']['lb'] = [int(df.iloc[0]['I']), int(df.iloc[0]['J']), int(df.iloc[0]['K'])]
     
     # Search for corners     
     x1_u = block1.X[I1[1],J1[1],K1[1]]    # lower corner of block 1 
@@ -558,166 +547,8 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
                 search_results.append({'I':p,'J':q,'K':r,'d':math.sqrt(dx*dx + dy*dy + dz*dz)})
     df = pd.DataFrame(search_results)
     df = df.sort_values(by=['d'])
-    match['block1']['IMAX'] = face1.IMAX
-    match['block1']['JMAX'] = face1.JMAX
-    match['block1']['KMAX'] = face1.KMAX
-    match['block2']['IMAX'] = int(df.iloc[0]['I'])
-    match['block2']['JMAX'] = int(df.iloc[0]['J'])
-    match['block2']['KMAX'] = int(df.iloc[0]['K'])
+    match['block1']['ub'] = [face1.IMAX, face1.JMAX, face1.KMAX]
+    match['block2']['ub'] = [int(df.iloc[0]['I']), int(df.iloc[0]['J']), int(df.iloc[0]['K'])]
     return match
 
 
-def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E-6):
-    """Verifies that the diagonal corners of face_matches are spatially consistent.
-
-    For each face_match, checks that block1's lower corner coordinates match
-    block2's lower corner coordinates (and similarly for upper corners) within
-    the specified tolerance. If the stored diagonal doesn't match, tries all
-    permutations of block2's face corners. If a valid permutation is found,
-    the face_match is corrected and added to the verified list.
-
-    Uses GCD reduction (same as connectivity_fast) for efficient coordinate lookups.
-
-    Args:
-        blocks (List[Block]): List of all blocks (original full-resolution)
-        face_matches (list): List of face_match dicts from connectivity or periodicity
-        tol (float, optional): Euclidean distance tolerance. Defaults to 1E-6.
-
-    Returns:
-        (list): verified face_matches whose diagonals are confirmed or corrected
-        (list): mismatched face_matches where no corner permutation matched
-    """
-    # Compute GCD and reduce blocks (same pattern as connectivity_fast)
-    gcd_array = list()
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array)
-    reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
-
-    # Scale down face_matches indices by GCD
-    scaled_matches = deepcopy(face_matches)
-    for fm in scaled_matches:
-        for side in ['block1', 'block2']:
-            for key in ['IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX']:
-                fm[side][key] = fm[side][key] // gcd_to_use
-
-    verified = list()
-    mismatched = list()
-
-    for idx in range(len(scaled_matches)):
-        fm = scaled_matches[idx]
-        b1 = fm['block1']
-        b2 = fm['block2']
-        b1_idx = b1['block_index']
-        b2_idx = b2['block_index']
-        block1 = reduced_blocks[b1_idx]
-        block2 = reduced_blocks[b2_idx]
-
-        # Block1 diagonal coordinates
-        x1_l = block1.X[b1['IMIN'], b1['JMIN'], b1['KMIN']]
-        y1_l = block1.Y[b1['IMIN'], b1['JMIN'], b1['KMIN']]
-        z1_l = block1.Z[b1['IMIN'], b1['JMIN'], b1['KMIN']]
-
-        x1_u = block1.X[b1['IMAX'], b1['JMAX'], b1['KMAX']]
-        y1_u = block1.Y[b1['IMAX'], b1['JMAX'], b1['KMAX']]
-        z1_u = block1.Z[b1['IMAX'], b1['JMAX'], b1['KMAX']]
-
-        # Enumerate unique corners of block2's face
-        I2 = [b2['IMIN'], b2['IMAX']]
-        J2 = [b2['JMIN'], b2['JMAX']]
-        K2 = [b2['KMIN'], b2['KMAX']]
-
-        unique_corners = list()
-        seen = set()
-        for i in I2:
-            for j in J2:
-                for k in K2:
-                    key = (i, j, k)
-                    if key not in seen:
-                        seen.add(key)
-                        unique_corners.append(key)
-
-        # Check stored diagonal first
-        x2_l = block2.X[b2['IMIN'], b2['JMIN'], b2['KMIN']]
-        y2_l = block2.Y[b2['IMIN'], b2['JMIN'], b2['KMIN']]
-        z2_l = block2.Z[b2['IMIN'], b2['JMIN'], b2['KMIN']]
-
-        x2_u = block2.X[b2['IMAX'], b2['JMAX'], b2['KMAX']]
-        y2_u = block2.Y[b2['IMAX'], b2['JMAX'], b2['KMAX']]
-        z2_u = block2.Z[b2['IMAX'], b2['JMAX'], b2['KMAX']]
-
-        dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
-        d_lower = math.sqrt(dx*dx + dy*dy + dz*dz)
-        dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
-        d_upper = math.sqrt(dx*dx + dy*dy + dz*dz)
-
-        if d_lower < tol and d_upper < tol:
-            verified.append(face_matches[idx])
-            continue
-
-        # Try all permutations of block2's corners
-        found = False
-        best_d_lower = d_lower
-        best_d_upper = d_upper
-
-        for corner_lower in unique_corners:
-            for corner_upper in unique_corners:
-                if corner_lower == corner_upper:
-                    continue
-
-                il, jl, kl = corner_lower
-                iu, ju, ku = corner_upper
-
-                x2_l = block2.X[il, jl, kl]
-                y2_l = block2.Y[il, jl, kl]
-                z2_l = block2.Z[il, jl, kl]
-
-                x2_u = block2.X[iu, ju, ku]
-                y2_u = block2.Y[iu, ju, ku]
-                z2_u = block2.Z[iu, ju, ku]
-
-                dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
-                dl = math.sqrt(dx*dx + dy*dy + dz*dz)
-                dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
-                du = math.sqrt(dx*dx + dy*dy + dz*dz)
-
-                if dl < best_d_lower:
-                    best_d_lower = dl
-                if du < best_d_upper:
-                    best_d_upper = du
-
-                if dl < tol and du < tol:
-                    corrected = deepcopy(face_matches[idx])
-                    corrected['block2']['IMIN'] = il * gcd_to_use
-                    corrected['block2']['JMIN'] = jl * gcd_to_use
-                    corrected['block2']['KMIN'] = kl * gcd_to_use
-                    corrected['block2']['IMAX'] = iu * gcd_to_use
-                    corrected['block2']['JMAX'] = ju * gcd_to_use
-                    corrected['block2']['KMAX'] = ku * gcd_to_use
-                    verified.append(corrected)
-                    if b1_idx == b2_idx:
-                        print("verify_connectivity: Self-match corrected for block index {0}".format(b1_idx))
-                    found = True
-                    break
-            if found:
-                break
-
-        if not found:
-            orig = face_matches[idx]
-            b1_orig = orig['block1']
-            b2_orig = orig['block2']
-            print(f"verify_connectivity: MISMATCH at face_match index {idx}")
-            print(f"  block1 (block_index={b1_orig['block_index']}): "
-                  f"lower=({b1_orig['IMIN']},{b1_orig['JMIN']},{b1_orig['KMIN']}) "
-                  f"upper=({b1_orig['IMAX']},{b1_orig['JMAX']},{b1_orig['KMAX']})")
-            print(f"  block2 (block_index={b2_orig['block_index']}): "
-                  f"lower=({b2_orig['IMIN']},{b2_orig['JMIN']},{b2_orig['KMIN']}) "
-                  f"upper=({b2_orig['IMAX']},{b2_orig['JMAX']},{b2_orig['KMAX']})")
-            print(f"  block1 lower xyz = ({x1_l:.6e}, {y1_l:.6e}, {z1_l:.6e})")
-            print(f"  block1 upper xyz = ({x1_u:.6e}, {y1_u:.6e}, {z1_u:.6e})")
-            print(f"  Closest block2 corner dist to block1 lower: {best_d_lower:.6e}")
-            print(f"  Closest block2 corner dist to block1 upper: {best_d_upper:.6e}")
-            mismatched.append(face_matches[idx])
-
-    return verified, mismatched

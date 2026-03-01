@@ -35,7 +35,7 @@ for i in range(len(outer_faces)):
 for b in blocks_to_extract: # Block indicies 
     for match_indx, f in enumerate(face_matches):
         if f['block1']['index'] == b: 
-            voi = [f['block1']['IMIN'], f['block1']['IMAX'], f['block1']['JMIN'], f['block1']['JMAX'],f['block1']['KMIN'], f['block1']['KMAX']]
+            voi = [f['block1']['lb'][0], f['block1']['ub'][0], f['block1']['lb'][1], f['block1']['ub'][1],f['block1']['lb'][2], f['block1']['ub'][2]]
             print(voi)
             
 # print("done")

@@ -42,15 +42,11 @@ class Face:
     # Basic utilities
     # ------------------------------------------------------------------
 
-    def to_dict(self) -> Dict[str, int]:
+    def to_dict(self) -> Dict:
         """Return a dictionary representation of this face."""
         return {
-            "IMIN": int(self.I.min()),
-            "JMIN": int(self.J.min()),
-            "KMIN": int(self.K.min()),
-            "IMAX": int(self.I.max()),
-            "JMAX": int(self.J.max()),
-            "KMAX": int(self.K.max()),
+            "lb": [int(self.I.min()), int(self.J.min()), int(self.K.min())],
+            "ub": [int(self.I.max()), int(self.J.max()), int(self.K.max())],
             "id": int(self.id),
             "block_index": int(self.blockIndex),
         }

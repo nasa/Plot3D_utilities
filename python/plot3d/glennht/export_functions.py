@@ -569,13 +569,15 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
     for match in matches:                        
         for block in blocks:
             block_indx = match[block]['block_index']+1 # type: ignore # block1 and block2 are arbitrary names, the key is the block index 
-            block_IMIN = match[block]['IMIN']+1 # type: ignore
-            block_JMIN = match[block]['JMIN']+1 # type: ignore
-            block_KMIN = match[block]['KMIN']+1 # type: ignore
+            lb = match[block]['lb'] # type: ignore
+            ub = match[block]['ub'] # type: ignore
+            block_IMIN = lb[0]+1
+            block_JMIN = lb[1]+1
+            block_KMIN = lb[2]+1
 
-            block_IMAX = match[block]['IMAX']+1 # type: ignore
-            block_JMAX = match[block]['JMAX']+1 # type: ignore
-            block_KMAX = match[block]['KMAX']+1 # type: ignore
+            block_IMAX = ub[0]+1
+            block_JMAX = ub[1]+1
+            block_KMAX = ub[2]+1
 
             lines.append(f"{block_indx:3d}\t{block_IMIN:5d} {block_JMIN:5d} {block_KMIN:5d}\t{block_IMAX:5d} {block_JMAX:5d} {block_KMAX:5d}\n")
     # Print Surfaces 
@@ -586,13 +588,15 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
     lines.append(f"{len(outer_faces)}\n")
     for surface in outer_faces:
         block_indx = surface['block_index']+1 # type: ignore
-        IMIN = surface['IMIN']+1 # type: ignore
-        JMIN = surface['JMIN']+1 # type: ignore
-        KMIN = surface['KMIN']+1 # type: ignore
-        
-        IMAX = surface['IMAX']+1 # type: ignore
-        JMAX = surface['JMAX']+1 # type: ignore
-        KMAX = surface['KMAX']+1 # type: ignore
+        lb = surface['lb'] # type: ignore
+        ub = surface['ub'] # type: ignore
+        IMIN = lb[0]+1
+        JMIN = lb[1]+1
+        KMIN = lb[2]+1
+
+        IMAX = ub[0]+1
+        JMAX = ub[1]+1
+        KMAX = ub[2]+1
         id = surface['id']       # type: ignore
         lines.append(f"{block_indx:3d}\t{IMIN:5d} {JMIN:5d} {KMIN:5d}\t{IMAX:5d} {JMAX:5d} {KMAX:5d}\t{id:4d}\n")
     

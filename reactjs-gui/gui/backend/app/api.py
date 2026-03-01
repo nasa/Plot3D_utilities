@@ -257,14 +257,14 @@ def connectivities(item: UUIDFilename):
         for fm in face_matches:
             nextcoords = []
             block_index1 = fm['block1']['block_index']
-            I1 = [fm['block1']['IMIN'],fm['block1']['IMAX']] # [ IMIN IMAX ]
-            J1 = [fm['block1']['JMIN'],fm['block1']['JMAX']] # [ JMIN JMAX ]
-            K1 = [fm['block1']['KMIN'],fm['block1']['KMAX']] # [ KMIN KMAX ]
+            I1 = [fm['block1']['lb'][0],fm['block1']['ub'][0]] # [ IMIN IMAX ]
+            J1 = [fm['block1']['lb'][1],fm['block1']['ub'][1]] # [ JMIN JMAX ]
+            K1 = [fm['block1']['lb'][2],fm['block1']['ub'][2]] # [ KMIN KMAX ]
 
             block_index2 = fm['block2']['block_index']
-            I2 = [fm['block2']['IMIN'],fm['block2']['IMAX']] # [ IMIN IMAX ]
-            J2 = [fm['block2']['JMIN'],fm['block2']['JMAX']] # [ JMIN JMAX ]
-            K2 = [fm['block2']['KMIN'],fm['block2']['KMAX']] # [ KMIN KMAX ]
+            I2 = [fm['block2']['lb'][0],fm['block2']['ub'][0]] # [ IMIN IMAX ]
+            J2 = [fm['block2']['lb'][1],fm['block2']['ub'][1]] # [ JMIN JMAX ]
+            K2 = [fm['block2']['lb'][2],fm['block2']['ub'][2]] # [ KMIN KMAX ]
 
             X1 = select_multi_dimensional(blocks[block_index1].X, (I1[0],I1[1]), (J1[0],J1[1]), (K1[0],K1[1]))
             Y1 = select_multi_dimensional(blocks[block_index1].Y, (I1[0],I1[1]), (J1[0],J1[1]), (K1[0],K1[1]))
@@ -346,14 +346,14 @@ def connectivities_grid(item: UUIDFilename):
         for fm in face_matches:
             nextcoords = []
             block_index1 = fm['block1']['block_index']
-            I1 = [fm['block1']['IMIN'],fm['block1']['IMAX']] # [ IMIN IMAX ]
-            J1 = [fm['block1']['JMIN'],fm['block1']['JMAX']] # [ JMIN JMAX ]
-            K1 = [fm['block1']['KMIN'],fm['block1']['KMAX']] # [ KMIN KMAX ]
+            I1 = [fm['block1']['lb'][0],fm['block1']['ub'][0]] # [ IMIN IMAX ]
+            J1 = [fm['block1']['lb'][1],fm['block1']['ub'][1]] # [ JMIN JMAX ]
+            K1 = [fm['block1']['lb'][2],fm['block1']['ub'][2]] # [ KMIN KMAX ]
 
             block_index2 = fm['block2']['block_index']
-            I2 = [fm['block2']['IMIN'],fm['block2']['IMAX']] # [ IMIN IMAX ]
-            J2 = [fm['block2']['JMIN'],fm['block2']['JMAX']] # [ JMIN JMAX ]
-            K2 = [fm['block2']['KMIN'],fm['block2']['KMAX']] # [ KMIN KMAX ]
+            I2 = [fm['block2']['lb'][0],fm['block2']['ub'][0]] # [ IMIN IMAX ]
+            J2 = [fm['block2']['lb'][1],fm['block2']['ub'][1]] # [ JMIN JMAX ]
+            K2 = [fm['block2']['lb'][2],fm['block2']['ub'][2]] # [ KMIN KMAX ]
 
             X1 = select_multi_dimensional(blocks[block_index1].X, (I1[0],I1[1]), (J1[0],J1[1]), (K1[0],K1[1]))
             Y1 = select_multi_dimensional(blocks[block_index1].Y, (I1[0],I1[1]), (J1[0],J1[1]), (K1[0],K1[1]))
@@ -379,7 +379,7 @@ def connectivities_grid(item: UUIDFilename):
             coords.append(nextcoords)
 
         return coords
-    
+
     connectivity_coords = plot_face(face_matches, blocks)
     
     # Add connectivity0, connectivity1, ... to return dictionary
@@ -456,14 +456,14 @@ def periodicities(item: PeriodicitiesItem):
         for fm in face_matches:
             nextcoords = []
             block_index1 = fm['block1']['block_index']
-            I1 = [fm['block1']['IMIN'],fm['block1']['IMAX']] # [ IMIN IMAX ]
-            J1 = [fm['block1']['JMIN'],fm['block1']['JMAX']] # [ JMIN JMAX ]
-            K1 = [fm['block1']['KMIN'],fm['block1']['KMAX']] # [ KMIN KMAX ]
+            I1 = [fm['block1']['lb'][0],fm['block1']['ub'][0]] # [ IMIN IMAX ]
+            J1 = [fm['block1']['lb'][1],fm['block1']['ub'][1]] # [ JMIN JMAX ]
+            K1 = [fm['block1']['lb'][2],fm['block1']['ub'][2]] # [ KMIN KMAX ]
 
             block_index2 = fm['block2']['block_index']
-            I2 = [fm['block2']['IMIN'],fm['block2']['IMAX']] # [ IMIN IMAX ]
-            J2 = [fm['block2']['JMIN'],fm['block2']['JMAX']] # [ JMIN JMAX ]
-            K2 = [fm['block2']['KMIN'],fm['block2']['KMAX']] # [ KMIN KMAX ]
+            I2 = [fm['block2']['lb'][0],fm['block2']['ub'][0]] # [ IMIN IMAX ]
+            J2 = [fm['block2']['lb'][1],fm['block2']['ub'][1]] # [ JMIN JMAX ]
+            K2 = [fm['block2']['lb'][2],fm['block2']['ub'][2]] # [ KMIN KMAX ]
 
             X1 = select_multi_dimensional(blocks[block_index1].X, (I1[0],I1[1]), (J1[0],J1[1]), (K1[0],K1[1]))
             Y1 = select_multi_dimensional(blocks[block_index1].Y, (I1[0],I1[1]), (J1[0],J1[1]), (K1[0],K1[1]))

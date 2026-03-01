@@ -224,12 +224,12 @@ def read_gridpro_connectivity(
     
 
     # ---------------------------- helpers ----------------------------
-    def face_dict(sb: int, imin: int, jmin: int, kmin: int, imax: int, jmax: int, kmax: int, pty:int=-1) -> Dict[str, int]:
+    def face_dict(sb: int, imin: int, jmin: int, kmin: int, imax: int, jmax: int, kmax: int, pty:int=-1) -> Dict:
         # Matches plot3d.connectivity_fast single-face dict shape
         return {
             "block_index": sb,
-            "IMIN": imin, "JMIN": jmin, "KMIN": kmin,
-            "IMAX": imax, "JMAX": jmax, "KMAX": kmax,
+            "lb": [imin, jmin, kmin],
+            "ub": [imax, jmax, kmax],
             "id": pty
         }
 
