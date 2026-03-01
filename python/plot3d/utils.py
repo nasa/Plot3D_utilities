@@ -75,29 +75,28 @@ def face_grid_dims(imin: int, imax: int, jmin: int, jmax: int,
 
 
 def divide_face_dict_indices(records: List[Dict], gcd: int,
-                              keys=('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX'),
                               nested_sides=None):
-    """Divide face dictionary indices by a GCD factor using integer division.
+    """Divide face dictionary lb/ub tuple indices by a GCD factor using integer division.
 
     This is the inverse of :func:`scale_face_dict_indices`. Used when
     reducing a mesh to GCD resolution before matching, to scale face
     indices down accordingly.
 
     Args:
-        records: List of dicts containing face indices to scale down.
+        records: List of dicts containing ``'lb'`` and ``'ub'`` tuple indices
+            to scale down.
         gcd: Divisor applied to each index via ``//``.
-        keys: Which keys to divide within each record.
-        nested_sides: If provided (e.g. ``['block1', 'block2']``), divides keys
-            inside each nested sub-dict rather than at the top level.
+        nested_sides: If provided (e.g. ``['block1', 'block2']``), divides
+            indices inside each nested sub-dict rather than at the top level.
     """
     for rec in records:
         if nested_sides:
             for side in nested_sides:
-                for k in keys:
-                    rec[side][k] = rec[side][k] // gcd
+                rec[side]['lb'] = tuple(v // gcd for v in rec[side]['lb'])
+                rec[side]['ub'] = tuple(v // gcd for v in rec[side]['ub'])
         else:
-            for k in keys:
-                rec[k] = rec[k] // gcd
+            rec['lb'] = tuple(v // gcd for v in rec['lb'])
+            rec['ub'] = tuple(v // gcd for v in rec['ub'])
 
 
 def enumerate_unique_corners(I: list, J: list, K: list) -> List[Tuple[int, int, int]]:
@@ -128,25 +127,24 @@ def enumerate_unique_corners(I: list, J: list, K: list) -> List[Tuple[int, int, 
 
 
 def scale_face_dict_indices(records: List[Dict], gcd: int,
-                            keys=('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX'),
                             nested_sides=None):
-    """Multiply face dictionary indices by a GCD factor.
+    """Multiply face dictionary lb/ub tuple indices by a GCD factor.
 
     Used to scale indices back to the original grid resolution after
     performing matching at reduced (GCD) resolution.
 
     Args:
-        records: List of dicts containing face indices to scale up.
+        records: List of dicts containing ``'lb'`` and ``'ub'`` tuple indices
+            to scale up.
         gcd: Factor to multiply each index by.
-        keys: Which keys to scale within each record.
-        nested_sides: If provided (e.g. ``['block1', 'block2']``), scales keys
-            inside each nested sub-dict rather than at the top level.
+        nested_sides: If provided (e.g. ``['block1', 'block2']``), scales
+            indices inside each nested sub-dict rather than at the top level.
     """
     for rec in records:
         if nested_sides:
             for side in nested_sides:
-                for k in keys:
-                    rec[side][k] = int(rec[side][k] * gcd)
+                rec[side]['lb'] = tuple(int(v * gcd) for v in rec[side]['lb'])
+                rec[side]['ub'] = tuple(int(v * gcd) for v in rec[side]['ub'])
         else:
-            for k in keys:
-                rec[k] = int(rec[k] * gcd)
+            rec['lb'] = tuple(int(v * gcd) for v in rec['lb'])
+            rec['ub'] = tuple(int(v * gcd) for v in rec['ub'])

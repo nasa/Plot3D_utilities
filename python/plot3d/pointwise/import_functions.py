@@ -75,12 +75,8 @@ class FvbndPatch:
     ) -> Dict[str, Any]:
         return {
             "block_index": self.block_index,
-            "IMIN": self.i1,
-            "JMIN": self.j1,
-            "KMIN": self.k1,
-            "IMAX": self.i2,
-            "JMAX": self.j2,
-            "KMAX": self.k2,
+            "lb": (self.i1, self.j1, self.k1),
+            "ub": (self.i2, self.j2, self.k2),
             "id": self.bc_id,
             "bc_name": bc_name,
             "bc_type": bc_type,
@@ -424,9 +420,9 @@ def export_pointwise_to_glennht(
         key=lambda f: (
             f.get("id", 0),
             f.get("block_index", 0),
-            f.get("IMIN", 0),
-            f.get("JMIN", 0),
-            f.get("KMIN", 0),
+            f.get("lb", (0, 0, 0))[0],
+            f.get("lb", (0, 0, 0))[1],
+            f.get("lb", (0, 0, 0))[2],
         ),
     )
 

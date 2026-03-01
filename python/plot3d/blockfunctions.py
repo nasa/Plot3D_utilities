@@ -111,8 +111,8 @@ def block_connection_matrix(
         blocks (List[Block]): List of blocks to analyze.
         outer_faces (List[Dict[str, int]]): Pre-computed outer-face
             definitions. Each dictionary must contain keys
-            ``"block_index"``, ``"IMIN"``, ``"JMIN"``, ``"KMIN"``,
-            ``"IMAX"``, ``"JMAX"``, ``"KMAX"``, and optionally ``"id"``.
+            ``"block_index"``, ``"lb"`` (tuple of 3 ints), ``"ub"``
+            (tuple of 3 ints), and optionally ``"id"``.
             When empty, outer faces are computed automatically.
         tol (float): Legacy tolerance parameter (unused internally but kept
             for API compatibility).
@@ -153,8 +153,8 @@ def block_connection_matrix(
     for o in outer_faces:
         face = create_face_from_diagonals(
             blocks[o["block_index"]],
-            int(o["IMIN"] / gcd_to_use), int(o["JMIN"] / gcd_to_use), int(o["KMIN"] / gcd_to_use),
-            int(o["IMAX"] / gcd_to_use), int(o["JMAX"] / gcd_to_use), int(o["KMAX"] / gcd_to_use)
+            int(o["lb"][0] / gcd_to_use), int(o["lb"][1] / gcd_to_use), int(o["lb"][2] / gcd_to_use),
+            int(o["ub"][0] / gcd_to_use), int(o["ub"][1] / gcd_to_use), int(o["ub"][2] / gcd_to_use)
         )
         face.set_block_index(o["block_index"])
         if "id" in o:

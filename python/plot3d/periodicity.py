@@ -34,23 +34,23 @@ from .connectivity import get_face_intersection, face_matches_to_dict
 from .utils import (scale_face_dict_indices, face_key, face_grid_dims)
 from tqdm import tqdm
 
-def _scale_dicts_down(dicts: List[Dict], gcd: int, keys=('IMIN','JMIN','KMIN','IMAX','JMAX','KMAX')):
-    """Scale dictionary face indices down by a GCD factor.
+def _scale_dicts_down(dicts: List[Dict], gcd: int):
+    """Scale dictionary face lb/ub tuple indices down by a GCD factor.
 
-    Divides each index key in every dictionary by ``gcd`` using integer
-    division. This is used to convert face indices from the original grid
-    resolution to the GCD-reduced resolution.
+    Divides each index in the ``'lb'`` and ``'ub'`` tuples by ``gcd``
+    using integer division. This is used to convert face indices from the
+    original grid resolution to the GCD-reduced resolution.
 
     Args:
-        dicts: List of face dictionaries containing index keys.
+        dicts: List of face dictionaries containing ``'lb'`` and ``'ub'``
+            tuple indices.
         gcd: Greatest common divisor factor to divide indices by.
-        keys: Tuple of dictionary keys to scale. Defaults to
-            ``('IMIN', 'JMIN', 'KMIN', 'IMAX', 'JMAX', 'KMAX')``.
     """
     for d in dicts:
-        for k in keys:
-            if k in d:
-                d[k] = int(d[k] / gcd)
+        if 'lb' in d:
+            d['lb'] = tuple(int(v / gcd) for v in d['lb'])
+        if 'ub' in d:
+            d['ub'] = tuple(int(v / gcd) for v in d['ub'])
 
 
 def create_rotation_matrix(rotation_angle:float, rotation_axis:str="x"):
@@ -667,7 +667,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         blocks: List of blocks. Do not duplicate before passing in; the
             function copies internally when reducing.
         matched_faces: Matched faces from connectivity, as dictionaries
-            with keys ``'block_index'``, ``'IMIN'``, ``'JMIN'``, etc.
+            with keys ``'block_index'``, ``'lb'``, ``'ub'``, etc.
         outer_faces: Outer (unmatched) faces in dictionary form.
         rotation_angle: Rotation angle in degrees. Either this or
             ``nblades`` must be provided. If both are given,
@@ -786,8 +786,7 @@ def translational_periodicity(
     Args:
         blocks: List of blocks.
         outer_faces: Outer faces as dictionaries with keys ``'block_index'``,
-            ``'IMIN'``, ``'JMIN'``, ``'KMIN'``, ``'IMAX'``, ``'JMAX'``,
-            ``'KMAX'``.
+            ``'lb'`` (tuple of 3 ints), and ``'ub'`` (tuple of 3 ints).
         delta: Periodicity spacing along the chosen axis. If ``None``, it is
             inferred from the global block min/max extent.
         translational_direction: Axis to check: ``'x'``, ``'y'``, or
@@ -1081,11 +1080,11 @@ def translational_periodicity(
                 periodic_pairs_r.append((fL, fU, m))
                 periodic_export.append({
                     "block1": {"block_index": fL.BlockIndex,
-                               "IMIN": fL.IMIN, "JMIN": fL.JMIN, "KMIN": fL.KMIN,
-                               "IMAX": fL.IMAX, "JMAX": fL.JMAX, "KMAX": fL.KMAX},
+                               "lb": (fL.IMIN, fL.JMIN, fL.KMIN),
+                               "ub": (fL.IMAX, fL.JMAX, fL.KMAX)},
                     "block2": {"block_index": fU.BlockIndex,
-                               "IMIN": fU.IMIN, "JMIN": fU.JMIN, "KMIN": fU.KMIN,
-                               "IMAX": fU.IMAX, "JMAX": fU.JMAX, "KMAX": fU.KMAX},
+                               "lb": (fU.IMIN, fU.JMIN, fU.KMIN),
+                               "ub": (fU.IMAX, fU.JMAX, fU.KMAX)},
                     "mapping": m,
                     "mode": mode
                     }) # type: ignore
@@ -1110,14 +1109,12 @@ def translational_periodicity(
     for rec in periodic_export:
         for side in ("block1","block2"):
             bi = rec[side]["block_index"]
-            key = (bi, rec[side]["IMIN"], rec[side]["JMIN"], rec[side]["KMIN"],
-                        rec[side]["IMAX"], rec[side]["JMAX"], rec[side]["KMAX"])
+            key = (bi,) + tuple(rec[side]["lb"]) + tuple(rec[side]["ub"])
             periodic_keys.add(key)
 
     outer_faces_remaining = []
     for o in outer_faces:
-        key = (o["block_index"], o["IMIN"], o["JMIN"], o["KMIN"],
-                               o["IMAX"], o["JMAX"], o["KMAX"])
+        key = (o["block_index"],) + tuple(o["lb"]) + tuple(o["ub"])
         if key not in periodic_keys:
             outer_faces_remaining.append(o)
 
@@ -1249,33 +1246,45 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
 
 
 def _extract_face_points_per(block: Block, rec: dict) -> np.ndarray:
-    """Extract all spatial (x, y, z) points on a face defined by a face record dict."""
-    i_lo = min(rec['IMIN'], rec['IMAX'])
-    i_hi = min(max(rec['IMIN'], rec['IMAX']), block.IMAX - 1)
-    j_lo = min(rec['JMIN'], rec['JMAX'])
-    j_hi = min(max(rec['JMIN'], rec['JMAX']), block.JMAX - 1)
-    k_lo = min(rec['KMIN'], rec['KMAX'])
-    k_hi = min(max(rec['KMIN'], rec['KMAX']), block.KMAX - 1)
+    """Extract face points in diagonal traversal order (lb -> ub)."""
+    il, jl, kl = rec['lb']
+    ih, jh, kh = rec['ub']
+    il = min(il, block.IMAX - 1); ih = min(ih, block.IMAX - 1)
+    jl = min(jl, block.JMAX - 1); jh = min(jh, block.JMAX - 1)
+    kl = min(kl, block.KMAX - 1); kh = min(kh, block.KMAX - 1)
 
-    x = block.X[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
-    y = block.Y[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
-    z = block.Z[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
-    return np.column_stack([x.ravel(), y.ravel(), z.ravel()])
+    def _directed(start, end):
+        if start <= end: return range(start, end + 1)
+        else: return range(start, end - 1, -1)
+
+    pts = []
+    for i in _directed(il, ih):
+        for j in _directed(jl, jh):
+            for k in _directed(kl, kh):
+                pts.append([block.X[i, j, k], block.Y[i, j, k], block.Z[i, j, k]])
+    return np.array(pts)
 
 
 def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
                        rotation_axis: str = 'x', tol: float = 1E-6):
     """Verify that every grid point on each periodic face pair matches after rotation.
 
-    For each match, extracts all interior grid points from both faces on the
-    full-resolution blocks, rotates face1 points by ±theta, sorts both
-    point sets lexicographically, and checks that every point pairs up
-    within ``tol`` Euclidean distance.
+    For each match, extracts all grid points from both faces using the
+    diagonal traversal convention (lb -> ub) on the full-resolution blocks,
+    rotates face1 points by +/-theta, and checks element-by-element that
+    every point pairs up within ``tol`` Euclidean distance.
+
+    The diagonal convention means that points are extracted in lb->ub
+    traversal order for both faces. Since matching faces share the same
+    diagonal convention, no lexicographic sorting is needed -- points are
+    compared directly in traversal order.
 
     Args:
         blocks (List[Block]): Full-resolution blocks.
         face_matches (list): List of face match dicts from
-            ``rotated_periodicity``.
+            ``rotated_periodicity``.  Each dict has ``'block1'`` and
+            ``'block2'`` sub-dicts with ``'block_index'``, ``'lb'``
+            (tuple), and ``'ub'`` (tuple).
         theta (float): Rotation angle in radians.
         rotation_axis (str): Axis of rotation: ``'x'``, ``'y'``, or ``'z'``.
         tol (float): Euclidean distance tolerance.  Defaults to 1e-6.
@@ -1309,18 +1318,11 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
             mismatched.append(fm)
             continue
 
-        # Sort face2 points lexicographically
-        order2 = np.lexsort((pts2[:, 2], pts2[:, 1], pts2[:, 0]))
-        pts2_s = pts2[order2]
-
-        # Try +theta rotation, then -theta
+        # Compare directly element-by-element (diagonal convention ensures matching order)
         found = False
         for rot in [rot_pos, rot_neg]:
             pts1_rot = pts1 @ rot.T  # Apply rotation
-            order1 = np.lexsort((pts1_rot[:, 2], pts1_rot[:, 1], pts1_rot[:, 0]))
-            pts1_s = pts1_rot[order1]
-
-            dists2 = np.sum((pts1_s - pts2_s) ** 2, axis=1)
+            dists2 = np.sum((pts1_rot - pts2) ** 2, axis=1)
             if np.all(dists2 < tol2):
                 verified.append(fm)
                 found = True

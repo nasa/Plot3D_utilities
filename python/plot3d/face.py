@@ -107,23 +107,20 @@ class Face:
         f.id = self.id
         return f
 
-    def to_dict(self) -> Dict[str, int]:
+    def to_dict(self) -> dict:
         """Return a dictionary representation of this face.
 
-        The dictionary keys are ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``,
-        ``JMAX``, ``KMAX``, ``id``, and ``block_index``.
+        The dictionary keys are ``lb`` (lower-bound corner as an
+        ``(I, J, K)`` tuple), ``ub`` (upper-bound corner as an
+        ``(I, J, K)`` tuple), ``id``, and ``block_index``.
 
         Returns:
-            A dictionary mapping string keys to integer values that
-            fully describe the face's index range and identity.
+            A dictionary that fully describes the face's index range
+            and identity.
         """
         return {
-            "IMIN": int(self.I.min()),
-            "JMIN": int(self.J.min()),
-            "KMIN": int(self.K.min()),
-            "IMAX": int(self.I.max()),
-            "JMAX": int(self.J.max()),
-            "KMAX": int(self.K.max()),
+            "lb": (int(self.I.min()), int(self.J.min()), int(self.K.min())),
+            "ub": (int(self.I.max()), int(self.J.max()), int(self.K.max())),
             "id": int(self.id),
             "block_index": int(self.blockIndex),
         }

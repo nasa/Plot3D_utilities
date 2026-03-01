@@ -27,11 +27,11 @@ def read_ght_conn(filename: str):
         - **face_matches** (*List[Dict[str, dict]]*): Block-to-block face
           match records.  Each entry is a dict with keys ``"block1"`` and
           ``"block2"``, where each value contains ``"block_index"``,
-          ``"IMIN"``, ``"JMIN"``, ``"KMIN"``, ``"IMAX"``, ``"JMAX"``, and
-          ``"KMAX"`` (all 0-based).
+          ``"lb"`` (tuple of 3 ints), and ``"ub"`` (tuple of 3 ints)
+          (all 0-based).
         - **outer_faces** (*List[Dict[str, int]]*): Boundary surface records
-          with keys ``"block_index"``, ``"IMIN"``, ``"JMIN"``, ``"KMIN"``,
-          ``"IMAX"``, ``"JMAX"``, ``"KMAX"`` (0-based), and ``"id"``
+          with keys ``"block_index"``, ``"lb"`` (tuple of 3 ints),
+          ``"ub"`` (tuple of 3 ints) (0-based), and ``"id"``
           (0-based surface ID).
         - **num_connections_foreach_block** (*np.ndarray*): Array of shape
           ``(N, 2)`` where column 0 is the 0-based block index and column 1
@@ -45,7 +45,8 @@ def read_ght_conn(filename: str):
         - **GIFs** (*List[Dict[str, int]]*): General Interface records, each
           with keys ``"S1"``, ``"S2"``, ``"GIF_TYPE"``, and ``"GIF_ORDER"``.
     """
-    IMIN = 0; JMIN = 0; KMIN = 0; IMAX = 0; JMAX = 0; KMAX = 0  # Preallocate  # noqa: E702
+    lb1 = (0, 0, 0)  # Preallocate lower bound tuple
+    ub1 = (0, 0, 0)  # Preallocate upper bound tuple
     # Read in the glennht connectivity file
     with open(filename, "r") as f:        
         line = f.readline()
@@ -60,20 +61,19 @@ def read_ght_conn(filename: str):
             temp = line.lstrip().rstrip().split(" ")
             temp = [int(t)-1 for t in temp if t.strip() != '']
             if (len(temp) == 7):
-                if idx % 2 == 0: # When there is a pair of blockd, write to the list
+                if idx % 2 == 0: # When there is a pair of blocks, write to the list
                     block_to_block.append({
                         'block1':{'block_index':blk_id1,
-                                  "IMIN":IMIN,"JMIN":JMIN,"KMIN":KMIN,
-                                  "IMAX":IMAX,"JMAX":JMAX,"KMAX":KMAX},
+                                  'lb':lb1,
+                                  'ub':ub1},
                         'block2':{'block_index':temp[0],
-                                  "IMIN":temp[1],"JMIN":temp[2],"KMIN":temp[3],
-                                  "IMAX":temp[4],"JMAX":temp[5],"KMAX":temp[6]},
-                        
-                    })                   
+                                  'lb':(temp[1],temp[2],temp[3]),
+                                  'ub':(temp[4],temp[5],temp[6])},
+                    })
                 else:
                     blk_id1 = temp[0]
-                    IMIN = temp[1]; JMIN = temp[2]; KMIN = temp[3]  # noqa: E702
-                    IMAX = temp[4]; JMAX = temp[5]; KMAX = temp[6]  # noqa: E702
+                    lb1 = (temp[1], temp[2], temp[3])
+                    ub1 = (temp[4], temp[5], temp[6])
         line = f.readline()
         # Read OuterFaces
         outer_faces = []
@@ -84,8 +84,8 @@ def read_ght_conn(filename: str):
             temp = [int(x)-1 for x in temp if x]
             outer_faces.append({
                 "block_index":temp[0],
-                "IMIN":temp[1],"JMIN":temp[2],"KMIN":temp[3],
-                "IMAX":temp[4],"JMAX":temp[5],"KMAX":temp[6],
+                "lb":(temp[1],temp[2],temp[3]),
+                "ub":(temp[4],temp[5],temp[6]),
                 "id":temp[7]
                 })
         
@@ -114,16 +114,16 @@ def read_ght_conn(filename: str):
                 temp = [int(t) for t in temp if t.strip() != '']
                 Zones.extend(temp)
     
-        # Find out how many connecting nodes each block has 
+        # Find out how many connecting nodes each block has
         l1 = [(row['block1']['block_index'],
-              (row['block1']['IMAX']-row['block1']['IMIN'])*
-              (row['block1']['JMAX']-row['block1']['IMIN'])*
-              (row['block1']['KMAX']-row['block1']['KMIN']))
+              (row['block1']['ub'][0]-row['block1']['lb'][0])*
+              (row['block1']['ub'][1]-row['block1']['lb'][1])*
+              (row['block1']['ub'][2]-row['block1']['lb'][2]))
               for row in block_to_block]
         l2= [(row['block2']['block_index'],
-              (row['block2']['IMAX']-row['block2']['IMIN'])*  
-              (row['block2']['JMAX']-row['block2']['IMIN'])*
-              (row['block2']['KMAX']-row['block2']['KMIN']))
+              (row['block2']['ub'][0]-row['block2']['lb'][0])*
+              (row['block2']['ub'][1]-row['block2']['lb'][1])*
+              (row['block2']['ub'][2]-row['block2']['lb'][2]))
               for row in block_to_block]
         
         l1.extend(l2)

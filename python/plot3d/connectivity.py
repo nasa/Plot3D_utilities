@@ -587,11 +587,11 @@ def connectivity_fast(blocks:List[Block]):
 
             - **face_matches** (List[Dict]): All matching face pairs. Each
               dict has keys ``block1`` and ``block2``, each containing
-              ``block_index``, ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``,
-              ``JMAX``, ``KMAX``.
+              ``block_index``, ``lb`` (tuple of 3 ints), and ``ub``
+              (tuple of 3 ints).
             - **outer_faces_formatted** (List[Dict]): All remaining exterior
-              surfaces. Each dict has keys ``block_index``, ``IMIN``,
-              ``JMIN``, ``KMIN``, ``IMAX``, ``JMAX``, ``KMAX``, ``id``.
+              surfaces. Each dict has keys ``block_index``, ``lb``
+              (tuple of 3 ints), ``ub`` (tuple of 3 ints), and ``id``.
     """
     gcd_to_use = compute_gcd(blocks)
     print(f"gcd to use {gcd_to_use}")
@@ -638,11 +638,11 @@ def connectivity(blocks:List[Block]):
 
             - **face_matches** (List[Dict]): All matching face pairs. Each
               dict has keys ``block1`` and ``block2``, each containing
-              ``block_index``, ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``,
-              ``JMAX``, ``KMAX``, and ``id``.
+              ``block_index``, ``lb`` (tuple of 3 ints), ``ub``
+              (tuple of 3 ints), and ``id``.
             - **outer_faces_formatted** (List[Dict]): All remaining exterior
-              surfaces. Each dict has keys ``block_index``, ``IMIN``,
-              ``JMIN``, ``KMIN``, ``IMAX``, ``JMAX``, ``KMAX``, ``id``.
+              surfaces. Each dict has keys ``block_index``, ``lb``
+              (tuple of 3 ints), ``ub`` (tuple of 3 ints), and ``id``.
     """
 
     face_matches = list()
@@ -817,12 +817,14 @@ def connectivity(blocks:List[Block]):
         _,self_matches = get_outer_faces(blocks[i])
         for match in self_matches: # Append to face matches
             face_matches.append({'block1':{
-                                            'block_index':i,'IMIN':int(match[0].I.min()),'JMIN':int(match[0].J.min()),'KMIN':int(match[0].K.min()),
-                                            'IMAX':int(match[0].I.max()),'JMAX':int(match[0].J.max()),'KMAX':int(match[0].K.max())
+                                            'block_index':i,
+                                            'lb':(int(match[0].I.min()),int(match[0].J.min()),int(match[0].K.min())),
+                                            'ub':(int(match[0].I.max()),int(match[0].J.max()),int(match[0].K.max()))
                                         },
                                     'block2':{
-                                            'block_index':i,'IMIN':int(match[1].I.min()),'JMIN':int(match[1].J.min()),'KMIN':int(match[1].K.min()),
-                                            'IMAX':int(match[1].I.max()),'JMAX':int(match[1].J.max()),'KMAX':int(match[1].K.max())
+                                            'block_index':i,
+                                            'lb':(int(match[1].I.min()),int(match[1].J.min()),int(match[1].K.min())),
+                                            'ub':(int(match[1].I.max()),int(match[1].J.max()),int(match[1].K.max()))
                                         }
                                     })
 
@@ -830,8 +832,9 @@ def connectivity(blocks:List[Block]):
     outer_faces_formatted = list() # This will contain
     id = 1
     for face in outer_faces:
-        outer_faces_formatted.append({ 'IMIN':min(face.I), 'JMIN':min(face.J), 'KMIN':min(face.K),
-                            'IMAX':max(face.I), 'JMAX':max(face.J), 'KMAX':max(face.K),
+        outer_faces_formatted.append({
+                            'lb':(min(face.I), min(face.J), min(face.K)),
+                            'ub':(max(face.I), max(face.J), max(face.K)),
                             'id':id, 'block_index':face.BlockIndex })
         id += 1
 
@@ -861,21 +864,22 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
 
     Returns:
         dict: A dictionary with keys ``block1`` and ``block2``, each
-        containing ``block_index``, ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``,
-        ``JMAX``, ``KMAX``, and ``id``. The lower/upper corners of
+        containing ``block_index``, ``lb`` (lower-bound corner as an
+        ``(I, J, K)`` tuple), ``ub`` (upper-bound corner as an
+        ``(I, J, K)`` tuple), and ``id``. The ``lb``/``ub`` corners of
         ``block2`` are reordered to spatially match those of ``block1``.
     """
     match = {
             'block1':{
                             'block_index':face1.BlockIndex,
-                            'IMIN':-1,'JMIN':-1,'KMIN':-1,  # Lower Corner
-                            'IMAX':-1,'JMAX':-1,'KMAX':-1,   # Upper Corner
+                            'lb':(-1,-1,-1),  # Lower Corner
+                            'ub':(-1,-1,-1),   # Upper Corner
                             'id':face1.id
                         },
                 'block2':{
                             'block_index':face2.BlockIndex,
-                            'IMIN':-1,'JMIN':-1,'KMIN':-1,  # Lower Corner
-                            'IMAX':-1,'JMAX':-1,'KMAX':-1,   # Upper Corner
+                            'lb':(-1,-1,-1),  # Lower Corner
+                            'ub':(-1,-1,-1),   # Upper Corner
                             'id':face2.id
                         }
                 }
@@ -904,12 +908,8 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
                 if d < best_d:
                     best_d = d
                     best_ijk = (p, q, r)
-    match['block1']['IMIN'] = face1.IMIN
-    match['block1']['JMIN'] = face1.JMIN
-    match['block1']['KMIN'] = face1.KMIN
-    match['block2']['IMIN'] = best_ijk[0]
-    match['block2']['JMIN'] = best_ijk[1]
-    match['block2']['KMIN'] = best_ijk[2]
+    match['block1']['lb'] = (face1.IMIN, face1.JMIN, face1.KMIN)
+    match['block2']['lb'] = best_ijk
 
     # Search for upper corner match
     x1_u = block1.X[I1[1],J1[1],K1[1]]
@@ -927,46 +927,50 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
                 if d < best_d:
                     best_d = d
                     best_ijk = (p, q, r)
-    match['block1']['IMAX'] = face1.IMAX
-    match['block1']['JMAX'] = face1.JMAX
-    match['block1']['KMAX'] = face1.KMAX
-    match['block2']['IMAX'] = best_ijk[0]
-    match['block2']['JMAX'] = best_ijk[1]
-    match['block2']['KMAX'] = best_ijk[2]
+    match['block1']['ub'] = (face1.IMAX, face1.JMAX, face1.KMAX)
+    match['block2']['ub'] = best_ijk
     return match
 
 
 def _extract_face_points(block: Block, rec: dict) -> np.ndarray:
-    """Extract all spatial (x, y, z) points on a face defined by a face record dict.
+    """Extract face points in diagonal traversal order (lb -> ub).
 
-    Returns an (N, 3) array of all grid points in the rectangle bounded by
-    the record's IMIN/IMAX, JMIN/JMAX, KMIN/KMAX, clamped to block dims.
+    Uses directed traversal respecting the diagonal convention.
+    Point n from face A must match point n from face B - no sorting needed.
     """
-    i_lo = min(rec['IMIN'], rec['IMAX'])
-    i_hi = min(max(rec['IMIN'], rec['IMAX']), block.IMAX - 1)
-    j_lo = min(rec['JMIN'], rec['JMAX'])
-    j_hi = min(max(rec['JMIN'], rec['JMAX']), block.JMAX - 1)
-    k_lo = min(rec['KMIN'], rec['KMAX'])
-    k_hi = min(max(rec['KMIN'], rec['KMAX']), block.KMAX - 1)
+    il, jl, kl = rec['lb']
+    ih, jh, kh = rec['ub']
+    # Clamp to block bounds
+    il = min(il, block.IMAX - 1); ih = min(ih, block.IMAX - 1)
+    jl = min(jl, block.JMAX - 1); jh = min(jh, block.JMAX - 1)
+    kl = min(kl, block.KMAX - 1); kh = min(kh, block.KMAX - 1)
 
-    x = block.X[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
-    y = block.Y[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
-    z = block.Z[i_lo:i_hi+1, j_lo:j_hi+1, k_lo:k_hi+1]
-    return np.column_stack([x.ravel(), y.ravel(), z.ravel()])
+    def _directed(start, end):
+        if start <= end: return range(start, end + 1)
+        else: return range(start, end - 1, -1)
+
+    pts = []
+    for i in _directed(il, ih):
+        for j in _directed(jl, jh):
+            for k in _directed(kl, kh):
+                pts.append([block.X[i, j, k], block.Y[i, j, k], block.Z[i, j, k]])
+    return np.array(pts)
 
 
 def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E-6):
     """Verify that every grid point on each face pair is spatially coincident.
 
-    For each match, extracts all interior grid points from both faces on the
-    full-resolution blocks, sorts them lexicographically, and checks that
-    every point on face1 has a corresponding point on face2 within ``tol``
-    Euclidean distance.
+    Uses directed diagonal traversal (lb -> ub) so that point n from face A
+    corresponds to point n from face B by construction.  Lexicographic sorting
+    is deliberately avoided because it destroys the diagonal pairing: two
+    faces that share the same physical surface but have flipped index
+    directions would be re-ordered independently, causing point-wise
+    comparisons to fail even though the faces are correctly matched.
 
     Args:
         blocks (List[Block]): Full-resolution blocks.
-        face_matches (list): List of face match dicts from
-            ``connectivity`` or ``connectivity_fast``.
+        face_matches (list): List of face match dicts (with ``lb``/``ub``
+            keys) from ``connectivity`` or ``connectivity_fast``.
         tol (float, optional): Euclidean distance tolerance.  Defaults to 1e-6.
 
     Returns:
@@ -994,13 +998,7 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
             mismatched.append(fm)
             continue
 
-        # Sort lexicographically by (x, y, z)
-        order1 = np.lexsort((pts1[:, 2], pts1[:, 1], pts1[:, 0]))
-        order2 = np.lexsort((pts2[:, 2], pts2[:, 1], pts2[:, 0]))
-        pts1_s = pts1[order1]
-        pts2_s = pts2[order2]
-
-        dists2 = np.sum((pts1_s - pts2_s) ** 2, axis=1)
+        dists2 = np.sum((pts1 - pts2) ** 2, axis=1)
         if np.all(dists2 < tol2):
             verified.append(fm)
         else:

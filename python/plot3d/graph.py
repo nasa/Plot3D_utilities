@@ -49,8 +49,8 @@ def build_weighted_graph_from_face_matches(
     Args:
         face_matches: Output from ``connectivity_fast``.  Each element is a
             dict containing ``block1`` and ``block2`` sub-dicts with keys
-            ``block_index``, ``IMIN``, ``JMIN``, ``KMIN``, ``IMAX``, ``JMAX``,
-            and ``KMAX``.
+            ``block_index``, ``lb`` (tuple of 3 ints), and ``ub`` (tuple of
+            3 ints).
         n_blocks: Total number of blocks in the mesh.
         aggregate: Strategy for merging multiple face weights between the same
             block pair.  Must be one of ``’sum’``, ``’max’``, or ``’min’``.
@@ -82,8 +82,8 @@ def build_weighted_graph_from_face_matches(
         if ignore_self_matches and i == j:
             continue
 
-        IMIN = int(m["block1"]["IMIN"]); JMIN = int(m["block1"]["JMIN"]); KMIN = int(m["block1"]["KMIN"])
-        IMAX = int(m["block1"]["IMAX"]); JMAX = int(m["block1"]["JMAX"]); KMAX = int(m["block1"]["KMAX"])
+        IMIN = int(m["block1"]["lb"][0]); JMIN = int(m["block1"]["lb"][1]); KMIN = int(m["block1"]["lb"][2])
+        IMAX = int(m["block1"]["ub"][0]); JMAX = int(m["block1"]["ub"][1]); KMAX = int(m["block1"]["ub"][2])
         dI = max(abs(IMAX - IMIN), 1)
         dJ = max(abs(JMAX - JMIN), 1)
         dK = max(abs(KMAX - KMIN), 1)

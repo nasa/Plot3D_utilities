@@ -228,8 +228,8 @@ def read_gridpro_connectivity(
         # Matches plot3d.connectivity_fast single-face dict shape
         return {
             "block_index": sb,
-            "IMIN": imin, "JMIN": jmin, "KMIN": kmin,
-            "IMAX": imax, "JMAX": jmax, "KMAX": kmax,
+            "lb": (imin, jmin, kmin),
+            "ub": (imax, jmax, kmax),
             "id": pty
         }
 

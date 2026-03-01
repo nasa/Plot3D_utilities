@@ -718,12 +718,12 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
     Args:
         matches: List of block-to-block face match records.  Each record is a
             dict with keys ``"block1"`` and ``"block2"``, where each value is
-            a dict containing ``"block_index"``, ``"IMIN"``, ``"JMIN"``,
-            ``"KMIN"``, ``"IMAX"``, ``"JMAX"``, and ``"KMAX"`` (all 0-based).
+            a dict containing ``"block_index"``, ``"lb"`` (tuple of 3 ints),
+            and ``"ub"`` (tuple of 3 ints) (all 0-based).
         outer_faces: List of non-matched (boundary) surface face records.
-            Each record must contain ``"block_index"``, ``"IMIN"``,
-            ``"JMIN"``, ``"KMIN"``, ``"IMAX"``, ``"JMAX"``, ``"KMAX"``
-            (0-based), and ``"id"`` (1-based surface ID).
+            Each record must contain ``"block_index"``, ``"lb"`` (tuple of 3
+            ints), ``"ub"`` (tuple of 3 ints) (0-based), and ``"id"``
+            (1-based surface ID).
         filename: Destination path for the connectivity file.  The
             ``.ght_conn`` extension is appended automatically if absent.
         gif_pairs: List of GIF pair dicts, each with keys ``"a"`` and ``"b"``
@@ -743,16 +743,16 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
     blocks = ['block1','block2']
     nMatches = len(matches)
     lines.append(f'{nMatches}\n') # Print number of matches 
-    for match in matches:                        
+    for match in matches:
         for block in blocks:
-            block_indx = match[block]['block_index']+1 # type: ignore # block1 and block2 are arbitrary names, the key is the block index 
-            block_IMIN = match[block]['IMIN']+1 # type: ignore
-            block_JMIN = match[block]['JMIN']+1 # type: ignore
-            block_KMIN = match[block]['KMIN']+1 # type: ignore
+            block_indx = match[block]['block_index']+1 # type: ignore # block1 and block2 are arbitrary names, the key is the block index
+            block_IMIN = match[block]['lb'][0]+1 # type: ignore
+            block_JMIN = match[block]['lb'][1]+1 # type: ignore
+            block_KMIN = match[block]['lb'][2]+1 # type: ignore
 
-            block_IMAX = match[block]['IMAX']+1 # type: ignore
-            block_JMAX = match[block]['JMAX']+1 # type: ignore
-            block_KMAX = match[block]['KMAX']+1 # type: ignore
+            block_IMAX = match[block]['ub'][0]+1 # type: ignore
+            block_JMAX = match[block]['ub'][1]+1 # type: ignore
+            block_KMAX = match[block]['ub'][2]+1 # type: ignore
 
             lines.append(f"{block_indx:3d}\t{block_IMIN:5d} {block_JMIN:5d} {block_KMIN:5d}\t{block_IMAX:5d} {block_JMAX:5d} {block_KMAX:5d}\n")
     # Print Surfaces 
@@ -763,13 +763,13 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
     lines.append(f"{len(outer_faces)}\n")
     for surface in outer_faces:
         block_indx = surface['block_index']+1 # type: ignore
-        IMIN = surface['IMIN']+1 # type: ignore
-        JMIN = surface['JMIN']+1 # type: ignore
-        KMIN = surface['KMIN']+1 # type: ignore
-        
-        IMAX = surface['IMAX']+1 # type: ignore
-        JMAX = surface['JMAX']+1 # type: ignore
-        KMAX = surface['KMAX']+1 # type: ignore
+        IMIN = surface['lb'][0]+1 # type: ignore
+        JMIN = surface['lb'][1]+1 # type: ignore
+        KMIN = surface['lb'][2]+1 # type: ignore
+
+        IMAX = surface['ub'][0]+1 # type: ignore
+        JMAX = surface['ub'][1]+1 # type: ignore
+        KMAX = surface['ub'][2]+1 # type: ignore
         id = surface['id']       # type: ignore
         lines.append(f"{block_indx:3d}\t{IMIN:5d} {JMIN:5d} {KMIN:5d}\t{IMAX:5d} {JMAX:5d} {KMAX:5d}\t{id:4d}\n")
     

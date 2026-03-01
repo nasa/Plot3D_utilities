@@ -855,9 +855,9 @@ def find_face_nearest_point(faces:List[Face], x:float,y:float,z:float):
 def outer_face_dict_to_list(blocks:List[Block],outer_faces:List[Dict[str,int]],gcd:int=1) -> List[Face]:
     """Convert a list of outer-face dictionaries to ``Face`` objects.
 
-    Each dictionary is expected to contain ``'block_index'``, ``'IMIN'``,
-    ``'JMIN'``, ``'KMIN'``, ``'IMAX'``, ``'JMAX'``, ``'KMAX'``, and
-    optionally ``'id'``. Index values are divided by the GCD before face
+    Each dictionary is expected to contain ``'block_index'``, ``'lb'``
+    (tuple of 3 ints), ``'ub'`` (tuple of 3 ints), and optionally
+    ``'id'``. Index values are divided by the GCD before face
     construction so that the resulting faces align with a GCD-reduced
     block list.
 
@@ -873,8 +873,9 @@ def outer_face_dict_to_list(blocks:List[Block],outer_faces:List[Dict[str,int]],g
     """
     outer_faces_all = list()
     for o in outer_faces:
-        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd), int(o['JMIN']/gcd),
-            int(o['KMIN']/gcd), int(o['IMAX']/gcd), int(o['JMAX']/gcd), int(o['KMAX']/gcd))
+        face = create_face_from_diagonals(blocks[o['block_index']],
+            int(o['lb'][0]/gcd), int(o['lb'][1]/gcd), int(o['lb'][2]/gcd),
+            int(o['ub'][0]/gcd), int(o['ub'][1]/gcd), int(o['ub'][2]/gcd))
         if 'id' in o.keys():
             face.id = o['id']
         face.set_block_index(o['block_index'])
@@ -886,10 +887,10 @@ def match_faces_dict_to_list(blocks:List[Block],matched_faces:List[Dict[str,int]
     """Convert a list of matched-face dictionaries to ``Face`` objects.
 
     Each dictionary is expected to contain ``'block1'`` and ``'block2'``
-    sub-dictionaries, each with ``'block_index'``, ``'IMIN'``..``'KMAX'``,
-    and optionally ``'id'``. The function creates two ``Face`` objects per
-    entry (one for each side of the match) and returns them all in a flat
-    list.
+    sub-dictionaries, each with ``'block_index'``, ``'lb'`` (tuple of 3
+    ints), ``'ub'`` (tuple of 3 ints), and optionally ``'id'``. The
+    function creates two ``Face`` objects per entry (one for each side of
+    the match) and returns them all in a flat list.
 
     Args:
         blocks: List of ``Block`` objects (possibly GCD-reduced).
@@ -905,11 +906,11 @@ def match_faces_dict_to_list(blocks:List[Block],matched_faces:List[Dict[str,int]
     matched_faces_all = list()
     for _,m in enumerate(matched_faces):
         face1 = create_face_from_diagonals(blocks[m['block1']['block_index']],
-                            int(m['block1']['IMIN']/gcd), int(m['block1']['JMIN']/gcd), int(m['block1']['KMIN']/gcd),
-                            int(m['block1']['IMAX']/gcd), int(m['block1']['JMAX']/gcd), int(m['block1']['KMAX']/gcd))
+                            int(m['block1']['lb'][0]/gcd), int(m['block1']['lb'][1]/gcd), int(m['block1']['lb'][2]/gcd),
+                            int(m['block1']['ub'][0]/gcd), int(m['block1']['ub'][1]/gcd), int(m['block1']['ub'][2]/gcd))
         face2 = create_face_from_diagonals(blocks[m['block2']['block_index']],
-                            int(m['block2']['IMIN']/gcd), int(m['block2']['JMIN']/gcd), int(m['block2']['KMIN']/gcd),
-                            int(m['block2']['IMAX']/gcd), int(m['block2']['JMAX']/gcd), int(m['block2']['KMAX']/gcd))
+                            int(m['block2']['lb'][0]/gcd), int(m['block2']['lb'][1]/gcd), int(m['block2']['lb'][2]/gcd),
+                            int(m['block2']['ub'][0]/gcd), int(m['block2']['ub'][1]/gcd), int(m['block2']['ub'][2]/gcd))
         face1.set_block_index(m['block1']['block_index'])
         if 'id' in m['block1'].keys():
             face1.id = m['block1']['id']
