@@ -40,10 +40,12 @@ def _extract_face_points(block: Block, lb: list, ub: list) -> np.ndarray:
 
 
 def _generate_permutations(lb: list, ub: list) -> List[Tuple[list, list]]:
-    """Generate all traversal permutations for a face.
+    """Generate all 8 traversal permutations for a face (4 direct + 4 transposed).
 
     Determines which axis is constant, then for the two varying axes
     generates all 4 direction combinations (increase/decrease per axis).
+    Then swaps (transposes) the two varying axes and generates 4 more,
+    giving 8 total permutations.
     Returns list of (new_lb, new_ub) tuples.
     """
     perms = []
@@ -52,6 +54,7 @@ def _generate_permutations(lb: list, ub: list) -> List[Tuple[list, list]]:
             varying = [d for d in range(3) if d != dim]
             d0, d1 = varying
             vals = [[lb[d0], ub[d0]], [lb[d1], ub[d1]]]
+            # 4 direct permutations
             for s0 in [0, 1]:  # 0=forward, 1=reversed for d0
                 for s1 in [0, 1]:  # 0=forward, 1=reversed for d1
                     new_lb = list(lb)
@@ -60,6 +63,16 @@ def _generate_permutations(lb: list, ub: list) -> List[Tuple[list, list]]:
                     new_ub[d0] = vals[0][1 - s0]
                     new_lb[d1] = vals[1][s1]
                     new_ub[d1] = vals[1][1 - s1]
+                    perms.append((new_lb, new_ub))
+            # 4 transposed permutations (swap which axis values go to d0 vs d1)
+            for s0 in [0, 1]:
+                for s1 in [0, 1]:
+                    new_lb = list(lb)
+                    new_ub = list(ub)
+                    new_lb[d0] = vals[1][s0]   # d1's values → d0's slot
+                    new_ub[d0] = vals[1][1 - s0]
+                    new_lb[d1] = vals[0][s1]   # d0's values → d1's slot
+                    new_ub[d1] = vals[0][1 - s1]
                     perms.append((new_lb, new_ub))
             break
     return perms
@@ -70,8 +83,8 @@ def _try_all_permutations(block1: Block, b1_lb: list, b1_ub: list,
                           tol: float) -> Tuple[bool, list, list]:
     """Try all direction permutations of block2's face against block1's face.
 
-    Holds block1's traversal fixed (lb->ub). For block2, tries all 4
-    direction combinations of the two varying axes.
+    Holds block1's traversal fixed (lb->ub). For block2, tries all 8
+    permutations (4 direct + 4 transposed) of the two varying axes.
 
     Returns:
         (matched, corrected_lb, corrected_ub) — if matched is True,
@@ -110,8 +123,8 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
       2. Extracts all points from each face in directed traversal order
          (lb -> ub), stepping +1 or -1 per dimension.
       3. Compares every point: point n from face1 must equal point n
-         from face2. If they don't match, tries all 4 direction
-         permutations of block2's two varying axes.
+         from face2. If they don't match, tries all 8 permutations
+         (4 direct + 4 transposed) of block2's two varying axes.
       4. If a permutation matches, corrects the face_match's block2
          lb/ub and adds it to the verified list.
 
