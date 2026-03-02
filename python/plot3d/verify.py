@@ -1,22 +1,121 @@
 from .block import Block
 from .blockfunctions import reduce_blocks, rotate_block
 from .periodicity import create_rotation_matrix
-from typing import List
+from typing import List, Tuple
 from copy import deepcopy
 from math import radians
 import math
+import numpy as np
 
+
+# ---------------------------------------------------------------------------
+# Helpers for directed traversal
+# ---------------------------------------------------------------------------
+
+def _directed(start: int, end: int) -> range:
+    """Inclusive range stepping +1 or -1."""
+    return range(start, end + 1) if start <= end else range(start, end - 1, -1)
+
+
+def _face_dims(lb: list, ub: list) -> Tuple[int, int, int]:
+    """Return (di, dj, dk) face dimensions from diagonal corners."""
+    return (abs(ub[0] - lb[0]) + 1,
+            abs(ub[1] - lb[1]) + 1,
+            abs(ub[2] - lb[2]) + 1)
+
+
+def _extract_face_points(block: Block, lb: list, ub: list) -> np.ndarray:
+    """Extract all face points in directed traversal order (lb -> ub).
+
+    Returns an (N, 3) array where point n from face A must match
+    point n from face B — the diagonal convention preserves the
+    node-to-node mapping between blocks.
+    """
+    pts = []
+    for i in _directed(lb[0], ub[0]):
+        for j in _directed(lb[1], ub[1]):
+            for k in _directed(lb[2], ub[2]):
+                pts.append([block.X[i, j, k], block.Y[i, j, k], block.Z[i, j, k]])
+    return np.array(pts)
+
+
+def _generate_permutations(lb: list, ub: list) -> List[Tuple[list, list]]:
+    """Generate all traversal permutations for a face.
+
+    Determines which axis is constant, then for the two varying axes
+    generates all 4 direction combinations (increase/decrease per axis).
+    Returns list of (new_lb, new_ub) tuples.
+    """
+    perms = []
+    for dim in range(3):
+        if lb[dim] == ub[dim]:
+            varying = [d for d in range(3) if d != dim]
+            d0, d1 = varying
+            vals = [[lb[d0], ub[d0]], [lb[d1], ub[d1]]]
+            for s0 in [0, 1]:  # 0=forward, 1=reversed for d0
+                for s1 in [0, 1]:  # 0=forward, 1=reversed for d1
+                    new_lb = list(lb)
+                    new_ub = list(ub)
+                    new_lb[d0] = vals[0][s0]
+                    new_ub[d0] = vals[0][1 - s0]
+                    new_lb[d1] = vals[1][s1]
+                    new_ub[d1] = vals[1][1 - s1]
+                    perms.append((new_lb, new_ub))
+            break
+    return perms
+
+
+def _try_all_permutations(block1: Block, b1_lb: list, b1_ub: list,
+                          block2: Block, b2_lb: list, b2_ub: list,
+                          tol: float) -> Tuple[bool, list, list]:
+    """Try all direction permutations of block2's face against block1's face.
+
+    Holds block1's traversal fixed (lb->ub). For block2, tries all 4
+    direction combinations of the two varying axes.
+
+    Returns:
+        (matched, corrected_lb, corrected_ub) — if matched is True,
+        corrected_lb/ub give the block2 diagonal that makes all points align.
+    """
+    dims1 = _face_dims(b1_lb, b1_ub)
+    dims2 = _face_dims(b2_lb, b2_ub)
+    n1 = dims1[0] * dims1[1] * dims1[2]
+    n2 = dims2[0] * dims2[1] * dims2[2]
+
+    if n1 != n2:
+        return False, b2_lb, b2_ub
+
+    pts1 = _extract_face_points(block1, b1_lb, b1_ub)
+
+    for perm_lb, perm_ub in _generate_permutations(b2_lb, b2_ub):
+        pts2 = _extract_face_points(block2, perm_lb, perm_ub)
+        if pts1.shape != pts2.shape:
+            continue
+        diffs = np.linalg.norm(pts1 - pts2, axis=1)
+        if diffs.max() < tol:
+            return True, perm_lb, perm_ub
+
+    return False, b2_lb, b2_ub
+
+
+# ---------------------------------------------------------------------------
+# verify_connectivity — full directed point-by-point traversal
+# ---------------------------------------------------------------------------
 
 def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E-6):
-    """Verifies that the diagonal corners of face_matches are spatially consistent.
+    """Verifies face_matches using full directed point-by-point traversal.
 
-    For each face_match, checks that block1's lower corner coordinates match
-    block2's lower corner coordinates (and similarly for upper corners) within
-    the specified tolerance. If the stored diagonal doesn't match, tries all
-    permutations of block2's face corners. If a valid permutation is found,
-    the face_match is corrected and added to the verified list.
+    For each face_match:
+      1. Checks that both faces have the same number of points.
+      2. Extracts all points from each face in directed traversal order
+         (lb -> ub), stepping +1 or -1 per dimension.
+      3. Compares every point: point n from face1 must equal point n
+         from face2. If they don't match, tries all 4 direction
+         permutations of block2's two varying axes.
+      4. If a permutation matches, corrects the face_match's block2
+         lb/ub and adds it to the verified list.
 
-    Uses GCD reduction (same as connectivity_fast) for efficient coordinate lookups.
+    Uses GCD reduction for efficient coordinate lookups.
 
     Args:
         blocks (List[Block]): List of all blocks (original full-resolution)
@@ -25,13 +124,10 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
 
     Returns:
         (list): verified face_matches whose diagonals are confirmed or corrected
-        (list): mismatched face_matches where no corner permutation matched
+        (list): mismatched face_matches where no permutation matched
     """
-    # Compute GCD and reduce blocks (same pattern as connectivity_fast)
-    gcd_array = list()
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
+    # Compute GCD and reduce blocks
+    gcd_array = [math.gcd(b.IMAX - 1, math.gcd(b.JMAX - 1, b.KMAX - 1)) for b in blocks]
     gcd_to_use = min(gcd_array)
     reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
@@ -42,152 +138,100 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
             fm[side]['lb'] = [x // gcd_to_use for x in fm[side]['lb']]
             fm[side]['ub'] = [x // gcd_to_use for x in fm[side]['ub']]
 
-    verified = list()
-    mismatched = list()
+    verified = []
+    mismatched = []
 
     for idx in range(len(scaled_matches)):
         fm = scaled_matches[idx]
         b1 = fm['block1']
         b2 = fm['block2']
-        b1_idx = b1['block_index']
-        b2_idx = b2['block_index']
-        block1 = reduced_blocks[b1_idx]
-        block2 = reduced_blocks[b2_idx]
+        block1 = reduced_blocks[b1['block_index']]
+        block2 = reduced_blocks[b2['block_index']]
 
-        # Block1 diagonal coordinates
-        x1_l = block1.X[b1['lb'][0], b1['lb'][1], b1['lb'][2]]
-        y1_l = block1.Y[b1['lb'][0], b1['lb'][1], b1['lb'][2]]
-        z1_l = block1.Z[b1['lb'][0], b1['lb'][1], b1['lb'][2]]
+        # Step 1: Dimension check
+        dims1 = _face_dims(b1['lb'], b1['ub'])
+        dims2 = _face_dims(b2['lb'], b2['ub'])
+        n1 = dims1[0] * dims1[1] * dims1[2]
+        n2 = dims2[0] * dims2[1] * dims2[2]
 
-        x1_u = block1.X[b1['ub'][0], b1['ub'][1], b1['ub'][2]]
-        y1_u = block1.Y[b1['ub'][0], b1['ub'][1], b1['ub'][2]]
-        z1_u = block1.Z[b1['ub'][0], b1['ub'][1], b1['ub'][2]]
+        if n1 != n2:
+            orig = face_matches[idx]
+            print(f"verify_connectivity: DIMENSION MISMATCH at index {idx}")
+            print(f"  block {orig['block1']['block_index']}: "
+                  f"lb={orig['block1']['lb']} ub={orig['block1']['ub']} dims={dims1}")
+            print(f"  block {orig['block2']['block_index']}: "
+                  f"lb={orig['block2']['lb']} ub={orig['block2']['ub']} dims={dims2}")
+            mismatched.append(face_matches[idx])
+            continue
 
-        # Enumerate unique corners of block2's face
-        I2 = [b2['lb'][0], b2['ub'][0]]
-        J2 = [b2['lb'][1], b2['ub'][1]]
-        K2 = [b2['lb'][2], b2['ub'][2]]
+        # Step 2: Extract face1 points (held constant)
+        pts1 = _extract_face_points(block1, b1['lb'], b1['ub'])
 
-        unique_corners = list()
-        seen = set()
-        for i in I2:
-            for j in J2:
-                for k in K2:
-                    key = (i, j, k)
-                    if key not in seen:
-                        seen.add(key)
-                        unique_corners.append(key)
+        # Step 3: Check stored diagonal first
+        pts2 = _extract_face_points(block2, b2['lb'], b2['ub'])
+        diffs = np.linalg.norm(pts1 - pts2, axis=1)
 
-        # Check stored diagonal first
-        x2_l = block2.X[b2['lb'][0], b2['lb'][1], b2['lb'][2]]
-        y2_l = block2.Y[b2['lb'][0], b2['lb'][1], b2['lb'][2]]
-        z2_l = block2.Z[b2['lb'][0], b2['lb'][1], b2['lb'][2]]
-
-        x2_u = block2.X[b2['ub'][0], b2['ub'][1], b2['ub'][2]]
-        y2_u = block2.Y[b2['ub'][0], b2['ub'][1], b2['ub'][2]]
-        z2_u = block2.Z[b2['ub'][0], b2['ub'][1], b2['ub'][2]]
-
-        dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
-        d_lower = math.sqrt(dx*dx + dy*dy + dz*dz)
-        dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
-        d_upper = math.sqrt(dx*dx + dy*dy + dz*dz)
-
-        if d_lower < tol and d_upper < tol:
+        if diffs.max() < tol:
             verified.append(face_matches[idx])
             continue
 
-        # Try all permutations of block2's corners
-        found = False
-        best_d_lower = d_lower
-        best_d_upper = d_upper
+        # Step 4: Try all permutations of block2's direction
+        matched, corr_lb, corr_ub = _try_all_permutations(
+            block1, b1['lb'], b1['ub'],
+            block2, b2['lb'], b2['ub'],
+            tol
+        )
 
-        for corner_lower in unique_corners:
-            for corner_upper in unique_corners:
-                if corner_lower == corner_upper:
-                    continue
-
-                il, jl, kl = corner_lower
-                iu, ju, ku = corner_upper
-
-                x2_l = block2.X[il, jl, kl]
-                y2_l = block2.Y[il, jl, kl]
-                z2_l = block2.Z[il, jl, kl]
-
-                x2_u = block2.X[iu, ju, ku]
-                y2_u = block2.Y[iu, ju, ku]
-                z2_u = block2.Z[iu, ju, ku]
-
-                dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
-                dl = math.sqrt(dx*dx + dy*dy + dz*dz)
-                dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
-                du = math.sqrt(dx*dx + dy*dy + dz*dz)
-
-                if dl < best_d_lower:
-                    best_d_lower = dl
-                if du < best_d_upper:
-                    best_d_upper = du
-
-                if dl < tol and du < tol:
-                    corrected = deepcopy(face_matches[idx])
-                    corrected['block2']['lb'] = [il * gcd_to_use, jl * gcd_to_use, kl * gcd_to_use]
-                    corrected['block2']['ub'] = [iu * gcd_to_use, ju * gcd_to_use, ku * gcd_to_use]
-                    verified.append(corrected)
-                    if b1_idx == b2_idx:
-                        print("verify_connectivity: Self-match corrected for block index {0}".format(b1_idx))
-                    found = True
-                    break
-            if found:
-                break
-
-        if not found:
+        if matched:
+            corrected = deepcopy(face_matches[idx])
+            corrected['block2']['lb'] = [x * gcd_to_use for x in corr_lb]
+            corrected['block2']['ub'] = [x * gcd_to_use for x in corr_ub]
+            verified.append(corrected)
+            if b1['block_index'] == b2['block_index']:
+                print(f"verify_connectivity: Self-match corrected for block index {b1['block_index']}")
+        else:
             orig = face_matches[idx]
             b1_orig = orig['block1']
             b2_orig = orig['block2']
-            print(f"verify_connectivity: MISMATCH at face_match index {idx}")
-            print(f"  block1 (block_index={b1_orig['block_index']}): "
-                  f"lower=({b1_orig['lb'][0]},{b1_orig['lb'][1]},{b1_orig['lb'][2]}) "
-                  f"upper=({b1_orig['ub'][0]},{b1_orig['ub'][1]},{b1_orig['ub'][2]})")
-            print(f"  block2 (block_index={b2_orig['block_index']}): "
-                  f"lower=({b2_orig['lb'][0]},{b2_orig['lb'][1]},{b2_orig['lb'][2]}) "
-                  f"upper=({b2_orig['ub'][0]},{b2_orig['ub'][1]},{b2_orig['ub'][2]})")
-            print(f"  block1 lower xyz = ({x1_l:.6e}, {y1_l:.6e}, {z1_l:.6e})")
-            print(f"  block1 upper xyz = ({x1_u:.6e}, {y1_u:.6e}, {z1_u:.6e})")
-            print(f"  Closest block2 corner dist to block1 lower: {best_d_lower:.6e}")
-            print(f"  Closest block2 corner dist to block1 upper: {best_d_upper:.6e}")
+            worst = float(diffs.max())
+            n_bad = int(np.sum(diffs > tol))
+            print(f"verify_connectivity: POINT MISMATCH at index {idx}")
+            print(f"  block {b1_orig['block_index']}: lb={b1_orig['lb']} ub={b1_orig['ub']}")
+            print(f"  block {b2_orig['block_index']}: lb={b2_orig['lb']} ub={b2_orig['ub']}")
+            print(f"  total points: {len(pts1)}, mismatched: {n_bad}, max dist: {worst:.6e}")
             mismatched.append(face_matches[idx])
 
     return verified, mismatched
 
 
-def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, rotation_axis: str = 'x', tol: float = 1E-6):
-    """Verifies that the diagonal corners of periodic face_matches are spatially
-    consistent after rotating block1 by ±theta about the given axis.
+# ---------------------------------------------------------------------------
+# verify_periodicity — full directed point-by-point traversal with rotation
+# ---------------------------------------------------------------------------
 
-    For each face_match, rotates block1 by +theta (and if needed -theta) and checks
-    that the rotated lower/upper corner coordinates match block2's lower/upper
-    corners within tolerance. If the stored diagonal doesn't match, tries all
-    permutations of block2's face corners. If a valid permutation is found,
-    the face_match is corrected and added to the verified list.
+def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
+                       rotation_axis: str = 'x', tol: float = 1E-6):
+    """Verifies periodic face_matches using full directed point-by-point traversal.
 
-    Uses GCD reduction (same as connectivity_fast / periodicity_fast) for
-    efficient coordinate lookups.
+    For each face_match, rotates block1 by +theta (and if needed -theta) and
+    checks that every rotated point matches the corresponding point on block2
+    in directed traversal order. Tries all direction permutations of block2
+    if the stored diagonal doesn't match.
+
+    Uses GCD reduction for efficient coordinate lookups.
 
     Args:
         blocks (List[Block]): List of all blocks (original full-resolution)
-        face_matches (list): List of face_match dicts from periodicity or rotated_periodicity
+        face_matches (list): List of face_match dicts from periodicity
         theta (float): Rotation angle in degrees
         rotation_axis (str, optional): Axis of rotation 'x', 'y', or 'z'. Defaults to 'x'.
         tol (float, optional): Euclidean distance tolerance. Defaults to 1E-6.
 
     Returns:
         (list): verified face_matches whose diagonals are confirmed or corrected
-        (list): mismatched face_matches where no corner permutation matched
+        (list): mismatched face_matches where no permutation matched
     """
-    # Compute GCD and reduce blocks (same pattern as connectivity_fast)
-    gcd_array = list()
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
+    # Compute GCD and reduce blocks
+    gcd_array = [math.gcd(b.IMAX - 1, math.gcd(b.JMAX - 1, b.KMAX - 1)) for b in blocks]
     gcd_to_use = min(gcd_array)
     reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
@@ -206,126 +250,73 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float, ro
             fm[side]['lb'] = [x // gcd_to_use for x in fm[side]['lb']]
             fm[side]['ub'] = [x // gcd_to_use for x in fm[side]['ub']]
 
-    verified = list()
-    mismatched = list()
+    verified = []
+    mismatched = []
 
     for idx in range(len(scaled_matches)):
         fm = scaled_matches[idx]
         b1 = fm['block1']
         b2 = fm['block2']
-        b1_idx = b1['block_index']
         b2_idx = b2['block_index']
         block2 = reduced_blocks[b2_idx]
 
-        # Enumerate unique corners of block2's face
-        I2 = [b2['lb'][0], b2['ub'][0]]
-        J2 = [b2['lb'][1], b2['ub'][1]]
-        K2 = [b2['lb'][2], b2['ub'][2]]
+        # Dimension check
+        dims1 = _face_dims(b1['lb'], b1['ub'])
+        dims2 = _face_dims(b2['lb'], b2['ub'])
+        n1 = dims1[0] * dims1[1] * dims1[2]
+        n2 = dims2[0] * dims2[1] * dims2[2]
 
-        unique_corners = list()
-        seen = set()
-        for i in I2:
-            for j in J2:
-                for k in K2:
-                    key = (i, j, k)
-                    if key not in seen:
-                        seen.add(key)
-                        unique_corners.append(key)
+        if n1 != n2:
+            orig = face_matches[idx]
+            print(f"verify_periodicity: DIMENSION MISMATCH at index {idx}")
+            print(f"  block {orig['block1']['block_index']}: "
+                  f"lb={orig['block1']['lb']} ub={orig['block1']['ub']} dims={dims1}")
+            print(f"  block {orig['block2']['block_index']}: "
+                  f"lb={orig['block2']['lb']} ub={orig['block2']['ub']} dims={dims2}")
+            mismatched.append(face_matches[idx])
+            continue
 
         found = False
-        best_d_lower = float('inf')
-        best_d_upper = float('inf')
 
         # Try +theta rotation first, then -theta
         for rotated_blocks in [rotated_blocks_pos, rotated_blocks_neg]:
             if found:
                 break
 
-            block1_rotated = rotated_blocks[b1_idx]
+            block1_rotated = rotated_blocks[b1['block_index']]
 
-            # Block1 rotated diagonal coordinates
-            x1_l = block1_rotated.X[b1['lb'][0], b1['lb'][1], b1['lb'][2]]
-            y1_l = block1_rotated.Y[b1['lb'][0], b1['lb'][1], b1['lb'][2]]
-            z1_l = block1_rotated.Z[b1['lb'][0], b1['lb'][1], b1['lb'][2]]
+            # Check stored diagonal first (full point-by-point)
+            pts1 = _extract_face_points(block1_rotated, b1['lb'], b1['ub'])
+            pts2 = _extract_face_points(block2, b2['lb'], b2['ub'])
+            diffs = np.linalg.norm(pts1 - pts2, axis=1)
 
-            x1_u = block1_rotated.X[b1['ub'][0], b1['ub'][1], b1['ub'][2]]
-            y1_u = block1_rotated.Y[b1['ub'][0], b1['ub'][1], b1['ub'][2]]
-            z1_u = block1_rotated.Z[b1['ub'][0], b1['ub'][1], b1['ub'][2]]
-
-            # Check stored diagonal first
-            x2_l = block2.X[b2['lb'][0], b2['lb'][1], b2['lb'][2]]
-            y2_l = block2.Y[b2['lb'][0], b2['lb'][1], b2['lb'][2]]
-            z2_l = block2.Z[b2['lb'][0], b2['lb'][1], b2['lb'][2]]
-
-            x2_u = block2.X[b2['ub'][0], b2['ub'][1], b2['ub'][2]]
-            y2_u = block2.Y[b2['ub'][0], b2['ub'][1], b2['ub'][2]]
-            z2_u = block2.Z[b2['ub'][0], b2['ub'][1], b2['ub'][2]]
-
-            dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
-            d_lower = math.sqrt(dx*dx + dy*dy + dz*dz)
-            dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
-            d_upper = math.sqrt(dx*dx + dy*dy + dz*dz)
-
-            if d_lower < best_d_lower:
-                best_d_lower = d_lower
-            if d_upper < best_d_upper:
-                best_d_upper = d_upper
-
-            if d_lower < tol and d_upper < tol:
+            if diffs.max() < tol:
                 verified.append(face_matches[idx])
                 found = True
                 break
 
-            # Try all permutations of block2's corners
-            for corner_lower in unique_corners:
-                for corner_upper in unique_corners:
-                    if corner_lower == corner_upper:
-                        continue
+            # Try all permutations of block2's direction
+            matched, corr_lb, corr_ub = _try_all_permutations(
+                block1_rotated, b1['lb'], b1['ub'],
+                block2, b2['lb'], b2['ub'],
+                tol
+            )
 
-                    il, jl, kl = corner_lower
-                    iu, ju, ku = corner_upper
-
-                    x2_l = block2.X[il, jl, kl]
-                    y2_l = block2.Y[il, jl, kl]
-                    z2_l = block2.Z[il, jl, kl]
-
-                    x2_u = block2.X[iu, ju, ku]
-                    y2_u = block2.Y[iu, ju, ku]
-                    z2_u = block2.Z[iu, ju, ku]
-
-                    dx = x2_l - x1_l; dy = y2_l - y1_l; dz = z2_l - z1_l
-                    dl = math.sqrt(dx*dx + dy*dy + dz*dz)
-                    dx = x2_u - x1_u; dy = y2_u - y1_u; dz = z2_u - z1_u
-                    du = math.sqrt(dx*dx + dy*dy + dz*dz)
-
-                    if dl < best_d_lower:
-                        best_d_lower = dl
-                    if du < best_d_upper:
-                        best_d_upper = du
-
-                    if dl < tol and du < tol:
-                        corrected = deepcopy(face_matches[idx])
-                        corrected['block2']['lb'] = [il * gcd_to_use, jl * gcd_to_use, kl * gcd_to_use]
-                        corrected['block2']['ub'] = [iu * gcd_to_use, ju * gcd_to_use, ku * gcd_to_use]
-                        verified.append(corrected)
-                        found = True
-                        break
-                if found:
-                    break
+            if matched:
+                corrected = deepcopy(face_matches[idx])
+                corrected['block2']['lb'] = [x * gcd_to_use for x in corr_lb]
+                corrected['block2']['ub'] = [x * gcd_to_use for x in corr_ub]
+                verified.append(corrected)
+                found = True
+                break
 
         if not found:
             orig = face_matches[idx]
             b1_orig = orig['block1']
             b2_orig = orig['block2']
-            print(f"verify_periodicity: MISMATCH at face_match index {idx}")
-            print(f"  block1 (block_index={b1_orig['block_index']}): "
-                  f"lower=({b1_orig['lb'][0]},{b1_orig['lb'][1]},{b1_orig['lb'][2]}) "
-                  f"upper=({b1_orig['ub'][0]},{b1_orig['ub'][1]},{b1_orig['ub'][2]})")
-            print(f"  block2 (block_index={b2_orig['block_index']}): "
-                  f"lower=({b2_orig['lb'][0]},{b2_orig['lb'][1]},{b2_orig['lb'][2]}) "
-                  f"upper=({b2_orig['ub'][0]},{b2_orig['ub'][1]},{b2_orig['ub'][2]})")
-            print(f"  Closest rotated block1 corner dist to block2 lower: {best_d_lower:.6e}")
-            print(f"  Closest rotated block1 corner dist to block2 upper: {best_d_upper:.6e}")
+            print(f"verify_periodicity: MISMATCH at index {idx}")
+            print(f"  block {b1_orig['block_index']}: lb={b1_orig['lb']} ub={b1_orig['ub']}")
+            print(f"  block {b2_orig['block_index']}: lb={b2_orig['lb']} ub={b2_orig['ub']}")
             mismatched.append(face_matches[idx])
 
     return verified, mismatched
