@@ -302,20 +302,21 @@ def calculate_outward_normals(block:Block):
     X = block.X
     Y = block.Y
     Z = block.Z
-    imax = block.IMAX
-    jmax = block.JMAX
-    kmax = block.KMAX 
-    # IMAX - Normal should be out of the page        
+    # IMAX/JMAX/KMAX are shapes (e.g. 41); last valid index is shape-1
+    imax = block.IMAX - 1
+    jmax = block.JMAX - 1
+    kmax = block.KMAX - 1
+    # IMAX - Normal should be out of the page
     # Normals I direction: IMIN https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
-    x = [X[0,0,0],X[0,jmax,0],X[0,0,kmax]] 
+    x = [X[0,0,0],X[0,jmax,0],X[0,0,kmax]]
     y = [Y[0,0,0],Y[0,jmax,0],Y[0,0,kmax]]
     z = [Z[0,0,0],Z[0,jmax,0],Z[0,0,kmax]]
-    u = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]]) 
+    u = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
     v = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
     n_imin = np.cross(u,v)
-    
+
     # Normals I direction: IMAX
-    x = [X[imax,0,0],X[imax,jmax,0],X[imax,0,kmax]] 
+    x = [X[imax,0,0],X[imax,jmax,0],X[imax,0,kmax]]
     y = [Y[imax,0,0],Y[imax,jmax,0],Y[imax,0,kmax]]
     z = [Z[imax,0,0],Z[imax,jmax,0],Z[imax,0,kmax]]
     v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
@@ -323,7 +324,7 @@ def calculate_outward_normals(block:Block):
     n_imax = np.cross(v1,v2)
 
     # Normals J direction: JMIN
-    x = [X[0,0,0],X[imax,0,0],X[0,0,kmax]] 
+    x = [X[0,0,0],X[imax,0,0],X[0,0,kmax]]
     y = [Y[0,0,0],Y[imax,0,0],Y[0,0,kmax]]
     z = [Z[0,0,0],Z[imax,0,0],Z[0,0,kmax]]
     v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
@@ -331,7 +332,7 @@ def calculate_outward_normals(block:Block):
     n_jmin = np.cross(v1,v2)
 
     # Normals J direction: JMAX
-    x = [X[0,jmax,0],X[imax,jmax,0],X[0,jmax,kmax]] 
+    x = [X[0,jmax,0],X[imax,jmax,0],X[0,jmax,kmax]]
     y = [Y[0,jmax,0],Y[imax,jmax,0],Y[0,jmax,kmax]]
     z = [Z[0,jmax,0],Z[imax,jmax,0],Z[0,jmax,kmax]]
     v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
@@ -339,7 +340,7 @@ def calculate_outward_normals(block:Block):
     n_jmax = np.cross(v1,v2)
 
     # Normals K direction: KMIN
-    x = [X[imax,0,0],X[0,jmax,0],X[0,0,0]] 
+    x = [X[imax,0,0],X[0,jmax,0],X[0,0,0]]
     y = [Y[imax,0,0],Y[0,jmax,0],Y[0,0,0]]
     z = [Z[imax,0,0],Z[0,jmax,0],Z[0,0,0]]
     v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
@@ -347,7 +348,7 @@ def calculate_outward_normals(block:Block):
     n_kmin = np.cross(v1,v2)
 
     # Normals K direction: KMAX
-    x = [X[imax,0,kmax],X[0,jmax,kmax],X[0,0,kmax]] 
+    x = [X[imax,0,kmax],X[0,jmax,kmax],X[0,0,kmax]]
     y = [Y[imax,0,kmax],Y[0,jmax,kmax],Y[0,0,kmax]]
     z = [Z[imax,0,kmax],Z[0,jmax,kmax],Z[0,0,kmax]]
     v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])

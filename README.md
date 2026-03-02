@@ -67,6 +67,34 @@ Never use jupyter notebook unless you are done with your .py file and want to de
 | Christopher Keokot 	| Intern   	| Fall 2021 	| Plot3D ReactJS GUI                         	|                             	|
 | Tim Beach          	| Advisor  	| Fall 2021 	| Block splitting help             	|                             	|
 
+# Connectivity & Orientation
+
+`connectivity_fast()` finds matching faces between blocks and returns orientation data for each match. When two faces lie on different constant planes (e.g., a K-face connects to a J-face), the varying axes differ and an axis swap may be needed. This is encoded as a `permutation_index` (0–7) using 3 bits:
+
+| Bit | Flag | Meaning |
+|-----|------|---------|
+| 0 | `u_reversed` | Flip first varying axis |
+| 1 | `v_reversed` | Flip second varying axis |
+| 2 | `swapped` | Transpose u and v axes |
+
+Each face match includes an `orientation` dict:
+
+```python
+face_matches, outer_faces = connectivity_fast(blocks)
+# Each match in face_matches has:
+#   match['orientation'] = {
+#       'permutation_index': int,   # 0-7
+#       'plane': str,               # 'in-plane' or 'cross-plane'
+#       'permutation_matrix': list  # 2x2 signed permutation matrix
+#   }
+```
+
+The 8 permutation matrices are also available as `plot3d.PERMUTATION_MATRICES`.
+
+# Documentation
+- [Face Orientation: Cross-Plane Connectivity](docs/notes/unverified_connectivity_findings.md) — why cross-plane face connections need orientation flags beyond lb/ub, and how the 8-permutation system works
+- [Presentation (PowerPoint)](docs/notes/unverified_connectivity_findings.pptx) — visual walkthrough of 2D→3D diagonal combinatorics
+
 # Rust Version
 The rust version is available here. This version of the code is useful for creating CFD solvers in rust [Plot3D-RS](https://github.com/pjuangph/plot3d-rs) It has most of the functionality of the python version except for some of the GlennHT pre-processing code. 
 

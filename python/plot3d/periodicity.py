@@ -5,7 +5,7 @@ from .block import Block
 from .blockfunctions import rotate_block, reduce_blocks
 from .face import Face
 from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals, find_bounding_faces,get_outer_faces
-from .connectivity import get_face_intersection, face_matches_to_dict, _compute_orientation
+from .connectivity import get_face_intersection, face_matches_to_dict, _compute_orientation, _orient_vec_to_permutation, PERMUTATION_MATRICES
 import pandas as pd
 from math import cos, radians, sin, sqrt, acos
 from copy import deepcopy
@@ -48,7 +48,8 @@ def periodicity_fast(blocks:List[Block],outer_faces:List[Dict[str,int]], matched
             matched_faces[i][side]['lb'] = [int(x/gcd_to_use) for x in matched_faces[i][side]['lb']]
             matched_faces[i][side]['ub'] = [int(x/gcd_to_use) for x in matched_faces[i][side]['ub']]
 
-    # Reduce outer faces for the block
+    # Reduce outer faces for the block (deepcopy to avoid mutating caller's list)
+    outer_faces = deepcopy(outer_faces)
     for i in range(len(outer_faces)):
         outer_faces[i]['lb'] = [int(x/gcd_to_use) for x in outer_faces[i]['lb']]
         outer_faces[i]['ub'] = [int(x/gcd_to_use) for x in outer_faces[i]['ub']]
@@ -205,12 +206,17 @@ def _build_periodic_export(df: pd.DataFrame, periodic_faces_temp: list) -> dict:
     lb2 = [int(df.iloc[0]['i2']), int(df.iloc[0]['j2']), int(df.iloc[0]['k2'])]
     ub2 = [int(df.iloc[-1]['i2']), int(df.iloc[-1]['j2']), int(df.iloc[-1]['k2'])]
     orientation = _compute_orientation(df, lb1, ub1)
+    perm_idx, plane = _orient_vec_to_permutation(orientation, lb1, ub1, lb2, ub2)
     return {
         'block1': {'block_index': periodic_faces_temp[0].BlockIndex,
                     'lb': lb1, 'ub': ub1, 'id': periodic_faces_temp[0].id},
         'block2': {'block_index': periodic_faces_temp[1].BlockIndex,
                     'lb': lb2, 'ub': ub2, 'id': periodic_faces_temp[1].id},
-        'orientation': orientation
+        'orientation': {
+            'permutation_index': perm_idx,
+            'plane': plane,
+            'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
+        }
     }
 
 
@@ -790,12 +796,17 @@ def translational_periodicity(
             lb2, ub2, orient = _compute_periodic_lb_ub_orientation(
                 blk1_orig, lb1, ub1, blk2_orig, lb2, ub2,
                 shift_axis=axis_idx, shift_amount=shift_amt)
+            perm_idx, plane = _orient_vec_to_permutation(orient, lb1, ub1, lb2, ub2)
             periodic_export.append({
                 "block1": {"block_index": fL.BlockIndex,
                            "lb": lb1, "ub": ub1},
                 "block2": {"block_index": fU.BlockIndex,
                            "lb": lb2, "ub": ub2},
-                "orientation": orient,
+                "orientation": {
+                    "permutation_index": perm_idx,
+                    "plane": plane,
+                    "permutation_matrix": PERMUTATION_MATRICES[perm_idx].tolist(),
+                },
                 "mapping": m,
                 "mode": matched_mode
                 }) # type: ignore
@@ -872,8 +883,14 @@ def linear_real_transform(face1:Face,face2:Face) -> Tuple:
         rotation_matrix  = np.zeros(shape=(3,3))
     else:
         #Compute the angle of rotation  
-        cosAng=(dTo[1]*dFrom[1]+dTo[2]*dFrom[2])/sqrt(dTo[1]*dTo[1]+dTo[2]*dTo[2])/sqrt(dFrom[1]*dFrom[1]+dFrom[2]*dFrom[2])
-        sinAng=(dTo[2]*dFrom[1]-dTo[1]*dFrom[2])/sqrt(dTo[1]*dTo[1]+dTo[2]*dTo[2])/sqrt(dFrom[1]*dFrom[1]+dFrom[2]*dFrom[2])
+        yz_mag_to = sqrt(dTo[1]*dTo[1]+dTo[2]*dTo[2])
+        yz_mag_from = sqrt(dFrom[1]*dFrom[1]+dFrom[2]*dFrom[2])
+        if yz_mag_to < 1e-15 or yz_mag_from < 1e-15:
+            cosAng = 1.0
+            sinAng = 0.0
+        else:
+            cosAng=(dTo[1]*dFrom[1]+dTo[2]*dFrom[2])/(yz_mag_to*yz_mag_from)
+            sinAng=(dTo[2]*dFrom[1]-dTo[1]*dFrom[2])/(yz_mag_to*yz_mag_from)
         ang=acos(cosAng)
 
         rotation_matrix = [ [1, 0, 0],

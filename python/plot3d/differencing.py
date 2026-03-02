@@ -80,9 +80,9 @@ def find_edges(X:np.ndarray,Y:np.ndarray,Z:np.ndarray):
                 dx_f = 0; dy_f = 0; dz_f = 0    # Preset to 0
                 if i!=IMAX-1:
                     # Forward Differencing i
-                    dx_f = X[i,j,k] - X[i+1,j,k]
-                    dy_f = Y[i,j,k] - Y[i+1,j,k]
-                    dz_f = Z[i,j,k] - Z[i+1,j,k]
+                    dx_f = X[i+1,j,k] - X[i,j,k]
+                    dy_f = Y[i+1,j,k] - Y[i,j,k]
+                    dz_f = Z[i+1,j,k] - Z[i,j,k]
 
                 di = ((dx_b,dy_b,dz_b),(dx_f,dy_f,dz_f))                
                 if j!=0:
@@ -93,9 +93,9 @@ def find_edges(X:np.ndarray,Y:np.ndarray,Z:np.ndarray):
 
                 if j!=JMAX-1:
                     # Forward Differencing j
-                    dx_f = X[i,j,k] - X[i,j+1,k]
-                    dy_f = Y[i,j,k] - Y[i,j+1,k]
-                    dz_f = Z[i,j,k] - Z[i,j+1,k]
+                    dx_f = X[i,j+1,k] - X[i,j,k]
+                    dy_f = Y[i,j+1,k] - Y[i,j,k]
+                    dz_f = Z[i,j+1,k] - Z[i,j,k]
                 dj = ((dx_b,dy_b,dz_b),(dx_f,dy_f,dz_f))
 
                 dx_f = 0; dy_f = 0; dz_f = 0    # Preset to 0
@@ -107,9 +107,9 @@ def find_edges(X:np.ndarray,Y:np.ndarray,Z:np.ndarray):
 
                 if k!=KMAX-1:
                     # Forward Differencing k
-                    dx_f = X[i,j,k] - X[i,j,k+1]
-                    dy_f = Y[i,j,k] - Y[i,j,k+1]
-                    dz_f = Z[i,j,k] - Z[i,j,k+1]
+                    dx_f = X[i,j,k+1] - X[i,j,k]
+                    dy_f = Y[i,j,k+1] - Y[i,j,k]
+                    dz_f = Z[i,j,k+1] - Z[i,j,k]
                 dk = ((dx_b,dy_b,dz_b),(dx_f,dy_f,dz_f))
                 
                 diffArray.append({"i":i,"j":j,"k":k,'di':di,'dj':dj,'dk':dk})

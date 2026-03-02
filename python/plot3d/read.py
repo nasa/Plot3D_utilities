@@ -106,9 +106,9 @@ def read_ap_nasa(filename:str):
             meshr = np.append(meshr,meshj)
             mesht = np.append(mesht,meshk)
 
-    meshx = meshx.reshape(ints[1],ints[2],ints[0])
-    meshr = meshr.reshape(ints[1],ints[2],ints[0])
-    mesht = mesht.reshape(ints[1],ints[2],ints[0])
+    meshx = meshx.reshape(ints[1],ints[2],ints[0]).transpose(2,0,1)
+    meshr = meshr.reshape(ints[1],ints[2],ints[0]).transpose(2,0,1)
+    mesht = mesht.reshape(ints[1],ints[2],ints[0]).transpose(2,0,1)
 
     # Convert from x,r,theta to x,y,z
     z = meshr*np.sin(mesht)

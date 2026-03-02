@@ -1,3 +1,49 @@
+"""Connectivity detection for multi-block structured (Plot3D) meshes.
+
+The algorithm runs in three phases:
+
+1. **Phase 1 -- Candidate pairing**: Block pairs whose axis-aligned bounding
+   boxes (AABBs) overlap are identified by :func:`candidate_neighbor_pairs`.
+   Only these pairs proceed to expensive point matching.
+
+2. **Phase 2 -- Face matching**: For each candidate pair,
+   :func:`find_matching_blocks` compares every outer face of block *i* against
+   every outer face of block *j*.  Each comparison
+   (:func:`get_face_intersection`) tries three strategies in order:
+
+   * *Step 1 (same-size fast path)* -- if both faces have the same number of
+     points, try all 8 permutations via
+     :func:`_try_permutations_with_transpose`.
+   * *Step 2 (sub-region)* -- for different-size faces, locate the smaller
+     face's diagonal corners on the larger face to extract a sub-region, then
+     try the same 8 permutations.
+   * *Step 3 (fallback)* -- per-point geometric matching for any remaining
+     cases.
+
+3. **Phase 3 -- Fresh-face validation**: Outer faces left unmatched after
+   Phase 2 (because a partner block's face pool was consumed by an earlier
+   pair) are re-checked against fresh (un-consumed) outer faces of
+   neighbouring blocks.
+
+Orientation system
+------------------
+When two faces match, the module records *how* their local (u, v) axes
+relate.  Because each of the two varying axes can independently be reversed
+and the two axes can be swapped, there are 2 x 2 x 2 = **8 distinct
+orientations**, encoded as 2x2 signed permutation matrices in
+:data:`PERMUTATION_MATRICES`.
+
+The index into that array is computed with the bit formula::
+
+    index = u_reversed | (v_reversed << 1) | (swapped << 2)
+
+where *u_reversed* / *v_reversed* are booleans indicating whether the
+traversal direction along that axis is flipped between the two faces, and
+*swapped* indicates whether the u and v axes of face 1 map to v and u of
+face 2 (a cross-plane match).  Indices 0--3 are the four direct (non-swapped)
+permutations; indices 4--7 are the four transposed (swapped) permutations.
+"""
+
 from .block import Block
 from .blockfunctions import reduce_blocks
 from .face import Face
@@ -11,6 +57,96 @@ from typing import List, Tuple
 import math
 from .point_match import point_match
 from copy import deepcopy
+
+
+PERMUTATION_MATRICES = np.array([
+    [[ 1,  0], [ 0,  1]],   # 0: identity
+    [[-1,  0], [ 0,  1]],   # 1: u reversed
+    [[ 1,  0], [ 0, -1]],   # 2: v reversed
+    [[-1,  0], [ 0, -1]],   # 3: both reversed
+    [[ 0,  1], [ 1,  0]],   # 4: swapped
+    [[ 0, -1], [ 1,  0]],   # 5: swap + u reversed
+    [[ 0,  1], [-1,  0]],   # 6: swap + v reversed
+    [[ 0, -1], [-1,  0]],   # 7: swap + both reversed
+], dtype=np.int8)
+"""8 canonical 2x2 signed permutation matrices.
+
+Bit encoding: ``index = u_reversed | (v_reversed << 1) | (swapped << 2)``
+"""
+
+
+def _constant_axis(lb: list, ub: list) -> int:
+    """Return the index (0/1/2) of the constant axis on a face."""
+    for d in range(3):
+        if lb[d] == ub[d]:
+            return d
+    return -1
+
+
+def _orient_vec_to_permutation(orient_vec: list, lb1: list, ub1: list,
+                               lb2: list, ub2: list) -> Tuple[int, str]:
+    """Convert an orientation vector to a ``(permutation_index, plane)`` tuple.
+
+    This function translates the high-level 3-axis orientation vector produced
+    by :func:`_compute_orientation` into the compact representation used by
+    :data:`PERMUTATION_MATRICES`.  It works as follows:
+
+    1. Identify the constant axis on each face to determine the two *varying*
+       axes for face1 (``u1, v1``) and the two axes they map to on face2
+       (``u2, v2``).
+    2. Detect whether the axes are **swapped** (i.e. face1's u maps to a
+       different positional axis on face2 than its own).
+    3. Compare the traversal direction (sign of ``ub - lb``) along each
+       varying axis between the two faces to detect **reversal**.
+    4. Combine the three boolean flags into a permutation index using the
+       :data:`PERMUTATION_MATRICES` bit-encoding formula::
+
+           index = int(u_reversed) | (int(v_reversed) << 1) | (int(swapped) << 2)
+
+       Indices 0--3 are non-swapped; indices 4--7 are swapped (cross-axis).
+
+    The *plane* string is ``'in-plane'`` when both faces share the same
+    constant axis (e.g. both are I-constant) and ``'cross-plane'`` otherwise
+    (e.g. one is I-constant and the other is K-constant).
+
+    Parameters
+    ----------
+    orient_vec : list of int
+        1-indexed face2 axis per face1 axis, as returned by
+        :func:`_compute_orientation`.
+    lb1, ub1 : list of int
+        Lower-bound and upper-bound ``[i, j, k]`` corners of face1.
+    lb2, ub2 : list of int
+        Lower-bound and upper-bound ``[i, j, k]`` corners of face2.
+
+    Returns
+    -------
+    tuple of (int, str)
+        ``(permutation_index, plane)`` where *permutation_index* is in
+        ``0..7`` and *plane* is ``'in-plane'`` or ``'cross-plane'``.
+    """
+    ca1 = _constant_axis(lb1, ub1)
+    ca2 = _constant_axis(lb2, ub2)
+    plane = 'in-plane' if ca1 == ca2 else 'cross-plane'
+
+    varying1 = [d for d in range(3) if d != ca1]
+    if len(varying1) != 2:
+        return 0, plane
+
+    u1, v1 = varying1[0], varying1[1]
+    u2 = orient_vec[u1] - 1  # 0-indexed
+    v2 = orient_vec[v1] - 1
+
+    swapped = (u2 != u1) or (v2 != v1)
+
+    step1 = lambda d: 1 if ub1[d] >= lb1[d] else -1
+    step2 = lambda d: 1 if ub2[d] >= lb2[d] else -1
+
+    u_reversed = step1(u1) != step2(u2)
+    v_reversed = step1(v1) != step2(v2)
+
+    perm_idx = int(u_reversed) | (int(v_reversed) << 1) | (int(swapped) << 2)
+    return perm_idx, plane
 
 
 def _directed(start: int, end: int) -> range:
@@ -73,14 +209,6 @@ def _generate_face2_permutations(lb: list, ub: list) -> List[Tuple[list, list]]:
     return perms
 
 
-def _constant_axis(lb: list, ub: list) -> int:
-    """Return which axis is constant (0=I, 1=J, 2=K), or -1 if none."""
-    for d in range(3):
-        if lb[d] == ub[d]:
-            return d
-    return -1
-
-
 def _varying_dims(lb: list, ub: list) -> Tuple[int, int]:
     """Return (n_outer, n_inner) for the two varying axes of a face.
 
@@ -100,17 +228,38 @@ def _varying_dims(lb: list, ub: list) -> Tuple[int, int]:
 
 
 def _compute_orientation(df: pd.DataFrame, lb1: list, ub1: list) -> List[int]:
-    """Compute the orientation vector from a face match DataFrame.
+    """Compute the orientation vector that maps face1's axes to face2's axes.
 
-    The orientation maps face1's axes to face2's axes:
-        orientation[d] = 1-indexed face2 axis corresponding to face1 axis d.
-        (1=I, 2=J, 3=K)
+    Returns a 3-element list ``orientation`` where ``orientation[d]`` is the
+    **1-indexed** face2 axis that corresponds to face1 axis *d* (1=I, 2=J,
+    3=K).  For example, ``[3, 1, 2]`` means face1-I maps to face2-K, face1-J
+    maps to face2-I, and face1-K maps to face2-J.
 
-    Direction information is NOT in the orientation — it is already encoded
-    in the lb/ub values of each face.
+    Direction (forward / reversed) is **not** encoded in the orientation
+    vector -- it is already captured by the lb/ub traversal order of each
+    face.
 
-    The mapping is derived from the DataFrame by observing which face2 axis
-    changes when a specific face1 axis changes.
+    The mapping is derived from the point-match DataFrame *df* by inspecting
+    which face2 index column changes when a single face1 axis is incremented:
+
+    * Row 0 vs Row 1 reveals the face2 axis for face1's *inner* varying axis.
+    * Row 0 vs Row ``inner_size`` reveals the axis for face1's *outer* varying
+      axis.
+    * The remaining (third) face2 axis is assigned to face1's constant axis.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Point-match table with columns ``i1, j1, k1, i2, j2, k2``.  Rows
+        are ordered by face1's I-J-K nested traversal.
+    lb1, ub1 : list of int
+        Lower-bound and upper-bound [i, j, k] corners of face1 (determines
+        which axis is constant and the traversal order).
+
+    Returns
+    -------
+    list of int
+        ``[o_I, o_J, o_K]`` -- 1-indexed face2 axis per face1 axis.
     """
     ca1 = _constant_axis(lb1, ub1)
     varying1 = [d for d in range(3) if d != ca1]
@@ -225,11 +374,48 @@ def _find_corner_on_face(block: Block, face_lb: list, face_ub: list,
 def _try_permutations_with_transpose(block1: Block, lb1: list, ub1: list,
                                       block2: Block, lb2: list, ub2: list,
                                       tol: float) -> Tuple[bool, pd.DataFrame]:
-    """Try all 8 permutations (4 direct + 4 transposed) to match face1 to face2.
+    """Test all 8 permutations (4 direct + 4 transposed) to match face1 to face2.
 
-    Returns:
-        (matched, df) where df has columns i1,j1,k1,i2,j2,k2 if matched.
-        Returns (False, empty DataFrame) if no permutation works.
+    A structured face has one constant axis and two varying axes, giving four
+    possible traversal-direction combinations (forward/reverse for each
+    varying axis).  These are the **4 direct permutations**, generated by
+    :func:`_generate_face2_permutations`.
+
+    For cross-plane matches (where the two faces have *different* constant
+    axes), the outer and inner loop dimensions of face2 must be transposed
+    before comparison.  Applying the transpose to each of the 4 direct
+    permutations yields the **4 transposed permutations**, for a total of 8.
+
+    The function extracts face1's points once and then iterates over the 4
+    ``(lb, ub)`` direction variants of face2.  For each variant it performs:
+
+    * **Direct comparison** -- flatten both grids to (N, 3) and check if
+      every point pair is within *tol*.
+    * **Transposed comparison** -- reshape face2's points to its 2-D grid
+      shape, transpose the two spatial axes, re-flatten, and compare.
+
+    The first permutation that produces a full match (all point distances
+    below *tol*) is accepted and the function returns immediately.
+
+    Parameters
+    ----------
+    block1 : Block
+        Block containing face1.
+    lb1, ub1 : list of int
+        Lower/upper ``[i, j, k]`` corners of face1.
+    block2 : Block
+        Block containing face2.
+    lb2, ub2 : list of int
+        Lower/upper ``[i, j, k]`` corners of face2.
+    tol : float
+        Point-matching tolerance (Euclidean distance).
+
+    Returns
+    -------
+    tuple of (bool, pandas.DataFrame)
+        ``(True, df)`` on success, where *df* has columns
+        ``i1, j1, k1, i2, j2, k2`` mapping every matched point.
+        ``(False, empty_df)`` if no permutation produces a match.
     """
     pts1 = _extract_face_points(block1, lb1, ub1)
     idx1 = _extract_face_indices(lb1, ub1)
@@ -342,7 +528,7 @@ def select_multi_dimensional(T:np.ndarray,dim1:tuple,dim2:tuple, dim3:tuple):
     if dim3[0] == dim3[1]:
         return T[ dim1[0]:dim1[1]+1, dim2[0]:dim2[1]+1, dim3[0] ]
     
-    return T[dim1[0]:dim1[1], dim2[0]:dim2[1], dim3[0]:dim3[1]]
+    return T[dim1[0]:dim1[1]+1, dim2[0]:dim2[1]+1, dim3[0]:dim3[1]+1]
 
 def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:float=1E-6):
     """Get the index of the intersection between two faces located on two different blocks.
@@ -595,15 +781,23 @@ def __filter_block_increasing(df:pd.DataFrame,key1:str):
     key1_vals_to_use = list()
 
     if len(key1_vals)<=1:
-        return pd.DataFrame() # Returning an empty dataframe. This solves the condition where you have edge matching 
+        return pd.DataFrame() # Returning an empty dataframe. This solves the condition where you have edge matching
+
+    # With only 2 unique values, contiguity is trivially satisfied — keep all.
+    # This handles small faces (e.g. 2 nodes wide after GCD reduction) matching
+    # a large face where the matching indices may span a wide gap (e.g. [0, 113])
+    # but are still a valid match. The __check_edge() call upstream has already
+    # verified this isn't a degenerate edge.
+    if len(key1_vals) == 2:
+        return df
 
     for i in range(len(key1_vals)-1):
         if (key1_vals[i+1] - key1_vals[i])==1: # Remove
             key1_vals_to_use.append(key1_vals[i])
-    # Look backwards 
+    # Look backwards
     if (key1_vals[-1] - key1_vals[-2])==1: # Remove
             key1_vals_to_use.append(key1_vals[-1])
-    df = df[df[key1].isin(key1_vals_to_use)]        
+    df = df[df[key1].isin(key1_vals_to_use)]
     return df
 
 def __check_edge(df:pd.DataFrame):
@@ -629,20 +823,59 @@ def __check_edge(df:pd.DataFrame):
     else:
         return True
     
-def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
-    """Returns the indices of the nearest 6 blocks based on their centroid
+def candidate_neighbor_pairs(blocks:List[Block], tol:float=1e-6):
+    """Returns candidate block pairs whose AABBs overlap or nearly touch.
+
+    This replaces the former centroid-distance approach which only considered
+    the N nearest blocks and could miss neighbours for L-shaped or elongated
+    geometries.  AABB overlap is both more robust and more correct.
 
     Args:
-        block (Block): block you are interested in
         blocks (List[Block]): list of all your blocks
+        tol (float): AABB expansion tolerance
 
     Returns:
-        List[Tuple[int,int]]: combinations of nearest blocks 
+        List[Tuple[int,int]]: candidate (i, j) pairs with i < j
     """
-    # Pick a block get centroid of all outer faces        
+    n = len(blocks)
+    # Precompute AABBs: [xmin, xmax, ymin, ymax, zmin, zmax]
+    aabbs = np.empty((n, 6), dtype=np.float64)
+    for i, b in enumerate(blocks):
+        aabbs[i, 0] = b.X.min()
+        aabbs[i, 1] = b.X.max()
+        aabbs[i, 2] = b.Y.min()
+        aabbs[i, 3] = b.Y.max()
+        aabbs[i, 4] = b.Z.min()
+        aabbs[i, 5] = b.Z.max()
+
+    pairs = []
+    for i in range(n):
+        for j in range(i + 1, n):
+            a, b = aabbs[i], aabbs[j]
+            if (a[1] + tol >= b[0] and b[1] + tol >= a[0] and
+                a[3] + tol >= b[2] and b[3] + tol >= a[2] and
+                a[5] + tol >= b[4] and b[5] + tol >= a[4]):
+                pairs.append((i, j))
+    return pairs
+
+
+def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
+    """Returns the indices of the nearest N blocks based on their centroid.
+
+    .. deprecated::
+        Use :func:`candidate_neighbor_pairs` instead for AABB-based pairing.
+
+    Args:
+        blocks (List[Block]): list of all your blocks
+        nearest_nblocks (int): number of nearest blocks to consider
+
+    Returns:
+        List[Tuple[int,int]]: combinations of nearest blocks
+    """
+    # Pick a block get centroid of all outer faces
     centroids = np.array([(b.cx,b.cy,b.cz) for b in blocks])
     distance_matrix = np.zeros((centroids.shape[0],centroids.shape[0]))+10000
-    # Build a matrix 
+    # Build a matrix
     for i in range(centroids.shape[0]):
         for j in range(centroids.shape[0]):
             if i!=j:
@@ -650,7 +883,7 @@ def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
                 dy = centroids[i,1]-centroids[j,1]
                 dz = centroids[i,2]-centroids[j,2]
                 distance_matrix[i,j] = np.sqrt(dx*dx+dy*dy+dz*dz)
-    
+
     # Now that we have this matrix, we sort the distances by rows and pick the closest 8 blocks, can use 4 but 8 might be safer
     new_combos = list()
     for i in range(len(blocks)): # For block i
@@ -709,13 +942,10 @@ def connectivity(blocks:List[Block]):
     matches_to_remove = list()
     temp = [get_outer_faces(b) for b in blocks]
     block_outer_faces = [t[0] for t in temp]
-    combos = combinations_of_nearest_blocks(blocks,6) # Find the 6 nearest Blocks and search through all that. 
-    # df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[0],blocks[28],
-    #                                                                         [block_outer_faces[0][-1]],
-    #                                                                         [block_outer_faces[28][1]],1E-12)    # This function finds partial matches between blocks
+    combos = candidate_neighbor_pairs(blocks) # AABB overlap pairs (i < j)
 
-    t = trange(len(combos))    
-    for indx in t:     # block i        
+    t = trange(len(combos))
+    for indx in t:     # block i
         i,j = combos[indx]
         t.set_description(f"Checking connections block {i} with {j}")
         # Takes 2 blocks, gets the matching faces exterior faces of both blocks 
@@ -754,6 +984,8 @@ def connectivity(blocks:List[Block]):
                 # face2 axis corresponding to face1's axis d.
                 # Direction is already encoded in lb/ub.
                 orientation = _compute_orientation(df, lb1_out, ub1_out)
+                perm_idx, plane = _orient_vec_to_permutation(
+                    orientation, lb1_out, ub1_out, lb2_out, ub2_out)
 
                 temp = {
                     'block1': {
@@ -768,13 +1000,115 @@ def connectivity(blocks:List[Block]):
                         'ub': ub2_out,
                         'id': face2.id
                     },
-                    'orientation': orientation,
+                    'orientation': {
+                        'permutation_index': perm_idx,
+                        'plane': plane,
+                        'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
+                    },
                     'match': df
                 }
                 face_matches.append(temp)
 
-    # Update Outer Faces 
-    [outer_faces.extend(o) for o in block_outer_faces] # all the outer faces 
+    # ===== PHASE 3: Fresh-face validation for remaining outer faces =====
+    # Some outer faces remain unmatched because the matching block's face pool
+    # was consumed by an earlier combo in Phase 2.  Re-check each remaining
+    # outer face against *fresh* (un-consumed) outer faces of overlapping blocks.
+    print("Phase 3: Fresh-face validation...")
+    neighbors = [[] for _ in range(len(blocks))]
+    for i_combo, j_combo in combos:
+        neighbors[i_combo].append(j_combo)
+        neighbors[j_combo].append(i_combo)
+
+    fresh_all = [get_outer_faces(b)[0] for b in blocks]
+    phase3_keys = set()
+    phase3_count = 0
+
+    for bi in range(len(blocks)):
+        for face in block_outer_faces[bi]:
+            face_key = (bi, face.IMIN, face.JMIN, face.KMIN, face.IMAX, face.JMAX, face.KMAX)
+            if face_key in phase3_keys:
+                continue
+            for bj in neighbors[bi]:
+                for fresh_face in fresh_all[bj]:
+                    df, _, _ = get_face_intersection(face, fresh_face, blocks[bi], blocks[bj])
+                    if len(df) < 4:
+                        continue
+                    if __check_edge(df):
+                        continue
+
+                    # Apply axis filter
+                    I1 = [face.IMIN, face.IMAX]
+                    J1 = [face.JMIN, face.JMAX]
+                    K1 = [face.KMIN, face.KMAX]
+                    I2 = [fresh_face.IMIN, fresh_face.IMAX]
+                    J2 = [fresh_face.JMIN, fresh_face.JMAX]
+                    K2 = [fresh_face.KMIN, fresh_face.KMAX]
+
+                    if I1[0]==I1[1]:
+                        df = __filter_block_increasing(df,'j1')
+                        df = __filter_block_increasing(df,'k1')
+                    elif J1[0]==J1[1]:
+                        df = __filter_block_increasing(df,'i1')
+                        df = __filter_block_increasing(df,'k1')
+                    elif K1[0]==K1[1]:
+                        df = __filter_block_increasing(df,'i1')
+                        df = __filter_block_increasing(df,'j1')
+
+                    if I2[0]==I2[1]:
+                        df = __filter_block_increasing(df,'j2')
+                        df = __filter_block_increasing(df,'k2')
+                    elif J2[0]==J2[1]:
+                        df = __filter_block_increasing(df,'i2')
+                        df = __filter_block_increasing(df,'k2')
+                    elif K2[0]==K2[1]:
+                        df = __filter_block_increasing(df,'i2')
+                        df = __filter_block_increasing(df,'j2')
+
+                    if len(df) < 4:
+                        continue
+
+                    # Build match record
+                    lb1_out = [int(df.iloc[0]['i1']), int(df.iloc[0]['j1']), int(df.iloc[0]['k1'])]
+                    ub1_out = [int(df.iloc[-1]['i1']), int(df.iloc[-1]['j1']), int(df.iloc[-1]['k1'])]
+                    lb2_out = [int(df.iloc[0]['i2']), int(df.iloc[0]['j2']), int(df.iloc[0]['k2'])]
+                    ub2_out = [int(df.iloc[-1]['i2']), int(df.iloc[-1]['j2']), int(df.iloc[-1]['k2'])]
+
+                    orientation = _compute_orientation(df, lb1_out, ub1_out)
+                    perm_idx, plane = _orient_vec_to_permutation(
+                        orientation, lb1_out, ub1_out, lb2_out, ub2_out)
+
+                    face_matches.append({
+                        'block1': {
+                            'block_index': bi,
+                            'lb': lb1_out,
+                            'ub': ub1_out,
+                        },
+                        'block2': {
+                            'block_index': bj,
+                            'lb': lb2_out,
+                            'ub': ub2_out,
+                        },
+                        'orientation': {
+                            'permutation_index': perm_idx,
+                            'plane': plane,
+                            'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
+                        },
+                        'match': df,
+                    })
+                    phase3_keys.add(face_key)
+                    phase3_count += 1
+                    # Don't break — continue checking other neighbors' faces
+                    # for split-face matches
+
+    print(f"  Phase 3 done ({phase3_count} new matches)")
+
+    # Remove Phase 3 matched faces from outer faces
+    for bi in range(len(blocks)):
+        block_outer_faces[bi] = [f for f in block_outer_faces[bi]
+            if (bi, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX) not in phase3_keys]
+
+    # Update Outer Faces
+    [outer_faces.extend(o) for o in block_outer_faces] # all the outer faces
     outer_faces = list(set(outer_faces))    # Get most unique
         
     outer_faces = [o for o in outer_faces if o not in matches_to_remove]

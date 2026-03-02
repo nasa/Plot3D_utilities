@@ -24,71 +24,78 @@ def _face_dims(lb: list, ub: list) -> Tuple[int, int, int]:
             abs(ub[2] - lb[2]) + 1)
 
 
-def _extract_face_points(block: Block, lb: list, ub: list) -> np.ndarray:
+def _extract_face_points(block: Block, lb: list, ub: list, swap_loops: bool = False) -> np.ndarray:
     """Extract all face points in directed traversal order (lb -> ub).
 
     Returns an (N, 3) array where point n from face A must match
     point n from face B — the diagonal convention preserves the
     node-to-node mapping between blocks.
+
+    If swap_loops is True, the two varying axes swap their loop nesting
+    order (outer becomes inner and vice versa). This handles the cross-plane
+    case where lb/ub cannot encode loop order.
     """
-    pts = []
-    for i in _directed(lb[0], ub[0]):
-        for j in _directed(lb[1], ub[1]):
-            for k in _directed(lb[2], ub[2]):
-                pts.append([block.X[i, j, k], block.Y[i, j, k], block.Z[i, j, k]])
-    return np.array(pts)
+    ri = list(_directed(lb[0], ub[0]))
+    rj = list(_directed(lb[1], ub[1]))
+    rk = list(_directed(lb[2], ub[2]))
 
+    if not swap_loops:
+        pts = []
+        for i in ri:
+            for j in rj:
+                for k in rk:
+                    pts.append([block.X[i, j, k], block.Y[i, j, k], block.Z[i, j, k]])
+        return np.array(pts)
 
-def _generate_permutations(lb: list, ub: list) -> List[Tuple[list, list]]:
-    """Generate all 8 traversal permutations for a face (4 direct + 4 transposed).
-
-    Determines which axis is constant, then for the two varying axes
-    generates all 4 direction combinations (increase/decrease per axis).
-    Then swaps (transposes) the two varying axes and generates 4 more,
-    giving 8 total permutations.
-    Returns list of (new_lb, new_ub) tuples.
-    """
-    perms = []
-    for dim in range(3):
-        if lb[dim] == ub[dim]:
-            varying = [d for d in range(3) if d != dim]
-            d0, d1 = varying
-            vals = [[lb[d0], ub[d0]], [lb[d1], ub[d1]]]
-            # 4 direct permutations
-            for s0 in [0, 1]:  # 0=forward, 1=reversed for d0
-                for s1 in [0, 1]:  # 0=forward, 1=reversed for d1
-                    new_lb = list(lb)
-                    new_ub = list(ub)
-                    new_lb[d0] = vals[0][s0]
-                    new_ub[d0] = vals[0][1 - s0]
-                    new_lb[d1] = vals[1][s1]
-                    new_ub[d1] = vals[1][1 - s1]
-                    perms.append((new_lb, new_ub))
-            # 4 transposed permutations (swap which axis values go to d0 vs d1)
-            for s0 in [0, 1]:
-                for s1 in [0, 1]:
-                    new_lb = list(lb)
-                    new_ub = list(ub)
-                    new_lb[d0] = vals[1][s0]   # d1's values → d0's slot
-                    new_ub[d0] = vals[1][1 - s0]
-                    new_lb[d1] = vals[0][s1]   # d0's values → d1's slot
-                    new_ub[d1] = vals[0][1 - s1]
-                    perms.append((new_lb, new_ub))
+    # Swap the two varying axes' loop order
+    const_dim = None
+    for d in range(3):
+        if lb[d] == ub[d]:
+            const_dim = d
             break
-    return perms
+
+    if const_dim is None:
+        # No constant axis — fall back to normal order
+        pts = []
+        for i in ri:
+            for j in rj:
+                for k in rk:
+                    pts.append([block.X[i, j, k], block.Y[i, j, k], block.Z[i, j, k]])
+        return np.array(pts)
+
+    pts = []
+    if const_dim == 0:
+        # I-constant: normal is j-outer,k-inner → swapped is k-outer,j-inner
+        for k in rk:
+            for j in rj:
+                pts.append([block.X[ri[0], j, k], block.Y[ri[0], j, k], block.Z[ri[0], j, k]])
+    elif const_dim == 1:
+        # J-constant: normal is i-outer,k-inner → swapped is k-outer,i-inner
+        for k in rk:
+            for i in ri:
+                pts.append([block.X[i, rj[0], k], block.Y[i, rj[0], k], block.Z[i, rj[0], k]])
+    else:
+        # K-constant: normal is i-outer,j-inner → swapped is j-outer,i-inner
+        for j in rj:
+            for i in ri:
+                pts.append([block.X[i, j, rk[0]], block.Y[i, j, rk[0]], block.Z[i, j, rk[0]]])
+    return np.array(pts)
 
 
 def _try_all_permutations(block1: Block, b1_lb: list, b1_ub: list,
                           block2: Block, b2_lb: list, b2_ub: list,
-                          tol: float) -> Tuple[bool, list, list]:
-    """Try all direction permutations of block2's face against block1's face.
+                          tol: float) -> Tuple[bool, list, list, int]:
+    """Try all 8 permutations of block2's face against block1 using index-based grid manipulation.
 
-    Holds block1's traversal fixed (lb->ub). For block2, tries all 8
-    permutations (4 direct + 4 transposed) of the two varying axes.
+    Extracts block2's face points **once** in canonical (ascending) order, then
+    applies each of the 8 permutations via numpy index manipulation rather than
+    re-extracting points for each permutation.
+
+    Bit encoding: ``perm_idx = u_reversed | (v_reversed << 1) | (swapped << 2)``
 
     Returns:
-        (matched, corrected_lb, corrected_ub) — if matched is True,
-        corrected_lb/ub give the block2 diagonal that makes all points align.
+        (matched, corrected_lb, corrected_ub, perm_idx) — perm_idx in 0..7
+        if matched, -1 otherwise.
     """
     dims1 = _face_dims(b1_lb, b1_ub)
     dims2 = _face_dims(b2_lb, b2_ub)
@@ -96,19 +103,77 @@ def _try_all_permutations(block1: Block, b1_lb: list, b1_ub: list,
     n2 = dims2[0] * dims2[1] * dims2[2]
 
     if n1 != n2:
-        return False, b2_lb, b2_ub
+        return False, b2_lb, b2_ub, -1
 
     pts1 = _extract_face_points(block1, b1_lb, b1_ub)
 
-    for perm_lb, perm_ub in _generate_permutations(b2_lb, b2_ub):
-        pts2 = _extract_face_points(block2, perm_lb, perm_ub)
+    # Normalize to ascending ranges
+    lo = [min(b2_lb[d], b2_ub[d]) for d in range(3)]
+    hi = [max(b2_lb[d], b2_ub[d]) for d in range(3)]
+
+    # Find constant axis
+    const_dim = -1
+    for d in range(3):
+        if lo[d] == hi[d]:
+            const_dim = d
+            break
+    if const_dim < 0:
+        return False, b2_lb, b2_ub, -1
+
+    varying = [d for d in range(3) if d != const_dim]
+    d0, d1 = varying  # "u" and "v" axes
+    nu = hi[d0] - lo[d0] + 1
+    nv = hi[d1] - lo[d1] + 1
+
+    # Extract face2 points once in canonical ascending order: u outer, v inner
+    grid = np.empty((nu, nv, 3))
+    for u in range(nu):
+        for v in range(nv):
+            idx = [0, 0, 0]
+            idx[const_dim] = lo[const_dim]
+            idx[d0] = lo[d0] + u
+            idx[d1] = lo[d1] + v
+            grid[u, v] = [block2.X[idx[0], idx[1], idx[2]],
+                          block2.Y[idx[0], idx[1], idx[2]],
+                          block2.Z[idx[0], idx[1], idx[2]]]
+
+    # Try each of the 8 permutations
+    for perm_idx in range(8):
+        u_rev = bool(perm_idx & 1)
+        v_rev = bool(perm_idx & 2)
+        swap = bool(perm_idx & 4)
+
+        g = grid
+        if u_rev:
+            g = g[::-1, :, :]
+        if v_rev:
+            g = g[:, ::-1, :]
+        if swap:
+            g = g.transpose(1, 0, 2)
+
+        pts2 = g.reshape(-1, 3)
         if pts1.shape != pts2.shape:
             continue
         diffs = np.linalg.norm(pts1 - pts2, axis=1)
         if diffs.max() < tol:
-            return True, perm_lb, perm_ub
+            # Reconstruct corrected lb/ub
+            new_lo = list(lo)
+            new_hi = list(lo)
+            new_lo[const_dim] = lo[const_dim]
+            new_hi[const_dim] = lo[const_dim]
+            if swap:
+                new_lo[d0] = hi[d1] if u_rev else lo[d1]
+                new_hi[d0] = lo[d1] if u_rev else hi[d1]
+                new_lo[d1] = hi[d0] if v_rev else lo[d0]
+                new_hi[d1] = lo[d0] if v_rev else hi[d0]
+            else:
+                new_lo[d0] = hi[d0] if u_rev else lo[d0]
+                new_hi[d0] = lo[d0] if u_rev else hi[d0]
+                new_lo[d1] = hi[d1] if v_rev else lo[d1]
+                new_hi[d1] = lo[d1] if v_rev else hi[d1]
+            return True, new_lo, new_hi, perm_idx
 
-    return False, b2_lb, b2_ub
+    return False, b2_lb, b2_ub, -1
 
 
 # ---------------------------------------------------------------------------
@@ -137,7 +202,7 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
 
     Returns:
         (list): verified face_matches whose diagonals are confirmed or corrected
-        (list): mismatched face_matches where no permutation matched
+        (list): cross_plane face_matches where points didn't match with standard traversal
     """
     # Compute GCD and reduce blocks
     gcd_array = [math.gcd(b.IMAX - 1, math.gcd(b.JMAX - 1, b.KMAX - 1)) for b in blocks]
@@ -152,7 +217,7 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
             fm[side]['ub'] = [x // gcd_to_use for x in fm[side]['ub']]
 
     verified = []
-    mismatched = []
+    cross_plane = []
 
     for idx in range(len(scaled_matches)):
         fm = scaled_matches[idx]
@@ -174,7 +239,7 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
                   f"lb={orig['block1']['lb']} ub={orig['block1']['ub']} dims={dims1}")
             print(f"  block {orig['block2']['block_index']}: "
                   f"lb={orig['block2']['lb']} ub={orig['block2']['ub']} dims={dims2}")
-            mismatched.append(face_matches[idx])
+            cross_plane.append(face_matches[idx])
             continue
 
         # Step 2: Extract face1 points (held constant)
@@ -189,7 +254,7 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
             continue
 
         # Step 4: Try all permutations of block2's direction
-        matched, corr_lb, corr_ub = _try_all_permutations(
+        matched, corr_lb, corr_ub, _perm_idx = _try_all_permutations(
             block1, b1['lb'], b1['ub'],
             block2, b2['lb'], b2['ub'],
             tol
@@ -212,9 +277,9 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
             print(f"  block {b1_orig['block_index']}: lb={b1_orig['lb']} ub={b1_orig['ub']}")
             print(f"  block {b2_orig['block_index']}: lb={b2_orig['lb']} ub={b2_orig['ub']}")
             print(f"  total points: {len(pts1)}, mismatched: {n_bad}, max dist: {worst:.6e}")
-            mismatched.append(face_matches[idx])
+            cross_plane.append(face_matches[idx])
 
-    return verified, mismatched
+    return verified, cross_plane
 
 
 # ---------------------------------------------------------------------------
@@ -309,7 +374,7 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
                 break
 
             # Try all permutations of block2's direction
-            matched, corr_lb, corr_ub = _try_all_permutations(
+            matched, corr_lb, corr_ub, _perm_idx = _try_all_permutations(
                 block1_rotated, b1['lb'], b1['ub'],
                 block2, b2['lb'], b2['ub'],
                 tol
