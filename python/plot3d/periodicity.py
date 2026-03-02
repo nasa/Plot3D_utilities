@@ -110,39 +110,88 @@ def create_rotation_matrix(rotation_angle:float, rotation_axis:str="x"):
 
     return rotation_matrix
 
-def _compute_orientation_from_extents(lb1: list, ub1: list, lb2: list, ub2: list) -> List[int]:
-    """Compute orientation from face extents for translational periodicity.
+def _compute_periodic_lb_ub_orientation(
+    blk1: 'Block', lb1: list, ub1: list,
+    blk2: 'Block', lb2_orig: list, ub2_orig: list,
+    shift_axis: int = None, shift_amount: float = 0.0
+) -> Tuple[list, list, List[int]]:
+    """Compute corrected lb2, ub2, and orientation for a periodic face pair.
 
-    Maps face1's axes to face2's axes by matching:
-      1. Constant axis of face1 → constant axis of face2
-      2. Varying axes matched by dimension count
+    Shifts face1 by shift_amount along shift_axis, then uses KDTree lookup
+    to find which face2 indices correspond to face1's lb and ub corners.
+    Returns corrected lb2/ub2 that produce matching traversal order, plus
+    the orientation vector.
+
+    Returns:
+        (corrected_lb2, corrected_ub2, orientation)
     """
-    dims1 = [abs(ub1[d] - lb1[d]) + 1 for d in range(3)]
-    dims2 = [abs(ub2[d] - lb2[d]) + 1 for d in range(3)]
+    from scipy.spatial import cKDTree
 
-    ca1 = next((d for d in range(3) if dims1[d] == 1), -1)
-    ca2 = next((d for d in range(3) if dims2[d] == 1), -1)
+    def _get_point(blk, i, j, k):
+        return np.array([blk.X[i, j, k], blk.Y[i, j, k], blk.Z[i, j, k]])
+
+    # face1 lb and ub corners (shifted)
+    p1_lb = _get_point(blk1, lb1[0], lb1[1], lb1[2])
+    p1_ub = _get_point(blk1, ub1[0], ub1[1], ub1[2])
+    if shift_axis is not None:
+        p1_lb[shift_axis] += shift_amount
+        p1_ub[shift_axis] += shift_amount
+
+    lo2 = [min(lb2_orig[d], ub2_orig[d]) for d in range(3)]
+    hi2 = [max(lb2_orig[d], ub2_orig[d]) for d in range(3)]
+
+    # Build KDTree of all face2 grid points
+    indices2 = []
+    coords2 = []
+    for i in range(lo2[0], hi2[0] + 1):
+        for j in range(lo2[1], hi2[1] + 1):
+            for k in range(lo2[2], hi2[2] + 1):
+                indices2.append([i, j, k])
+                coords2.append(_get_point(blk2, i, j, k))
+    coords2 = np.array(coords2)
+    indices2 = np.array(indices2)
+    tree2 = cKDTree(coords2)
+
+    # Find face2 indices matching face1 lb and ub corners
+    _, idx_lb = tree2.query(p1_lb)
+    _, idx_ub = tree2.query(p1_ub)
+    corrected_lb2 = indices2[idx_lb].tolist()
+    corrected_ub2 = indices2[idx_ub].tolist()
+
+    # Compute orientation: step along each face1 axis, find which face2 axis changes
+    dims1 = [abs(ub1[d] - lb1[d]) + 1 for d in range(3)]
+    step1 = [1 if ub1[d] >= lb1[d] else -1 for d in range(3)]
+    cdims2 = [abs(corrected_ub2[d] - corrected_lb2[d]) + 1 for d in range(3)]
 
     orientation = [0, 0, 0]
-    if ca1 >= 0 and ca2 >= 0:
-        orientation[ca1] = ca2 + 1
-        varying1 = [d for d in range(3) if d != ca1]
-        varying2 = [d for d in range(3) if d != ca2]
-        # Match varying axes by dimension count
-        if dims1[varying1[0]] == dims2[varying2[0]] and dims1[varying1[1]] == dims2[varying2[1]]:
-            orientation[varying1[0]] = varying2[0] + 1
-            orientation[varying1[1]] = varying2[1] + 1
-        elif dims1[varying1[0]] == dims2[varying2[1]] and dims1[varying1[1]] == dims2[varying2[0]]:
-            orientation[varying1[0]] = varying2[1] + 1
-            orientation[varying1[1]] = varying2[0] + 1
+    for d1 in range(3):
+        if dims1[d1] == 1:
+            for d2 in range(3):
+                if cdims2[d2] == 1:
+                    orientation[d1] = d2 + 1
+                    break
         else:
-            # Same-size varying axes — default to matching order
-            orientation[varying1[0]] = varying2[0] + 1
-            orientation[varying1[1]] = varying2[1] + 1
-    else:
-        orientation = [1, 2, 3]
+            next_idx1 = list(lb1)
+            next_idx1[d1] += step1[d1]
+            p1_next = _get_point(blk1, next_idx1[0], next_idx1[1], next_idx1[2])
+            if shift_axis is not None:
+                p1_next[shift_axis] += shift_amount
+            _, idx_next = tree2.query(p1_next)
+            face2_next = indices2[idx_next]
+            for d2 in range(3):
+                if face2_next[d2] != corrected_lb2[d2] and cdims2[d2] > 1:
+                    orientation[d1] = d2 + 1
+                    break
 
-    return orientation
+    # Fill any missing entries (sanity)
+    if 0 in orientation:
+        used = set(orientation) - {0}
+        missing_d1 = [d for d in range(3) if orientation[d] == 0]
+        missing_d2 = list({1, 2, 3} - used)
+        for d1, d2 in zip(missing_d1, missing_d2):
+            orientation[d1] = d2
+
+    return corrected_lb2, corrected_ub2, orientation
 
 
 def _build_periodic_export(df: pd.DataFrame, periodic_faces_temp: list) -> dict:
@@ -730,7 +779,17 @@ def translational_periodicity(
             ub1 = [fL.IMAX, fL.JMAX, fL.KMAX]
             lb2 = [fU.IMIN, fU.JMIN, fU.KMIN]
             ub2 = [fU.IMAX, fU.JMAX, fU.KMAX]
-            orient = _compute_orientation_from_extents(lb1, ub1, lb2, ub2)
+            # Compute corrected lb2/ub2 and orientation from geometry
+            blk1_orig = B("orig", fL.BlockIndex)
+            blk2_orig = B("orig", fU.BlockIndex)
+            arr1 = [blk1_orig.X, blk1_orig.Y, blk1_orig.Z][axis_idx]
+            arr2 = [blk2_orig.X, blk2_orig.Y, blk2_orig.Z][axis_idx]
+            p1_val = arr1[lb1[0], lb1[1], lb1[2]]
+            p2_val = arr2[lb2[0], lb2[1], lb2[2]]
+            shift_amt = d_axis if p1_val < p2_val else -d_axis
+            lb2, ub2, orient = _compute_periodic_lb_ub_orientation(
+                blk1_orig, lb1, ub1, blk2_orig, lb2, ub2,
+                shift_axis=axis_idx, shift_amount=shift_amt)
             periodic_export.append({
                 "block1": {"block_index": fL.BlockIndex,
                            "lb": lb1, "ub": ub1},

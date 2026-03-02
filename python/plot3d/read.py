@@ -18,17 +18,13 @@ def __read_plot3D_chunk_binary(f,IMAX:int,JMAX:int,KMAX:int, big_endian:bool=Fal
         read_double (bool, optional): When ``True`` read 8-byte doubles, otherwise read 4-byte floats.
 
     Returns:
-        numpy.ndarray: Plot3D variable either X,Y, or Z 
+        numpy.ndarray: Plot3D variable either X,Y, or Z
     """
-    A = np.empty(shape=(IMAX, JMAX, KMAX))
-    for k in range(KMAX):
-        for j in range(JMAX):
-            for i in range(IMAX):
-                if read_double:
-                    A[i,j,k] = struct.unpack(">d",f.read(8))[0] if big_endian else struct.unpack("<d",f.read(8))[0]
-                else:
-                    A[i,j,k] = struct.unpack(">f",f.read(4))[0] if big_endian else struct.unpack("<f",f.read(4))[0]
-    return A
+    n = IMAX * JMAX * KMAX
+    byte_order = '>' if big_endian else '<'
+    dtype = np.dtype(f'{byte_order}f8' if read_double else f'{byte_order}f4')
+    data = np.frombuffer(f.read(n * dtype.itemsize), dtype=dtype)
+    return data.reshape((KMAX, JMAX, IMAX)).transpose(2, 1, 0).copy()
 
 def read_word(f):
     """Continously read a word from an ascii file
@@ -55,19 +51,17 @@ def __read_plot3D_chunk_ASCII(f,IMAX:int,JMAX:int,KMAX:int):
         KMAX (int): maximum K index
 
     Returns:
-        numpy.ndarray: Plot3D variable either X,Y, or Z 
+        numpy.ndarray: Plot3D variable either X,Y, or Z
     """
-    tokenArray = np.zeros(shape=(IMAX*JMAX*KMAX))
-    i = 0
-    for w in read_word(f):
-        tokenArray[i] = w
-        i+=1
-        if i>len(tokenArray)-1:
+    n = IMAX * JMAX * KMAX
+    values = []
+    while len(values) < n:
+        line = f.readline()
+        if not line:
             break
-
-    A = np.reshape(tokenArray,shape=(KMAX,JMAX,IMAX))
-    A = np.transpose(A,[2,1,0])    
-    return A
+        values.extend(line.split())
+    A = np.array(values[:n], dtype=np.float64)
+    return A.reshape((KMAX, JMAX, IMAX)).transpose(2, 1, 0).copy()
 
 def read_ap_nasa(filename:str):
     """Reads an AP NASA File and converts it to Block format which can be exported to a plot3d file
