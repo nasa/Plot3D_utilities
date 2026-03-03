@@ -12,7 +12,10 @@ from .read import read_plot3D, read_ap_nasa
 from .write import write_plot3D
 from .differencing import find_edges, find_face_edges
 from .periodicity import periodicity, periodicity_fast, create_rotation_matrix, rotated_periodicity, translational_periodicity
-from .verify import verify_connectivity, verify_periodicity
+from .verify import (verify_connectivity, verify_periodicity,
+                      extract_canonical_grid, apply_permutation, verify_match,
+                      verify_partial_match, try_all_permutations, get_bounds,
+                      determine_plane)
 from .point_match import point_match
 from .split_block import split_blocks, Direction
 from .listfunctions import unique_pairs
