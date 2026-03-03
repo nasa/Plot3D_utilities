@@ -11,16 +11,27 @@ Bit encoding: ``perm_idx = u_reversed | (v_reversed << 1) | (swapped << 2)``
 
 - 0-3 (in-plane): same constant axis, direction flips only.
 - 4-7 (cross-plane): different constant axes, loop order changes.
+
+JSON Export Convention
+---------------------
+When exporting face matches with lb/ub diagonal bounds:
+
+- **In-plane** (perm 0-3): ``permutation_index`` is set to **-1** because the
+  traversal direction is fully encoded in block2's lb/ub ordering.
+- **Cross-plane** (perm 4-7): ``permutation_index`` contains the actual index
+  (4-7) because lb/ub alone cannot represent an axis swap.
+
+The ``permutation_matrix`` field always contains the actual 2x2 matrix regardless
+of whether ``permutation_index`` is -1.
 """
 
 from .block import Block
-from .blockfunctions import reduce_blocks, rotate_block
+from .blockfunctions import reduce_blocks, rotate_block, compute_min_gcd, scale_face_bounds, constant_axis
 from .connectivity import PERMUTATION_MATRICES
 from .periodicity import create_rotation_matrix
 from typing import List, Tuple
 from copy import deepcopy
 from math import radians
-import math
 import numpy as np
 
 
@@ -70,8 +81,8 @@ def extract_canonical_grid(block: Block, lb: list, ub: list) -> Tuple[np.ndarray
     lo = [min(lb[d], ub[d]) for d in range(3)]
     hi = [max(lb[d], ub[d]) for d in range(3)]
 
-    const_dim = next((d for d in range(3) if lo[d] == hi[d]), None)
-    if const_dim is None:
+    const_dim = constant_axis(lo, hi)
+    if const_dim < 0:
         raise ValueError(f"No constant axis found: lo={lo}, hi={hi}")
 
     vary = [d for d in range(3) if d != const_dim]
@@ -203,9 +214,31 @@ def determine_plane(lb1, ub1, lb2, ub2) -> str:
     hi1 = [max(lb1[d], ub1[d]) for d in range(3)]
     lo2 = [min(lb2[d], ub2[d]) for d in range(3)]
     hi2 = [max(lb2[d], ub2[d]) for d in range(3)]
-    const_a = next((d for d in range(3) if lo1[d] == hi1[d]), None)
-    const_b = next((d for d in range(3) if lo2[d] == hi2[d]), None)
+    const_a = constant_axis(lo1, hi1)
+    const_b = constant_axis(lo2, hi2)
     return "in-plane" if const_a == const_b else "cross-plane"
+
+
+def _try_stored_then_all_perms(grid_a: np.ndarray, grid_b: np.ndarray,
+                                stored_perm, fm: dict, tol: float) -> int:
+    """Try stored permutation first, then brute-force all 8.
+
+    Args:
+        grid_a: Canonical grid of face A.
+        grid_b: Canonical grid of face B.
+        stored_perm: Stored permutation index (int or None).
+        fm: Face match dict (used only for lb/ub to determine plane).
+        tol: Euclidean distance tolerance.
+
+    Returns:
+        Permutation index (0-7) on success, -1 if none works.
+    """
+    nu_a, nv_a = grid_a.shape[:2]
+    if stored_perm is not None and stored_perm >= 0:
+        g = apply_permutation(grid_b, stored_perm)
+        if g.shape[:2] == (nu_a, nv_a) and verify_match(grid_a, g, tol):
+            return stored_perm
+    return try_all_permutations(grid_a, grid_b, tol)
 
 
 # ---------------------------------------------------------------------------
@@ -230,16 +263,17 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
     Returns:
         (verified, mismatched) lists of face_match dicts.
     """
-    gcd_array = [math.gcd(b.IMAX - 1, math.gcd(b.JMAX - 1, b.KMAX - 1)) for b in blocks]
-    gcd_to_use = min(gcd_array)
+    gcd_to_use = compute_min_gcd(blocks)
     reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
     scaled_matches = deepcopy(face_matches)
+    # Normalize to lb/ub format before scaling
     for fm in scaled_matches:
         for side in ['block1', 'block2']:
             lo, hi = get_bounds(fm[side])
-            fm[side]['lb'] = [x // gcd_to_use for x in lo]
-            fm[side]['ub'] = [x // gcd_to_use for x in hi]
+            fm[side]['lb'] = list(lo)
+            fm[side]['ub'] = list(hi)
+    scale_face_bounds(scaled_matches, gcd_to_use, divide=True)
 
     verified = []
     mismatched = []
@@ -257,21 +291,16 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
             mismatched.append(face_matches[idx])
             continue
 
-        # Try stored permutation_index first
         stored_perm = fm.get('orientation', {}).get('permutation_index')
-        if stored_perm is not None and stored_perm >= 0:
-            g = apply_permutation(grid_b, stored_perm)
-            if g.shape[:2] == (nu_a, nv_a) and verify_match(grid_a, g, tol):
-                verified.append(face_matches[idx])
-                continue
-
-        # Fall back: try all 8 permutations
-        perm_idx = try_all_permutations(grid_a, grid_b, tol)
+        perm_idx = _try_stored_then_all_perms(grid_a, grid_b, stored_perm, fm, tol)
         if perm_idx >= 0:
             corrected = deepcopy(face_matches[idx])
             plane = determine_plane(b1['lb'], b1['ub'], b2['lb'], b2['ub'])
+            # In-plane: direction encoded in lb/ub → export -1.
+            # Cross-plane: lb/ub can't encode axis swap → export actual index.
+            export_perm = -1 if plane == 'in-plane' else perm_idx
             corrected['orientation'] = {
-                'permutation_index': perm_idx,
+                'permutation_index': export_perm,
                 'plane': plane,
                 'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
             }
@@ -309,8 +338,7 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
     Returns:
         (verified, mismatched) lists of face_match dicts.
     """
-    gcd_array = [math.gcd(b.IMAX - 1, math.gcd(b.JMAX - 1, b.KMAX - 1)) for b in blocks]
-    gcd_to_use = min(gcd_array)
+    gcd_to_use = compute_min_gcd(blocks)
     reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
     rotation_matrix_pos = create_rotation_matrix(radians(theta), rotation_axis)
@@ -320,11 +348,13 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
     rotated_blocks_neg = [rotate_block(b, rotation_matrix_neg) for b in reduced_blocks]
 
     scaled_matches = deepcopy(face_matches)
+    # Normalize to lb/ub format before scaling
     for fm in scaled_matches:
         for side in ['block1', 'block2']:
             lo, hi = get_bounds(fm[side])
-            fm[side]['lb'] = [x // gcd_to_use for x in lo]
-            fm[side]['ub'] = [x // gcd_to_use for x in hi]
+            fm[side]['lb'] = list(lo)
+            fm[side]['ub'] = list(hi)
+    scale_face_bounds(scaled_matches, gcd_to_use, divide=True)
 
     verified = []
     mismatched_list = []
@@ -354,22 +384,14 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
             except (ValueError, IndexError):
                 continue
 
-            # Try stored permutation_index first
             stored_perm = fm.get('orientation', {}).get('permutation_index')
-            if stored_perm is not None and stored_perm >= 0:
-                g = apply_permutation(grid_b, stored_perm)
-                if g.shape[:2] == (nu_a, nv_a) and verify_match(grid_a, g, tol):
-                    verified.append(face_matches[idx])
-                    found = True
-                    break
-
-            # Fall back: try all 8 permutations
-            perm_idx = try_all_permutations(grid_a, grid_b, tol)
+            perm_idx = _try_stored_then_all_perms(grid_a, grid_b, stored_perm, fm, tol)
             if perm_idx >= 0:
                 corrected = deepcopy(face_matches[idx])
                 plane = determine_plane(b1['lb'], b1['ub'], b2['lb'], b2['ub'])
+                export_perm = -1 if plane == 'in-plane' else perm_idx
                 corrected['orientation'] = {
-                    'permutation_index': perm_idx,
+                    'permutation_index': export_perm,
                     'plane': plane,
                     'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
                 }

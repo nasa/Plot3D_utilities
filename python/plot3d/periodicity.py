@@ -2,7 +2,7 @@ from typing import List, Dict, Tuple, Optional
 from itertools import combinations_with_replacement, permutations, product
 import numpy as np
 from .block import Block
-from .blockfunctions import rotate_block, reduce_blocks
+from .blockfunctions import rotate_block, reduce_blocks, compute_min_gcd, scale_face_bounds
 from .face import Face
 from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals, find_bounding_faces,get_outer_faces
 from .connectivity import get_face_intersection, face_matches_to_dict, _compute_orientation, _orient_vec_to_permutation, PERMUTATION_MATRICES
@@ -10,7 +10,6 @@ import pandas as pd
 from math import cos, radians, sin, sqrt, acos
 from copy import deepcopy
 from tqdm import trange, tqdm
-import math 
 
 def periodicity_fast(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """Finds the connectivity of blocks when they are rotated by an angle defined by the number of blades. Only use this if your mesh is of an annulus. 
@@ -33,34 +32,18 @@ def periodicity_fast(blocks:List[Block],outer_faces:List[Dict[str,int]], matched
         - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
         
     """
-    gcd_array = list()
-    # Find the gcd of all the blocks 
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+    gcd_to_use = compute_min_gcd(blocks)
     print(f"gcd to use {gcd_to_use}")
-    new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
+    new_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
     matched_faces = deepcopy(matched_faces)
-    # Reduce face matches for the block 
-    for i in range(len(matched_faces)):
-        for side in ['block1', 'block2']:
-            matched_faces[i][side]['lb'] = [int(x/gcd_to_use) for x in matched_faces[i][side]['lb']]
-            matched_faces[i][side]['ub'] = [int(x/gcd_to_use) for x in matched_faces[i][side]['ub']]
-
-    # Reduce outer faces for the block (deepcopy to avoid mutating caller's list)
+    scale_face_bounds(matched_faces, gcd_to_use, divide=True)
     outer_faces = deepcopy(outer_faces)
-    for i in range(len(outer_faces)):
-        outer_faces[i]['lb'] = [int(x/gcd_to_use) for x in outer_faces[i]['lb']]
-        outer_faces[i]['ub'] = [int(x/gcd_to_use) for x in outer_faces[i]['ub']]
+    scale_face_bounds(outer_faces, gcd_to_use, divide=True)
 
-    # Find Periodicity 
-    periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all = periodicity(new_blocks,outer_faces,matched_faces,periodic_direction,rotation_axis,nblades)
+    # Find Periodicity
+    periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all = periodicity(new_blocks, outer_faces, matched_faces, periodic_direction, rotation_axis, nblades)
     # scale it up
-    for i in range(len(periodic_faces_export)):
-        for side in ['block1', 'block2']:
-            periodic_faces_export[i][side]['lb'] = [x * gcd_to_use for x in periodic_faces_export[i][side]['lb']]
-            periodic_faces_export[i][side]['ub'] = [x * gcd_to_use for x in periodic_faces_export[i][side]['ub']]
+    scale_face_bounds(periodic_faces_export, gcd_to_use)
 
     for i in range(len(periodic_faces)):
         periodic_faces[i][0].I *= gcd_to_use
@@ -71,9 +54,7 @@ def periodicity_fast(blocks:List[Block],outer_faces:List[Dict[str,int]], matched
         periodic_faces[i][1].J *= gcd_to_use
         periodic_faces[i][1].K *= gcd_to_use
 
-    for j in range(len(outer_faces_export)):
-        outer_faces_export[j]['lb'] = [x * gcd_to_use for x in outer_faces_export[j]['lb']]
-        outer_faces_export[j]['ub'] = [x * gcd_to_use for x in outer_faces_export[j]['ub']]
+    scale_face_bounds(outer_faces_export, gcd_to_use)
 
     for j in range(len(outer_faces_all)):
         outer_faces_all[j].I *= gcd_to_use
@@ -123,8 +104,19 @@ def _compute_periodic_lb_ub_orientation(
     Returns corrected lb2/ub2 that produce matching traversal order, plus
     the orientation vector.
 
+    Args:
+        blk1: Block containing face 1.
+        lb1: Lower-bound [i, j, k] of face 1.
+        ub1: Upper-bound [i, j, k] of face 1.
+        blk2: Block containing face 2.
+        lb2_orig: Original lower-bound [i, j, k] of face 2.
+        ub2_orig: Original upper-bound [i, j, k] of face 2.
+        shift_axis: Axis index (0/1/2) to shift face1 along, or None.
+        shift_amount: Distance to shift face1 along shift_axis.
+
     Returns:
-        (corrected_lb2, corrected_ub2, orientation)
+        (corrected_lb2, corrected_ub2, orientation): Corrected diagonal
+        corners for face 2 and 3-element orientation vector.
     """
     from scipy.spatial import cKDTree
 
@@ -199,7 +191,15 @@ def _build_periodic_export(df: pd.DataFrame, periodic_faces_temp: list) -> dict:
     """Build export dict from DataFrame with orientation, consistent with connectivity().
 
     Derives lb/ub from the DataFrame traversal order (first/last row) and computes
-    the orientation vector using _compute_orientation.
+    the orientation vector using _compute_orientation. Uses the -1 convention for
+    in-plane permutation_index.
+
+    Args:
+        df: DataFrame with columns i1,j1,k1,i2,j2,k2 from face matching.
+        periodic_faces_temp: List of [face1, face2] Face pairs.
+
+    Returns:
+        Face match dict with block1, block2 sub-dicts and orientation.
     """
     lb1 = [int(df.iloc[0]['i1']), int(df.iloc[0]['j1']), int(df.iloc[0]['k1'])]
     ub1 = [int(df.iloc[-1]['i1']), int(df.iloc[-1]['j1']), int(df.iloc[-1]['k1'])]
@@ -207,13 +207,14 @@ def _build_periodic_export(df: pd.DataFrame, periodic_faces_temp: list) -> dict:
     ub2 = [int(df.iloc[-1]['i2']), int(df.iloc[-1]['j2']), int(df.iloc[-1]['k2'])]
     orientation = _compute_orientation(df, lb1, ub1)
     perm_idx, plane = _orient_vec_to_permutation(orientation, lb1, ub1, lb2, ub2)
+    export_perm = -1 if plane == 'in-plane' else perm_idx
     return {
         'block1': {'block_index': periodic_faces_temp[0].BlockIndex,
                     'lb': lb1, 'ub': ub1, 'id': periodic_faces_temp[0].id},
         'block2': {'block_index': periodic_faces_temp[1].BlockIndex,
                     'lb': lb2, 'ub': ub2, 'id': periodic_faces_temp[1].id},
         'orientation': {
-            'permutation_index': perm_idx,
+            'permutation_index': export_perm,
             'plane': plane,
             'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
         }
@@ -371,14 +372,9 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
             - **periodic_faces** (List[Tuple[Face,Face]]): - This is a list of Face objects that are connected to each other organized as a list of tuples: [Face1, Face2] where Face 1 will contain the block number and the diagonals [IMIN,JMIN,KMIN,IMAX,JMAX,KMAX]. Example: blk: 1 [168,0,0,268,100,0].
             - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
     """
-    gcd_array = list()
     gcd_to_use = 1
-    # Find the gcd of all the blocks
     if ReduceMesh:
-        for block_indx in range(len(blocks)):
-            block = blocks[block_indx]
-            gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
-        gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+        gcd_to_use = compute_min_gcd(blocks)
         blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
     rotation_matrix = create_rotation_matrix(radians(rotation_angle),rotation_axis)
@@ -482,10 +478,8 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         outer_faces_export.append(o.to_dict())
 
     # scale it up
-    for i in range(len(periodic_faces_export)):
-        for side in ['block1', 'block2']:
-            periodic_faces_export[i][side]['lb'] = [x * gcd_to_use for x in periodic_faces_export[i][side]['lb']]
-            periodic_faces_export[i][side]['ub'] = [x * gcd_to_use for x in periodic_faces_export[i][side]['ub']]
+    scale_face_bounds(periodic_faces_export, gcd_to_use)
+    scale_face_bounds(outer_faces_export, gcd_to_use)
 
     for i in range(len(periodic_faces)):
         periodic_faces[i][0].I *= gcd_to_use
@@ -495,10 +489,6 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         periodic_faces[i][1].I *= gcd_to_use
         periodic_faces[i][1].J *= gcd_to_use
         periodic_faces[i][1].K *= gcd_to_use
-
-    for j in range(len(outer_faces_export)):
-        outer_faces_export[j]['lb'] = [x * gcd_to_use for x in outer_faces_export[j]['lb']]
-        outer_faces_export[j]['ub'] = [x * gcd_to_use for x in outer_faces_export[j]['ub']]
 
     for j in range(len(outer_faces_all)):
         outer_faces_all[j].I *= gcd_to_use
@@ -597,8 +587,7 @@ def translational_periodicity(
     assert axis in ("x","y","z")
 
     # 1) GCD reduce
-    gcd_array = [math.gcd(b.IMAX-1, math.gcd(b.JMAX-1, b.KMAX-1)) for b in blocks]
-    gcd_to_use = min(gcd_array)
+    gcd_to_use = compute_min_gcd(blocks)
 
     lower_faces_r = outer_face_dict_to_list(blocks, lower_connected_faces, gcd_to_use)
     upper_faces_r = outer_face_dict_to_list(blocks, upper_connected_faces, gcd_to_use)
@@ -797,13 +786,14 @@ def translational_periodicity(
                 blk1_orig, lb1, ub1, blk2_orig, lb2, ub2,
                 shift_axis=axis_idx, shift_amount=shift_amt)
             perm_idx, plane = _orient_vec_to_permutation(orient, lb1, ub1, lb2, ub2)
+            export_perm = -1 if plane == 'in-plane' else perm_idx
             periodic_export.append({
                 "block1": {"block_index": fL.BlockIndex,
                            "lb": lb1, "ub": ub1},
                 "block2": {"block_index": fU.BlockIndex,
                            "lb": lb2, "ub": ub2},
                 "orientation": {
-                    "permutation_index": perm_idx,
+                    "permutation_index": export_perm,
                     "plane": plane,
                     "permutation_matrix": PERMUTATION_MATRICES[perm_idx].tolist(),
                 },
@@ -815,10 +805,7 @@ def translational_periodicity(
             upper_centroids = np.delete(upper_centroids, matched_j, axis=0)
 
     # 9) scale back up
-    for rec in periodic_export:
-        for side in ("block1","block2"):
-            rec[side]['lb'] = [int(x * gcd_to_use) for x in rec[side]['lb']]
-            rec[side]['ub'] = [int(x * gcd_to_use) for x in rec[side]['ub']]
+    scale_face_bounds(periodic_export, gcd_to_use)
 
     periodic_pairs: List[Tuple[Face, Face, Dict[str,str]]] = []
     for (fL, fU, m) in periodic_pairs_r:

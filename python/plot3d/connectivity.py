@@ -42,10 +42,21 @@ traversal direction along that axis is flipped between the two faces, and
 *swapped* indicates whether the u and v axes of face 1 map to v and u of
 face 2 (a cross-plane match).  Indices 0--3 are the four direct (non-swapped)
 permutations; indices 4--7 are the four transposed (swapped) permutations.
+
+JSON export convention
+~~~~~~~~~~~~~~~~~~~~~~
+The exported ``permutation_index`` follows the **diagonal (lb/ub)** convention:
+
+- **In-plane** matches (perm 0--3): ``permutation_index`` is **-1** because the
+  traversal direction is fully encoded in block2's lb/ub ordering.
+- **Cross-plane** matches (perm 4--7): ``permutation_index`` is the actual index
+  because lb/ub alone cannot represent an axis swap.
+
+The ``permutation_matrix`` field always contains the actual 2x2 matrix.
 """
 
 from .block import Block
-from .blockfunctions import reduce_blocks
+from .blockfunctions import reduce_blocks, compute_min_gcd, scale_face_bounds, constant_axis as _constant_axis
 from .face import Face
 from .facefunctions import create_face_from_diagonals, split_face, get_outer_faces
 import math
@@ -74,13 +85,6 @@ PERMUTATION_MATRICES = np.array([
 Bit encoding: ``index = u_reversed | (v_reversed << 1) | (swapped << 2)``
 """
 
-
-def _constant_axis(lb: list, ub: list) -> int:
-    """Return the index (0/1/2) of the constant axis on a face."""
-    for d in range(3):
-        if lb[d] == ub[d]:
-            return d
-    return -1
 
 
 def _orient_vec_to_permutation(orient_vec: list, lb1: list, ub1: list,
@@ -894,39 +898,41 @@ def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
     return new_combos
     
 def connectivity_fast(blocks:List[Block]):
-    """Reduces the size of the blocks by a factor of the minimum gcd. This speeds up finding the connectivity 
+    """Find connectivity by GCD-reducing blocks first for speed.
+
+    Computes the minimum GCD across all block dimensions, reduces all blocks
+    uniformly, runs :func:`connectivity`, then scales bounds back up.
+
+    Face match dicts follow the diagonal (lb/ub) convention:
+    ``permutation_index`` is **-1** for in-plane, actual index for cross-plane.
 
     Args:
-        blocks (List[Block]): Lists of blocks you want to find the connectivity for
+        blocks (List[Block]): List of blocks to find connectivity for.
 
     Returns:
-        (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'lb', 'ub'} }
-        (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'lb', 'ub', 'id' }
-        
+        (List[Dict]): Face matches with orientation info.
+        (List[Dict]): Outer (non-connected) faces.
     """
-    gcd_array = list()
-    # Find the gcd of all the blocks 
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))        
-    gcd_to_use = min(gcd_array) # You need to use the minimum gcd otherwise 1 block may not exactly match the next block. They all have to be scaled the same way.
+    gcd_to_use = compute_min_gcd(blocks)
     print(f"gcd to use {gcd_to_use}")
-    new_blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
+    new_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
-    # Find Connectivity 
+    # Find Connectivity
     face_matches, outer_faces_formatted = connectivity(new_blocks)
     # scale it up
-    for i in range(len(face_matches)):
-        for side in ['block1', 'block2']:
-            face_matches[i][side]['lb'] = [x * gcd_to_use for x in face_matches[i][side]['lb']]
-            face_matches[i][side]['ub'] = [x * gcd_to_use for x in face_matches[i][side]['ub']]
-    for j in range(len(outer_faces_formatted)):
-        outer_faces_formatted[j]['lb'] = [x * gcd_to_use for x in outer_faces_formatted[j]['lb']]
-        outer_faces_formatted[j]['ub'] = [x * gcd_to_use for x in outer_faces_formatted[j]['ub']]
+    scale_face_bounds(face_matches, gcd_to_use)
+    scale_face_bounds(outer_faces_formatted, gcd_to_use)
     return face_matches, outer_faces_formatted
 
 def connectivity(blocks:List[Block]):
-    """Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces 
+    """Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces.
+
+    Each face match dict includes an ``orientation`` sub-dict with:
+
+    - ``permutation_index``: **-1** for in-plane matches (direction encoded in
+      lb/ub), or the actual index (4-7) for cross-plane matches.
+    - ``plane``: ``'in-plane'`` or ``'cross-plane'``.
+    - ``permutation_matrix``: the actual 2x2 signed permutation matrix.
 
     Args:
         blocks (List[Block]): List of all blocks in multi-block plot3d mesh
@@ -987,6 +993,10 @@ def connectivity(blocks:List[Block]):
                 perm_idx, plane = _orient_vec_to_permutation(
                     orientation, lb1_out, ub1_out, lb2_out, ub2_out)
 
+                # In-plane: direction fully encoded in lb/ub → export -1.
+                # Cross-plane: lb/ub can't encode axis swap → export actual index.
+                export_perm = -1 if plane == 'in-plane' else perm_idx
+
                 temp = {
                     'block1': {
                         'block_index': i,
@@ -1001,7 +1011,7 @@ def connectivity(blocks:List[Block]):
                         'id': face2.id
                     },
                     'orientation': {
-                        'permutation_index': perm_idx,
+                        'permutation_index': export_perm,
                         'plane': plane,
                         'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
                     },
@@ -1076,6 +1086,7 @@ def connectivity(blocks:List[Block]):
                     orientation = _compute_orientation(df, lb1_out, ub1_out)
                     perm_idx, plane = _orient_vec_to_permutation(
                         orientation, lb1_out, ub1_out, lb2_out, ub2_out)
+                    export_perm = -1 if plane == 'in-plane' else perm_idx
 
                     face_matches.append({
                         'block1': {
@@ -1089,7 +1100,7 @@ def connectivity(blocks:List[Block]):
                             'ub': ub2_out,
                         },
                         'orientation': {
-                            'permutation_index': perm_idx,
+                            'permutation_index': export_perm,
                             'plane': plane,
                             'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
                         },
