@@ -21,3 +21,6 @@ from .split_block import split_blocks, Direction
 from .listfunctions import unique_pairs
 
 from .graph import write_ddcmp, build_weighted_graph_from_face_matches,csr_from_adj_and_weights,partition_from_face_matches
+from .normals import (index_space_normal, compute_permutation_matrix,
+                      validate_connectivity, compute_all_normals,
+                      export_normals_json, import_normals_json, plot_face_normals)

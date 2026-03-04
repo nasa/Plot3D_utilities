@@ -551,35 +551,73 @@ def summarize_contiguous(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:List[Dict[str,int]],filename:str, 
-                           gif_pairs:List[List[Dict[str, int]]],gif_faces:List[List[Dict[str, int]]],
-                               volume_zones:List[Dict[str,Any]]):
-    """Exports the connectivity to GlennHT format 
+def _get_lb_ub(block_data: Dict) -> tuple:
+    """Get lb/ub from a block dict, supporting both lo/hi and lb/ub keys."""
+    lb = list(block_data.get('lb', block_data.get('lo')))
+    ub = list(block_data.get('ub', block_data.get('hi')))
+    return lb, ub
+
+
+def _apply_directed_flip(lb: list, ub: list, perm_idx: int) -> tuple:
+    """Apply directed diagonal flip to block2's lb/ub for GlennHT.
+
+    GlennHT's new_PTtransf derives its 3x3 permutation matrix from the
+    diagonal corner pairing (a1↔a2, b1↔b2 must be spatially coincident).
+    For this to work, block2's lb/ub must encode traversal direction by
+    flipping the varying axes based on permutation_index bits 0-1.
 
     Args:
-        matches (Dict[str,Dict[int,str]]): Any matching faces between blocks 
-        outer_faces (Dict[str,int]): Non matching faces of all blocks or surfaces to consider 
+        lb: Lower bound [i, j, k] (0-indexed).
+        ub: Upper bound [i, j, k] (0-indexed).
+        perm_idx: Permutation index (0-7). Bits: swap|v_rev|u_rev.
+
+    Returns:
+        (lb, ub) with axes flipped according to u_rev and v_rev bits.
+    """
+    if perm_idx < 0:
+        return lb, ub
+    const_axes = [i for i in range(3) if lb[i] == ub[i]]
+    if len(const_axes) != 1:
+        return lb, ub
+    vary = [i for i in range(3) if i != const_axes[0]]
+    d0, d1 = vary[0], vary[1]
+    u_rev = bool(perm_idx & 1)
+    v_rev = bool(perm_idx & 2)
+    if u_rev:
+        lb[d0], ub[d0] = ub[d0], lb[d0]
+    if v_rev:
+        lb[d1], ub[d1] = ub[d1], lb[d1]
+    return lb, ub
+
+
+def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:List[Dict[str,int]],filename:str,
+                           gif_pairs:List[List[Dict[str, int]]],gif_faces:List[List[Dict[str, int]]],
+                               volume_zones:List[Dict[str,Any]]):
+    """Exports the connectivity to GlennHT format
+
+    Args:
+        matches (Dict[str,Dict[int,str]]): Any matching faces between blocks
+        outer_faces (Dict[str,int]): Non matching faces of all blocks or surfaces to consider
     """
     lines = list()
-    
+
     # Print face matches
-    blocks = ['block1','block2']
     nMatches = len(matches)
-    lines.append(f'{nMatches}\n') # Print number of matches 
-    for match in matches:                        
-        for block in blocks:
-            block_indx = match[block]['block_index']+1 # type: ignore # block1 and block2 are arbitrary names, the key is the block index 
-            lb = match[block]['lb'] # type: ignore
-            ub = match[block]['ub'] # type: ignore
-            block_IMIN = lb[0]+1
-            block_JMIN = lb[1]+1
-            block_KMIN = lb[2]+1
+    lines.append(f'{nMatches}\n') # Print number of matches
+    for match in matches:
+        perm_idx = match.get('permutation_index', -1)
 
-            block_IMAX = ub[0]+1
-            block_JMAX = ub[1]+1
-            block_KMAX = ub[2]+1
+        # block1: always ascending lb/ub
+        block_indx = match['block1']['block_index']+1
+        lb, ub = _get_lb_ub(match['block1'])
+        lines.append(f"{block_indx:3d}\t{lb[0]+1:5d} {lb[1]+1:5d} {lb[2]+1:5d}\t{ub[0]+1:5d} {ub[1]+1:5d} {ub[2]+1:5d}\n")
 
-            lines.append(f"{block_indx:3d}\t{block_IMIN:5d} {block_JMIN:5d} {block_KMIN:5d}\t{block_IMAX:5d} {block_JMAX:5d} {block_KMAX:5d}\n")
+        # block2: directed lb/ub — flip varying axes based on permutation_index
+        # so that lb corners of block1 and block2 are spatially coincident.
+        block_indx = match['block2']['block_index']+1
+        lb, ub = _get_lb_ub(match['block2'])
+        lb, ub = _apply_directed_flip(lb, ub, perm_idx)
+        lines.append(f"{block_indx:3d}\t{lb[0]+1:5d} {lb[1]+1:5d} {lb[2]+1:5d}\t{ub[0]+1:5d} {ub[1]+1:5d} {ub[2]+1:5d}\n")
     # Print Surfaces 
     # Get total number of surfaces
     outer_faces.extend(gif_faces)
