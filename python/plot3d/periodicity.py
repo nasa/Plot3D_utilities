@@ -835,7 +835,7 @@ def linear_real_transform(face1:Face,face2:Face) -> Tuple:
         This function assumes the rotation axis is in the "x" direction. This is good for faces within the same block 
 
     Reference:
-        - Linear Real Transforms from GlennHT https://gitlab.grc.nasa.gov/lte-turbo/GlennHT/-/blob/master/src/M_ccMBMesh.F See computeLRT
+        - Linear Real Transforms (M_ccMBMesh.F, computeLRT)
         
     Args:
         Face1 (Face): Face to rotate

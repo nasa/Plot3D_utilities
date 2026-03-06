@@ -2,8 +2,8 @@
 
 This module provides:
 - ``index_space_normal``: Topological (integer) outward normal for a face.
-- ``compute_permutation_matrix``: Compute the 3x3 permutation matrix from diagonal
-  corners (replicates GlennHT's ``new_PTtransf`` formula).
+- ``compute_permutation_matrix``: Compute the 3x3 permutation matrix from
+  diagonal corners.
 - ``validate_connectivity``: Batch validation of face matches.
 - ``export_normals_json`` / ``import_normals_json``: Serialize face normals to/from JSON.
 - ``plot_face_normals``: Matplotlib 3D quiver plot of normals at face centroids.
@@ -59,7 +59,7 @@ def index_space_normal(lb: Sequence[int], ub: Sequence[int]) -> Optional[np.ndar
 
 
 # ---------------------------------------------------------------------------
-# Permutation matrix (GlennHT's PTtransf formula)
+# Permutation matrix from diagonal corners
 # ---------------------------------------------------------------------------
 
 def compute_permutation_matrix(
@@ -70,7 +70,8 @@ def compute_permutation_matrix(
 ) -> Optional[np.ndarray]:
     """Compute the 3x3 permutation matrix from diagonal corners.
 
-    Replicates GlennHT's ``new_PTtransf`` formula.
+    The formula maps block-1 indices to block-2 indices at a shared
+    interface:  ``j = a2 + M * (i - a1)``
 
     Parameters
     ----------
@@ -365,7 +366,6 @@ def plot_face_normals(
     if show_wireframe:
         for bi, blk in enumerate(blocks):
             ni, nj, nk = blk.X.shape
-            # Draw 12 edges of the bounding box
             corners = [
                 (0, 0, 0), (ni - 1, 0, 0), (ni - 1, nj - 1, 0), (0, nj - 1, 0),
                 (0, 0, nk - 1), (ni - 1, 0, nk - 1), (ni - 1, nj - 1, nk - 1), (0, nj - 1, nk - 1),
