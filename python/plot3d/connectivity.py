@@ -86,7 +86,6 @@ Bit encoding: ``index = u_reversed | (v_reversed << 1) | (swapped << 2)``
 """
 
 
-
 def _orient_vec_to_permutation(orient_vec: list, lb1: list, ub1: list,
                                lb2: list, ub2: list) -> Tuple[int, str]:
     """Convert an orientation vector to a ``(permutation_index, plane)`` tuple.

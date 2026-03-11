@@ -551,22 +551,22 @@ def summarize_contiguous(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:List[Dict[str,int]],filename:str, 
+def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:List[Dict[str,int]],filename:str,
                            gif_pairs:List[List[Dict[str, int]]],gif_faces:List[List[Dict[str, int]]],
                                volume_zones:List[Dict[str,Any]]):
-    """Exports the connectivity to GlennHT format 
+    """Exports the connectivity to GlennHT format
 
     Args:
-        matches (Dict[str,Dict[int,str]]): Any matching faces between blocks 
-        outer_faces (Dict[str,int]): Non matching faces of all blocks or surfaces to consider 
+        matches (Dict[str,Dict[int,str]]): Any matching faces between blocks
+        outer_faces (Dict[str,int]): Non matching faces of all blocks or surfaces to consider
     """
     lines = list()
-    
+
     # Print face matches
     blocks = ['block1','block2']
     nMatches = len(matches)
-    lines.append(f'{nMatches}\n') # Print number of matches 
-    for match in matches:                        
+    lines.append(f'{nMatches}\n') # Print number of matches
+    for match in matches:
         for block in blocks:
             block_indx = match[block]['block_index']+1 # type: ignore # block1 and block2 are arbitrary names, the key is the block index 
             lb = match[block]['lb'] # type: ignore

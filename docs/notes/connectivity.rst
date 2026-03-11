@@ -52,23 +52,86 @@ When faces lie on **different constant planes** (e.g., a K-face connects to a J-
 
 **4 × 2 = 8 total permutations. lb/ub only encodes 4.**
 
-The ``orientation`` vector solves this. It is computed by ``_compute_orientation()`` in ``connectivity.py`` and maps each face1 axis to a face2 axis:
+Permutation Matrix System
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: python
+Both the Python and Rust implementations encode all 8 orientations as a 3-bit ``permutation_index`` into an array of 2×2 signed matrices (``PERMUTATION_MATRICES``):
 
-    # orientation = [d1_maps_to, d2_maps_to, d3_maps_to]
-    # 1-indexed: 1=I, 2=J, 3=K
-    #
-    # Example: orientation = [2, 1, 3]
-    #   face1 I-axis -> face2 J-axis
-    #   face1 J-axis -> face2 I-axis
-    #   face1 K-axis -> face2 K-axis
+.. code-block:: text
 
-Direction (forward/reverse) is encoded in the ``lb/ub`` values, not in the orientation vector. The ``verify.py`` module's ``_generate_permutations()`` tests all 8 combinations (4 direct + 4 transposed) to confirm the match.
+    permutation_index = u_reversed | (v_reversed << 1) | (swapped << 2)
 
-For a detailed analysis with diagrams, see the `Root Cause Analysis <https://github.com/nasa/Plot3D_utilities/blob/main/docs/notes/unverified_connectivity_findings.md>`_ document.
+.. list-table:: The 8 Permutation Matrices
+   :header-rows: 1
+   :widths: 8 8 8 8 8 20 20
 
-**Rust version**: The `plot3d-rs <https://github.com/pjuangph/plot3d-rs>`_ crate mirrors this logic but stores orientation as flags: ``Orientation { swapped, u_reversed, v_reversed }``. Both representations encode the same 8 permutations.
+   * - Index
+     - Binary
+     - u_rev
+     - v_rev
+     - swap
+     - Matrix
+     - Effect
+   * - 0
+     - ``000``
+     - no
+     - no
+     - no
+     - ``[[ 1, 0],[ 0, 1]]``
+     - identity
+   * - 1
+     - ``001``
+     - yes
+     - no
+     - no
+     - ``[[-1, 0],[ 0, 1]]``
+     - flip u
+   * - 2
+     - ``010``
+     - no
+     - yes
+     - no
+     - ``[[ 1, 0],[ 0,-1]]``
+     - flip v
+   * - 3
+     - ``011``
+     - yes
+     - yes
+     - no
+     - ``[[-1, 0],[ 0,-1]]``
+     - flip both
+   * - 4
+     - ``100``
+     - no
+     - no
+     - yes
+     - ``[[ 0, 1],[ 1, 0]]``
+     - transpose
+   * - 5
+     - ``101``
+     - yes
+     - no
+     - yes
+     - ``[[ 0,-1],[ 1, 0]]``
+     - transpose + flip u
+   * - 6
+     - ``110``
+     - no
+     - yes
+     - yes
+     - ``[[ 0, 1],[-1, 0]]``
+     - transpose + flip v
+   * - 7
+     - ``111``
+     - yes
+     - yes
+     - yes
+     - ``[[ 0,-1],[-1, 0]]``
+     - transpose + both
+
+In **Python**, the ``PERMUTATION_MATRICES`` constant is defined in ``connectivity.py`` and ``_orient_vec_to_permutation()`` converts the legacy orientation vector to a ``permutation_index``.
+
+In **Rust**, the ``PERMUTATION_MATRICES`` constant is in ``face_record.rs`` and each ``FaceMatch`` carries an ``Orientation { permutation_index, plane }`` set by ``verify_connectivity``.
 
 The ``u`` and ``v`` names are abstract — they map to concrete i/j/k axes depending on which axis is constant:
 
@@ -90,6 +153,52 @@ The ``u`` and ``v`` names are abstract — they map to concrete i/j/k axes depen
      - j
 
 So ``u_reversed: true`` means the outer-loop axis runs opposite direction on block2 vs block1, and ``v_reversed: true`` means the inner-loop axis runs opposite.
+
+Legacy Orientation Vector
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The older Python ``_compute_orientation()`` in ``connectivity.py`` produces an orientation vector that maps each face1 axis to a face2 axis:
+
+.. code-block:: python
+
+    # orientation = [d1_maps_to, d2_maps_to, d3_maps_to]
+    # 1-indexed: 1=I, 2=J, 3=K
+    #
+    # Example: orientation = [2, 1, 3]
+    #   face1 I-axis -> face2 J-axis
+    #   face1 J-axis -> face2 I-axis
+    #   face1 K-axis -> face2 K-axis
+
+Direction (forward/reverse) is encoded in the ``lb/ub`` values, not in the orientation vector. The ``_orient_vec_to_permutation()`` function converts this vector to a ``permutation_index`` for the unified system. The verification modules (``verify_connectivity`` / ``verify_periodicity``) test all 8 permutations to confirm the match.
+
+For a detailed analysis with diagrams, see the `Root Cause Analysis <https://github.com/nasa/Plot3D_utilities/blob/main/docs/notes/unverified_connectivity_findings.md>`_ document.
+
+
+Directed Diagonal for GHT_CONN Export
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The GlennHT connectivity file (``.ght_conn``) uses a **directed diagonal** convention where each face is specified by two corners ``(IMIN, JMIN, KMIN)`` and ``(IMAX, JMAX, KMAX)``. For cross-plane matches, the traversal direction is encoded by allowing the "max" corner to be less than the "min" corner on reversed axes. For example:
+
+.. code-block:: text
+
+    1   1   1   1   25  409   1
+    2 409   1   1    1    1  25
+
+Here block 2's i-axis runs 409 → 1 (reversed), encoding the cross-plane orientation without a separate permutation matrix.
+
+When connectivity is computed in **Python** (via ``connectivity_fast``), the ``lb``/``ub`` values already encode the directed diagonal from the point-match traversal order.
+
+When connectivity is computed in **Rust** (via the ``connectivity-finder`` binary in grid-packed), the JSON output uses ascending ``lo``/``hi`` bounds with a ``permutation_index`` (0-7). Use ``reconstruct_directed_diagonal()`` to convert these to directed ``lb``/``ub`` before exporting:
+
+.. code-block:: python
+
+    from plot3d.connectivity import reconstruct_directed_diagonal
+
+    # face_match has ascending lb/ub + permutation_index from Rust JSON
+    directed_match = reconstruct_directed_diagonal(face_match)
+    # directed_match now has directed lb/ub and permutation_index = -1
+
+The ``export_to_glennht_conn()`` function applies this reconstruction automatically, so callers do not need to call it explicitly.
 
 
 Plotting Connectivity using Paraview
