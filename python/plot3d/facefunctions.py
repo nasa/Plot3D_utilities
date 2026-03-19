@@ -131,42 +131,38 @@ def get_outer_faces(block1:Block):
     # block_center_to_face_center =  block1.cx
     return non_matching, matching # these should be the outer faces
     
-def create_face_from_diagonals(block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int) -> Face:
-    """Creates a face on a block given a the diagonals defined as (IMIN,JMIN,KMIN), (IMAX, JMAX, KMAX)
+def create_face_from_diagonals(block:Block,lb:List[int],ub:List[int]) -> Face:
+    """Creates a face on a block given a the diagonals defined as lb, ub
 
     Args:
-        block (Block): Block to create a face on 
-        imin (int): Lower Corner IMIN
-        jmin (int): Lower Corner JMIN
-        kmin (int): Lower Corner KMIN
-        imax (int): Upper Corner IMAX
-        jmax (int): Upper Corner JMAX
-        kmax (int): Upper Corner
+        block (Block): Block to create a face on
+        lb (List[int]): Lower bound diagonal [i, j, k]
+        ub (List[int]): Upper bound diagonal [i, j, k]
 
     Returns:
-        (Face): Face created from diagonals 
+        (Face): Face created from diagonals
     """
-    newFace = Face(4)           # This is because two of the corners either imin or imax can be equal
-    if imin==imax:
-        i = imin
-        for j in [jmin,jmax]:
-            for k in [kmin,kmax]:
+    newFace = Face(4)           # This is because two of the corners either lb[0] or ub[0] can be equal
+    if lb[0]==ub[0]:
+        i = lb[0]
+        for j in [lb[1],ub[1]]:
+            for k in [lb[2],ub[2]]:
                 x = block.X[i,j,k]
                 y = block.Y[i,j,k]
                 z = block.Z[i,j,k]
                 newFace.add_vertex(x,y,z,i,j,k)
-    elif jmin==jmax:
-        j = jmin
-        for i in [imin,imax]:
-            for k in [kmin,kmax]:
+    elif lb[1]==ub[1]:
+        j = lb[1]
+        for i in [lb[0],ub[0]]:
+            for k in [lb[2],ub[2]]:
                 x = block.X[i,j,k]
                 y = block.Y[i,j,k]
                 z = block.Z[i,j,k]
                 newFace.add_vertex(x,y,z,i,j,k)
-    elif kmin==kmax:
-        k = kmin
-        for i in [imin,imax]:
-            for j in [jmin,jmax]:
+    elif lb[2]==ub[2]:
+        k = lb[2]
+        for i in [lb[0],ub[0]]:
+            for j in [lb[1],ub[1]]:
                 x = block.X[i,j,k]
                 y = block.Y[i,j,k]
                 z = block.Z[i,j,k]
@@ -448,7 +444,7 @@ def find_closest_block(blocks:List[Block],x:np.ndarray,y:np.ndarray,z:np.ndarray
     return selected_block_indx,target_x,target_y,target_z 
 
 
-def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:int,jmax:int,kmax:int):
+def split_face(face_to_split:Face, block:Block,ilb:int,jlb:int,klb:int,iub:int,jub:int,kub:int):
     """Splits a face with another face within the same block 
         picture the split as a two rectangles inside each other
 
@@ -474,77 +470,62 @@ def split_face(face_to_split:Face, block:Block,imin:int,jmin:int,kmin:int,imax:i
     Returns:
         [List[Faces]]: List of unique faces from the split 
     """
-    center_face = create_face_from_diagonals(block,
-            imin=imin,imax=imax,
-            jmin=jmin,jmax=jmax,
-            kmin=kmin,kmax=kmax)
+    center_face = create_face_from_diagonals(block,[ilb,jlb,klb],[iub,jub,kub])
 
-    if kmin == kmax:
+    if klb == kub:
         # In the picture above Horizontal = i, vertical = j
         left_face = create_face_from_diagonals(block,
-                imin=face_to_split.IMIN,imax=imin,
-                jmin=face_to_split.JMIN,jmax=face_to_split.JMAX,
-                kmin=kmin, kmax=kmax)
+                [face_to_split.IMIN,face_to_split.JMIN,klb],
+                [ilb,face_to_split.JMAX,kub])
 
-        
+
         right_face = create_face_from_diagonals(block,
-                imin=imax, imax=face_to_split.IMAX,
-                jmin=face_to_split.JMIN, jmax=face_to_split.JMAX,
-                kmin=kmin, kmax=kmax)
+                [iub,face_to_split.JMIN,klb],
+                [face_to_split.IMAX,face_to_split.JMAX,kub])
 
         top_face = create_face_from_diagonals(block,
-            imin=imin,imax=imax,
-            jmin=jmax,jmax=face_to_split.JMAX,
-            kmin=kmin,kmax=kmax)
-        
-        bottom_face = create_face_from_diagonals(block,
-            imin=imin,imax=imax,
-            jmin=face_to_split.JMIN,jmax=jmin,
-            kmin=kmin,kmax=kmax)  
+            [ilb,jub,klb],
+            [iub,face_to_split.JMAX,kub])
 
-    elif (imin==imax):
+        bottom_face = create_face_from_diagonals(block,
+            [ilb,face_to_split.JMIN,klb],
+            [iub,jlb,kub])
+
+    elif (ilb==iub):
         # In the picture above Horizontal = j, vertical = k
         left_face = create_face_from_diagonals(block,
-            imin=imin,imax=imax,
-            jmin=face_to_split.JMIN, jmax=jmin,
-            kmin=face_to_split.KMIN,kmax=face_to_split.KMAX)
+            [ilb,face_to_split.JMIN,face_to_split.KMIN],
+            [iub,jlb,face_to_split.KMAX])
 
         right_face = create_face_from_diagonals(block,
-            imin=imin,imax=imax,
-            jmin=jmax, jmax=face_to_split.JMAX,
-            kmin=face_to_split.KMIN,kmax=face_to_split.KMAX)
+            [ilb,jub,face_to_split.KMIN],
+            [iub,face_to_split.JMAX,face_to_split.KMAX])
 
         top_face = create_face_from_diagonals(block,
-            imin=imin,imax=imax,
-            jmin=jmin,jmax=jmax,
-            kmin=kmax,kmax=face_to_split.KMAX)
+            [ilb,jlb,kub],
+            [iub,jub,face_to_split.KMAX])
 
         bottom_face = create_face_from_diagonals(block,
-            imin=imin,imax=imax,
-            jmin=jmin,jmax=jmax,
-            kmin=face_to_split.KMIN,kmax=kmin)
+            [ilb,jlb,face_to_split.KMIN],
+            [iub,jub,klb])
 
-    elif (jmin==jmax):
-        # In the picture above Horizontal = i, vertical = k 
+    elif (jlb==jub):
+        # In the picture above Horizontal = i, vertical = k
         left_face = create_face_from_diagonals(block,
-            imin=face_to_split.IMIN,imax=imin,
-            jmin=jmin,jmax=jmax,
-            kmin=face_to_split.KMIN,kmax=face_to_split.KMAX)
+            [face_to_split.IMIN,jlb,face_to_split.KMIN],
+            [ilb,jub,face_to_split.KMAX])
 
         right_face = create_face_from_diagonals(block,
-            imin=imax,imax=face_to_split.IMAX,
-            jmin=jmin,jmax=jmax,
-            kmin=face_to_split.KMIN,kmax=face_to_split.KMAX)
-        
+            [iub,jlb,face_to_split.KMIN],
+            [face_to_split.IMAX,jub,face_to_split.KMAX])
+
         top_face = create_face_from_diagonals(block,
-            imin=imin,imax=imax,
-            jmin=jmin,jmax=jmax,
-            kmin=kmax,kmax=face_to_split.KMAX)
-        
+            [ilb,jlb,kub],
+            [iub,jub,face_to_split.KMAX])
+
         bottom_face = create_face_from_diagonals(block,
-            imin=imin, imax=imax,
-            jmin=jmin, jmax=jmax,
-            kmin=face_to_split.KMIN, kmax=kmin)
+            [ilb,jlb,face_to_split.KMIN],
+            [iub,jub,klb])
     
     faces = [top_face,bottom_face,left_face,right_face]
     faces = [f for f in faces if not f.isEdge and not f.index_equals(center_face)] # Remove edges
@@ -571,7 +552,7 @@ def find_face_nearest_point(faces:List[Face], x:float,y:float,z:float):
     face_index = np.argmin(np.array(dv))
     return face_index
 
-def outer_face_dict_to_list(blocks:List[Block],outer_faces:List[Dict[str,int]],gcd:int=1) -> List[Face]:
+def outer_face_dict_to_list(blocks:List[Block],outer_faces:List[Dict],gcd:int=1) -> List[Face]:
     """Converts a list of dictionary face representations to a list of faces. Use this only for outer faces 
 
     Args:
@@ -584,8 +565,9 @@ def outer_face_dict_to_list(blocks:List[Block],outer_faces:List[Dict[str,int]],g
     """
     outer_faces_all = list()
     for o in outer_faces:
-        face = create_face_from_diagonals(blocks[o['block_index']], int(o['IMIN']/gcd), int(o['JMIN']/gcd), 
-            int(o['KMIN']/gcd), int(o['IMAX']/gcd), int(o['JMAX']/gcd), int(o['KMAX']/gcd))
+        face = create_face_from_diagonals(blocks[o['block_index']],
+            [int(o['lb'][0]/gcd), int(o['lb'][1]/gcd), int(o['lb'][2]/gcd)],
+            [int(o['ub'][0]/gcd), int(o['ub'][1]/gcd), int(o['ub'][2]/gcd)])
         if 'id' in o.keys():
             face.id = o['id']
         face.set_block_index(o['block_index'])
@@ -593,7 +575,7 @@ def outer_face_dict_to_list(blocks:List[Block],outer_faces:List[Dict[str,int]],g
 
     return outer_faces_all
 
-def match_faces_dict_to_list(blocks:List[Block],matched_faces:List[Dict[str,int]],gcd:int=1):
+def match_faces_dict_to_list(blocks:List[Block],matched_faces:List[Dict],gcd:int=1):
     """Converts a list of dictionaries representing matched faces to a list of Faces
 
     Args:
@@ -606,12 +588,12 @@ def match_faces_dict_to_list(blocks:List[Block],matched_faces:List[Dict[str,int]
     """
     matched_faces_all = list() 
     for _,m in enumerate(matched_faces):
-        face1 = create_face_from_diagonals(blocks[m['block1']['block_index']], 
-                            int(m['block1']['IMIN']/gcd), int(m['block1']['JMIN']/gcd), int(m['block1']['KMIN']/gcd), 
-                            int(m['block1']['IMAX']/gcd), int(m['block1']['JMAX']/gcd), int(m['block1']['KMAX']/gcd))
-        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']], 
-                            int(m['block2']['IMIN']/gcd), int(m['block2']['JMIN']/gcd), int(m['block2']['KMIN']/gcd), 
-                            int(m['block2']['IMAX']/gcd), int(m['block2']['JMAX']/gcd), int(m['block2']['KMAX']/gcd))
+        face1 = create_face_from_diagonals(blocks[m['block1']['block_index']],
+                            [int(m['block1']['lb'][0]/gcd), int(m['block1']['lb'][1]/gcd), int(m['block1']['lb'][2]/gcd)],
+                            [int(m['block1']['ub'][0]/gcd), int(m['block1']['ub'][1]/gcd), int(m['block1']['ub'][2]/gcd)])
+        face2 = create_face_from_diagonals(blocks[m['block2']['block_index']],
+                            [int(m['block2']['lb'][0]/gcd), int(m['block2']['lb'][1]/gcd), int(m['block2']['lb'][2]/gcd)],
+                            [int(m['block2']['ub'][0]/gcd), int(m['block2']['ub'][1]/gcd), int(m['block2']['ub'][2]/gcd)])
         face1.set_block_index(m['block1']['block_index'])
         if 'id' in m['block1'].keys():
             face1.id = m['block1']['id']

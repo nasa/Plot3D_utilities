@@ -14,27 +14,14 @@ def __write_plot3D_block_binary(f, B:Block, big_endian:bool=False, double_precis
         B (Block): writes a single block to a file
         big_endian (bool): use big-endian byte order. Defaults to False (little-endian).
         double_precision (bool): writes to binary using double precision. Defaults to True.
-        batch_size (int, optional): number of packed values to buffer before writing. Defaults to 100.
+        batch_size (int, optional): unused, kept for API compatibility.
 
     See: https://docs.python.org/3/library/struct.html
     """
-    def write_var(V:np.ndarray):
-        endian = '>' if big_endian else '<'
-        fmt = f'{endian}d' if double_precision else f'{endian}f'
-        value_size = struct.calcsize(fmt)
-        buffer = bytearray()
-        buffer_limit = value_size * batch_size
-
-        for k in range(B.KMAX):
-            for j in range(B.JMAX):
-                for i in range(B.IMAX):
-                    buffer.extend(struct.pack(fmt, V[i,j,k]))
-                    if len(buffer) >= buffer_limit:
-                        f.write(buffer)
-                        buffer.clear()
-
-        if buffer:
-            f.write(buffer)
+    byte_order = '>' if big_endian else '<'
+    dtype = np.dtype(f'{byte_order}f8' if double_precision else f'{byte_order}f4')
+    def write_var(V: np.ndarray):
+        f.write(V.transpose(2, 1, 0).astype(dtype).tobytes())
     write_var(B.X)
     write_var(B.Y)
     write_var(B.Z)
@@ -48,34 +35,17 @@ def __write_plot3D_block_ASCII(f, B:Block, double_precision:bool=True, columns:i
         B (Block): writes a single block to a file
         double_precision (bool, optional): Use double precision format (15 decimals). Defaults to True.
         columns (int, optional): Number of columns in the file. Defaults to 6.
-        batch_size (int, optional): number of lines to buffer before writing. Defaults to 100.
+        batch_size (int, optional): unused, kept for API compatibility.
     """
-    # Scientific notation format: width.precision E
-    fmt = '{0:23.15f}' if double_precision else '{0:15.8f}'
+    fmt = '%.15f' if double_precision else '%.8f'
 
-    def write_var(V:np.ndarray):
-        line_entries = []
-        line_batch = []
-
-        def flush_batch():
-            if line_batch:
-                f.writelines(line_batch)
-                line_batch.clear()
-
-        for k in range(B.KMAX):
-            for j in range(B.JMAX):
-                for i in range(B.IMAX):
-                    line_entries.append(fmt.format(V[i,j,k]))
-                    if len(line_entries) == columns:
-                        line_batch.append(' '.join(line_entries) + '\n')
-                        line_entries.clear()
-                        if len(line_batch) == batch_size:
-                            flush_batch()
-
-        if line_entries:
-            line_batch.append(' '.join(line_entries) + '\n')
-
-        flush_batch()
+    def write_var(V: np.ndarray):
+        flat = V.transpose(2, 1, 0).ravel()
+        lines = []
+        for start in range(0, len(flat), columns):
+            chunk = flat[start:start + columns]
+            lines.append(' '.join(fmt % v for v in chunk) + '\n')
+        f.writelines(lines)
     write_var(B.X)
     write_var(B.Y)
     write_var(B.Z)

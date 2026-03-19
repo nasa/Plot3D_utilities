@@ -319,13 +319,13 @@ def print_connectivity(filename:str,matches:List[Dict[str,int]],faces_and_types:
         for match in matches:                        
             for block in match_keys:
                 block_indx = match[block]['block_index']+1 
-                block_IMIN = match[block]['IMIN']+1
-                block_JMIN = match[block]['JMIN']+1
-                block_KMIN = match[block]['KMIN']+1
+                block_IMIN = match[block]['lb'][0]+1
+                block_JMIN = match[block]['lb'][1]+1
+                block_KMIN = match[block]['lb'][2]+1
 
-                block_IMAX = match[block]['IMAX']+1
-                block_JMAX = match[block]['JMAX']+1
-                block_KMAX = match[block]['KMAX']+1
+                block_IMAX = match[block]['ub'][0]+1
+                block_JMAX = match[block]['ub'][1]+1
+                block_KMAX = match[block]['ub'][2]+1
 
                 lines.append(f"{block_indx:3d}\t{block_IMIN:5d} {block_JMIN:5d} {block_KMIN:5d}\t{block_IMAX:5d} {block_JMAX:5d} {block_KMAX:5d}\n")
         return lines
@@ -334,13 +334,13 @@ def print_connectivity(filename:str,matches:List[Dict[str,int]],faces_and_types:
         lines = list()
         for f in faces_and_types['faces']:
             block_index = f["block_index"]
-            IMIN = f['IMIN']+1
-            JMIN = f['JMIN']+1
-            KMIN = f['KMIN']+1
-            
-            IMAX = f['IMAX']+1
-            JMAX = f['JMAX']+1
-            KMAX = f['KMAX']+1
+            IMIN = f['lb'][0]+1
+            JMIN = f['lb'][1]+1
+            KMIN = f['lb'][2]+1
+
+            IMAX = f['ub'][0]+1
+            JMAX = f['ub'][1]+1
+            KMAX = f['ub'][2]+1
             lines.append(f"{block_index:3d}\t{IMIN:5d} {JMIN:5d} {KMIN:5d}\t{IMAX:5d} {JMAX:5d} {KMAX:5d}\t{id:4d} \n")
         return lines 
 

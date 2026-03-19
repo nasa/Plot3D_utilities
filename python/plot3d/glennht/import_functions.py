@@ -37,12 +37,12 @@ def read_ght_conn(filename:str):
                 if idx % 2 == 0: # When there is a pair of blockd, write to the list
                     block_to_block.append({
                         'block1':{'block_index':blk_id1,
-                                  "IMIN":IMIN,"JMIN":JMIN,"KMIN":KMIN,
-                                  "IMAX":IMAX,"JMAX":JMAX,"KMAX":KMAX},
+                                  "lb":[IMIN,JMIN,KMIN],
+                                  "ub":[IMAX,JMAX,KMAX]},
                         'block2':{'block_index':temp[0],
-                                  "IMIN":temp[1],"JMIN":temp[2],"KMIN":temp[3],
-                                  "IMAX":temp[4],"JMAX":temp[5],"KMAX":temp[6]},
-                        
+                                  "lb":[temp[1],temp[2],temp[3]],
+                                  "ub":[temp[4],temp[5],temp[6]]},
+
                     })                   
                 else:
                     blk_id1 = temp[0]
@@ -58,8 +58,8 @@ def read_ght_conn(filename:str):
             temp = [int(x)-1 for x in temp if x]
             outer_faces.append({
                 "block_index":temp[0],
-                "IMIN":temp[1],"JMIN":temp[2],"KMIN":temp[3],
-                "IMAX":temp[4],"JMAX":temp[5],"KMAX":temp[6],
+                "lb":[temp[1],temp[2],temp[3]],
+                "ub":[temp[4],temp[5],temp[6]],
                 "id":temp[7]
                 })
         
@@ -90,14 +90,14 @@ def read_ght_conn(filename:str):
     
         # Find out how many connecting nodes each block has 
         l1 = [(row['block1']['block_index'],
-              (row['block1']['IMAX']-row['block1']['IMIN'])*
-              (row['block1']['JMAX']-row['block1']['IMIN'])*
-              (row['block1']['KMAX']-row['block1']['KMIN']))
+              (row['block1']['ub'][0]-row['block1']['lb'][0])*
+              (row['block1']['ub'][1]-row['block1']['lb'][1])*
+              (row['block1']['ub'][2]-row['block1']['lb'][2]))
               for row in block_to_block]
         l2= [(row['block2']['block_index'],
-              (row['block2']['IMAX']-row['block2']['IMIN'])*  
-              (row['block2']['JMAX']-row['block2']['IMIN'])*
-              (row['block2']['KMAX']-row['block2']['KMIN']))
+              (row['block2']['ub'][0]-row['block2']['lb'][0])*
+              (row['block2']['ub'][1]-row['block2']['lb'][1])*
+              (row['block2']['ub'][2]-row['block2']['lb'][2]))
               for row in block_to_block]
         
         l1.extend(l2)

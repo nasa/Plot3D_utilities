@@ -152,9 +152,9 @@ if __name__=="__main__":
             # Add Plots for Matched Faces 
             if f['block1']['index'] == b or f['block2']['index'] == b : 
                 if f['block1']['index'] == b:
-                    voi = [f['block1']['IMIN'], f['block1']['IMAX'], f['block1']['JMIN'], f['block1']['JMAX'],f['block1']['KMIN'], f['block1']['KMAX']]
+                    voi = [f['block1']['lb'][0], f['block1']['ub'][0], f['block1']['lb'][1], f['block1']['ub'][1],f['block1']['lb'][2], f['block1']['ub'][2]]
                 else:
-                    voi = [f['block2']['IMIN'], f['block2']['IMAX'], f['block2']['JMIN'], f['block2']['JMAX'],f['block2']['KMIN'], f['block2']['KMAX']]
+                    voi = [f['block2']['lb'][0], f['block2']['ub'][0], f['block2']['lb'][1], f['block2']['ub'][1],f['block2']['lb'][2], f['block2']['ub'][2]]
                 CreateSubset(block_source, voi, name='match '+str(match_indx))
         
         # Plot the outer faces  
@@ -162,6 +162,6 @@ if __name__=="__main__":
             # Add Plots for Outer Faces
             if o['index'] == b:
                 for surface in o['surfaces']:
-                    voi = [surface['IMIN'], surface['IMAX'], surface['JMIN'], surface['JMAX'],surface['KMIN'], surface['KMAX']]
+                    voi = [surface['lb'][0], surface['ub'][0], surface['lb'][1], surface['ub'][1],surface['lb'][2], surface['ub'][2]]
                     CreateSubset(block_source, voi, name='outer_face '+str(surface_indx),opacity=0.2)
                     surface_indx +=1 

@@ -113,7 +113,7 @@ def split_blocks(blocks:List[Block], ncells_per_block:int,direction:Direction=No
     
 
         Wisdom from Dave Rigby:
-            For example, for radial equilibrium we must integrate across the span.  Some codes (GlennHT used to) would want a single block across the entire span.  In that case you would want some additional control.
+            For example, for radial equilibrium we must integrate across the span.  Some solvers would want a single block across the entire span.  In that case you would want some additional control.
  
             Another example might be if you would like a block to include the entire boundary layer.  In that case you might introduce an aspect ratio control.
             

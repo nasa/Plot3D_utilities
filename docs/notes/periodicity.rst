@@ -33,3 +33,19 @@ In this example we will use the file  `PahtCascade-ASCII <https://nasa-public-da
     :align: center
     :alt: periodic surface block 2 exit of the domain
     :figclass: align-center
+
+Verification
+**************
+
+After computing periodic matches, call ``verify_periodicity`` to confirm that
+face pairs align after rotation and to set the correct ``permutation_index``
+(0-7) from the ``PERMUTATION_MATRICES`` system. This is the same 8-permutation
+scheme used for connectivity — see :doc:`connectivity` for the full table.
+
+.. code-block:: python
+
+    from plot3d import verify_periodicity
+
+    verified, mismatched = verify_periodicity(
+        blocks, periodic_surfaces, rotation_angle_rad, rotation_axis='x', tol=1e-4
+    )

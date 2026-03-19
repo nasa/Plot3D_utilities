@@ -9,12 +9,12 @@ def read_connectivity_file(filename:str):
         for i in range(nConnectionPairs):
             pair1 = [int(w.replace('\n','')) for w in f.readline().split(' ') if w]
             pair2 = [int(w.replace('\n','')) for w in f.readline().split(' ') if w]
-            connections.append({ "block1":{ 'index':pair1[0], 
-                                    'IMIN':pair1[1],'JMIN':pair1[2],'KMIN':pair1[3],
-                                    'IMAX':pair1[4],'JMAX':pair1[5],'KMAX':pair1[6] },
-                                  "block2":{ 'index':pair2[0], 
-                                    'IMIN':pair2[1],'JMIN':pair2[2],'KMIN':pair2[3],
-                                    'IMAX':pair2[4],'JMAX':pair2[5],'KMAX':pair2[6] }
+            connections.append({ "block1":{ 'index':pair1[0],
+                                    'lb':[pair1[1],pair1[2],pair1[3]],
+                                    'ub':[pair1[4],pair1[5],pair1[6]] },
+                                  "block2":{ 'index':pair2[0],
+                                    'lb':[pair2[1],pair2[2],pair2[3]],
+                                    'ub':[pair2[4],pair2[5],pair2[6]] }
                                 })
     return connections
 
@@ -30,23 +30,23 @@ def compare_connectivity(con1:List,con2:List):
         bMatching = False
         pairs_1 = con1[p]    
         p1_block_1_index = pairs_1['block1']['index']
-        p1_block_1_corner = np.array([pairs_1['block1']['IMIN'], pairs_1['block1']['JMIN'], pairs_1['block1']['KMIN'],
-                                        pairs_1['block1']['IMAX'], pairs_1['block1']['JMAX'], pairs_1['block1']['KMAX']])
-        
+        p1_block_1_corner = np.array([pairs_1['block1']['lb'][0], pairs_1['block1']['lb'][1], pairs_1['block1']['lb'][2],
+                                        pairs_1['block1']['ub'][0], pairs_1['block1']['ub'][1], pairs_1['block1']['ub'][2]])
+
         p1_block_2_index = pairs_1['block2']['index']
-        p1_block_2_corner = np.array([pairs_1['block2']['IMIN'], pairs_1['block2']['JMIN'], pairs_1['block2']['KMIN'],
-                                        pairs_1['block2']['IMAX'], pairs_1['block2']['JMAX'], pairs_1['block2']['KMAX']])
+        p1_block_2_corner = np.array([pairs_1['block2']['lb'][0], pairs_1['block2']['lb'][1], pairs_1['block2']['lb'][2],
+                                        pairs_1['block2']['ub'][0], pairs_1['block2']['ub'][1], pairs_1['block2']['ub'][2]])
         
         
         for q in range(len(con2)):
             pairs_2 = con2[q]  
             p2_block_1_index = pairs_2['block1']['index']
-            p2_block_1_corner = np.array([pairs_2['block1']['IMIN'], pairs_2['block1']['JMIN'], pairs_2['block1']['KMIN'],
-                                            pairs_2['block2']['IMAX'], pairs_2['block1']['JMAX'], pairs_2['block1']['KMAX']])
-            
+            p2_block_1_corner = np.array([pairs_2['block1']['lb'][0], pairs_2['block1']['lb'][1], pairs_2['block1']['lb'][2],
+                                            pairs_2['block2']['ub'][0], pairs_2['block1']['ub'][1], pairs_2['block1']['ub'][2]])
+
             p2_block_2_index = pairs_2['block2']['index']
-            p2_block_2_corner = np.array([pairs_2['block2']['IMIN'], pairs_2['block2']['JMIN'], pairs_2['block2']['KMIN'],
-                                            pairs_2['block2']['IMAX'], pairs_2['block2']['JMAX'], pairs_2['block2']['KMAX']])
+            p2_block_2_corner = np.array([pairs_2['block2']['lb'][0], pairs_2['block2']['lb'][1], pairs_2['block2']['lb'][2],
+                                            pairs_2['block2']['ub'][0], pairs_2['block2']['ub'][1], pairs_2['block2']['ub'][2]])
 
             # Check for matches 
             ## Check if the match is diagonal 
@@ -75,13 +75,13 @@ def write_connectivity(matches):
         for match in matches:                        
             for block in blocks:
                 block_indx = match[block]['index'] # block1 and block2 are arbitrary names, the key is the block index 
-                block_IMIN = match[block]['IMIN']
-                block_JMIN = match[block]['JMIN']
-                block_KMIN = match[block]['KMIN']
+                block_IMIN = match[block]['lb'][0]
+                block_JMIN = match[block]['lb'][1]
+                block_KMIN = match[block]['lb'][2]
 
-                block_IMAX = match[block]['IMAX']
-                block_JMAX = match[block]['JMAX']
-                block_KMAX = match[block]['KMAX']
+                block_IMAX = match[block]['ub'][0]
+                block_JMAX = match[block]['ub'][1]
+                block_KMAX = match[block]['ub'][2]
 
                 f.write(f"{block_indx:3d}\t{block_IMIN:5d} {block_JMIN:5d} {block_KMIN:5d}\t{block_IMAX:5d} {block_JMAX:5d} {block_KMAX:5d}\n")        
 

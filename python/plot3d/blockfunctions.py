@@ -14,6 +14,62 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  
 import numpy.typing as npt 
 
+def compute_min_gcd(blocks: List[Block]) -> int:
+    """Compute the minimum GCD across all block dimensions.
+
+    Args:
+        blocks: List of blocks.
+
+    Returns:
+        The minimum GCD value to use for uniform reduction.
+    """
+    return min(
+        math.gcd(b.IMAX - 1, math.gcd(b.JMAX - 1, b.KMAX - 1))
+        for b in blocks
+    )
+
+
+def scale_face_bounds(face_dicts: list, factor: int, divide: bool = False):
+    """Scale lb/ub bounds in face-match or outer-face dicts by a factor.
+
+    For face-match dicts (with 'block1'/'block2' sub-dicts) both sides
+    are scaled.  For outer-face dicts (flat dict with 'lb'/'ub') the
+    bounds are scaled directly.
+
+    Modifies *face_dicts* in place.
+
+    Args:
+        face_dicts: List of face-match or outer-face dicts.
+        factor: Scale factor.
+        divide: If True, divide by *factor*; otherwise multiply.
+    """
+    op = (lambda x: x // factor) if divide else (lambda x: x * factor)
+    for d in face_dicts:
+        if 'block1' in d:
+            for side in ('block1', 'block2'):
+                d[side]['lb'] = [op(x) for x in d[side]['lb']]
+                d[side]['ub'] = [op(x) for x in d[side]['ub']]
+        else:
+            d['lb'] = [op(x) for x in d['lb']]
+            d['ub'] = [op(x) for x in d['ub']]
+
+
+def constant_axis(lb: list, ub: list) -> int:
+    """Return the index (0, 1, or 2) of the constant axis on a face, or -1.
+
+    Args:
+        lb: Lower bound [i, j, k].
+        ub: Upper bound [i, j, k].
+
+    Returns:
+        Axis index where lb[d] == ub[d], or -1 if none found.
+    """
+    for d in range(3):
+        if lb[d] == ub[d]:
+            return d
+    return -1
+
+
 def rotate_block(block,rotation_matrix:np.ndarray) -> Block:
     """Rotates a block by a rotation matrix
 
@@ -90,21 +146,31 @@ def block_connection_matrix(
     use_area_fallback: bool = True,
     area_min_overlap_frac: float = 0.01
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Creates matrices representing how blocks are connected.
+    """Create matrices representing how blocks are connected.
+
+    GCD-reduces blocks for speed, then checks every block pair for shared
+    nodes (primary) or overlapping face area (fallback).
+
+    Args:
+        blocks: List of all blocks.
+        outer_faces: Pre-computed outer faces as dicts with 'block_index', 'lb', 'ub'.
+            If empty, outer faces are computed automatically.
+        tol: General tolerance (unused directly; kept for API compat).
+        node_tol_xyz: Tolerance for node-sharing check.
+        min_shared_frac: Minimum fraction of shared nodes to count as connected.
+        min_shared_abs: Minimum absolute number of shared nodes.
+        stride_u: Sampling stride along u-axis for node check.
+        stride_v: Sampling stride along v-axis for node check.
+        use_area_fallback: If True, fall back to polygon-overlap check.
+        area_min_overlap_frac: Minimum overlap fraction for area fallback.
 
     Returns:
-        connectivity     : (n,n) overall connectivity (1 = connected, -1 = not)
-        connectivity_i   : (n,n) connections where both faces are I-constant
-        connectivity_j   : (n,n) connections where both faces are J-constant
-        connectivity_k   : (n,n) connections where both faces are K-constant
+        (connectivity, connectivity_i, connectivity_j, connectivity_k):
+        Four (n, n) matrices where 1 = connected, -1 = not connected.
+        The last three are axis-specific (both faces I/J/K-constant).
     """
     # Reduce the size of the blocks by the minimum GCD so index grids line up
-    gcd_array = []
-    for block_indx in range(len(blocks)):
-        block = blocks[block_indx]
-        gcd_array.append(math.gcd(block.IMAX - 1, math.gcd(block.JMAX - 1, block.KMAX - 1)))
-    gcd_to_use = min(gcd_array)
+    gcd_to_use = compute_min_gcd(blocks)
     blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
     # Convert dict outer faces (if provided) to Face objects at the reduced resolution
@@ -112,8 +178,8 @@ def block_connection_matrix(
     for o in outer_faces:
         face = create_face_from_diagonals(
             blocks[o["block_index"]],
-            int(o["IMIN"] / gcd_to_use), int(o["JMIN"] / gcd_to_use), int(o["KMIN"] / gcd_to_use),
-            int(o["IMAX"] / gcd_to_use), int(o["JMAX"] / gcd_to_use), int(o["KMAX"] / gcd_to_use)
+            [int(o["lb"][0] / gcd_to_use), int(o["lb"][1] / gcd_to_use), int(o["lb"][2] / gcd_to_use)],
+            [int(o["ub"][0] / gcd_to_use), int(o["ub"][1] / gcd_to_use), int(o["ub"][2] / gcd_to_use)]
         )
         face.set_block_index(o["block_index"])
         if "id" in o:
@@ -196,7 +262,15 @@ def block_connection_matrix(
     return connectivity, connectivity_i, connectivity_j, connectivity_k
 
 def plot_blocks(blocks):
-    gcd_array = list()    
+    """Plot all blocks as a 3D wireframe grid using matplotlib.
+
+    GCD-reduces blocks for faster rendering, then draws grid lines
+    along each axis for every block with alternating markers.
+
+    Args:
+        blocks: List of Block objects to plot.
+    """
+    gcd_array = list()
     for block_indx in range(len(blocks)):
         block = blocks[block_indx]
         gcd_array.append(math.gcd(block.IMAX-1, math.gcd(block.JMAX-1, block.KMAX-1)))
@@ -285,6 +359,15 @@ def standardize_block_orientation(block:Block):
     return Block(X, Y, Z)
 
 def checkCollinearity(v1:npt.NDArray, v2:npt.NDArray):
+    """Check if two 3D vectors are collinear (parallel or anti-parallel).
+
+    Args:
+        v1: First 3D vector.
+        v2: Second 3D vector.
+
+    Returns:
+        True if the cross product is the zero vector, False otherwise.
+    """
     # Calculate their cross product
     cross_P = np.cross(v1,v2) 
  
@@ -298,24 +381,35 @@ def checkCollinearity(v1:npt.NDArray, v2:npt.NDArray):
         return False
     
 def calculate_outward_normals(block:Block):
+    """Compute outward-facing normal vectors for all six faces of a block.
+
+    Uses corner points of each face to compute cross-product normals.
+
+    Args:
+        block: Block to compute normals for.
+
+    Returns:
+        (n_imin, n_jmin, n_kmin, n_imax, n_jmax, n_kmax): Six 3D normal vectors.
+    """
     # Calculate Normals
     X = block.X
     Y = block.Y
     Z = block.Z
-    imax = block.IMAX
-    jmax = block.JMAX
-    kmax = block.KMAX 
-    # IMAX - Normal should be out of the page        
+    # IMAX/JMAX/KMAX are shapes (e.g. 41); last valid index is shape-1
+    imax = block.IMAX - 1
+    jmax = block.JMAX - 1
+    kmax = block.KMAX - 1
+    # IMAX - Normal should be out of the page
     # Normals I direction: IMIN https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
-    x = [X[0,0,0],X[0,jmax,0],X[0,0,kmax]] 
+    x = [X[0,0,0],X[0,jmax,0],X[0,0,kmax]]
     y = [Y[0,0,0],Y[0,jmax,0],Y[0,0,kmax]]
     z = [Z[0,0,0],Z[0,jmax,0],Z[0,0,kmax]]
-    u = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]]) 
+    u = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
     v = np.array([x[2]-x[0],y[2]-y[0],z[2]-z[0]])
     n_imin = np.cross(u,v)
-    
+
     # Normals I direction: IMAX
-    x = [X[imax,0,0],X[imax,jmax,0],X[imax,0,kmax]] 
+    x = [X[imax,0,0],X[imax,jmax,0],X[imax,0,kmax]]
     y = [Y[imax,0,0],Y[imax,jmax,0],Y[imax,0,kmax]]
     z = [Z[imax,0,0],Z[imax,jmax,0],Z[imax,0,kmax]]
     v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
@@ -323,7 +417,7 @@ def calculate_outward_normals(block:Block):
     n_imax = np.cross(v1,v2)
 
     # Normals J direction: JMIN
-    x = [X[0,0,0],X[imax,0,0],X[0,0,kmax]] 
+    x = [X[0,0,0],X[imax,0,0],X[0,0,kmax]]
     y = [Y[0,0,0],Y[imax,0,0],Y[0,0,kmax]]
     z = [Z[0,0,0],Z[imax,0,0],Z[0,0,kmax]]
     v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
@@ -331,7 +425,7 @@ def calculate_outward_normals(block:Block):
     n_jmin = np.cross(v1,v2)
 
     # Normals J direction: JMAX
-    x = [X[0,jmax,0],X[imax,jmax,0],X[0,jmax,kmax]] 
+    x = [X[0,jmax,0],X[imax,jmax,0],X[0,jmax,kmax]]
     y = [Y[0,jmax,0],Y[imax,jmax,0],Y[0,jmax,kmax]]
     z = [Z[0,jmax,0],Z[imax,jmax,0],Z[0,jmax,kmax]]
     v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
@@ -339,7 +433,7 @@ def calculate_outward_normals(block:Block):
     n_jmax = np.cross(v1,v2)
 
     # Normals K direction: KMIN
-    x = [X[imax,0,0],X[0,jmax,0],X[0,0,0]] 
+    x = [X[imax,0,0],X[0,jmax,0],X[0,0,0]]
     y = [Y[imax,0,0],Y[0,jmax,0],Y[0,0,0]]
     z = [Z[imax,0,0],Z[0,jmax,0],Z[0,0,0]]
     v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
@@ -347,7 +441,7 @@ def calculate_outward_normals(block:Block):
     n_kmin = np.cross(v1,v2)
 
     # Normals K direction: KMAX
-    x = [X[imax,0,kmax],X[0,jmax,kmax],X[0,0,kmax]] 
+    x = [X[imax,0,kmax],X[0,jmax,kmax],X[0,0,kmax]]
     y = [Y[imax,0,kmax],Y[0,jmax,kmax],Y[0,0,kmax]]
     z = [Z[imax,0,kmax],Z[0,jmax,kmax],Z[0,0,kmax]]
     v1 = np.array([x[1]-x[0],y[1]-y[0],z[1]-z[0]])
@@ -357,11 +451,11 @@ def calculate_outward_normals(block:Block):
     return n_imin,n_jmin,n_kmin,n_imax,n_jmax,n_kmax
 
 def split_blocks(blocks:List[Block],gcd:int=4):
-    """Split blocks but also keep greatest common divisor
+    """Split blocks into smaller sub-blocks while preserving GCD divisibility.
 
     Args:
-        blocks (List[]): _description_
-        gcd (int, optional): _description_. Defaults to 4.
+        blocks (List[Block]): Blocks to split.
+        gcd (int): Target greatest common divisor for sub-block dimensions.
     """
     pass
 

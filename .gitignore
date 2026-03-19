@@ -6,6 +6,8 @@
 # vs code folders
 .vscode/
 *.p3d
+# Allow test data p3d files
+!python/tests/data/cross_plane_pair.p3d
 *.x
 *.lock
 python/mesh.pickle

@@ -66,11 +66,11 @@ def build_weighted_graph_from_face_matches(
         if ignore_self_matches and i == j:
             continue
 
-        IMIN = int(m["block1"]["IMIN"]); JMIN = int(m["block1"]["JMIN"]); KMIN = int(m["block1"]["KMIN"])
-        IMAX = int(m["block1"]["IMAX"]); JMAX = int(m["block1"]["JMAX"]); KMAX = int(m["block1"]["KMAX"])
-        dI = max(abs(IMAX - IMIN), 1)
-        dJ = max(abs(JMAX - JMIN), 1)
-        dK = max(abs(KMAX - KMIN), 1)
+        lb = m["block1"]["lb"]
+        ub = m["block1"]["ub"]
+        dI = max(abs(int(ub[0]) - int(lb[0])), 1)
+        dJ = max(abs(int(ub[1]) - int(lb[1])), 1)
+        dK = max(abs(int(ub[2]) - int(lb[2])), 1)
         w = dI * dJ * dK  # Edge weight = communication cost (number of face nodes)
 
         a, b = (i, j) if i < j else (j, i)

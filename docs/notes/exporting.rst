@@ -1,6 +1,15 @@
 Exporting to GlennHT Connectivity Files
 ###############################################
-This is an example of how I read a mesh, convert it to ascii, save it, find connectivity, find periodicty and export to glennht format. 
+
+.. note::
+
+    The GHT_CONN file uses a **directed diagonal** convention where cross-plane
+    matches encode traversal direction in the corner ordering (e.g., ``IMIN > IMAX``
+    means the i-axis is reversed). ``export_to_glennht_conn()`` handles this
+    automatically via ``reconstruct_directed_diagonal()``. See
+    :ref:`Directed Diagonal for GHT_CONN Export <connectivity>` for details.
+
+This is an example of how I read a mesh, convert it to ascii, save it, find connectivity, find periodicty and export to glennht format.
 In this example we will use the file `PahtCascade-ASCII <https://nasa-public-data.s3.amazonaws.com/plot3d_utilities/PahtCascade-ASCII.xyz>`_
 
 .. code-block:: python 
