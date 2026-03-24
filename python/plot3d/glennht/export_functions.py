@@ -242,7 +242,7 @@ def populate_reference_from_inputs(
     rho_solid: float | None = None,
 ):
     """Fill job.ReferenceCondFull from physics and then mirror into job.ReferenceCond."""
-    from glennht_export_classes import ReferenceCond  # local import to avoid circular typing
+    from .class_definitions import ReferenceCond  # local import to avoid circular typing
 
     rcfull = job.ReferenceCondFull
     MolW  = MolW  if MolW  not in (None, 0) else _AIR_MOLW_DEFAULT
@@ -630,7 +630,7 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
 # ============================================================
 if __name__ == "__main__":
     # Minimal smoke test (requires your glennht_export_classes.py definitions)
-    from glennht_export_classes import (
+    from .class_definitions import (
         Job, InletBC, OutletBC, BoundaryConditionType, BCGroup,
     )
 
