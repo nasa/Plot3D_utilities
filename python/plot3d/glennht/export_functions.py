@@ -116,12 +116,15 @@ def _fmt_bool(v: bool) -> str:
 
 def _fmt_value(v: Any) -> str:
     from enum import Enum, IntEnum
+    from .class_definitions import FortranLiteral
     if isinstance(v, bool):
         return _fmt_bool(v)
     if isinstance(v, (IntEnum, Enum)):
         return str(int(v))
     if isinstance(v, (int, float)):
         return repr(v)
+    if isinstance(v, FortranLiteral):
+        return str(v)
     if isinstance(v, str):
         return f"'{v}'"
     if isinstance(v, (list, tuple)):
@@ -299,28 +302,21 @@ def populate_reference_from_inputs(
     rcfull.cond_solid = 20.0
     rcfull.csp_solid  = 896.0
 
-    # compact RefCond derived from Full (stored back on the job)
+    # compact RefCond — minimal set so GlennHT derives the rest:
+    #   Group 0: refLen, refVisc
+    #   Group 1: refP0, refT0, Rgas  (3 of 4)
+    #   Group 2: gamma
+    #   Group 3: Pr
     rc = ReferenceCond(
         useDimensionalVariables=False,
         refLen=rcfull.reflen,
         refP0=rcfull.refP0,
         refT0=rcfull.refT0,
-        refRho0=rcfull.refrho0,
-        refVel=rcfull.refVel,
-        refVisc=rcfull.refvisc,
-        refCond=rcfull.refcond,
-        refCp=rcfull.refCp,
-        MolW=rcfull.MolW,
-        RgasUnv=rcfull.RgasUnv,
         Rgas=rcfull.Rgas,
         gamma=rcfull.gamma,
-        Re=rcfull.Re,
+        refVisc=rcfull.refvisc,
         Pr=rcfull.Pr,
-        ndVisc=1.0,
-        ndCond=1.0,
         Omegab=rcfull.Omegab,
-        ReScalingFactor=1.0,
-        rho_solid=rcfull.rho_solid,
         cond_solid=rcfull.cond_solid,
         Csp_solid=rcfull.csp_solid,
     )
