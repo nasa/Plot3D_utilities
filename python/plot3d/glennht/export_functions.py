@@ -121,8 +121,10 @@ def _fmt_value(v: Any) -> str:
         return _fmt_bool(v)
     if isinstance(v, (IntEnum, Enum)):
         return str(int(v))
-    if isinstance(v, (int, float)):
+    if isinstance(v, int):
         return repr(v)
+    if isinstance(v, float):
+        return f"{v:.4g}"
     if isinstance(v, FortranLiteral):
         return str(v)
     if isinstance(v, str):
@@ -609,13 +611,15 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
     for k,v in summary['zone_types_by_id'].items():
         lines.append(f"{k} ")
     lines.append("\n")
-    # Print Zone Groups
+    # Print Zone Groups (all block contiguous indices on one line,
+    # wrapping after columns_to_print entries)
     columns_to_print = 10
-    for i,v in enumerate(volume_zones):
-        if i % columns_to_print==0:
-            lines.append(f"{v["contiguous_index"]}\n")
+    for i, v in enumerate(volume_zones):
+        lines.append(f"{v['contiguous_index']}")
+        if (i + 1) % columns_to_print == 0 or i == len(volume_zones) - 1:
+            lines.append("\n")
         else:
-            lines.append(f"{v["contiguous_index"]} ")
+            lines.append(" ")
     
     filename = ensure_extension(filename,'.ght_conn')
     with open(f'{filename}','w') as fp:

@@ -188,9 +188,56 @@ class Block:
             'kmax': (self.X[:,:,-1], self.Y[:,:,-1], self.Z[:,:,-1]),
         }
         
+    def check_handedness(self) -> bool:
+        """Check if the block has right-handed (positive volume) cells.
+
+        Samples cells at the block center and corners using a scalar
+        triple product.  Returns ``True`` if right-handed, ``False``
+        if left-handed (negative volume).
+        """
+        X, Y, Z = self.X, self.Y, self.Z
+        ni, nj, nk = self.IMAX, self.JMAX, self.KMAX
+        if ni < 2 or nj < 2 or nk < 2:
+            return True  # degenerate block, nothing to check
+
+        # Sample a few representative cells
+        samples = [
+            (ni // 2, nj // 2, nk // 2),   # center
+            (0, 0, 0),                       # corner
+            (ni - 2, nj - 2, nk - 2),       # opposite corner
+        ]
+        total = 0.0
+        for i, j, k in samples:
+            if i >= ni - 1 or j >= nj - 1 or k >= nk - 1:
+                continue
+            p000 = np.array([X[i, j, k], Y[i, j, k], Z[i, j, k]])
+            d1 = np.array([X[i+1,j,k] - p000[0], Y[i+1,j,k] - p000[1], Z[i+1,j,k] - p000[2]])
+            d2 = np.array([X[i,j+1,k] - p000[0], Y[i,j+1,k] - p000[1], Z[i,j+1,k] - p000[2]])
+            d3 = np.array([X[i,j,k+1] - p000[0], Y[i,j,k+1] - p000[1], Z[i,j,k+1] - p000[2]])
+            total += np.dot(d1, np.cross(d2, d3))
+        return total >= 0
+
+    def fix_handedness(self) -> bool:
+        """Fix left-handed blocks by reversing the j-axis.
+
+        If the block has negative cell volumes (left-handed), the
+        j-index is reversed so that the cell orientation becomes
+        right-handed.  The physical geometry is unchanged.
+
+        Returns:
+            bool: ``True`` if a fix was applied, ``False`` if already
+            right-handed.
+        """
+        if self.check_handedness():
+            return False
+        self.X = self.X[:, ::-1, :].copy()
+        self.Y = self.Y[:, ::-1, :].copy()
+        self.Z = self.Z[:, ::-1, :].copy()
+        return True
+
     @property
     def size(self)->int:
-        """returns the total number of nodes 
+        """returns the total number of nodes
 
         Returns:
             int: number of nodes
