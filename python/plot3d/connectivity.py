@@ -733,6 +733,19 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                 df = __filter_block_increasing(df,'i2')
                 df = __filter_block_increasing(df,'j2')
 
+            # Reject matches where matched points don't cover the full
+            # matched sub-face area.  Two blocks that share only edges
+            # (e.g. O-grid SS and PS sharing LE/TE lines) can pass the
+            # edge check above because the matched points span two
+            # separate edges, making the diagonal look like a face.
+            # Verify that matched point count == expected sub-face area.
+            if len(df) >= 4:
+                ilb1, jlb1, klb1 = int(df['i1'].min()), int(df['j1'].min()), int(df['k1'].min())
+                iub1, jub1, kub1 = int(df['i1'].max()), int(df['j1'].max()), int(df['k1'].max())
+                matched_area = _face_point_count([ilb1, jlb1, klb1], [iub1, jub1, kub1])
+                if matched_area > 0 and len(df) < matched_area:
+                    df = pd.DataFrame()  # Not a face — only partial (edge) coverage
+
             # Do a final check after doing all these checks
             if len(df)>=4:       # Greater than 4 because match can occur with simply 4 corners but the interior doesn't match.
                 # Check for Split faces
