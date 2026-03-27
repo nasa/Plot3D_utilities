@@ -98,6 +98,8 @@ class InletBC(BoundaryCondition):
     bet1_const: Optional[float] = None
 
     annular_inlet: bool = False
+    mult_for_full_ring: Optional[int] = None
+    angularPeriod: Optional[float] = None
     deltah: Optional[float] = None
     deltat: Optional[float] = None
     twall_hub: Optional[float] = None

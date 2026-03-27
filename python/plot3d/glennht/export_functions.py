@@ -214,8 +214,8 @@ def _write_vzconditions(w, vz: Any) -> None:
         # Fluid default
         w.write(
             " &VZConditions\n"
-            f"VZid={vzid}, VZtype=1, OmegaVZ=0., VZMaterialName=Air,\n"
-            "Fluid_Tref_prop=0., Fluid_k_Tref=285., Fluid_amu_Tref=285., Fluid_expnt=.7,UseDryAir=.TRUE.,\n"
+            f"VZid={vzid}, VZtype=1, OmegaVZ=0., VZMaterialName='Air',\n"
+            "Fluid_Tref_prop=0., Fluid_k_Tref=285., Fluid_amu_Tref=285., Fluid_expnt=.7,\n"
             "!Fluid_cp=1002., Fluid_Pr=.7, Fluid_MW=28.964\n"
             " &END\n\n"
         )
@@ -223,7 +223,7 @@ def _write_vzconditions(w, vz: Any) -> None:
         # Solid default
         w.write(
             " &VZConditions\n"
-            f"VZid={vzid}, VZtype=2, OmegaVZ=0., VZMaterialName=CMC,\n"
+            f"VZid={vzid}, VZtype=2, OmegaVZ=0., VZMaterialName='CMC',\n"
             "Solid_Tref_prop=285., Solid_rho_Tref=2707. , Solid_condN_Tref=6.5, Solid_condT_Tref=6.5, Solid_condA_Tref=6.5,\n"
             "Solid_Csp_Tref=896.\n"
             " &END\n\n"
@@ -449,8 +449,13 @@ def export_to_boundary_condition(
             if sid is not None:
                 _set_field(obj, field_name, sid)
 
-        # Detailed BC blocks (skip meta + *_unit)
-        exclude = {"Name", "SurfaceID", "BCType"}
+        # Detailed BC blocks (skip meta + *_unit + base-class fields).
+        # IsPostProcessing, IsCalculateMassFlow, ToggleProcessSurface belong
+        # in &BSurf_Spec only — GlennHT's INLET_BC/OUTLET_BC/WALL_BC namelists
+        # do not include them and will reject unrecognised names.
+        exclude = {"Name", "SurfaceID", "BCType",
+                   "IsPostProcessing", "IsCalculateMassFlow",
+                   "ToggleProcessSurface"}
         for inlet in bc_group.Inlets:
             _sync_detail_surface_id(inlet, "surfID_inlet")
             w.write(f"! {inlet.Name}\n")
