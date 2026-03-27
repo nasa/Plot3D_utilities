@@ -218,11 +218,13 @@ class Block:
         return total >= 0
 
     def fix_handedness(self) -> bool:
-        """Fix left-handed blocks by reversing the j-axis.
+        """Fix left-handed blocks by reversing the k-axis.
 
         If the block has negative cell volumes (left-handed), the
-        j-index is reversed so that the cell orientation becomes
-        right-handed.  The physical geometry is unchanged.
+        k-index is reversed so that the cell orientation becomes
+        right-handed.  Reversing k (spanwise) preserves the i and j
+        conventions (i=chord, j=wall-normal) that connectivity and
+        boundary conditions depend on.
 
         Returns:
             bool: ``True`` if a fix was applied, ``False`` if already
@@ -230,9 +232,9 @@ class Block:
         """
         if self.check_handedness():
             return False
-        self.X = self.X[:, ::-1, :].copy()
-        self.Y = self.Y[:, ::-1, :].copy()
-        self.Z = self.Z[:, ::-1, :].copy()
+        self.X = self.X[:, :, ::-1].copy()
+        self.Y = self.Y[:, :, ::-1].copy()
+        self.Z = self.Z[:, :, ::-1].copy()
         return True
 
     @property
