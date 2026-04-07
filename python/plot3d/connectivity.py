@@ -909,7 +909,7 @@ def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
                 new_combos.append((i,j))
     return new_combos
     
-def connectivity_fast(blocks:List[Block]):
+def connectivity_fast(blocks:List[Block], use_minmax:bool=False):
     """Find connectivity by GCD-reducing blocks first for speed.
 
     Computes the minimum GCD across all block dimensions, reduces all blocks
@@ -920,6 +920,10 @@ def connectivity_fast(blocks:List[Block]):
 
     Args:
         blocks (List[Block]): List of blocks to find connectivity for.
+        use_minmax (bool): If True, normalise lb/ub to strict min/max
+            order (IMIN,JMIN,KMIN → IMAX,JMAX,KMAX) and recompute the
+            permutation matrix accordingly.  Default is False (traversal
+            order).
 
     Returns:
         (List[Dict]): Face matches with orientation info.
@@ -934,6 +938,8 @@ def connectivity_fast(blocks:List[Block]):
     # scale it up
     scale_face_bounds(face_matches, gcd_to_use)
     scale_face_bounds(outer_faces_formatted, gcd_to_use)
+    if use_minmax:
+        face_matches = normalize_face_matches(face_matches)
     return face_matches, outer_faces_formatted
 
 def connectivity(blocks:List[Block]):
@@ -1266,3 +1272,93 @@ def face_matches_to_dict(face1:Face, face2:Face,block1:Block,block2:Block):
     return match
 
 
+def normalize_face_matches(face_matches: list) -> list:
+    """Convert face match lb/ub to strict min/max order.
+
+    By default the library encodes traversal direction in lb/ub ordering
+    (lb is not necessarily < ub).  This function normalises every face
+    match so that ``lb = [IMIN, JMIN, KMIN]`` and ``ub = [IMAX, JMAX,
+    KMAX]`` on **both** sides, and recomputes the orientation /
+    permutation matrix accordingly.
+
+    The resulting PM satisfies::
+
+        Face_A(IMIN,JMIN,KMIN -> IMAX,JMAX,KMAX) * PM
+            = Face_B(IMIN,JMIN,KMIN -> IMAX,JMAX,KMAX)
+
+    Parameters
+    ----------
+    face_matches : list of dict
+        Face match dicts as returned by :func:`connectivity_fast` or
+        :func:`connectivity`.  Each dict must have ``block1`` and
+        ``block2`` sub-dicts with ``lb`` and ``ub`` keys.  If a ``match``
+        key (point-match DataFrame) is present it is used to recompute
+        the orientation; otherwise the orientation is recomputed from the
+        new min/max bounds.
+
+    Returns
+    -------
+    list of dict
+        A **new** list with the same structure, but lb/ub in min/max
+        order and orientation updated.
+    """
+    out = []
+    for fm in face_matches:
+        fm = deepcopy(fm)
+        lb1 = fm['block1']['lb']
+        ub1 = fm['block1']['ub']
+        lb2 = fm['block2']['lb']
+        ub2 = fm['block2']['ub']
+
+        new_lb1 = [min(lb1[d], ub1[d]) for d in range(3)]
+        new_ub1 = [max(lb1[d], ub1[d]) for d in range(3)]
+        new_lb2 = [min(lb2[d], ub2[d]) for d in range(3)]
+        new_ub2 = [max(lb2[d], ub2[d]) for d in range(3)]
+
+        fm['block1']['lb'] = new_lb1
+        fm['block1']['ub'] = new_ub1
+        fm['block2']['lb'] = new_lb2
+        fm['block2']['ub'] = new_ub2
+
+        # Recompute orientation if we have the point-match DataFrame
+        # with the expected columns (i1,j1,k1,i2,j2,k2)
+        df = fm.get('match')
+        has_point_match = (df is not None and isinstance(df, pd.DataFrame)
+                          and len(df) > 1 and 'i2' in df.columns)
+        if has_point_match:
+            orientation = _compute_orientation(df, new_lb1, new_ub1)
+            perm_idx, plane = _orient_vec_to_permutation(
+                orientation, new_lb1, new_ub1, new_lb2, new_ub2)
+            export_perm = -1 if plane == 'in-plane' else perm_idx
+            fm['orientation'] = {
+                'permutation_index': export_perm,
+                'plane': plane,
+                'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
+            }
+        elif 'orientation' in fm:
+            # No DataFrame — recompute from min/max bounds.
+            # With min/max ordering, all axes go forward, so reversal
+            # flags depend only on the axis mapping (no direction flip).
+            ca1 = _constant_axis(new_lb1, new_ub1)
+            ca2 = _constant_axis(new_lb2, new_ub2)
+            plane = 'in-plane' if ca1 == ca2 else 'cross-plane'
+
+            # Build identity-like orientation: face1 axis d -> face2 axis d
+            # unless cross-plane, in which case use the old orientation's
+            # permutation matrix to infer the mapping.
+            old_perm = fm['orientation'].get('permutation_matrix')
+            if old_perm is not None and plane == 'cross-plane':
+                # Preserve the cross-plane axis swap from original
+                fm['orientation']['plane'] = plane
+            else:
+                # In-plane with min/max ordering: both sides go forward,
+                # so the PM is identity (no reversal, no swap).
+                perm_idx = 0
+                fm['orientation'] = {
+                    'permutation_index': -1,
+                    'plane': plane,
+                    'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
+                }
+
+        out.append(fm)
+    return out

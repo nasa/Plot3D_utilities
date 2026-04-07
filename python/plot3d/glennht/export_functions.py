@@ -200,7 +200,7 @@ def _write_gif_pair(w, pair: Any) -> None:
     )
     w.write(f" &GIF_Spec\nSurfID_1={sid1}, SurfID2={sid2}\n &END\n\n")
 
-def _write_vzconditions(w, vz: Any) -> None:
+def _write_vzconditions(w, vz: Any, ref_T0: float = 285.0) -> None:
     """
     Convert inputs like:
       {"block_index": 1, "zone_type": "fluid"|"solid", "contiguous_index": 1}
@@ -212,10 +212,11 @@ def _write_vzconditions(w, vz: Any) -> None:
 
     if vztype == 1:
         # Fluid default
+        t_ref = _get_field(vz, "Fluid_Tref", ref_T0)
         w.write(
             " &VZConditions\n"
             f"VZid={vzid}, VZtype=1, OmegaVZ=0., VZMaterialName='Air',\n"
-            "Fluid_Tref_prop=0., Fluid_k_Tref=285., Fluid_amu_Tref=285., Fluid_expnt=.7,\n"
+            f"Fluid_Tref_prop=0., Fluid_k_Tref={t_ref}, Fluid_amu_Tref={t_ref}, Fluid_expnt=.7,\n"
             "!Fluid_cp=1002., Fluid_Pr=.7, Fluid_MW=28.964\n"
             " &END\n\n"
         )
@@ -303,6 +304,16 @@ def populate_reference_from_inputs(
     rcfull.rho_solid = rho_solid
     rcfull.cond_solid = 20.0
     rcfull.csp_solid  = 896.0
+
+    # Fill GasPropertiesInput constants from computed values so the job
+    # file doesn't contain -1e+99 sentinel defaults.
+    gas = job.GasPropertiesInput
+    gas.const_cp = cp
+    gas.const_visc = mu
+    gas.const_kth = k_val
+    gas.SpecialGasMW = MolW
+    if gas.RefT_Properties is None or gas.RefT_Properties < -1e+90:
+        gas.RefT_Properties = T0
 
     # compact RefCond — minimal set so GlennHT derives the rest:
     #   Group 0: refLen, refVisc
@@ -411,8 +422,7 @@ def export_to_boundary_condition(
                 _set_field(inlet, "twall_hub", _get_field(inlet, "twall_hub") / ref.refT0)
             if _get_field(inlet, "twall_case") is not None and ref.refT0 not in (None, 0):
                 _set_field(inlet, "twall_case", _get_field(inlet, "twall_case") / ref.refT0)
-            if _get_field(inlet, "Ts_const") is not None and ref.reflen not in (None, 0):
-                _set_field(inlet, "Ts_const", _get_field(inlet, "Ts_const") / ref.reflen)
+            # Ts_const is nondimensional (turbulence length scale) — no normalization needed
             _write_bsurf_spec(w, inlet)
 
         # OUTLETS (normalize back-pressure by refP0)
@@ -438,9 +448,10 @@ def export_to_boundary_condition(
         for vz in volume_zones:
             key = _first_field(vz, ("contiguous_index", "contiguous_id"))
             volume_zone_unique[key] = vz
+        ref_T0 = getattr(getattr(job_settings, "ReferenceCondFull", None), "refT0", 285.0) or 285.0
         for vz in volume_zone_unique.values():
             if _get_field(vz, "zone_type") is not None:
-                _write_vzconditions(w, vz)
+                _write_vzconditions(w, vz, ref_T0=ref_T0)
             else:
                 w.write(_export_namelist_block("VZConditions", vz)); w.write("\n")
         

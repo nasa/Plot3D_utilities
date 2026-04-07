@@ -336,7 +336,7 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
 
-def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]], rotation_angle:float, rotation_axis:str = "x", ReduceMesh:bool=True):
+def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]], rotation_angle:float, rotation_axis:str = "x", ReduceMesh:bool=True, use_minmax:bool=False):
     """Finds the peridocity/connectivity by rotating a block. This is a bit different from "periodicity_fast" where you specify the periodic direction. This method doesn't care about the direction as long as the angle you specify results in a match between the Left Face and the Right Face. I would use this instead.
 
     Example 1:              
@@ -827,6 +827,10 @@ def translational_periodicity(
         key = (o["block_index"], tuple(o["lb"]), tuple(o["ub"]))
         if key not in periodic_keys:
             outer_faces_remaining.append(o)
+
+    if use_minmax:
+        from .connectivity import normalize_face_matches
+        periodic_export = normalize_face_matches(periodic_export)
 
     return periodic_export, periodic_pairs, outer_faces_remaining
 
