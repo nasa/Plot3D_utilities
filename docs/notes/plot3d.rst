@@ -80,16 +80,22 @@ Knowing this, reading the files is fairly simple to do in python. The following 
 
         return A, offset
 
-    def read_plot3D(filename:str, binary:bool=True,big_endian:bool=False):
-        """Reads a plot3d file and returns Blocks
+    def read_plot3D(filename:str, binary:bool=None, big_endian:bool=None,
+                    read_double:bool=None, fortran:bool=None):
+        """Reads a plot3d file and returns Blocks.
+
+        When any parameter is None (the default), the format is auto-detected
+        by probing the file header and comparing file size.
 
         Args:
-            filename (str): name of the file to read, .p3d, .xyz, .pdc, .plot3d? 
-            binary (bool, optional): indicates if the file is binary. Defaults to True.
-            big_endian (bool, optional): use big endian format for reading binary files
+            filename (str): name of the file to read, .p3d, .xyz, .plot3d
+            binary (bool, optional): True for binary, False for ASCII. Auto-detected when None.
+            big_endian (bool, optional): use big endian format for reading binary files. Auto-detected when None.
+            read_double (bool, optional): True for 64-bit, False for 32-bit. Auto-detected when None.
+            fortran (bool, optional): True for Fortran unformatted binary. Auto-detected when None.
 
         Returns:
-            List[Block]: List of blocks insdie the plot3d file
+            List[Block]: List of blocks inside the plot3d file
         """
         
         blocks = list()

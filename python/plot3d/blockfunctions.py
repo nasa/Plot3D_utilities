@@ -481,3 +481,100 @@ def build_connectivity_graph(connectivities: List[List[Dict]]) -> nx.Graph:
         block2 = pair['block2']['block_index'] # type: ignore
         G.add_edge(block1, block2)
     return G
+
+
+def make_right_handed(
+    blocks: List[Block],
+    face_matches: Optional[List[dict]] = None,
+    periodic_matches: Optional[List[dict]] = None,
+    outer_faces: Optional[List[dict]] = None,
+    block_names: Optional[List[str]] = None,
+    flip_axis: int = 2,
+) -> Tuple[List[Block], List[dict], List[dict], List[dict]]:
+    """Make all blocks right-handed by reversing one axis on left-handed blocks.
+
+    A left-handed block has majority-negative cell volumes (computed via
+    the Davies & Salmond hexahedral formula).  This commonly occurs when
+    converting from cylindrical to Cartesian coordinates.  GlennHT and
+    other structured solvers require right-handed blocks.
+
+    For each left-handed block the function:
+    1. Reverses the chosen axis in the X, Y, Z arrays.
+    2. Remaps all connectivity indices for that block:
+       ``idx -> n - 1 - idx`` along the flipped axis.
+
+    Parameters
+    ----------
+    blocks : list of Block
+        Plot3D blocks (modified in place and returned).
+    face_matches : list of dict, optional
+        Interface connectivity records (modified in place).
+    periodic_matches : list of dict, optional
+        Periodic connectivity records (modified in place).
+    outer_faces : list of dict, optional
+        Boundary-condition face records (modified in place).
+    block_names : list of str, optional
+        Names for log output.  If None, blocks are numbered.
+    flip_axis : int
+        Which axis to reverse on left-handed blocks: 0=i, 1=j, 2=k.
+        Default 2 (k) preserves the i/j blade-plane topology.
+
+    Returns
+    -------
+    (blocks, face_matches, periodic_matches, outer_faces)
+        The same objects, modified in place, for convenience.
+    """
+    if face_matches is None:
+        face_matches = []
+    if periodic_matches is None:
+        periodic_matches = []
+    if outer_faces is None:
+        outer_faces = []
+
+    flipped: List[int] = []
+
+    for bi, b in enumerate(blocks):
+        vol = b.cell_volumes()
+        interior = vol[1:, 1:, 1:]
+        n_neg = int(np.sum(interior < 0))
+        if n_neg <= interior.size // 2:
+            continue  # already right-handed (or mixed — leave alone)
+
+        # Flip the chosen axis
+        slices = [slice(None)] * 3
+        slices[flip_axis] = slice(None, None, -1)
+        s = tuple(slices)
+        b.X = np.ascontiguousarray(b.X[s])
+        b.Y = np.ascontiguousarray(b.Y[s])
+        b.Z = np.ascontiguousarray(b.Z[s])
+
+        name = block_names[bi] if block_names else str(bi)
+        dim_name = "ijk"[flip_axis]
+        n_dim = [b.IMAX, b.JMAX, b.KMAX][flip_axis]
+        print(f"  make_right_handed: flipped {name} {dim_name}-axis ({n_dim} planes)")
+        flipped.append(bi)
+
+    if not flipped:
+        return blocks, face_matches, periodic_matches, outer_faces
+
+    # Remap connectivity indices for flipped blocks
+    def _remap_face(face: dict) -> None:
+        bi = face["block_index"]
+        if bi not in flipped:
+            return
+        b = blocks[bi]
+        n = [b.IMAX, b.JMAX, b.KMAX][flip_axis]
+        for key in ("lb", "ub"):
+            face[key] = list(face[key])  # ensure mutable
+            face[key][flip_axis] = n - 1 - face[key][flip_axis]
+
+    for m in face_matches:
+        _remap_face(m["block1"])
+        _remap_face(m["block2"])
+    for m in periodic_matches:
+        _remap_face(m["block1"])
+        _remap_face(m["block2"])
+    for of in outer_faces:
+        _remap_face(of)
+
+    return blocks, face_matches, periodic_matches, outer_faces

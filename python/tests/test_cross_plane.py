@@ -28,7 +28,7 @@ def test_python_connectivity_produces_directed_diagonal():
     """Python connectivity_fast already produces directed lb/ub."""
     from plot3d import read_plot3D, connectivity_fast
 
-    blocks = read_plot3D(_mesh_path(), binary=False)
+    blocks = read_plot3D(_mesh_path())
     assert len(blocks) == 2
 
     face_matches, _outer = connectivity_fast(blocks)
@@ -51,7 +51,7 @@ def test_ght_conn_export_directed_diagonal():
     from plot3d import read_plot3D, connectivity_fast
     from plot3d.glennht.export_functions import export_to_glennht_conn
 
-    blocks = read_plot3D(_mesh_path(), binary=False)
+    blocks = read_plot3D(_mesh_path())
     face_matches, outer_faces = connectivity_fast(blocks)
 
     tmpf = tempfile.NamedTemporaryFile(suffix='.ght_conn', delete=False, mode='w')

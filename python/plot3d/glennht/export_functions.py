@@ -116,12 +116,17 @@ def _fmt_bool(v: bool) -> str:
 
 def _fmt_value(v: Any) -> str:
     from enum import Enum, IntEnum
+    from .class_definitions import FortranLiteral
     if isinstance(v, bool):
         return _fmt_bool(v)
     if isinstance(v, (IntEnum, Enum)):
         return str(int(v))
-    if isinstance(v, (int, float)):
+    if isinstance(v, int):
         return repr(v)
+    if isinstance(v, float):
+        return f"{v:.4g}"
+    if isinstance(v, FortranLiteral):
+        return str(v)
     if isinstance(v, str):
         return f"'{v}'"
     if isinstance(v, (list, tuple)):
@@ -195,7 +200,7 @@ def _write_gif_pair(w, pair: Any) -> None:
     )
     w.write(f" &GIF_Spec\nSurfID_1={sid1}, SurfID2={sid2}\n &END\n\n")
 
-def _write_vzconditions(w, vz: Any) -> None:
+def _write_vzconditions(w, vz: Any, ref_T0: float = 285.0) -> None:
     """
     Convert inputs like:
       {"block_index": 1, "zone_type": "fluid"|"solid", "contiguous_index": 1}
@@ -207,10 +212,11 @@ def _write_vzconditions(w, vz: Any) -> None:
 
     if vztype == 1:
         # Fluid default
+        t_ref = _get_field(vz, "Fluid_Tref", ref_T0)
         w.write(
             " &VZConditions\n"
-            f"VZid={vzid}, VZtype=1, OmegaVZ=0., VZMaterialName=Air,\n"
-            "Fluid_Tref_prop=0., Fluid_k_Tref=285., Fluid_amu_Tref=285., Fluid_expnt=.7,UseDryAir=.TRUE.,\n"
+            f"VZid={vzid}, VZtype=1, OmegaVZ=0., VZMaterialName='Air',\n"
+            f"Fluid_Tref_prop=0., Fluid_k_Tref={t_ref}, Fluid_amu_Tref={t_ref}, Fluid_expnt=.7,\n"
             "!Fluid_cp=1002., Fluid_Pr=.7, Fluid_MW=28.964\n"
             " &END\n\n"
         )
@@ -218,7 +224,7 @@ def _write_vzconditions(w, vz: Any) -> None:
         # Solid default
         w.write(
             " &VZConditions\n"
-            f"VZid={vzid}, VZtype=2, OmegaVZ=0., VZMaterialName=CMC,\n"
+            f"VZid={vzid}, VZtype=2, OmegaVZ=0., VZMaterialName='CMC',\n"
             "Solid_Tref_prop=285., Solid_rho_Tref=2707. , Solid_condN_Tref=6.5, Solid_condT_Tref=6.5, Solid_condA_Tref=6.5,\n"
             "Solid_Csp_Tref=896.\n"
             " &END\n\n"
@@ -299,28 +305,31 @@ def populate_reference_from_inputs(
     rcfull.cond_solid = 20.0
     rcfull.csp_solid  = 896.0
 
-    # compact RefCond derived from Full (stored back on the job)
+    # Fill GasPropertiesInput constants from computed values so the job
+    # file doesn't contain -1e+99 sentinel defaults.
+    gas = job.GasPropertiesInput
+    gas.const_cp = cp
+    gas.const_visc = mu
+    gas.const_kth = k_val
+    gas.SpecialGasMW = MolW
+    if gas.RefT_Properties is None or gas.RefT_Properties < -1e+90:
+        gas.RefT_Properties = T0
+
+    # compact RefCond — minimal set so GlennHT derives the rest:
+    #   Group 0: refLen, refVisc
+    #   Group 1: refP0, refT0, Rgas  (3 of 4)
+    #   Group 2: gamma
+    #   Group 3: Pr
     rc = ReferenceCond(
         useDimensionalVariables=False,
         refLen=rcfull.reflen,
         refP0=rcfull.refP0,
         refT0=rcfull.refT0,
-        refRho0=rcfull.refrho0,
-        refVel=rcfull.refVel,
-        refVisc=rcfull.refvisc,
-        refCond=rcfull.refcond,
-        refCp=rcfull.refCp,
-        MolW=rcfull.MolW,
-        RgasUnv=rcfull.RgasUnv,
         Rgas=rcfull.Rgas,
         gamma=rcfull.gamma,
-        Re=rcfull.Re,
+        refVisc=rcfull.refvisc,
         Pr=rcfull.Pr,
-        ndVisc=1.0,
-        ndCond=1.0,
         Omegab=rcfull.Omegab,
-        ReScalingFactor=1.0,
-        rho_solid=rcfull.rho_solid,
         cond_solid=rcfull.cond_solid,
         Csp_solid=rcfull.csp_solid,
     )
@@ -413,8 +422,7 @@ def export_to_boundary_condition(
                 _set_field(inlet, "twall_hub", _get_field(inlet, "twall_hub") / ref.refT0)
             if _get_field(inlet, "twall_case") is not None and ref.refT0 not in (None, 0):
                 _set_field(inlet, "twall_case", _get_field(inlet, "twall_case") / ref.refT0)
-            if _get_field(inlet, "Ts_const") is not None and ref.reflen not in (None, 0):
-                _set_field(inlet, "Ts_const", _get_field(inlet, "Ts_const") / ref.reflen)
+            # Ts_const is nondimensional (turbulence length scale) — no normalization needed
             _write_bsurf_spec(w, inlet)
 
         # OUTLETS (normalize back-pressure by refP0)
@@ -440,9 +448,10 @@ def export_to_boundary_condition(
         for vz in volume_zones:
             key = _first_field(vz, ("contiguous_index", "contiguous_id"))
             volume_zone_unique[key] = vz
+        ref_T0 = getattr(getattr(job_settings, "ReferenceCondFull", None), "refT0", 285.0) or 285.0
         for vz in volume_zone_unique.values():
             if _get_field(vz, "zone_type") is not None:
-                _write_vzconditions(w, vz)
+                _write_vzconditions(w, vz, ref_T0=ref_T0)
             else:
                 w.write(_export_namelist_block("VZConditions", vz)); w.write("\n")
         
@@ -451,8 +460,13 @@ def export_to_boundary_condition(
             if sid is not None:
                 _set_field(obj, field_name, sid)
 
-        # Detailed BC blocks (skip meta + *_unit)
-        exclude = {"Name", "SurfaceID", "BCType"}
+        # Detailed BC blocks (skip meta + *_unit + base-class fields).
+        # IsPostProcessing, IsCalculateMassFlow, ToggleProcessSurface belong
+        # in &BSurf_Spec only — GlennHT's INLET_BC/OUTLET_BC/WALL_BC namelists
+        # do not include them and will reject unrecognised names.
+        exclude = {"Name", "SurfaceID", "BCType",
+                   "IsPostProcessing", "IsCalculateMassFlow",
+                   "ToggleProcessSurface"}
         for inlet in bc_group.Inlets:
             _sync_detail_surface_id(inlet, "surfID_inlet")
             w.write(f"! {inlet.Name}\n")
@@ -613,13 +627,15 @@ def export_to_glennht_conn(matches:List[Dict[str, Dict[int, str]]],outer_faces:L
     for k,v in summary['zone_types_by_id'].items():
         lines.append(f"{k} ")
     lines.append("\n")
-    # Print Zone Groups
+    # Print Zone Groups (all block contiguous indices on one line,
+    # wrapping after columns_to_print entries)
     columns_to_print = 10
-    for i,v in enumerate(volume_zones):
-        if i % columns_to_print==0:
-            lines.append(f"{v["contiguous_index"]}\n")
+    for i, v in enumerate(volume_zones):
+        lines.append(f"{v['contiguous_index']}")
+        if (i + 1) % columns_to_print == 0 or i == len(volume_zones) - 1:
+            lines.append("\n")
         else:
-            lines.append(f"{v["contiguous_index"]} ")
+            lines.append(" ")
     
     filename = ensure_extension(filename,'.ght_conn')
     with open(f'{filename}','w') as fp:

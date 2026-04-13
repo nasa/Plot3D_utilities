@@ -1,13 +1,38 @@
 Reading and Writing Plot3D Files
 ==================================
 
+Auto-detection
+--------------
+
+As of v1.9.0, :func:`~plot3d.read.read_plot3D` **auto-detects** the file
+format when parameters are omitted (or set to ``None``).  It probes the file
+header and compares the file size against expected sizes to determine:
+
+* **Binary vs ASCII**
+* **Big-endian vs little-endian** byte order
+* **Single (32-bit) vs double (64-bit)** precision
+* **Fortran unformatted** record markers
+
+.. code-block:: python
+
+    from plot3d import read_plot3D
+
+    # Auto-detect everything — just pass the filename
+    blocks = read_plot3D('finalmesh.xyz')
+
+You can still override any individual parameter when needed.  Only ``None``
+values trigger detection, so explicit flags are always respected.
+
+Reading and converting formats
+------------------------------
+
 This Plot3D library is capable of reading binary (big endian/little endian) and ASCII plot3d files. This is an example of how to read a plot3D file in binary and convert it to ASCII
-    
+
 .. code-block:: python
 
     from plot3d import write_plot3D, read_plot3D
 
-    # Convert to binary because of size 
+    # Explicit parameters still work as before
     blocks = read_plot3D('finalmesh.xyz', binary = True, big_endian=False)
     write_plot3D('finalmesh-ASCII.xyz',blocks, binary=False)
 

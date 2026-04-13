@@ -4,12 +4,13 @@ import numpy as np
 from .block import Block
 from .blockfunctions import rotate_block, reduce_blocks, compute_min_gcd, scale_face_bounds
 from .face import Face
-from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals, find_bounding_faces,get_outer_faces
+from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals, find_bounding_faces,get_outer_faces, split_face
 from .connectivity import get_face_intersection, face_matches_to_dict, _compute_orientation, _orient_vec_to_permutation, PERMUTATION_MATRICES
 import pandas as pd
 from math import cos, radians, sin, sqrt, acos
 from copy import deepcopy
 from tqdm import trange, tqdm
+from scipy.spatial import cKDTree
 
 def periodicity_fast(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_faces:List[Dict[str,int]], periodic_direction:str='k', rotation_axis:str='x',nblades:int=55):
     """Finds the connectivity of blocks when they are rotated by an angle defined by the number of blades. Only use this if your mesh is of an annulus. 
@@ -336,7 +337,7 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
 
 
-def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]], rotation_angle:float, rotation_axis:str = "x", ReduceMesh:bool=True):
+def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], outer_faces:List[Dict[str,int]], rotation_angle:float, rotation_axis:str = "x", ReduceMesh:bool=True, use_minmax:bool=False, tol:float=1E-4):
     """Finds the peridocity/connectivity by rotating a block. This is a bit different from "periodicity_fast" where you specify the periodic direction. This method doesn't care about the direction as long as the angle you specify results in a match between the Left Face and the Right Face. I would use this instead.
 
     Example 1:              
@@ -421,7 +422,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
                 block2 = blocks[face2.blockIndex]
                 t.set_description(f"Blk {face1.blockIndex} <-> {face2.blockIndex} | found {len(periodic_faces)}")
                 #   Check periodicity
-                df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2)
+                df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2, tol=tol)
                 
                 if len(periodic_faces_temp) > 0:
                     outer_faces_to_remove.append(face1)
@@ -828,6 +829,10 @@ def translational_periodicity(
         if key not in periodic_keys:
             outer_faces_remaining.append(o)
 
+    if use_minmax:
+        from .connectivity import normalize_face_matches
+        periodic_export = normalize_face_matches(periodic_export)
+
     return periodic_export, periodic_pairs, outer_faces_remaining
 
 def linear_real_transform(face1:Face,face2:Face) -> Tuple:
@@ -887,61 +892,148 @@ def linear_real_transform(face1:Face,face2:Face) -> Tuple:
             ang*=-1
     return ang, rotation_matrix
 
-def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:float=1E-6):
-    """General function to find periodicity within a given block. 
-    
-    Steps:
-        - 1: Take the face with the shorter diagonal. 
-        - 2: Rotate the shorter face by angle 360/nblades.  
-        - 3: Check to see if faces intersect
+def _extract_face_points(face: Face, block: Block):
+    """Extract all (x,y,z) points and their (i,j,k) indices from a face.
+
+    Returns:
+        pts (np.ndarray): (N, 3) array of xyz coordinates
+        ijk (List[Tuple[int,int,int]]): parallel list of (i,j,k) indices
+    """
+    rows = []
+    ijk = []
+    if face.IMIN == face.IMAX:
+        ic = face.IMIN
+        for j in range(face.JMIN, face.JMAX + 1):
+            for k in range(face.KMIN, face.KMAX + 1):
+                rows.append([block.X[ic, j, k], block.Y[ic, j, k], block.Z[ic, j, k]])
+                ijk.append((ic, j, k))
+    elif face.JMIN == face.JMAX:
+        jc = face.JMIN
+        for i in range(face.IMIN, face.IMAX + 1):
+            for k in range(face.KMIN, face.KMAX + 1):
+                rows.append([block.X[i, jc, k], block.Y[i, jc, k], block.Z[i, jc, k]])
+                ijk.append((i, jc, k))
+    elif face.KMIN == face.KMAX:
+        kc = face.KMIN
+        for i in range(face.IMIN, face.IMAX + 1):
+            for j in range(face.JMIN, face.JMAX + 1):
+                rows.append([block.X[i, j, kc], block.Y[i, j, kc], block.Z[i, j, kc]])
+                ijk.append((i, j, kc))
+    return np.array(rows), ijk
+
+
+def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:float=1E-4):
+    """Check if two faces are periodic using cKDTree geometric matching.
+
+    Uses a spatial tree to robustly match rotated coordinates, handling
+    different-sized faces and floating-point error from rotation matrices.
 
     Args:
-        face1 (Face): An arbitrary face 
-        face2 (Face): An arbitrary face 
-        block1 (Block): block 1 cooresponding to face 1
-        block2 (Block): block 2 cooresponding to face 2 
+        face1 (Face): An arbitrary face
+        face2 (Face): An arbitrary face
+        block1 (Block): block 1 corresponding to face 1 (already rotated)
+        block2 (Block): block 2 corresponding to face 2
+        tol (float): Matching tolerance for point distances
 
     Returns:
         (tuple): containing
 
-            - **df** (pandas.Dataframe): List of point matches for periodic surfaces 
-            - **periodic_surface** (List[Face]):  These are faces that are periodic 
-            - **split_surfaces** (List[Face]): Some blocks may have periodic faces with other blocks. But the faces may need to be split so say you pair a small face with a larger face. The split surfaces should be treated as an outer face  
-
+            - **df** (pandas.DataFrame): Point matches with columns i1,j1,k1,i2,j2,k2
+            - **periodic_surface** (List[Face]): Faces that are periodic
+            - **split_surfaces** (List[Face]): Split faces to be treated as outer faces
     """
-    
     periodic_faces = list()
-    split_faces = list()
+    split_faces_out = list()
     swapped = False
-    if (face2.diagonal_length < face1.diagonal_length): # switch so that face 2 is always longer
+    if (face2.diagonal_length < face1.diagonal_length):
         temp = deepcopy(face1)
         face1 = deepcopy(face2)
         face2 = temp
 
         temp_block = deepcopy(block1)
         block1 = deepcopy(block2)
-        block2 = temp_block        
+        block2 = temp_block
         swapped = True
-    
-    df,split_face1,split_face2 = get_face_intersection(face1,face2,block1,block2,tol)
 
-    if len(df)>=4:
+    # Extract xyz points with index tracking
+    pts1, ijk1 = _extract_face_points(face1, block1)
+    pts2, ijk2 = _extract_face_points(face2, block2)
+
+    if len(pts1) == 0 or len(pts2) == 0:
+        return pd.DataFrame(), periodic_faces, split_faces_out
+
+    # cKDTree matching: find face1 points on face2
+    tree = cKDTree(pts2)
+    dists, indices = tree.query(pts1, k=1)
+    mask = dists < tol
+
+    # Build match DataFrame
+    match_records = []
+    for idx in range(len(pts1)):
+        if mask[idx]:
+            i1, j1, k1 = ijk1[idx]
+            i2, j2, k2 = ijk2[indices[idx]]
+            match_records.append({'i1': i1, 'j1': j1, 'k1': k1,
+                                  'i2': i2, 'j2': j2, 'k2': k2})
+
+    df = pd.DataFrame(match_records, columns=['i1','j1','k1','i2','j2','k2'])
+
+    if len(df) >= 4:
+        # Check it's not just an edge
+        n_const = (int(df['i1'].min() == df['i1'].max()) +
+                   int(df['j1'].min() == df['j1'].max()) +
+                   int(df['k1'].min() == df['k1'].max()))
+        if n_const >= 2:
+            # It's an edge or degenerate, not a face
+            return pd.DataFrame(), periodic_faces, split_faces_out
+
+        # Create Face objects from matched region
         f1 = create_face_from_diagonals(block1,
-            [df['i1'].min(),df['j1'].min(),df['k1'].min()],
-            [df['i1'].max(),df['j1'].max(),df['k1'].max()])
+            [int(df['i1'].min()), int(df['j1'].min()), int(df['k1'].min())],
+            [int(df['i1'].max()), int(df['j1'].max()), int(df['k1'].max())])
         f1.set_block_index(face1.blockIndex)
         f1.set_face_id(face1.id)
 
         f2 = create_face_from_diagonals(block2,
-            [df['i2'].min(),df['j2'].min(),df['k2'].min()],
-            [df['i2'].max(),df['j2'].max(),df['k2'].max()])
+            [int(df['i2'].min()), int(df['j2'].min()), int(df['k2'].min())],
+            [int(df['i2'].max()), int(df['j2'].max()), int(df['k2'].max())])
         f2.set_block_index(face2.blockIndex)
         f2.set_face_id(face2.id)
-        
-        split_faces.extend(split_face1)
-        split_faces.extend(split_face2)
+
+        # Split faces for partial matches (matched region smaller than original face)
+        # Face 1 splits
+        ilb1, jlb1, klb1 = int(df['i1'].min()), int(df['j1'].min()), int(df['k1'].min())
+        iub1, jub1, kub1 = int(df['i1'].max()), int(df['j1'].max()), int(df['k1'].max())
+        if (ilb1 != face1.IMIN or iub1 != face1.IMAX or
+            jlb1 != face1.JMIN or jub1 != face1.JMAX or
+            klb1 != face1.KMIN or kub1 != face1.KMAX):
+            if int(ilb1==iub1) + int(jlb1==jub1) + int(klb1==kub1) == 1:
+                main_face1 = create_face_from_diagonals(block1,
+                    [face1.IMIN, face1.JMIN, face1.KMIN],
+                    [face1.IMAX, face1.JMAX, face1.KMAX])
+                sf1 = split_face(main_face1, block1,
+                    ilb=ilb1, jlb=jlb1, klb=klb1, iub=iub1, jub=jub1, kub=kub1)
+                [s.set_block_index(face1.blockIndex) for s in sf1]
+                [s.set_face_id(face1.id) for s in sf1]
+                split_faces_out.extend(sf1)
+
+        # Face 2 splits
+        ilb2, jlb2, klb2 = int(df['i2'].min()), int(df['j2'].min()), int(df['k2'].min())
+        iub2, jub2, kub2 = int(df['i2'].max()), int(df['j2'].max()), int(df['k2'].max())
+        if (ilb2 != face2.IMIN or iub2 != face2.IMAX or
+            jlb2 != face2.JMIN or jub2 != face2.JMAX or
+            klb2 != face2.KMIN or kub2 != face2.KMAX):
+            if int(ilb2==iub2) + int(jlb2==jub2) + int(klb2==kub2) == 1:
+                main_face2 = create_face_from_diagonals(block2,
+                    [face2.IMIN, face2.JMIN, face2.KMIN],
+                    [face2.IMAX, face2.JMAX, face2.KMAX])
+                sf2 = split_face(main_face2, block2,
+                    ilb=ilb2, jlb=jlb2, klb=klb2, iub=iub2, jub=jub2, kub=kub2)
+                [s.set_block_index(face2.blockIndex) for s in sf2]
+                [s.set_face_id(face2.id) for s in sf2]
+                split_faces_out.extend(sf2)
+
         if swapped:
-            # Rename df columns so i1/j1/k1 always refers to periodic_faces[0]
             df = df.rename(columns={
                 'i1': '_i2', 'j1': '_j2', 'k1': '_k2',
                 'i2': 'i1',  'j2': 'j1',  'k2': 'k1',
@@ -954,6 +1046,6 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
             periodic_faces.append(f1)
             periodic_faces.append(f2)
 
-    return df,periodic_faces,split_faces
+    return df, periodic_faces, split_faces_out
 
 

@@ -103,6 +103,60 @@ def extract_canonical_grid(block: Block, lb: list, ub: list) -> Tuple[np.ndarray
     return grid, nu, nv
 
 
+def _get_point(block: Block, ijk: list) -> np.ndarray:
+    """Extract a single (x, y, z) point from a block at index [i, j, k]."""
+    i, j, k = int(ijk[0]), int(ijk[1]), int(ijk[2])
+    return np.array([block.X[i, j, k], block.Y[i, j, k], block.Z[i, j, k]])
+
+
+def _directed_range(start: int, end: int) -> range:
+    """Inclusive range stepping +1 or -1 depending on direction."""
+    if start <= end:
+        return range(start, end + 1)
+    return range(start, end - 1, -1)
+
+
+def extract_directed_grid(block: Block, lb: list, ub: list) -> Tuple[np.ndarray, int, int]:
+    """Extract face as a 2D grid following the lb→ub directed diagonal.
+
+    Unlike :func:`extract_canonical_grid` which always extracts in ascending
+    order, this function preserves traversal direction so that:
+
+    - ``grid[0, 0]`` = physical point at the ``lb`` corner
+    - ``grid[-1, -1]`` = physical point at the ``ub`` corner
+
+    Args:
+        block: Block to extract from.
+        lb: Directed lower-bound corner [i, j, k].
+        ub: Directed upper-bound corner [i, j, k].
+
+    Returns:
+        (grid, nu, nv) where grid has shape (nu, nv, 3).
+    """
+    lo = [min(lb[d], ub[d]) for d in range(3)]
+    hi = [max(lb[d], ub[d]) for d in range(3)]
+    const_dim = constant_axis(lo, hi)
+    if const_dim < 0:
+        raise ValueError(f"No constant axis found: lb={lb}, ub={ub}")
+
+    vary = [d for d in range(3) if d != const_dim]
+    d0, d1 = vary
+    nu = abs(ub[d0] - lb[d0]) + 1
+    nv = abs(ub[d1] - lb[d1]) + 1
+
+    grid = np.empty((nu, nv, 3))
+    idx = [0, 0, 0]
+    idx[const_dim] = lb[const_dim]
+    for u_idx, u_val in enumerate(_directed_range(lb[d0], ub[d0])):
+        idx[d0] = u_val
+        for v_idx, v_val in enumerate(_directed_range(lb[d1], ub[d1])):
+            idx[d1] = v_val
+            grid[u_idx, v_idx] = [block.X[idx[0], idx[1], idx[2]],
+                                  block.Y[idx[0], idx[1], idx[2]],
+                                  block.Z[idx[0], idx[1], idx[2]]]
+    return grid, nu, nv
+
+
 def apply_permutation(grid: np.ndarray, perm_idx: int) -> np.ndarray:
     """Apply a pre-computed permutation matrix to a 2D face grid.
 
@@ -246,58 +300,72 @@ def _try_stored_then_all_perms(grid_a: np.ndarray, grid_b: np.ndarray,
 # ---------------------------------------------------------------------------
 
 def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E-6):
-    """Verify connectivity face matches using permutation matrices.
+    """Verify connectivity face matches using directed lb/ub extraction.
 
-    For each face match:
-    1. GCD-reduce blocks and scale indices.
-    2. Extract both faces as canonical 2D grids.
-    3. Try stored permutation_index first (if available).
-    4. Fall back to trying all 8 permutations.
-    5. On success, store the correct permutation_index in the orientation.
+    For each face match, verifies that:
+
+    1. The physical point at lb of block1 equals the physical point at lb of
+       block2 (corner match).
+    2. Same for ub corners.
+    3. ``face_A == apply_permutation(face_B, perm_idx)`` for some permutation.
+
+    Face grids are extracted following the directed lb→ub diagonal (not
+    normalized to ascending order), so the verification respects traversal
+    direction.
 
     Args:
         blocks: List of all blocks (original full-resolution).
-        face_matches: List of face_match dicts.
+        face_matches: List of face_match dicts with directed lb/ub.
         tol: Euclidean distance tolerance.
 
     Returns:
         (verified, mismatched) lists of face_match dicts.
     """
-    gcd_to_use = compute_min_gcd(blocks)
-    reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
-
-    scaled_matches = deepcopy(face_matches)
-    # Normalize to lb/ub format before scaling
-    for fm in scaled_matches:
-        for side in ['block1', 'block2']:
-            lo, hi = get_bounds(fm[side])
-            fm[side]['lb'] = list(lo)
-            fm[side]['ub'] = list(hi)
-    scale_face_bounds(scaled_matches, gcd_to_use, divide=True)
-
     verified = []
     mismatched = []
 
-    for idx, fm in enumerate(scaled_matches):
-        b1 = fm['block1']
-        b2 = fm['block2']
+    for idx, fm_orig in enumerate(face_matches):
+        b1 = fm_orig['block1']
+        b2 = fm_orig['block2']
+        blk1 = blocks[b1['block_index']]
+        blk2 = blocks[b2['block_index']]
+        lb1, ub1 = b1['lb'], b1['ub']
+        lb2, ub2 = b2['lb'], b2['ub']
 
-        try:
-            grid_a, nu_a, nv_a = extract_canonical_grid(
-                reduced_blocks[b1['block_index']], b1['lb'], b1['ub'])
-            grid_b, nu_b, nv_b = extract_canonical_grid(
-                reduced_blocks[b2['block_index']], b2['lb'], b2['ub'])
-        except (ValueError, IndexError):
-            mismatched.append(face_matches[idx])
+        # --- Strict corner check: lb1 xyz == lb2 xyz, ub1 xyz == ub2 xyz ---
+        pt_lb1 = _get_point(blk1, lb1)
+        pt_lb2 = _get_point(blk2, lb2)
+        pt_ub1 = _get_point(blk1, ub1)
+        pt_ub2 = _get_point(blk2, ub2)
+
+        lb_err = float(np.linalg.norm(pt_lb1 - pt_lb2))
+        ub_err = float(np.linalg.norm(pt_ub1 - pt_ub2))
+
+        if lb_err > tol or ub_err > tol:
+            print(f"verify_connectivity: CORNER MISMATCH at index {idx}")
+            print(f"  block {b1['block_index']}: lb={lb1} ub={ub1}")
+            print(f"  block {b2['block_index']}: lb={lb2} ub={ub2}")
+            if lb_err > tol:
+                print(f"  lb1 xyz={pt_lb1}  lb2 xyz={pt_lb2}  diff={lb_err:.2e}")
+            if ub_err > tol:
+                print(f"  ub1 xyz={pt_ub1}  ub2 xyz={pt_ub2}  diff={ub_err:.2e}")
+            mismatched.append(fm_orig)
             continue
 
-        stored_perm = fm.get('orientation', {}).get('permutation_index')
-        perm_idx = _try_stored_then_all_perms(grid_a, grid_b, stored_perm, fm, tol)
+        # --- Full face check: extract directed grids and find permutation ---
+        try:
+            grid_a, nu_a, nv_a = extract_directed_grid(blk1, lb1, ub1)
+            grid_b, nu_b, nv_b = extract_directed_grid(blk2, lb2, ub2)
+        except (ValueError, IndexError) as e:
+            print(f"verify_connectivity: EXTRACTION ERROR at index {idx}: {e}")
+            mismatched.append(fm_orig)
+            continue
+
+        stored_perm = fm_orig.get('orientation', {}).get('permutation_index')
+        perm_idx = _try_stored_then_all_perms(grid_a, grid_b, stored_perm, fm_orig, tol)
         if perm_idx >= 0:
-            corrected = deepcopy(face_matches[idx])
-            plane = determine_plane(b1['lb'], b1['ub'], b2['lb'], b2['ub'])
-            # In-plane: direction encoded in lb/ub → export -1.
-            # Cross-plane: lb/ub can't encode axis swap → export actual index.
+            corrected = deepcopy(fm_orig)
+            plane = determine_plane(lb1, ub1, lb2, ub2)
             export_perm = -1 if plane == 'in-plane' else perm_idx
             corrected['orientation'] = {
                 'permutation_index': export_perm,
@@ -306,13 +374,11 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
             }
             verified.append(corrected)
         else:
-            orig = face_matches[idx]
-            lo1, hi1 = get_bounds(orig['block1'])
-            lo2, hi2 = get_bounds(orig['block2'])
-            print(f"verify_connectivity: MISMATCH at index {idx}")
-            print(f"  block {orig['block1']['block_index']}: lo={lo1} hi={hi1}")
-            print(f"  block {orig['block2']['block_index']}: lo={lo2} hi={hi2}")
-            mismatched.append(face_matches[idx])
+            print(f"verify_connectivity: FACE MISMATCH at index {idx} "
+                  f"(corners OK but no permutation found)")
+            print(f"  block {b1['block_index']}: lb={lb1} ub={ub1}")
+            print(f"  block {b2['block_index']}: lb={lb2} ub={ub2}")
+            mismatched.append(fm_orig)
 
     return verified, mismatched
 
@@ -323,10 +389,12 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
 
 def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
                        rotation_axis: str = 'x', tol: float = 1E-6):
-    """Verify periodic face matches using permutation matrices with rotation.
+    """Verify periodic face matches using directed lb/ub extraction with rotation.
 
-    For each face match, rotates block1 by +/- theta and uses the same
-    canonical grid + permutation approach as :func:`verify_connectivity`.
+    For each face match, rotates block1 by +/- theta and verifies:
+
+    1. Corner match: rotated lb1 xyz == lb2 xyz (within tolerance).
+    2. Full face: ``rotated_face_A == apply_permutation(face_B, perm_idx)``.
 
     Args:
         blocks: List of all blocks (original full-resolution).
@@ -338,57 +406,55 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
     Returns:
         (verified, mismatched) lists of face_match dicts.
     """
-    gcd_to_use = compute_min_gcd(blocks)
-    reduced_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
-
     rotation_matrix_pos = create_rotation_matrix(radians(theta), rotation_axis)
     rotation_matrix_neg = create_rotation_matrix(radians(-theta), rotation_axis)
 
-    rotated_blocks_pos = [rotate_block(b, rotation_matrix_pos) for b in reduced_blocks]
-    rotated_blocks_neg = [rotate_block(b, rotation_matrix_neg) for b in reduced_blocks]
-
-    scaled_matches = deepcopy(face_matches)
-    # Normalize to lb/ub format before scaling
-    for fm in scaled_matches:
-        for side in ['block1', 'block2']:
-            lo, hi = get_bounds(fm[side])
-            fm[side]['lb'] = list(lo)
-            fm[side]['ub'] = list(hi)
-    scale_face_bounds(scaled_matches, gcd_to_use, divide=True)
+    rotated_blocks_pos = [rotate_block(deepcopy(b), rotation_matrix_pos) for b in blocks]
+    rotated_blocks_neg = [rotate_block(deepcopy(b), rotation_matrix_neg) for b in blocks]
 
     verified = []
     mismatched_list = []
 
-    for idx, fm in enumerate(scaled_matches):
-        b1 = fm['block1']
-        b2 = fm['block2']
+    for idx, fm_orig in enumerate(face_matches):
+        b1 = fm_orig['block1']
+        b2 = fm_orig['block2']
         b1_idx = b1['block_index']
         b2_idx = b2['block_index']
+        lb1, ub1 = b1['lb'], b1['ub']
+        lb2, ub2 = b2['lb'], b2['ub']
 
-        try:
-            grid_b, nu_b, nv_b = extract_canonical_grid(
-                reduced_blocks[b2_idx], b2['lb'], b2['ub'])
-        except (ValueError, IndexError):
-            mismatched_list.append(face_matches[idx])
-            continue
+        blk2 = blocks[b2_idx]
 
         found = False
-
         for rotated_blocks in [rotated_blocks_pos, rotated_blocks_neg]:
             if found:
                 break
 
+            blk1_rot = rotated_blocks[b1_idx]
+
+            # Corner check with rotation
+            pt_lb1 = _get_point(blk1_rot, lb1)
+            pt_lb2 = _get_point(blk2, lb2)
+            pt_ub1 = _get_point(blk1_rot, ub1)
+            pt_ub2 = _get_point(blk2, ub2)
+
+            lb_err = float(np.linalg.norm(pt_lb1 - pt_lb2))
+            ub_err = float(np.linalg.norm(pt_ub1 - pt_ub2))
+
+            if lb_err > tol or ub_err > tol:
+                continue
+
             try:
-                grid_a, nu_a, nv_a = extract_canonical_grid(
-                    rotated_blocks[b1_idx], b1['lb'], b1['ub'])
+                grid_a, nu_a, nv_a = extract_directed_grid(blk1_rot, lb1, ub1)
+                grid_b, nu_b, nv_b = extract_directed_grid(blk2, lb2, ub2)
             except (ValueError, IndexError):
                 continue
 
-            stored_perm = fm.get('orientation', {}).get('permutation_index')
-            perm_idx = _try_stored_then_all_perms(grid_a, grid_b, stored_perm, fm, tol)
+            stored_perm = fm_orig.get('orientation', {}).get('permutation_index')
+            perm_idx = _try_stored_then_all_perms(grid_a, grid_b, stored_perm, fm_orig, tol)
             if perm_idx >= 0:
-                corrected = deepcopy(face_matches[idx])
-                plane = determine_plane(b1['lb'], b1['ub'], b2['lb'], b2['ub'])
+                corrected = deepcopy(fm_orig)
+                plane = determine_plane(lb1, ub1, lb2, ub2)
                 export_perm = -1 if plane == 'in-plane' else perm_idx
                 corrected['orientation'] = {
                     'permutation_index': export_perm,
@@ -397,15 +463,11 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
                 }
                 verified.append(corrected)
                 found = True
-                break
 
         if not found:
-            orig = face_matches[idx]
-            lo1, hi1 = get_bounds(orig['block1'])
-            lo2, hi2 = get_bounds(orig['block2'])
             print(f"verify_periodicity: MISMATCH at index {idx}")
-            print(f"  block {orig['block1']['block_index']}: lo={lo1} hi={hi1}")
-            print(f"  block {orig['block2']['block_index']}: lo={lo2} hi={hi2}")
-            mismatched_list.append(face_matches[idx])
+            print(f"  block {b1_idx}: lb={lb1} ub={ub1}")
+            print(f"  block {b2_idx}: lb={lb2} ub={ub2}")
+            mismatched_list.append(fm_orig)
 
     return verified, mismatched_list

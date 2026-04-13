@@ -3,11 +3,18 @@
 *.xyz
 *.DS_Store
 
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
 # vs code folders
 .vscode/
 *.p3d
 # Allow test data p3d files
 !python/tests/data/cross_plane_pair.p3d
+!python/tests/data/vspt_mesh_scaled.xyz
 *.x
 *.lock
 python/mesh.pickle

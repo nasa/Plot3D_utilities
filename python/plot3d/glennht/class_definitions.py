@@ -4,6 +4,15 @@ from dataclasses import dataclass, field
 from enum import IntEnum, Enum
 from typing import Any, Dict, List, Optional
 
+
+class FortranLiteral(str):
+    """String subclass for Fortran namelist values that must NOT be quoted.
+
+    Use for repeat-count arrays (``4*T``, ``0.25,0.3333333,0.5,1.,6*0``)
+    and any other raw Fortran syntax that the namelist reader expects unquoted.
+    """
+    pass
+
 # ----------------------------
 # Enums (mirror your C#)
 # ----------------------------
@@ -89,6 +98,8 @@ class InletBC(BoundaryCondition):
     bet1_const: Optional[float] = None
 
     annular_inlet: bool = False
+    mult_for_full_ring: Optional[int] = None
+    angularPeriod: Optional[float] = None
     deltah: Optional[float] = None
     deltat: Optional[float] = None
     twall_hub: Optional[float] = None
@@ -241,41 +252,36 @@ class TimeStpControl:
 @dataclass
 class SPDSchemeControl:
     # GlennHT-style defaults (with shorthand preserved)
-    NS_Central: str = "4*T"
-    TB2_Upwind1: str = "4*T"
-    NS_Upwind2: str = "4*F"
+    NS_Central: FortranLiteral = FortranLiteral("4*T")
+    TB2_Upwind1: FortranLiteral = FortranLiteral("4*T")
+    NS_Upwind2: FortranLiteral = FortranLiteral("4*F")
 
     ScalrCoeff_ArtDiss: bool = True
     useSecDiffArtDiss: bool = True
     useFrthDiffArtDiss: bool = True
 
-    rk2: str = "4*0.12500"
-    rk4: str = "4*0.032"
+    rk2: FortranLiteral = FortranLiteral("4*0.12500")
+    rk4: FortranLiteral = FortranLiteral("4*0.032")
 
-    # Keep other optional fields from your previous version
     NS_Upwind1: bool = False
     use_AUSM_Chima: bool = False
     use_AUSM_Liou_hTot: bool = False
     TB2_Central: bool = False
     TBRSM_Central: bool = False
     TBRSM_Upwind1: bool = True
-    constArtDiss: bool = False
-    scalarArtDiss: bool = True
+    ConstCoeff_ArtDiss: bool = False
     MatrxCoeff_ArtDiss: bool = False
-    secDiffArtDiss: bool = True
-    matrixArtDiss: bool = False
-    frthDiffArtDiss: bool = True
     MachCutOff: float = 0.1
     ivanAlbada: int = 1
 
 @dataclass
 class RKSchemeControl:
     nStages: int = 4
-    RKCoeff: str = "0.25,0.3333333,0.5,1.,6*0"
-    compute_pdiff_in_stage: str = "T,T,T,T,6*F"
-    compute_adiss_in_stage: str = "T,T,T,T,6*F"
-    export_import_after_stage: str = "T,T,T,T,6*F"
-    use_implicit_residual_smoothing: str = ".T."
+    RKCoeff: FortranLiteral = FortranLiteral("0.25,0.3333333,0.5,1.,6*0")
+    compute_pdiff_in_stage: FortranLiteral = FortranLiteral("T,T,T,T,6*F")
+    compute_adiss_in_stage: FortranLiteral = FortranLiteral("T,T,T,T,6*F")
+    export_import_after_stage: FortranLiteral = FortranLiteral("T,T,T,T,6*F")
+    use_implicit_residual_smoothing: FortranLiteral = FortranLiteral(".T.")
     irs_neqs: Optional[int] = 1
     irs_use_GS: bool = True
     n_GS_iterations: Optional[int] = 3
@@ -309,26 +315,31 @@ class GasPropertiesInput:
 
 @dataclass
 class ReferenceCond:
-    # Derived (not user input) — kept for export
+    # Minimal set for GlennHT: only fields that are explicitly set get exported.
+    # When Re is NOT specified, GlennHT requires:
+    #   Group 0: refLen, refVisc
+    #   Group 1: 3 of {refP0, refT0, refRho0, Rgas}
+    #   Group 2: gamma or refCp
+    #   Group 3: Pr or refCond
     useDimensionalVariables: bool = False
-    refLen: Optional[float] = 1.0
-    refP0: Optional[float] = 101325.0  # Pa (total)
-    refT0: Optional[float] = 300.0
-    refRho0: Optional[float] = 1.1765823
-    refVel: Optional[float] = 293.4588
-    refVisc: Optional[float] = 1.84e-5
-    refCond: Optional[float] = 0.02636
-    refCp: Optional[float] = 1004.5784
-    MolW: Optional[float] = 28.964
-    RgasUnv: Optional[float] = 8314.4126
-    Rgas: Optional[float] = 287.06023
-    gamma: Optional[float] = 1.4
-    Re: Optional[float] = 1.8765e7
-    Pr: Optional[float] = 0.706
-    ndVisc: Optional[float] = 1.0
-    ndCond: Optional[float] = 1.0
-    Omegab: Optional[float] = 0.0
-    ReScalingFactor: Optional[float] = 1.0
+    refLen: Optional[float] = None
+    refP0: Optional[float] = None
+    refT0: Optional[float] = None
+    refRho0: Optional[float] = None
+    refVel: Optional[float] = None
+    refVisc: Optional[float] = None
+    refCond: Optional[float] = None
+    refCp: Optional[float] = None
+    MolW: Optional[float] = None
+    RgasUnv: Optional[float] = None
+    Rgas: Optional[float] = None
+    gamma: Optional[float] = None
+    Re: Optional[float] = None
+    Pr: Optional[float] = None
+    ndVisc: Optional[float] = None
+    ndCond: Optional[float] = None
+    Omegab: Optional[float] = None
+    ReScalingFactor: Optional[float] = None
     rho_solid: Optional[float] = None
     cond_solid: Optional[float] = None
     Csp_solid: Optional[float] = None
