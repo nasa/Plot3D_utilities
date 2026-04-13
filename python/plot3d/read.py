@@ -117,19 +117,132 @@ def read_ap_nasa(filename:str):
     return Block(X=meshx,Y=y,Z=z), nbld
 
 
-def read_plot3D(filename:str, binary:bool=True, big_endian:bool=False, read_double:bool=True, fortran:bool=False):
+def _detect_plot3d_format(filename: str):
+    """Auto-detect Plot3D file format: ASCII/binary, endianness, precision, Fortran.
+
+    Returns:
+        dict with keys: binary, big_endian, read_double, fortran
+    """
+    file_size = osp.getsize(filename)
+
+    # ── Try ASCII first ──
+    try:
+        with open(filename, 'r') as f:
+            first_line = f.readline().strip()
+            nblocks = int(first_line)
+            if 1 <= nblocks <= 10000:
+                # Read dimensions to confirm
+                dims_line = f.readline()
+                if dims_line:
+                    return {'binary': False, 'big_endian': False, 'read_double': True, 'fortran': False}
+    except (ValueError, UnicodeDecodeError):
+        pass
+
+    with open(filename, 'rb') as f:
+        header = f.read(16)
+
+    if len(header) < 8:
+        # Fallback
+        return {'binary': True, 'big_endian': False, 'read_double': True, 'fortran': False}
+
+    def _try_binary(big_endian, fortran):
+        """Try reading header as binary with given settings. Returns (nblocks, dims) or None."""
+        fmt = '>' if big_endian else '<'
+        try:
+            with open(filename, 'rb') as f:
+                if fortran:
+                    # Fortran record: [rec_len][nblocks][rec_len]
+                    rec_len = struct.unpack(f'{fmt}i', f.read(4))[0]
+                    if rec_len != 4:
+                        return None
+                    nblocks = struct.unpack(f'{fmt}i', f.read(4))[0]
+                    rec_end = struct.unpack(f'{fmt}i', f.read(4))[0]
+                    if rec_end != 4 or not (1 <= nblocks <= 10000):
+                        return None
+                    # Read dims record
+                    rec_len2 = struct.unpack(f'{fmt}i', f.read(4))[0]
+                    if rec_len2 != nblocks * 3 * 4:
+                        return None
+                    dims = struct.unpack(f'{fmt}{nblocks*3}i', f.read(nblocks * 3 * 4))
+                    rec_end2 = struct.unpack(f'{fmt}i', f.read(4))[0]
+                    if rec_end2 != rec_len2:
+                        return None
+                else:
+                    nblocks = struct.unpack(f'{fmt}I', f.read(4))[0]
+                    if not (1 <= nblocks <= 10000):
+                        return None
+                    dims = struct.unpack(f'{fmt}{nblocks*3}I', f.read(nblocks * 3 * 4))
+
+                # Validate dimensions
+                for d in dims:
+                    if not (1 <= d <= 100000):
+                        return None
+                return nblocks, dims
+        except (struct.error, EOFError):
+            return None
+
+    def _expected_data_size(nblocks, dims, precision_bytes, fortran):
+        """Compute expected file size for given precision."""
+        header_size = 4 + nblocks * 3 * 4  # nblocks int + dimension ints
+        data_size = 0
+        for b in range(nblocks):
+            ni, nj, nk = dims[b*3], dims[b*3+1], dims[b*3+2]
+            data_size += 3 * ni * nj * nk * precision_bytes
+        if fortran:
+            # Record markers: 2*4 bytes per record
+            # 1 record for nblocks, 1 for dims, nblocks records for data (one per block)
+            n_records = 2 + nblocks  # nblocks record + dims record + one data record per block
+            header_size += n_records * 2 * 4
+        return header_size + data_size
+
+    # ── Try each combination ──
+    for fortran in [False, True]:
+        for big_endian in [False, True]:
+            result = _try_binary(big_endian, fortran)
+            if result is None:
+                continue
+            nblocks, dims = result
+
+            size_single = _expected_data_size(nblocks, dims, 4, fortran)
+            size_double = _expected_data_size(nblocks, dims, 8, fortran)
+
+            if file_size == size_double:
+                return {'binary': True, 'big_endian': big_endian, 'read_double': True, 'fortran': fortran}
+            if file_size == size_single:
+                return {'binary': True, 'big_endian': big_endian, 'read_double': False, 'fortran': fortran}
+
+    # Fallback
+    return {'binary': True, 'big_endian': False, 'read_double': True, 'fortran': False}
+
+
+def read_plot3D(filename:str, binary:bool=None, big_endian:bool=None, read_double:bool=None, fortran:bool=None):
     """Reads a Plot3D file and returns blocks.
+
+    When any format parameter is ``None`` (the default), the file format is
+    auto-detected by probing the header and comparing file size against
+    expected sizes for single/double precision.
 
     Args:
         filename (str): Name of the file to read, e.g. ``.p3d``, ``.xyz`` or ``.plot3d``.
-        binary (bool, optional): Indicates if the file is binary. Defaults to True.
-        big_endian (bool, optional): Use big endian format when reading binary files. Defaults to False.
-        read_double (bool, optional): Read 8-byte doubles when ``True`` and 4-byte floats otherwise.
-        fortran (bool, optional): Read Fortran unformatted binary with record markers. Defaults to False.
+        binary (bool, optional): ``True`` for binary, ``False`` for ASCII. Auto-detected when ``None``.
+        big_endian (bool, optional): Use big endian format for binary files. Auto-detected when ``None``.
+        read_double (bool, optional): Read 8-byte doubles (``True``) or 4-byte floats (``False``). Auto-detected when ``None``.
+        fortran (bool, optional): Read Fortran unformatted binary with record markers. Auto-detected when ``None``.
 
     Returns:
         List[Block]: List of blocks inside the Plot3D file.
     """
+    # Auto-detect any unspecified parameters
+    if any(p is None for p in [binary, big_endian, read_double, fortran]):
+        detected = _detect_plot3d_format(filename)
+        if binary is None:
+            binary = detected['binary']
+        if big_endian is None:
+            big_endian = detected['big_endian']
+        if read_double is None:
+            read_double = detected['read_double']
+        if fortran is None:
+            fortran = detected['fortran']
 
     blocks = list()
     if osp.isfile(filename):
