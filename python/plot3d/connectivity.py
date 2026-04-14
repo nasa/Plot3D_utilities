@@ -908,7 +908,62 @@ def combinations_of_nearest_blocks(blocks:List[Block],nearest_nblocks:int=4):
             if distance_matrix[i,j] < 10000:
                 new_combos.append((i,j))
     return new_combos
-    
+
+def _phase3_overlaps_existing(bi, lb1, ub1, bj, lb2, ub2, face_matches):
+    """Return True if a candidate Phase-3 match's region overlaps any
+    existing ``face_matches`` record on the same block pair.
+
+    Overlap guard used inside :func:`connectivity` Phase 3 to prevent
+    re-emission of regions that Phase 2 already claimed. On meshes with
+    an O-grid seam, ``__filter_block_increasing`` drops seam-adjacent
+    points during Phase 2 and leaves a residue that Phase 3 then
+    re-matches against the fresh neighbor face pool, producing a
+    wrap-around record whose bbox already overlaps two clean Phase 2
+    sub-faces on the same block pair. The per-face dedup key in Phase 3
+    (``(bi, IMIN, JMIN, KMIN, IMAX, JMAX, KMAX)``) does not catch this
+    because it only tracks which ``block1`` faces have been processed
+    in Phase 3.
+
+    The check is per-dimension on both sides, with ``lb``/``ub``
+    normalised to (min, max) per axis so direction does not matter.
+    """
+    def _ranges_overlap(a_lo, a_hi, b_lo, b_hi):
+        return not (a_hi < b_lo or b_hi < a_lo)
+
+    def _normalise(lb, ub):
+        return ([min(lb[d], ub[d]) for d in range(len(lb))],
+                [max(lb[d], ub[d]) for d in range(len(lb))])
+
+    cand_lb1, cand_ub1 = _normalise(lb1, ub1)
+    cand_lb2, cand_ub2 = _normalise(lb2, ub2)
+
+    for m in face_matches:
+        m1 = m.get('block1', {})
+        m2 = m.get('block2', {})
+        mbi = m1.get('block_index')
+        mbj = m2.get('block_index')
+        if mbi is None or mbj is None:
+            continue
+        if mbi == bi and mbj == bj:
+            mlb1, mub1 = _normalise(m1['lb'], m1['ub'])
+            mlb2, mub2 = _normalise(m2['lb'], m2['ub'])
+        elif mbi == bj and mbj == bi:
+            mlb1, mub1 = _normalise(m2['lb'], m2['ub'])
+            mlb2, mub2 = _normalise(m1['lb'], m1['ub'])
+        else:
+            continue
+        side1 = all(
+            _ranges_overlap(cand_lb1[d], cand_ub1[d], mlb1[d], mub1[d])
+            for d in range(3)
+        )
+        side2 = all(
+            _ranges_overlap(cand_lb2[d], cand_ub2[d], mlb2[d], mub2[d])
+            for d in range(3)
+        )
+        if side1 and side2:
+            return True
+    return False
+
 def connectivity_fast(blocks:List[Block], use_minmax:bool=False):
     """Find connectivity by GCD-reducing blocks first for speed.
 
@@ -1100,6 +1155,17 @@ def connectivity(blocks:List[Block]):
                     ub1_out = [int(df.iloc[-1]['i1']), int(df.iloc[-1]['j1']), int(df.iloc[-1]['k1'])]
                     lb2_out = [int(df.iloc[0]['i2']), int(df.iloc[0]['j2']), int(df.iloc[0]['k2'])]
                     ub2_out = [int(df.iloc[-1]['i2']), int(df.iloc[-1]['j2']), int(df.iloc[-1]['k2'])]
+
+                    # Skip if this region overlaps an existing Phase 2
+                    # match on the same block pair — happens around
+                    # O-grid seams where __filter_block_increasing drops
+                    # seam-adjacent points and leaves a residue that
+                    # Phase 3 re-matches against the fresh neighbor face.
+                    if _phase3_overlaps_existing(
+                        bi, lb1_out, ub1_out, bj, lb2_out, ub2_out,
+                        face_matches,
+                    ):
+                        continue
 
                     orientation = _compute_orientation(df, lb1_out, ub1_out)
                     perm_idx, plane = _orient_vec_to_permutation(
