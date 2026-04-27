@@ -1104,6 +1104,7 @@ def connectivity(blocks:List[Block]):
 
     fresh_all = [get_outer_faces(b)[0] for b in blocks]
     phase3_keys = set()
+    phase3_partial_matches: dict = {}
     phase3_count = 0
 
     for bi in range(len(blocks)):
@@ -1191,16 +1192,57 @@ def connectivity(blocks:List[Block]):
                         'match': df,
                     })
                     phase3_keys.add(face_key)
+                    # Track the matched sub-region so we can split the
+                    # original face and keep the unmatched leftover as
+                    # an outer face. Without this, partial Phase 3
+                    # matches silently discard the rest of the face,
+                    # which then can't participate in periodicity.
+                    phase3_partial_matches.setdefault(face_key, []).append(
+                        (lb1_out, ub1_out)
+                    )
                     phase3_count += 1
                     # Don't break — continue checking other neighbors' faces
                     # for split-face matches
 
     print(f"  Phase 3 done ({phase3_count} new matches)")
 
-    # Remove Phase 3 matched faces from outer faces
+    # Remove Phase 3 matched faces from outer faces, but for partial
+    # matches (matched sub-region smaller than the original face)
+    # add the unmatched leftover splits back so they can still be
+    # detected as outer faces / periodic candidates.
     for bi in range(len(blocks)):
-        block_outer_faces[bi] = [f for f in block_outer_faces[bi]
-            if (bi, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX) not in phase3_keys]
+        new_outer = []
+        for f in block_outer_faces[bi]:
+            fk = (bi, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX)
+            if fk not in phase3_keys:
+                new_outer.append(f)
+                continue
+            # face was matched in Phase 3 — emit leftovers from each
+            # partial match region
+            partials = phase3_partial_matches.get(fk, [])
+            leftovers = [f]
+            for lb_m, ub_m in partials:
+                next_leftovers = []
+                for left in leftovers:
+                    # Skip if match region doesn't overlap this leftover
+                    if (ub_m[0] < left.IMIN or lb_m[0] > left.IMAX or
+                        ub_m[1] < left.JMIN or lb_m[1] > left.JMAX or
+                        ub_m[2] < left.KMIN or lb_m[2] > left.KMAX):
+                        next_leftovers.append(left)
+                        continue
+                    # Clip match region to leftover, then split
+                    ilb = max(lb_m[0], left.IMIN); iub = min(ub_m[0], left.IMAX)
+                    jlb = max(lb_m[1], left.JMIN); jub = min(ub_m[1], left.JMAX)
+                    klb = max(lb_m[2], left.KMIN); kub = min(ub_m[2], left.KMAX)
+                    splits = split_face(left, blocks[bi],
+                                        ilb=ilb, jlb=jlb, klb=klb,
+                                        iub=iub, jub=jub, kub=kub)
+                    for s in splits:
+                        s.set_block_index(bi)
+                    next_leftovers.extend(splits)
+                leftovers = next_leftovers
+            new_outer.extend(leftovers)
+        block_outer_faces[bi] = new_outer
 
     # Update Outer Faces
     [outer_faces.extend(o) for o in block_outer_faces] # all the outer faces
