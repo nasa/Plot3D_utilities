@@ -273,25 +273,101 @@ def determine_plane(lb1, ub1, lb2, ub2) -> str:
     return "in-plane" if const_a == const_b else "cross-plane"
 
 
-def _try_stored_then_all_perms(grid_a: np.ndarray, grid_b: np.ndarray,
-                                stored_perm, fm: dict, tol: float) -> int:
-    """Try stored permutation first, then brute-force all 8.
+def _index_from_permutation_matrix(matrix) -> int:
+    """Look up a 2x2 signed permutation matrix in :data:`PERMUTATION_MATRICES`.
+
+    Mirrors `Orientation::index_from_permutation_matrix` from plot3d-rs
+    (commit 920149f, ``src/verification.rs``). Returns the canonical index
+    (0-7) on a match, or ``-1`` if the matrix is not one of the 8 canonical
+    signed permutation matrices.
 
     Args:
-        grid_a: Canonical grid of face A.
-        grid_b: Canonical grid of face B.
-        stored_perm: Stored permutation index (int or None).
-        fm: Face match dict (used only for lb/ub to determine plane).
+        matrix: A 2x2 nested list, tuple, or ndarray of int / float values.
+
+    Returns:
+        Canonical index in ``range(8)`` on match; ``-1`` otherwise.
+    """
+    if matrix is None:
+        return -1
+    arr = np.asarray(matrix)
+    if arr.shape != (2, 2):
+        return -1
+    arr_int = arr.astype(np.int8)
+    for idx in range(8):
+        if np.array_equal(arr_int, PERMUTATION_MATRICES[idx]):
+            return idx
+    return -1
+
+
+def _resolve_declared_perm(orientation_dict) -> int:
+    """Return the canonical permutation index DECLARED on a face match, or ``-1``.
+
+    Mirrors the gold-standard rule from plot3d-rs commit 920149f
+    (``src/verification.rs::verify_*`` cascade). The face match is
+    "DECLARED" when the orientation dict carries either:
+
+    * a ``permutation_matrix`` field (preferred — the matrix is the source
+      of truth), OR
+    * a non-sentinel ``permutation_index`` (>= 0) without a matrix.
+
+    A face match is "UNDECLARED" when neither is present (or both are
+    sentinels). The caller routes UNDECLARED matches through the legacy
+    brute-force ``try_all_permutations`` discovery path.
+
+    Args:
+        orientation_dict: dict with optional ``permutation_matrix`` and
+            ``permutation_index`` fields, or ``None``.
+
+    Returns:
+        DECLARED index (0-7) on match; ``-1`` for UNDECLARED.
+    """
+    if not orientation_dict:
+        return -1
+    matrix = orientation_dict.get('permutation_matrix')
+    if matrix is not None:
+        idx = _index_from_permutation_matrix(matrix)
+        if idx >= 0:
+            return idx
+    perm_idx = orientation_dict.get('permutation_index')
+    if perm_idx is None or perm_idx < 0:
+        return -1
+    return int(perm_idx)
+
+
+def _resolve_match_perm(grid_a: np.ndarray, grid_b: np.ndarray,
+                         fm: dict, tol: float) -> int:
+    """DECLARED-vs-UNDECLARED resolver — returns the verifying permutation index, or -1.
+
+    DECLARED path (orientation present):
+        Try the declared permutation EXACTLY. If it verifies, return it.
+        If not, return -1 — **no brute-force fallback**. A wrong declared
+        matrix is reported as mismatched, never silently rounded into a
+        different canonical index. (Plot3d-rs gold-standard rule from
+        commit 920149f.)
+
+    UNDECLARED path (orientation absent / sentinel):
+        Discover via :func:`try_all_permutations` and back-fill the index.
+        Preserved for backward compatibility with legacy connectivity files
+        that don't carry orientation metadata.
+
+    Args:
+        grid_a: Canonical grid of face A, shape ``(nu_a, nv_a, 3)``.
+        grid_b: Canonical grid of face B, shape ``(nu_b, nv_b, 3)``.
+        fm: Face match dict (used to look up ``orientation``).
         tol: Euclidean distance tolerance.
 
     Returns:
-        Permutation index (0-7) on success, -1 if none works.
+        Permutation index (0-7) on success, ``-1`` on failure.
     """
     nu_a, nv_a = grid_a.shape[:2]
-    if stored_perm is not None and stored_perm >= 0:
-        g = apply_permutation(grid_b, stored_perm)
+    declared = _resolve_declared_perm(fm.get('orientation'))
+    if declared >= 0:
+        # DECLARED — matrix-honest, no fallback.
+        g = apply_permutation(grid_b, declared)
         if g.shape[:2] == (nu_a, nv_a) and verify_match(grid_a, g, tol):
-            return stored_perm
+            return declared
+        return -1
+    # UNDECLARED — geometry-driven discovery.
     return try_all_permutations(grid_a, grid_b, tol)
 
 
@@ -361,8 +437,7 @@ def verify_connectivity(blocks: List[Block], face_matches: list, tol: float = 1E
             mismatched.append(fm_orig)
             continue
 
-        stored_perm = fm_orig.get('orientation', {}).get('permutation_index')
-        perm_idx = _try_stored_then_all_perms(grid_a, grid_b, stored_perm, fm_orig, tol)
+        perm_idx = _resolve_match_perm(grid_a, grid_b, fm_orig, tol)
         if perm_idx >= 0:
             corrected = deepcopy(fm_orig)
             plane = determine_plane(lb1, ub1, lb2, ub2)
@@ -450,8 +525,7 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
             except (ValueError, IndexError):
                 continue
 
-            stored_perm = fm_orig.get('orientation', {}).get('permutation_index')
-            perm_idx = _try_stored_then_all_perms(grid_a, grid_b, stored_perm, fm_orig, tol)
+            perm_idx = _resolve_match_perm(grid_a, grid_b, fm_orig, tol)
             if perm_idx >= 0:
                 corrected = deepcopy(fm_orig)
                 plane = determine_plane(lb1, ub1, lb2, ub2)
@@ -466,6 +540,137 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
 
         if not found:
             print(f"verify_periodicity: MISMATCH at index {idx}")
+            print(f"  block {b1_idx}: lb={lb1} ub={ub1}")
+            print(f"  block {b2_idx}: lb={lb2} ub={ub2}")
+            mismatched_list.append(fm_orig)
+
+    return verified, mismatched_list
+
+
+# ---------------------------------------------------------------------------
+# verify_translational_periodicity
+# ---------------------------------------------------------------------------
+
+def verify_translational_periodicity(blocks: List[Block], face_matches: list,
+                                      shift_axis: str = 'z',
+                                      shift_amount: float = None,
+                                      tol: float = 1E-6):
+    """Verify periodic face matches along an axis-aligned translation.
+
+    Mirrors plot3d-rs ``src/verification.rs::verify_translational_periodicity``
+    (commit 363fde2). For each face match, shifts block1 by ``+shift`` and
+    ``-shift`` along ``shift_axis`` and verifies:
+
+    1. Corner match: shifted lb1 xyz == lb2 xyz (within tolerance).
+    2. Full face: ``shifted_face_A == apply_permutation(face_B, perm_idx)``.
+
+    The DECLARED-vs-UNDECLARED rule from
+    :func:`_resolve_match_perm` applies — a face match with a declared
+    ``permutation_matrix`` that does NOT verify is reported as
+    mismatched, never silently rounded.
+
+    Args:
+        blocks: List of all blocks (original full-resolution).
+        face_matches: List of face_match dicts produced by
+            :func:`plot3d.periodicity.translational_periodicity`.
+        shift_axis: Translation axis, ``'x'``, ``'y'``, or ``'z'``.
+        shift_amount: Global shift magnitude. When ``None``, the
+            per-match centroid delta along ``shift_axis`` is used
+            (matches the Rust verifier's behaviour for cascade-fed
+            inputs).
+        tol: Euclidean distance tolerance.
+
+    Returns:
+        (verified, mismatched) lists of face_match dicts. Verified
+        matches have ``orientation`` populated with
+        ``permutation_index``, ``plane``, and ``permutation_matrix``.
+    """
+    if shift_axis.lower() not in ('x', 'y', 'z'):
+        raise ValueError(f"verify_translational_periodicity: invalid axis "
+                         f"{shift_axis!r}; expected 'x', 'y', or 'z'.")
+
+    axis_idx = {'x': 0, 'y': 1, 'z': 2}[shift_axis.lower()]
+
+    verified = []
+    mismatched_list = []
+
+    for idx, fm_orig in enumerate(face_matches):
+        b1 = fm_orig['block1']
+        b2 = fm_orig['block2']
+        b1_idx = b1['block_index']
+        b2_idx = b2['block_index']
+        lb1, ub1 = b1['lb'], b1['ub']
+        lb2, ub2 = b2['lb'], b2['ub']
+
+        blk1 = blocks[b1_idx]
+        blk2 = blocks[b2_idx]
+
+        # Per-match Δ: when caller doesn't pin a global delta, compute
+        # the geometrically-required shift directly from the face
+        # centroids projected onto the requested axis. Mirrors
+        # plot3d-rs verification.rs:686-714 (face_axis_centroid).
+        if shift_amount is None:
+            grid1, _, _ = extract_canonical_grid(blk1, lb1, ub1)
+            grid2, _, _ = extract_canonical_grid(blk2, lb2, ub2)
+            c1 = float(grid1.reshape(-1, 3)[:, axis_idx].mean())
+            c2 = float(grid2.reshape(-1, 3)[:, axis_idx].mean())
+            delta = abs(c2 - c1)
+        else:
+            delta = float(shift_amount)
+
+        # Skip degenerate Δ — implies the two faces are already
+        # coincident along this axis; they wouldn't need a
+        # translational verifier.
+        if abs(delta) < tol:
+            mismatched_list.append(fm_orig)
+            continue
+
+        found = False
+
+        # Try +Δ shift first, then −Δ.
+        for sign in (+1.0, -1.0):
+            if found:
+                break
+            blk1_shifted = deepcopy(blk1)
+            blk1_shifted.shift(sign * delta, shift_axis)
+
+            # Corner check with shift.
+            pt_lb1 = _get_point(blk1_shifted, lb1)
+            pt_lb2 = _get_point(blk2, lb2)
+            pt_ub1 = _get_point(blk1_shifted, ub1)
+            pt_ub2 = _get_point(blk2, ub2)
+
+            lb_err = float(np.linalg.norm(pt_lb1 - pt_lb2))
+            ub_err = float(np.linalg.norm(pt_ub1 - pt_ub2))
+
+            if lb_err > tol or ub_err > tol:
+                continue
+
+            try:
+                grid_a, _, _ = extract_directed_grid(blk1_shifted, lb1, ub1)
+                grid_b, _, _ = extract_directed_grid(blk2, lb2, ub2)
+            except (ValueError, IndexError):
+                continue
+
+            perm_idx = _resolve_match_perm(grid_a, grid_b, fm_orig, tol)
+            if perm_idx >= 0:
+                corrected = deepcopy(fm_orig)
+                plane = determine_plane(lb1, ub1, lb2, ub2)
+                export_perm = -1 if plane == 'in-plane' else perm_idx
+                corrected['orientation'] = {
+                    'permutation_index': export_perm,
+                    'plane': plane,
+                    'permutation_matrix': PERMUTATION_MATRICES[perm_idx].tolist(),
+                }
+                # Record the shift used so callers can introspect.
+                corrected['shift_axis'] = shift_axis.lower()
+                corrected['shift_amount'] = sign * delta
+                verified.append(corrected)
+                found = True
+
+        if not found:
+            print(f"verify_translational_periodicity[axis={shift_axis}, "
+                  f"|Δ|={delta:+.3e}]: MISMATCH at index {idx}")
             print(f"  block {b1_idx}: lb={lb1} ub={ub1}")
             print(f"  block {b2_idx}: lb={lb2} ub={ub2}")
             mismatched_list.append(fm_orig)
