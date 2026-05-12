@@ -378,13 +378,17 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         gcd_to_use = compute_min_gcd(blocks)
         blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
 
-    rotation_matrix = create_rotation_matrix(radians(rotation_angle),rotation_axis)
+    rotation_matrix_pos = create_rotation_matrix(radians(rotation_angle),rotation_axis)
+    rotation_matrix_neg = create_rotation_matrix(-radians(rotation_angle),rotation_axis)
 
-    _rotated_cache = {}
-    def get_rotated(block_index):
-        if block_index not in _rotated_cache:
-            _rotated_cache[block_index] = rotate_block(blocks[block_index], rotation_matrix)
-        return _rotated_cache[block_index]
+    _rotated_cache_pos: dict = {}
+    _rotated_cache_neg: dict = {}
+    def get_rotated(block_index, sign=+1):
+        cache = _rotated_cache_pos if sign > 0 else _rotated_cache_neg
+        rmat = rotation_matrix_pos if sign > 0 else rotation_matrix_neg
+        if block_index not in cache:
+            cache[block_index] = rotate_block(blocks[block_index], rmat)
+        return cache[block_index]
 
     # Check periodic within a block 
     periodic_found = True
@@ -417,12 +421,20 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
                 (face1.KMIN == face1.KMAX) and (face2.KMIN == face2.KMAX):
 
                 # Rotate Block 1 -> Check periodicity -> if not periodic -> Rotate Block 1 opposite direction -> Check periodicity
-                #   Rotate Block 1
-                block1_rotated = get_rotated(face1.blockIndex)
                 block2 = blocks[face2.blockIndex]
                 t.set_description(f"Blk {face1.blockIndex} <-> {face2.blockIndex} | found {len(periodic_faces)}")
-                #   Check periodicity
+                # Try +rotation first
+                block1_rotated = get_rotated(face1.blockIndex, sign=+1)
                 df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2, tol=tol)
+                # If no match, retry with -rotation. Without this we miss
+                # matches whose pitch direction is opposite to the (face1,
+                # face2) ordering tried — the old `periodicity` function
+                # tried both directions; `rotated_periodicity` did not, so
+                # any pair filtered out of the reverse ordering by the
+                # stale-index `non_matching` set was silently dropped.
+                if len(periodic_faces_temp) == 0:
+                    block1_rotated = get_rotated(face1.blockIndex, sign=-1)
+                    df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2, tol=tol)
                 
                 if len(periodic_faces_temp) > 0:
                     outer_faces_to_remove.append(face1)
@@ -445,7 +457,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
                 split_faces.clear()
 
     # Free rotated block copies no longer needed after the matching loop
-    del _rotated_cache
+    del _rotated_cache_pos, _rotated_cache_neg
 
     # This is an added check to make sure all periodic faces are in the outer_faces_to_remove
     for p in periodic_faces:
