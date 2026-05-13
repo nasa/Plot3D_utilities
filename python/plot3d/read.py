@@ -261,14 +261,28 @@ def read_plot3D(filename:str, binary:bool=None, big_endian:bool=None, read_doubl
                 IMAX = dims[0::3]  # Every 3rd starting at 0
                 JMAX = dims[1::3]  # Every 3rd starting at 1
                 KMAX = dims[2::3]  # Every 3rd starting at 2
-                # Read coordinate arrays
+                # Read coordinate arrays. The standard PLOT3D convention writes
+                # X, Y, Z as a single record per block; older files produced by
+                # this library wrote them as three separate records. Detect
+                # which layout is present from the size of the first record.
                 for b in tqdm(range(nblocks), desc="Reading Fortran blocks", unit="block"):
                     npts = IMAX[b] * JMAX[b] * KMAX[b]
                     arr = f.read_reals(real_dtype)
+                    shape = (IMAX[b], JMAX[b], KMAX[b])
 
-                    X = arr[: npts].reshape((IMAX[b], JMAX[b], KMAX[b]), order='F')
-                    Y = arr[npts : 2 * npts].reshape((IMAX[b], JMAX[b], KMAX[b]), order='F')
-                    Z = arr[2 * npts :].reshape((IMAX[b], JMAX[b], KMAX[b]), order='F')
+                    if arr.size == 3 * npts:
+                        X = arr[:npts].reshape(shape, order='F')
+                        Y = arr[npts:2 * npts].reshape(shape, order='F')
+                        Z = arr[2 * npts:].reshape(shape, order='F')
+                    elif arr.size == npts:
+                        X = arr.reshape(shape, order='F')
+                        Y = f.read_reals(real_dtype).reshape(shape, order='F')
+                        Z = f.read_reals(real_dtype).reshape(shape, order='F')
+                    else:
+                        raise ValueError(
+                            f"Unexpected Fortran record size for block {b}: "
+                            f"got {arr.size} reals, expected {npts} or {3 * npts}"
+                        )
 
                     blocks.append(Block(X, Y, Z))
         elif binary:
