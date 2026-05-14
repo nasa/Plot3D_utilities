@@ -64,20 +64,24 @@ def write_plot3D(filename:str, blocks:List[Block], binary:bool=True, big_endian:
         batch_size (int, optional): number of items (binary) or lines (ASCII) to buffer before writing. Defaults to 100.
     """
     if fortran:
-        # Fortran unformatted binary with record markers
-        dtype = np.float64 if double_precision else np.float32
-        with FortranFile(filename, 'w') as f:
-            # Write nblocks as one record
-            f.write_record(np.array([len(blocks)], dtype=np.int32))
-            # Write all dimensions in one record
+        # Fortran unformatted binary with record markers, standard PLOT3D
+        # layout (one record per block containing X, Y, Z concatenated).
+        endian = '>' if big_endian else '<'
+        header_dtype = np.dtype(f'{endian}u4')
+        int_dtype = np.dtype(f'{endian}i4')
+        real_dtype = np.dtype(f'{endian}f8' if double_precision else f'{endian}f4')
+        with FortranFile(filename, 'w', header_dtype) as f:
+            f.write_record(np.array([len(blocks)], dtype=int_dtype))
             dims = np.array([[b.X.shape[0], b.X.shape[1], b.X.shape[2]]
-                             for b in blocks], dtype=np.int32).flatten()
+                             for b in blocks], dtype=int_dtype).flatten()
             f.write_record(dims)
-            # Write each coordinate array as a record (Fortran column-major order)
             for b in tqdm(blocks, desc="Writing Fortran blocks", unit="block"):
-                f.write_record(b.X.flatten(order='F').astype(dtype))
-                f.write_record(b.Y.flatten(order='F').astype(dtype))
-                f.write_record(b.Z.flatten(order='F').astype(dtype))
+                xyz = np.concatenate([
+                    b.X.flatten(order='F'),
+                    b.Y.flatten(order='F'),
+                    b.Z.flatten(order='F'),
+                ]).astype(real_dtype)
+                f.write_record(xyz)
     elif binary:
         endian = '>' if big_endian else '<'
         with open(filename, 'wb') as f:
