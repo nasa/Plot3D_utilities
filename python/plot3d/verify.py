@@ -26,10 +26,10 @@ of whether ``permutation_index`` is -1.
 """
 
 from .block import Block
-from .blockfunctions import reduce_blocks, rotate_block, compute_min_gcd, scale_face_bounds, constant_axis
+from .blockfunctions import reduce_blocks, rotate_block, scale_face_bounds, constant_axis
 from .connectivity import PERMUTATION_MATRICES
 from .periodicity import create_rotation_matrix
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from copy import deepcopy
 from math import radians
 import numpy as np
@@ -553,7 +553,7 @@ def verify_periodicity(blocks: List[Block], face_matches: list, theta: float,
 
 def verify_translational_periodicity(blocks: List[Block], face_matches: list,
                                       shift_axis: str = 'z',
-                                      shift_amount: float = None,
+                                      shift_amount: Optional[float] = None,
                                       tol: float = 1E-6):
     """Verify periodic face matches along an axis-aligned translation.
 

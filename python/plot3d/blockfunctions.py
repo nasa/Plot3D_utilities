@@ -4,15 +4,12 @@ import math
 import numpy as np
 from typing import Dict, List, Optional, Set, Tuple
 from tqdm import trange
-from .facefunctions import create_face_from_diagonals, get_outer_faces, find_matching_faces,faces_match
+from .facefunctions import create_face_from_diagonals, get_outer_faces, find_matching_faces
 from .block import Block, reduce_blocks
-from .write import write_plot3D
 from .face import Face
-import tqdm
 import networkx as nx
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D  
-import numpy.typing as npt 
+import numpy.typing as npt
 
 def compute_min_gcd(blocks: List[Block]) -> int:
     """Compute the minimum GCD across all block dimensions.

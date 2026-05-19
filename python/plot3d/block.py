@@ -2,7 +2,6 @@ import numpy as np
 import math 
 from tqdm import trange
 from typing import List
-from copy import deepcopy
 import numpy.typing as npt 
 
 class Block:

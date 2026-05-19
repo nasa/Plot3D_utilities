@@ -1,5 +1,4 @@
 import numpy as np
-import os.path as osp
 import struct
 from typing import List
 from tqdm import tqdm

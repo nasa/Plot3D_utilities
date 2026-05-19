@@ -227,8 +227,6 @@ def combine_nxnxn_cubes_mixed_pairs(
     List[Tuple[Block, Set[int]]]
         A list of merged Block objects and their source block indices.
     """
-    from itertools import product
-
     used = set()
     merged_groups = []
     G = build_connectivity_graph(connectivities)

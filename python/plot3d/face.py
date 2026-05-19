@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import numpy.typing as npt
 import math
-from math import acos, degrees
+from math import degrees
 
 
 class Face:
