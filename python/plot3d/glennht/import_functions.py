@@ -1,5 +1,4 @@
-from typing import Any, Dict, List
-import numpy as np 
+import numpy as np
 
 def read_ght_conn(filename:str):
     """Reads in the glennht connectivity file and splits it into partitions using metis 

@@ -1,7 +1,7 @@
 # glennht_export_classes.py
 from __future__ import annotations
 from dataclasses import dataclass, field
-from enum import IntEnum, Enum
+from enum import IntEnum
 from typing import Any, Dict, List, Optional
 
 

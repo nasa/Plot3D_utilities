@@ -1,7 +1,7 @@
 import numpy as np 
 import os.path as osp
 import struct
-from typing import List
+from typing import List, Optional
 from .block import Block
 from scipy.io import FortranFile
 from tqdm import tqdm
@@ -215,7 +215,7 @@ def _detect_plot3d_format(filename: str):
     return {'binary': True, 'big_endian': False, 'read_double': True, 'fortran': False}
 
 
-def read_plot3D(filename:str, binary:bool=None, big_endian:bool=None, read_double:bool=None, fortran:bool=None):
+def read_plot3D(filename:str, binary:Optional[bool]=None, big_endian:Optional[bool]=None, read_double:Optional[bool]=None, fortran:Optional[bool]=None):
     """Reads a Plot3D file and returns blocks.
 
     When any format parameter is ``None`` (the default), the file format is
@@ -243,6 +243,8 @@ def read_plot3D(filename:str, binary:bool=None, big_endian:bool=None, read_doubl
             read_double = detected['read_double']
         if fortran is None:
             fortran = detected['fortran']
+    assert binary is not None and big_endian is not None
+    assert read_double is not None and fortran is not None
 
     blocks = list()
     if osp.isfile(filename):

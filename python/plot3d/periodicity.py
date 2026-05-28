@@ -1,11 +1,11 @@
 from typing import List, Dict, Tuple, Optional
-from itertools import combinations_with_replacement, permutations, product
+from itertools import combinations_with_replacement, permutations
 import numpy as np
 from .block import Block
 from .blockfunctions import rotate_block, reduce_blocks, compute_min_gcd, scale_face_bounds
 from .face import Face
-from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals, find_bounding_faces,get_outer_faces, split_face
-from .connectivity import get_face_intersection, face_matches_to_dict, _compute_orientation, _orient_vec_to_permutation, PERMUTATION_MATRICES
+from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals, find_bounding_faces, split_face
+from .connectivity import get_face_intersection, _compute_orientation, _orient_vec_to_permutation, PERMUTATION_MATRICES
 import pandas as pd
 from math import cos, radians, sin, sqrt, acos
 from copy import deepcopy
@@ -96,7 +96,7 @@ def create_rotation_matrix(rotation_angle:float, rotation_axis:str="x"):
 def _compute_periodic_lb_ub_orientation(
     blk1: 'Block', lb1: list, ub1: list,
     blk2: 'Block', lb2_orig: list, ub2_orig: list,
-    shift_axis: int = None, shift_amount: float = 0.0
+    shift_axis: Optional[int] = None, shift_amount: float = 0.0
 ) -> Tuple[list, list, List[int]]:
     """Compute corrected lb2, ub2, and orientation for a periodic face pair.
 
@@ -512,9 +512,9 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
 def translational_periodicity(
     blocks: List[Block],
     outer_faces: List[Dict[str,int]],
-    delta: float = None,
+    delta: Optional[float] = None,
     translational_direction: str = "z",
-    node_tol_xyz: float = None,        # global override; if None we compute per-pair adaptively
+    node_tol_xyz: Optional[float] = None,        # global override; if None we compute per-pair adaptively
     min_shared_frac: float = 0.02,
     min_shared_abs: int = 4,
     stride_u: int = 1,

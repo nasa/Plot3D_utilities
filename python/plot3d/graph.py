@@ -16,7 +16,6 @@ if sys.platform != "win32":
 else:
     pymetis = None  # type: ignore
     HAS_PYMETIS = False
-from .block import Block  # <-- use your existing Block
 
 
 # ---------------------------------------------------------------------------
