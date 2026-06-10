@@ -519,6 +519,7 @@ def translational_periodicity(
     min_shared_abs: int = 4,
     stride_u: int = 1,
     stride_v: int = 1,
+    use_minmax: bool = False,
     ) -> Tuple[ 
                List[Dict[str, Dict[str, int]]], 
                List[Tuple[Face, Face, Dict[str, str]]], 
