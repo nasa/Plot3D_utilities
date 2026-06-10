@@ -752,6 +752,42 @@ def translational_periodicity(
 
     axis_idx = {"x": 0, "y": 1, "z": 2}[axis]
 
+    def _face_key(f: Face) -> Tuple:
+        return (f.BlockIndex, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX)
+
+    def _record_match(fL: Face, fU: Face, mode: str, shift_amt: float) -> None:
+        """Build the export record + pair entry for one matched pair.
+
+        ``shift_amt`` is the SIGNED translation that maps face L onto
+        face U along the periodic axis.
+        """
+        m = mapping_minmax(fL, fU)
+        periodic_pairs_r.append((fL, fU, m))
+        lb1 = [fL.IMIN, fL.JMIN, fL.KMIN]
+        ub1 = [fL.IMAX, fL.JMAX, fL.KMAX]
+        lb2 = [fU.IMIN, fU.JMIN, fU.KMIN]
+        ub2 = [fU.IMAX, fU.JMAX, fU.KMAX]
+        blk1_orig = B("orig", fL.BlockIndex)
+        blk2_orig = B("orig", fU.BlockIndex)
+        lb2, ub2, orient = _compute_periodic_lb_ub_orientation(
+            blk1_orig, lb1, ub1, blk2_orig, lb2, ub2,
+            shift_axis=axis_idx, shift_amount=shift_amt)
+        perm_idx, plane = _orient_vec_to_permutation(orient, lb1, ub1, lb2, ub2)
+        export_perm = -1 if plane == 'in-plane' else perm_idx
+        periodic_export.append({
+            "block1": {"block_index": fL.BlockIndex,
+                       "lb": lb1, "ub": ub1},
+            "block2": {"block_index": fU.BlockIndex,
+                       "lb": lb2, "ub": ub2},
+            "orientation": {
+                "permutation_index": export_perm,
+                "plane": plane,
+                "permutation_matrix": PERMUTATION_MATRICES[perm_idx].tolist(),
+            },
+            "mapping": m,
+            "mode": mode
+            }) # type: ignore
+
     # Pre-compute centroids for all faces (in-plane XY after shift)
     def _centroid_inplane(f: Face, shifted: bool = False) -> np.ndarray:
         pts = f.grid_points(B("orig", f.BlockIndex), stride_u=1, stride_v=1)
@@ -762,6 +798,7 @@ def translational_periodicity(
         return np.delete(c, axis_idx)
 
     upper_centroids = np.array([_centroid_inplane(fU) for fU in upper_pool])
+    consumed_keys: set = set()
 
     for fL in list(lower_pool):
         cL = _centroid_inplane(fL, shifted=True)
@@ -782,41 +819,180 @@ def translational_periodicity(
 
         if matched_j >= 0:
             fU = upper_pool[matched_j]
-            m = mapping_minmax(fL, fU)
-            periodic_pairs_r.append((fL, fU, m))
-            lb1 = [fL.IMIN, fL.JMIN, fL.KMIN]
-            ub1 = [fL.IMAX, fL.JMAX, fL.KMAX]
-            lb2 = [fU.IMIN, fU.JMIN, fU.KMIN]
-            ub2 = [fU.IMAX, fU.JMAX, fU.KMAX]
-            # Compute corrected lb2/ub2 and orientation from geometry
             blk1_orig = B("orig", fL.BlockIndex)
             blk2_orig = B("orig", fU.BlockIndex)
             arr1 = [blk1_orig.X, blk1_orig.Y, blk1_orig.Z][axis_idx]
             arr2 = [blk2_orig.X, blk2_orig.Y, blk2_orig.Z][axis_idx]
-            p1_val = arr1[lb1[0], lb1[1], lb1[2]]
-            p2_val = arr2[lb2[0], lb2[1], lb2[2]]
+            p1_val = arr1[fL.IMIN, fL.JMIN, fL.KMIN]
+            p2_val = arr2[fU.IMIN, fU.JMIN, fU.KMIN]
             shift_amt = d_axis if p1_val < p2_val else -d_axis
-            lb2, ub2, orient = _compute_periodic_lb_ub_orientation(
-                blk1_orig, lb1, ub1, blk2_orig, lb2, ub2,
-                shift_axis=axis_idx, shift_amount=shift_amt)
-            perm_idx, plane = _orient_vec_to_permutation(orient, lb1, ub1, lb2, ub2)
-            export_perm = -1 if plane == 'in-plane' else perm_idx
-            periodic_export.append({
-                "block1": {"block_index": fL.BlockIndex,
-                           "lb": lb1, "ub": ub1},
-                "block2": {"block_index": fU.BlockIndex,
-                           "lb": lb2, "ub": ub2},
-                "orientation": {
-                    "permutation_index": export_perm,
-                    "plane": plane,
-                    "permutation_matrix": PERMUTATION_MATRICES[perm_idx].tolist(),
-                },
-                "mapping": m,
-                "mode": matched_mode
-                }) # type: ignore
+            _record_match(fL, fU, matched_mode, shift_amt)
+            consumed_keys.add(_face_key(fL))
+            consumed_keys.add(_face_key(fU))
             # Remove matched upper face from pool and centroids
             upper_pool.pop(matched_j)
             upper_centroids = np.delete(upper_centroids, matched_j, axis=0)
+
+    # 8b) Oblique fallback — bladed-cascade pitch boundaries.
+    #
+    # The bounding-face candidate selection above only sees faces lying at
+    # the GLOBAL axis extremes, i.e. flat constant-coordinate pitch planes.
+    # A bladed cascade's pitch boundaries are oblique (they follow the
+    # metal-angle inlet/outlet extensions and hug the O-grid), so the
+    # lower/upper pools come back empty and the legacy path finds nothing
+    # even on an exactly-periodic mesh.
+    #
+    # This pass considers ALL still-unmatched outer faces as candidates,
+    # exploiting two properties of a pure translation along `axis`:
+    #   1. The pair's centroids COINCIDE in the orthogonal plane.
+    #   2. The translation Δ is the centroid difference along `axis`
+    #      (no global-extent assumption — that heuristic is wrong for
+    #      cascades where the domain is wider than one pitch).
+    # Candidate pairs are sorted by orthogonal-centroid distance and
+    # verified with a full quantized-node intersection under the per-pair
+    # shift, so false positives require two faces that genuinely coincide
+    # node-for-node after translation — which IS translational periodicity.
+    all_faces_r = list(dict.fromkeys(
+        outer_face_dict_to_list(blocks, outer_faces, gcd_to_use)
+    ))
+    remaining_faces = [f for f in all_faces_r
+                       if _face_key(f) not in consumed_keys]
+
+    if len(remaining_faces) >= 2:
+        pts_cache: Dict[Tuple, np.ndarray] = {}
+
+        def _pts(f: Face) -> np.ndarray:
+            k = _face_key(f)
+            if k not in pts_cache:
+                pts_cache[k] = f.grid_points(
+                    B("orig", f.BlockIndex), stride_u=1, stride_v=1)
+            return pts_cache[k]
+
+        def _orth_map(f: Face, tol: float) -> Optional[Dict[Tuple[int, int], float]]:
+            """Map quantized orthogonal-plane coords -> axis coordinate.
+
+            A face is a valid translational-periodic candidate for `axis`
+            only if it is SINGLE-VALUED along the axis over its orthogonal
+            footprint (a height field) — true of pitch boundaries, false
+            of faces whose normal is orthogonal to the axis (inlet/outlet,
+            hub/shroud: their footprint collapses to a line) and of
+            wrap-around walls (a blade wall has SS and PS at the same
+            (orth1, orth2) with different axis values). Those returned a
+            degenerate footprint that produced false matches; reject them
+            by counting multi-valued collisions.
+            """
+            P = _pts(f)
+            orth = np.delete(P, axis_idx, axis=1)
+            keys = np.round(orth / tol).astype(np.int64)
+            out: Dict[Tuple[int, int], float] = {}
+            ax_vals = P[:, axis_idx]
+            n_multi = 0
+            for (k1, k2), av in zip(map(tuple, keys), ax_vals):
+                prev = out.get((k1, k2))
+                if prev is None:
+                    out[(k1, k2)] = av
+                elif abs(av - prev) > tol:
+                    n_multi += 1
+            # Footprint-quality filters (a cheap PRUNE — final acceptance is
+            # the 99 % Δ-agreement test in _match_pair). Calibrated on the
+            # tgs-py cascade mesh:
+            #   ratio = unique footprint keys / nodes. Faces whose normal is
+            #     ⊥ to the axis collapse to a line (inlet/outlet ≈ 0.06,
+            #     constant-z hub/shroud ≈ 0.18); pitch faces ≥ 0.70.
+            #   mfrac = multi-valued collisions / keys. Wrap-around blade
+            #     walls see SS+PS at the same footprint (≈ 0.34+); pitch
+            #     faces stay ≤ 0.19 (steep LE/TE wrap only).
+            ratio = len(out) / max(len(P), 1)
+            mfrac = n_multi / max(len(out), 1)
+            if ratio < 0.5 or mfrac > 0.30:
+                return None  # not a height field over the orthogonal plane
+            return out
+
+        def _match_pair(fA: Face, fB: Face, tol: float):
+            """Try to match A onto B by a pure axis translation.
+
+            Returns ``(n_common, frac_small, d_pair)`` or None. Works for
+            PARTIAL containment too (e.g. a split inlet-extension face
+            matching the corresponding piece of an unsplit pitch face) —
+            the shared orthogonal footprint defines the overlap, and Δ is
+            the median axis offset over that footprint. The smaller side
+            must be essentially fully covered (≥ 95 % of its footprint —
+            quantization collisions in steep LE/TE wrap strips cost a few
+            % even on exactly-periodic meshes): discovery has to be
+            conservative because the result is consumed as an exact
+            index-mapped interface by the solver.
+            """
+            mA = _orth_map(fA, tol)
+            mB = _orth_map(fB, tol)
+            if mA is None or mB is None:
+                return None
+            # Footprint overlap gate + Δ estimation. The per-key map's
+            # "first stored value" is ambiguous where quantization
+            # collapses steep LE/TE strips, so it is used ONLY to gate
+            # overlap and estimate Δ (median — robust to those keys).
+            common = mA.keys() & mB.keys()
+            n_small = min(len(mA), len(mB))
+            if len(common) < max(min_shared_abs, int(0.5 * n_small)):
+                return None
+            diffs = np.array([mB[k] - mA[k] for k in common])
+            d_pair = float(np.median(diffs))
+            if abs(d_pair) <= tol:
+                return None  # coincident along axis — interface, not periodic
+            if delta is not None and abs(abs(d_pair) - abs(delta)) > 10 * tol:
+                return None  # caller pinned the pitch; reject other shifts
+            # Verification: quantized 3D node intersection under the
+            # estimated shift. Identical geometry quantizes identically on
+            # both sides, so this has none of the first-stored ambiguity —
+            # an exactly-periodic overlap scores ~100 %.
+            PA = _pts(fA).copy()
+            PA[:, axis_idx] += d_pair
+            PB = _pts(fB)
+            QA = np.unique(np.round(PA / tol).astype(np.int64), axis=0)
+            QB = np.unique(np.round(PB / tol).astype(np.int64), axis=0)
+            vA = QA.view([('', QA.dtype)] * QA.shape[1]).reshape(-1)
+            vB = QB.view([('', QB.dtype)] * QB.shape[1]).reshape(-1)
+            inter = np.intersect1d(vA, vB, assume_unique=True)
+            n_3d_small = min(len(QA), len(QB))
+            need = max(min_shared_abs, int(0.95 * n_3d_small))
+            if inter.size < need:
+                return None
+            return int(inter.size), inter.size / max(n_3d_small, 1), d_pair
+
+        # Test all remaining pairs; faces may match PARTIALLY (an unsplit
+        # pitch face can host several smaller counterparts), so only the
+        # fully-covered (smaller) side of each accepted pair is consumed.
+        pair_hits = []  # (frac_small, n_common, ia, ib, d_pair, tol_pair)
+        for ia in range(len(remaining_faces)):
+            for ib in range(ia + 1, len(remaining_faces)):
+                fA, fB = remaining_faces[ia], remaining_faces[ib]
+                tol_pair = _pair_tol(fA, fB)
+                hit = _match_pair(fA, fB, tol_pair)
+                if hit is not None:
+                    n_common, frac_small, d_pair = hit
+                    pair_hits.append(
+                        (frac_small, n_common, ia, ib, d_pair, tol_pair))
+
+        # Best-coverage pairs first; consume fully-matched sides. A face
+        # is only retired once it is essentially fully covered (an
+        # unsplit pitch face can host several smaller counterparts).
+        pair_hits.sort(key=lambda t: (-t[0], -t[1]))
+        fully_used: set = set()
+        for frac_small, n_common, ia, ib, d_pair, tol_pair in pair_hits:
+            fA, fB = remaining_faces[ia], remaining_faces[ib]
+            kA, kB = _face_key(fA), _face_key(fB)
+            if kA in fully_used or kB in fully_used:
+                continue
+            # block1 = the smaller (contained) face; Δ maps block1 → block2.
+            # frac_small (3D-intersection coverage of the smaller side)
+            # ≥ 0.95 retires that side from further pairing.
+            if len(_pts(fA)) <= len(_pts(fB)):
+                _record_match(fA, fB, f"{axis}_oblique_pair", d_pair)
+                if frac_small >= 0.95:
+                    fully_used.add(kA)
+            else:
+                _record_match(fB, fA, f"{axis}_oblique_pair", -d_pair)
+                if frac_small >= 0.95:
+                    fully_used.add(kB)
 
     # 9) scale back up
     scale_face_bounds(periodic_export, gcd_to_use)
