@@ -7,7 +7,7 @@ large meshes -- runs in well under a second. The fixture always produces
 exactly 1 face match and 10 outer faces (5 per block, one side per block
 consumed by the match).
 
-A gated round-trip test at the bottom exercises a real ADS-tagged stator
+A gated round-trip test at the bottom exercises a real code-tagged stator
 case from an external test-data directory (configured via an environment
 variable, not part of the repo) when available; it is skipped everywhere
 else via ``pytest.mark.skipif``, mirroring the pattern in
@@ -282,7 +282,7 @@ def test_write_bc_codes_json_roundtrip(tmp_path, fixture_blocks):
 
     assert payload["face_order"] == ["I=1", "I=IMAX", "J=1", "J=JMAX", "K=1", "K=KMAX"]
     assert payload["blocks"] == bc_codes
-    assert "ads_code_legend" in payload
+    assert "face_code_legend" in payload
     assert payload["block_order"] == ["block_0", "block_1"]
 
 
@@ -497,7 +497,7 @@ def test_export_to_glennht_gpu_unknown_tagging(tmp_path, fixture_blocks):
 
 
 # ---------------------------------------------------------------------------
-# 10: (gated) stator round-trip against real ADS-tagged mesh
+# 10: (gated) stator round-trip against real code-tagged mesh
 # ---------------------------------------------------------------------------
 
 STATOR_DIR = os.environ.get("PLOT3D_GLENNHT_GPU_STATOR_DIR", "")
@@ -507,7 +507,7 @@ STATOR_BC_CODES = os.path.join(STATOR_DIR, "stator.bc_codes.json") if STATOR_DIR
 skip_no_stator_data = pytest.mark.skipif(
     not (STATOR_DIR and os.path.exists(STATOR_XYZ) and os.path.exists(STATOR_BC_CODES)),
     reason=(
-        "external ADS-tagged stator test data not found (set "
+        "external code-tagged stator test data not found (set "
         "PLOT3D_GLENNHT_GPU_STATOR_DIR to enable this test)"
     ),
 )
@@ -515,7 +515,7 @@ skip_no_stator_data = pytest.mark.skipif(
 
 @skip_no_stator_data
 def test_export_to_glennht_gpu_stator_roundtrip(tmp_path):
-    """End-to-end against the real ADS-coded stator mesh (external data).
+    """End-to-end against the real face-code-tagged stator mesh (external data).
 
     This calls the FULL connectivity() on a real ~205x21x81-ish 5-block
     mesh, so it is comparatively slow (order ~1 minute) -- kept as the

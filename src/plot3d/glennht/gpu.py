@@ -69,14 +69,14 @@ __all__ = [
 #: field when the caller doesn't supply one.
 _SOURCE = "plot3d_utilities.glennht.gpu.write_connectivity_json"
 
-#: Fixed ADS BKBC face order used by ``bc_codes`` tables: one code per block
+#: Fixed solver face order used by ``bc_codes`` tables: one code per block
 #: side, in this order. Matches the face-side convention used by
 #: glennht-gpu's connectivity format.
 FACE_ORDER: List[str] = ["I=1", "I=IMAX", "J=1", "J=JMAX", "K=1", "K=KMAX"]
 
-#: ADS BKBC-code -> surface-id legend (matches the ``bc_codes.json``
-#: schema's ``ads_code_legend`` used by glennht-gpu).
-ADS_CODE_LEGEND: Dict[str, str] = {
+#: Face-code -> surface-id legend (matches the ``bc_codes.json``
+#: schema's ``face_code_legend`` used by glennht-gpu).
+BC_CODE_LEGEND: Dict[str, str] = {
     "5": "inlet",
     "6": "outlet",
     "10": "blade",
@@ -87,15 +87,15 @@ ADS_CODE_LEGEND: Dict[str, str] = {
     "0": "interface",
 }
 
-#: Surface id used for an ADS-interface face (code 0) that plot3d_utilities
+#: Surface id used for an interface face (code 0) that plot3d_utilities
 #: failed to block-match. These are CONFORMAL interior interfaces, NOT
-#: walls -- matches glennht-gpu's convention for unmatched ADS interfaces.
+#: walls -- matches glennht-gpu's convention for unmatched interfaces.
 UNMATCHED_INTERFACE_ID = 8
 
 #: Default surface-id -> name map used by :func:`tag_surfaces_geometric`
 #: and :func:`tag_surfaces_from_bc_codes` (ids 1-5 mirror glennht-gpu's
-#: default surface-id convention; 6 and 8 cover the remaining ADS BKBC
-#: code outcomes).
+#: default surface-id convention; 6 and 8 cover the remaining face-code
+#: outcomes).
 _DEFAULT_SURFACE_IDS: Dict[str, str] = {
     "1": "inlet",
     "2": "outlet",
@@ -194,15 +194,15 @@ def _block_side_of_face(face: Dict[str, Any]) -> Optional[int]:
     return None
 
 
-def _bkbc_code_to_surface_id(code: int) -> Optional[int]:
-    """Map an ADS BKBC code to a surface id.
+def _face_code_to_surface_id(code: int) -> Optional[int]:
+    """Map an integer face code to a surface id.
 
-    Implements glennht-gpu's ADS BKBC surface-code convention:
+    Implements glennht-gpu's face-code surface-code convention:
 
     - 5 -> 1 (inlet), 6 -> 2 (outlet), 10 -> 3 (blade), 9 -> 4 (hub),
       109 -> 5 (shroud);
     - 13 or 14 (leftover periodic) -> 6;
-    - 0 (ADS interface) -> :data:`UNMATCHED_INTERFACE_ID` (8) -- a
+    - 0 (interface) -> :data:`UNMATCHED_INTERFACE_ID` (8) -- a
       CONFORMAL interior interface that plot3d_utilities failed to
       block-match, NOT a wall;
     - anything else -> ``None`` (fall back to geometry).
@@ -407,7 +407,7 @@ def tag_surfaces_from_bc_codes(
     outer_faces: List[Dict[str, Any]],
     bc_codes: List[List[int]],
 ) -> Tuple[List[Dict[str, Any]], Dict[str, str]]:
-    """Tag outer faces using per-block ADS BKBC codes (authoritative).
+    """Tag outer faces using per-block solver face codes (authoritative).
 
     Args:
         blocks (List[Block]): The multi-block mesh.
@@ -433,7 +433,7 @@ def tag_surfaces_from_bc_codes(
         if side is None:
             continue
         code = bc_codes[block_index][side]
-        surf_id = _bkbc_code_to_surface_id(code)
+        surf_id = _face_code_to_surface_id(code)
         if surf_id is not None:
             face["id"] = surf_id
 
@@ -450,7 +450,8 @@ def tag_surfaces_geometric(
     band: float = 0.1,
     overrides: Optional[Dict[Tuple[int, int], int]] = None,
 ) -> Tuple[List[Dict[str, Any]], Dict[str, str]]:
-    """Tag outer faces by geometric position (fallback when no ADS codes).
+    """Tag outer faces by geometric position (fallback when no face codes
+    are available).
 
     Matches glennht-gpu's geometric fallback convention: the global axial
     and radial extent of all outer-face centroids is computed first; a
@@ -532,10 +533,10 @@ def write_bc_codes_json(
     *,
     block_order: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
-    """Write a ``<mesh>.bc_codes.json`` sidecar (ADS BKBC per-face codes).
+    """Write a ``<mesh>.bc_codes.json`` sidecar (solver per-face codes).
 
     Matches glennht-gpu's ``bc_codes.json`` schema: ``face_order``,
-    ``ads_code_legend``, ``blocks`` (the per-block 6-int arrays),
+    ``face_code_legend``, ``blocks`` (the per-block 6-int arrays),
     ``block_order``.
 
     Args:
@@ -555,7 +556,7 @@ def write_bc_codes_json(
 
     payload = {
         "face_order": list(FACE_ORDER),
-        "ads_code_legend": dict(ADS_CODE_LEGEND),
+        "face_code_legend": dict(BC_CODE_LEGEND),
         "blocks": [[int(c) for c in row] for row in bc_codes],
         "block_order": list(block_order),
     }
