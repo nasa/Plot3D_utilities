@@ -1,8 +1,9 @@
 [tool.poetry]
 name = "plot3d"
-version = "1.9.5"
+version = "1.10.0"
 description = "Plot3D python utilities for reading and writing and also finding connectivity between blocks"
 authors = ["Paht Juangphanich <paht.juangphanich@nasa.gov>"]
+packages = [{ include = "plot3d", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10.12"
@@ -13,6 +14,7 @@ tqdm = "*"
 networkx = "*"
 pymetis = { version = "*", markers = "platform_system != 'Windows'" }
 matplotlib = "*"
+pyyaml = "*"
 
 [tool.poetry.group.deve.dependencies]
 

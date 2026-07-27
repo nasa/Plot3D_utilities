@@ -9,9 +9,7 @@ job:
     image: python:3.11
     script:
         - pip install poetry
-        - cd python
         - poetry install --with docs
-        - cd ../
     artifacts:
         untracked: true
 
@@ -19,9 +17,7 @@ pages:
   stage: deploy
   script:
     - pip install poetry
-    - cd python
-    - poetry run sphinx-build -b html ../docs ../docs/_build/html
-    - cd ../
+    - poetry run sphinx-build -b html docs docs/_build/html
     - mkdir .public
     - cp -r docs/_build/html/* .public
     - mv .public public

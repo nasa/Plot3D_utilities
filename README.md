@@ -7,8 +7,8 @@ To install simply do a `pip install plot3d`
 > [Link to documentation](https://nasa.github.io/Plot3D_utilities/_build/html/)
 
 **Building the docs**
-1. From python/, run poetry install --with docs (and commit the refreshed poetry.lock) to capture the new Sphinx dependencies.
-2. Build locally with poetry run sphinx-build -b html ../docs ../docs/_build/html or use poetry run sphinx-autobuild for live previews.
+1. From the repo root, run poetry install --with docs (and commit the refreshed poetry.lock) to capture the new Sphinx dependencies.
+2. Build locally with poetry run sphinx-build -b html docs docs/_build/html or use poetry run sphinx-autobuild for live previews.
 3. Push the branch to main, then enable GitHub Pages (Settings → Pages → “GitHub Actions”) so the new workflow can deploy your merged Sphinx docs automatically.
 
 ## Metis
@@ -45,6 +45,8 @@ For Mac. install homebrew and do `brew install metis` then add this to your ~/.z
 [Translated periodicity](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_TranslatedPeriodicity.ipynb)
 
 [Merging Blocks](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/merge_block_test.ipynb)
+
+[Export a mesh to the GlennHT-GPU graph format](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_GlennHT_GPU_GraphExport.ipynb)
 
 [Learning Python with VSCode](https://www.youtube.com/watch?v=lZiK9e8b21M) 
 

@@ -17,7 +17,7 @@ import plot3d
 project = 'Plot3D'
 copyright = '2025, Paht Juangphanich'
 author = 'Paht Juangphanich <paht.juangphanich@nasa.gov>'
-_pyproject_path = Path(__file__).resolve().parents[1] / 'python' / 'pyproject.toml'
+_pyproject_path = Path(__file__).resolve().parents[1] / 'pyproject.toml'
 try:
     _pyproject = tomllib.loads(_pyproject_path.read_text(encoding='utf-8'))
     release = _pyproject['tool']['poetry']['version']
