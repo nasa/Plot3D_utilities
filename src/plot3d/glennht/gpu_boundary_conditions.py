@@ -198,6 +198,37 @@ class GpuWallBC:
 GpuBC = Any  # GpuInletBC | GpuOutletBC | GpuWallBC, kept loose for isinstance-free duck typing
 
 
+def _boundary_conditions_yaml_text(
+    bcs: List[GpuBC],
+    *,
+    rotation: Optional[Dict[str, Any]] = None,
+) -> str:
+    """Build the run-yaml fragment text for a list of GPU BC dataclasses.
+
+    Factored out of :func:`write_boundary_conditions_yaml` so callers that
+    need the YAML text in memory -- e.g.
+    :func:`plot3d.glennht.graph_p3d.write_graph_p3d`, which embeds it as a
+    string dataset inside an HDF5 bundle -- don't have to round-trip
+    through a temporary file just to get the same bytes
+    :func:`write_boundary_conditions_yaml` would have written.
+
+    Args:
+        bcs (List[GpuInletBC | GpuOutletBC | GpuWallBC]): The boundary
+            conditions to emit, in order.
+        rotation (Dict[str, Any], optional): See
+            :func:`write_boundary_conditions_yaml`.
+
+    Returns:
+        (str): The YAML text.
+    """
+    payload: Dict[str, Any] = {}
+    if rotation is not None:
+        payload["rotation"] = rotation
+    payload["boundary_conditions"] = [bc.to_dict() for bc in bcs]
+
+    return yaml.safe_dump(payload, sort_keys=False, default_flow_style=False)
+
+
 def write_boundary_conditions_yaml(
     bcs: List[GpuBC],
     filename: str,
@@ -219,12 +250,7 @@ def write_boundary_conditions_yaml(
     Returns:
         (str): The YAML text that was written (useful for tests/inspection).
     """
-    payload: Dict[str, Any] = {}
-    if rotation is not None:
-        payload["rotation"] = rotation
-    payload["boundary_conditions"] = [bc.to_dict() for bc in bcs]
-
-    text = yaml.safe_dump(payload, sort_keys=False, default_flow_style=False)
+    text = _boundary_conditions_yaml_text(bcs, rotation=rotation)
 
     with open(filename, "w") as fh:
         fh.write(text)

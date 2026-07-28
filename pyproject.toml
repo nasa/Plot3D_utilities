@@ -16,6 +16,10 @@ networkx = "*"
 pymetis = { version = "*", markers = "platform_system != 'Windows'" }
 matplotlib = "*"
 pyyaml = "*"
+h5py = { version = "*", optional = true }
+
+[tool.poetry.extras]
+hdf5 = ["h5py"]
 
 [tool.poetry.group.deve.dependencies]
 
