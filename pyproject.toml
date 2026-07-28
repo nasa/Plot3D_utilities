@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "plot3d"
-version = "1.10.0"
+version = "1.10.1"
 description = "Plot3D python utilities for reading and writing and also finding connectivity between blocks"
 authors = ["Paht Juangphanich <paht.juangphanich@nasa.gov>"]
 readme = "README.md"
@@ -16,6 +16,10 @@ networkx = "*"
 pymetis = { version = "*", markers = "platform_system != 'Windows'" }
 matplotlib = "*"
 pyyaml = "*"
+h5py = { version = "*", optional = true }
+
+[tool.poetry.extras]
+hdf5 = ["h5py"]
 
 [tool.poetry.group.deve.dependencies]
 
