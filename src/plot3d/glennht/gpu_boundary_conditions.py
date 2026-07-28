@@ -206,11 +206,10 @@ def _boundary_conditions_yaml_text(
     """Build the run-yaml fragment text for a list of GPU BC dataclasses.
 
     Factored out of :func:`write_boundary_conditions_yaml` so callers that
-    need the YAML text in memory -- e.g.
-    :func:`plot3d.glennht.graph_p3d.write_graph_p3d`, which embeds it as a
-    string dataset inside an HDF5 bundle -- don't have to round-trip
-    through a temporary file just to get the same bytes
-    :func:`write_boundary_conditions_yaml` would have written.
+    need the YAML text in memory (e.g. to embed it as a string alongside
+    other serialized data) don't have to round-trip through a temporary
+    file just to get the same bytes :func:`write_boundary_conditions_yaml`
+    would have written.
 
     Args:
         bcs (List[GpuInletBC | GpuOutletBC | GpuWallBC]): The boundary

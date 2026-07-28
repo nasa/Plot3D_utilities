@@ -735,7 +735,6 @@ def export_to_glennht_gpu(
     rotation: Optional[Dict[str, Any]] = None,
     write_grid: bool = True,
     tagging_kwargs: Optional[Dict[str, Any]] = None,
-    bundle: bool = False,
 ) -> Dict[str, str]:
     """Single-call happy path: Plot3D blocks -> glennht-gpu case files.
 
@@ -790,19 +789,11 @@ def export_to_glennht_gpu(
             to the chosen ``tag_surfaces_*`` function (e.g. ``{"axis":
             "x", "band": 0.1}`` for ``"geometric"``, or ``{"overrides":
             {...}}``).
-        bundle (bool): If True, also write a single-file HDF5
-            ``{case_name}.graph_p3d`` bundle (grid + connectivity +
-            surface tags + ``bcs``) via
-            :func:`plot3d.glennht.graph_p3d.write_graph_p3d`. Requires the
-            optional ``h5py`` dependency (the ``hdf5`` extra). glennht-gpu
-            cannot read this bundle directly -- explode it back into the
-            loose trio with :func:`plot3d.glennht.graph_p3d.graph_p3d_to_files`
-            first. Defaults to False, so existing callers are unaffected.
 
     Returns:
         (Dict[str, str]): ``{"connectivity": ..., "grid": ...,
-        "bc_codes": ..., "boundary_conditions": ..., "graph_p3d": ...}``
-        -- only the keys for files actually written are present.
+        "bc_codes": ..., "boundary_conditions": ...}`` -- only the keys
+        for files actually written are present.
     """
     if (rotation_angle is None) != (nblades is None):
         raise ValueError(
@@ -889,29 +880,5 @@ def export_to_glennht_gpu(
         bcs_path = os.path.join(out_dir, f"{case_name}_boundary_conditions.yaml")
         write_boundary_conditions_yaml(bcs, bcs_path, rotation=rotation)
         paths["boundary_conditions"] = bcs_path
-
-    if bundle:
-        # Local import: graph_p3d.py imports helpers FROM this module at
-        # its own top level, so importing it back here at gpu.py's module
-        # top would be circular. Deferring it into this branch also keeps
-        # h5py (optional dependency, imported lazily inside graph_p3d.py)
-        # out of the import chain entirely unless bundle=True is used.
-        from .graph_p3d import write_graph_p3d
-
-        graph_p3d_path = os.path.join(out_dir, f"{case_name}.graph_p3d")
-        write_graph_p3d(
-            graph_p3d_path,
-            blocks,
-            matched_faces=face_matches,
-            outer_faces=outer_faces,
-            periodic_faces=periodic_faces,
-            periodicity=periodicity_meta,
-            surface_ids=surface_ids,
-            bcs=bcs,
-            rotation=rotation,
-            case_name=case_name,
-            mesh_file=f"{case_name}.xyz",
-        )
-        paths["graph_p3d"] = graph_p3d_path
 
     return paths

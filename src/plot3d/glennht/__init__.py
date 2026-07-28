@@ -27,15 +27,6 @@ from .gpu_boundary_conditions import (
     write_boundary_conditions_yaml,
 )
 
-# glennht-gpu single-file HDF5 bundle format (.graph_p3d). h5py is an
-# OPTIONAL dependency -- it is only imported lazily inside graph_p3d.py's
-# own functions, so this import stays safe even when h5py isn't installed.
-from .graph_p3d import (
-    write_graph_p3d,
-    read_graph_p3d,
-    graph_p3d_to_files,
-)
-
 # validation functions
 from .validation import (
     check_handedness,
