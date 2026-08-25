@@ -2,7 +2,7 @@
 ``FlatMesh``).
 
 Fixture: the tutorial's 2-block annular wedge (see the ``wedge_block`` cell
-in ``colab/Plot3D_GlennHT_GPU_GraphExport.ipynb``) -- two 15x9x13-node
+in ``colab/Plot3D_Flatten.ipynb``) -- two 15x9x13-node
 blocks spanning x in [0,0.5]/[0.5,1], r in [0.2,0.3], theta in [0,20deg].
 20 degrees is exactly 1/18 of a full annulus (``nblades=18``), which is why
 each block's own K=1/K=KMAX faces self-match under a +/-20deg rotation
@@ -10,7 +10,7 @@ each block's own K=1/K=KMAX faces self-match under a +/-20deg rotation
 ``connectivity()``/``rotated_periodicity()`` run in well under a second on
 this fixture (~1700 nodes/block, confirmed empirically), so nothing here is
 gated on mesh size the way the real-stator round-trip in
-``test_glennht_gpu_export.py`` is.
+``test_plot3d_flatten_deck.py`` is.
 
 Volume/area correctness is deliberately NOT checked against the smooth
 annular-sector analytic formula -- that formula assumes a smooth circular
@@ -39,7 +39,7 @@ import pytest
 from plot3d import Block
 from plot3d.connectivity import connectivity
 from plot3d.periodicity import create_rotation_matrix, rotated_periodicity
-from plot3d.glennht import GpuInletBC, GpuWallBC, tag_surfaces_geometric
+from plot3d.glennht import Plot3DFlattenInletBC, Plot3DFlattenWallBC, tag_surfaces_geometric
 from plot3d.flatmesh import (
     BC_INLET,
     BC_INTERIOR,
@@ -53,7 +53,7 @@ from plot3d.flatmesh import (
 
 # ---------------------------------------------------------------------------
 # Fixture: 2-block annular wedge (matches
-# colab/Plot3D_GlennHT_GPU_GraphExport.ipynb's `wedge_block` cell).
+# colab/Plot3D_Flatten.ipynb's `wedge_block` cell).
 # ---------------------------------------------------------------------------
 
 DTHETA_DEG = 20.0
@@ -97,7 +97,7 @@ def wedge_connectivity(wedge_blocks):
     and read-only -- except the multi-surface test, which needs to
     reassign some ``outer_faces[].id`` values and therefore
     ``copy.deepcopy``s the list first, exactly as ``tag_surfaces_*`` tests
-    do in ``test_glennht_gpu_export.py``.
+    do in ``test_plot3d_flatten_deck.py``.
     """
     face_matches, outer_faces = connectivity(wedge_blocks)
     periodic_faces, outer_faces, _, _ = rotated_periodicity(
@@ -339,12 +339,12 @@ def test_multi_surface_and_mixed_wall_bcs(wedge_blocks, wedge_connectivity, peri
     })
 
     bcs = [
-        GpuInletBC(name="main_inlet", surfaces=[1],
+        Plot3DFlattenInletBC(name="main_inlet", surfaces=[1],
                    total_pressure=350000.0, total_temperature=450.0),
-        GpuInletBC(name="cooling_inlet", surfaces=[6],
+        Plot3DFlattenInletBC(name="cooling_inlet", surfaces=[6],
                    total_pressure=360000.0, total_temperature=320.0),
-        GpuWallBC(name="hub_wall", surfaces=[4], rotating=True, wall_rotation_rate=-6.0),
-        GpuWallBC(name="shroud_wall", surfaces=[5]),
+        Plot3DFlattenWallBC(name="hub_wall", surfaces=[4], rotating=True, wall_rotation_rate=-6.0),
+        Plot3DFlattenWallBC(name="shroud_wall", surfaces=[5]),
     ]
 
     fm = flatten_mesh(

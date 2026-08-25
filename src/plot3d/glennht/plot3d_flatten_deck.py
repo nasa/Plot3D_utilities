@@ -1,12 +1,13 @@
-# glennht_gpu.py
+# plot3d_flatten_deck.py
 """Export Plot3D multi-block connectivity to the ``connectivity.json``
-format consumed by the ``glennht-gpu`` solver.
+format used by the plot3d-flatten deck format.
 
-This module produces the same ``connectivity.json`` schema that
-glennht-gpu's own upstream mesh-preprocessing tooling emits, letting
-``plot3d_utilities`` -- which already computes block connectivity, outer
-faces and rotational periodicity -- produce that JSON directly, without a
-separate preprocessing round-trip.
+This module produces the plot3d-flatten deck's ``connectivity.json``
+schema -- a Plot3D grid + connectivity.json + boundary_conditions.yaml
+bundle intended for GPU CFD solvers -- letting ``plot3d_utilities`` --
+which already computes block connectivity, outer faces and rotational
+periodicity -- produce that JSON directly, without a separate
+preprocessing round-trip.
 
 Permutation-index convention
 -----------------------------
@@ -19,7 +20,7 @@ the *diagonal* (lb/ub) convention documented in ``connectivity.py``:
 - **cross-plane** matches (permutation 4-7) export the real ``0..7`` index
   because lb/ub alone cannot represent an axis swap.
 
-The glennht-gpu connectivity reader prefers a ``permutation_matrix`` over
+The plot3d-flatten reader prefers a ``permutation_matrix`` over
 the bare ``permutation_index`` whenever both are present: it derives the
 canonical ``0..7`` index directly from the matrix, and only falls back to
 ``permutation_index.clamp(0, 7)`` when no matrix is supplied. A bare ``-1``
@@ -32,13 +33,13 @@ always emits **both** ``permutation_index`` (as-is, including ``-1``) *and*
 it always tries first -- sees the real orientation regardless of what
 ``permutation_index`` says.
 
-This differs from connectivity JSON produced by glennht-gpu's own upstream
-mesh-preprocessing tooling, which carries only a flat ``permutation_index``
-and no ``permutation_matrix``. That form's indices happen to be small real
-values (0, 1, ...) rather than -1 because its face-match representation
-doesn't have a "diagonal implies direction" shortcut. Both forms are
-accepted by the glennht-gpu reader; we keep the richer one (with the
-matrix) since it is unambiguous.
+This differs from connectivity JSON produced by upstream mesh-preprocessing
+tooling that emits the plot3d-flatten deck format, which carries only a
+flat ``permutation_index`` and no ``permutation_matrix``. That form's
+indices happen to be small real values (0, 1, ...) rather than -1 because
+its face-match representation doesn't have a "diagonal implies direction"
+shortcut. Both forms are accepted by the plot3d-flatten reader; we keep
+the richer one (with the matrix) since it is unambiguous.
 """
 from __future__ import annotations
 
@@ -53,7 +54,7 @@ from ..connectivity import PERMUTATION_MATRICES, connectivity
 from ..facefunctions import create_face_from_diagonals
 from ..periodicity import create_rotation_matrix, rotated_periodicity
 from ..write import write_plot3D
-from .gpu_boundary_conditions import write_boundary_conditions_yaml
+from .plot3d_flatten_bc import write_boundary_conditions_yaml
 
 __all__ = [
     "write_connectivity_json",
@@ -62,20 +63,20 @@ __all__ = [
     "tag_surfaces_geometric",
     "write_bc_codes_json",
     "merge_connectivity_json",
-    "export_to_glennht_gpu",
+    "export_to_plot3d_flatten_deck",
 ]
 
 #: Provenance string stamped into the ``periodicity`` block's ``source``
 #: field when the caller doesn't supply one.
-_SOURCE = "plot3d_utilities.glennht.gpu.write_connectivity_json"
+_SOURCE = "plot3d_utilities.glennht.plot3d_flatten_deck.write_connectivity_json"
 
 #: Fixed solver face order used by ``bc_codes`` tables: one code per block
 #: side, in this order. Matches the face-side convention used by
-#: glennht-gpu's connectivity format.
+#: the plot3d-flatten deck's connectivity format.
 FACE_ORDER: List[str] = ["I=1", "I=IMAX", "J=1", "J=JMAX", "K=1", "K=KMAX"]
 
 #: Face-code -> surface-id legend (matches the ``bc_codes.json``
-#: schema's ``face_code_legend`` used by glennht-gpu).
+#: schema's ``face_code_legend`` used by the plot3d-flatten deck format).
 BC_CODE_LEGEND: Dict[str, str] = {
     "5": "inlet",
     "6": "outlet",
@@ -89,11 +90,12 @@ BC_CODE_LEGEND: Dict[str, str] = {
 
 #: Surface id used for an interface face (code 0) that plot3d_utilities
 #: failed to block-match. These are CONFORMAL interior interfaces, NOT
-#: walls -- matches glennht-gpu's convention for unmatched interfaces.
+#: walls -- matches the plot3d-flatten deck format's convention for
+#: unmatched interfaces.
 UNMATCHED_INTERFACE_ID = 8
 
 #: Default surface-id -> name map used by :func:`tag_surfaces_geometric`
-#: and :func:`tag_surfaces_from_bc_codes` (ids 1-5 mirror glennht-gpu's
+#: and :func:`tag_surfaces_from_bc_codes` (ids 1-5 mirror plot3d-flatten's
 #: default surface-id convention; 6 and 8 cover the remaining face-code
 #: outcomes).
 _DEFAULT_SURFACE_IDS: Dict[str, str] = {
@@ -114,8 +116,8 @@ def _clean_face_record(rec: Dict[str, Any]) -> Dict[str, Any]:
 
     Drops any extra keys (e.g. ``id``) that ``connectivity_fast`` /
     ``rotated_periodicity`` attach to ``block1``/``block2`` sub-dicts but
-    which glennht-gpu's ``connectivity.json`` format does not carry on
-    match entries.
+    which the plot3d-flatten deck format's ``connectivity.json`` does not
+    carry on match entries.
     """
     return {
         "block_index": int(rec["block_index"]),
@@ -126,7 +128,8 @@ def _clean_face_record(rec: Dict[str, Any]) -> Dict[str, Any]:
 
 def _clean_face_match(fm: Dict[str, Any]) -> Dict[str, Any]:
     """Reduce one ``connectivity_fast``/``rotated_periodicity`` match dict
-    to the glennht-gpu ``face_matches`` / ``periodic_faces`` entry schema.
+    to the plot3d-flatten deck's ``face_matches`` / ``periodic_faces``
+    entry schema.
 
     Handles both known shapes:
 
@@ -178,7 +181,7 @@ def _block_side_of_face(face: Dict[str, Any]) -> Optional[int]:
     """Which of the 6 block sides an outer face lies on, as an index into
     :data:`FACE_ORDER` (``[I=1, I=IMAX, J=1, J=JMAX, K=1, K=KMAX]``).
 
-    Matches glennht-gpu's face-side convention: the low/high side is
+    Matches the plot3d-flatten deck format's face-side convention: the low/high side is
     decided purely by whether the constant index is 0 (low) or not (high).
     Returns ``None`` if the face isn't collapsed on a single axis.
     """
@@ -197,7 +200,8 @@ def _block_side_of_face(face: Dict[str, Any]) -> Optional[int]:
 def _face_code_to_surface_id(code: int) -> Optional[int]:
     """Map an integer face code to a surface id.
 
-    Implements glennht-gpu's face-code surface-code convention:
+    Implements the plot3d-flatten deck format's face-code surface-code
+    convention:
 
     - 5 -> 1 (inlet), 6 -> 2 (outlet), 10 -> 3 (blade), 9 -> 4 (hub),
       109 -> 5 (shroud);
@@ -267,7 +271,7 @@ def write_connectivity_json(
     surface_ids: Optional[Dict[Any, str]] = None,
     mesh_file: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Write a glennht-gpu ``connectivity.json`` file.
+    """Write a plot3d-flatten deck ``connectivity.json`` file.
 
     Args:
         blocks (List[Block]): The multi-block mesh (only ``len(blocks)`` is
@@ -284,7 +288,7 @@ def write_connectivity_json(
         periodicity (Dict, optional): Global periodicity metadata:
             ``{nblades, rotation_axis, rotation_angle_rad,
             rotation_angle_deg, transformation_matrix, convention, source}``.
-            Required (by glennht-gpu) whenever ``periodic_faces`` is
+            Required (by the plot3d-flatten deck format) whenever ``periodic_faces`` is
             non-empty. If given without a ``source`` key, one is filled in.
         surface_ids (Dict, optional): ``{id: name}`` map, e.g.
             ``{1: "inlet", 2: "outlet", ...}``. Written with string keys.
@@ -307,7 +311,7 @@ def write_connectivity_json(
     if periodic_faces and periodicity is None:
         raise ValueError(
             "periodic_faces was given but periodicity is missing; the "
-            "glennht-gpu parser requires a 'periodicity' block whenever "
+            "the plot3d-flatten deck parser requires a 'periodicity' block whenever "
             "'periodic_faces' is non-empty."
         )
 
@@ -453,7 +457,7 @@ def tag_surfaces_geometric(
     """Tag outer faces by geometric position (fallback when no face codes
     are available).
 
-    Matches glennht-gpu's geometric fallback convention: the global axial
+    Matches the plot3d-flatten deck format's geometric fallback convention: the global axial
     and radial extent of all outer-face centroids is computed first; a
     face within ``band`` (a fraction of that extent) of the -axial extreme
     is the inlet, of the +axial extreme the outlet, of min-radius the hub,
@@ -535,7 +539,7 @@ def write_bc_codes_json(
 ) -> Dict[str, Any]:
     """Write a ``<mesh>.bc_codes.json`` sidecar (solver per-face codes).
 
-    Matches glennht-gpu's ``bc_codes.json`` schema: ``face_order``,
+    Matches the plot3d-flatten deck format's ``bc_codes.json`` schema: ``face_order``,
     ``face_code_legend``, ``blocks`` (the per-block 6-int arrays),
     ``block_order``.
 
@@ -574,8 +578,8 @@ def write_bc_codes_json(
 def _offset_match_block_indices(fm: Dict[str, Any], off: int) -> None:
     """Shift ``block1``/``block2``'s ``block_index`` by ``off`` (in place).
 
-    Mirrors how glennht-gpu's own connectivity-merge step shifts block
-    indices when concatenating rows. Note it only touches ``block_index``
+    Mirrors how the plot3d-flatten deck format's own connectivity-merge
+    step shifts block indices when concatenating rows. Note it only touches ``block_index``
     -- NOT any per-side ``id`` that some producers attach to ``block1``/
     ``block2`` in ``periodic_faces`` entries: those per-side ids are left
     unchanged by row offsetting even though ``block_index`` is correctly
@@ -598,9 +602,9 @@ def merge_connectivity_json(
     """Merge several per-row ``connectivity.json`` payloads into one.
 
     Companion to a concatenated multi-row ``.xyz`` (e.g. rotor blocks then
-    stator blocks): mirrors how glennht-gpu merges several single-row
-    ``connectivity.json`` payloads (e.g. a rotor row and a stator row) into
-    one multi-row mesh's connectivity file.
+    stator blocks): mirrors how the plot3d-flatten deck format merges
+    several single-row ``connectivity.json`` payloads (e.g. a rotor row
+    and a stator row) into one multi-row mesh's connectivity file.
 
     For row ``r`` (0-indexed, in flow order matching the concatenated grid):
 
@@ -610,7 +614,7 @@ def merge_connectivity_json(
     - every ``outer_faces[].id`` is shifted by ``id_stride * r`` (the
       ``id_stride=100`` convention: row 0 keeps ids 1-5, row 1 becomes
       101-105, etc. -- see the ``boundary_conditions:`` list of your
-      glennht-gpu run configuration);
+      plot3d-flatten deck run configuration);
     - each row's own ``periodicity.rotation_angle_rad`` (its blade pitch)
       is stamped onto that row's ``periodic_faces`` entries, so a merged
       mesh with different blade counts per row still tags each seam's
@@ -618,16 +622,18 @@ def merge_connectivity_json(
     - the merged top-level ``periodicity`` block is row 0's (a
       default/fallback -- the authoritative per-seam angle rides on each
       ``periodic_faces`` entry's own ``rotation_angle_rad``), matching
-      glennht-gpu's own merge behaviour.
+      the plot3d-flatten deck format's own merge behaviour.
 
-    NOTE on ``surface_ids``: glennht-gpu's own connectivity merge does not
-    carry this field at all -- a merged file it produces has no
-    ``surface_ids`` key, even though both per-row inputs do. This function
-    instead merges and offsets ``surface_ids`` (by ``id_stride * r`` on the
-    integer keys, matching ``outer_faces[].id``) because it is useful and
-    harmless (nothing downstream reads it; the run configuration hardcodes
-    its own surface-id map), but a byte-for-byte match against glennht-gpu's
-    own merged output is therefore neither possible nor expected.
+    NOTE on ``surface_ids``: the plot3d-flatten deck format's own
+    connectivity merge does not carry this field at all -- a merged file
+    it produces has no ``surface_ids`` key, even though both per-row
+    inputs do. This function instead merges and offsets ``surface_ids``
+    (by ``id_stride * r`` on the integer keys, matching
+    ``outer_faces[].id``) because it is useful and harmless (nothing
+    downstream reads it; the run configuration hardcodes its own
+    surface-id map), but a byte-for-byte match against the plot3d-flatten
+    deck format's own merged output is therefore neither possible nor
+    expected.
 
     Args:
         row_files (List[str | Dict]): Per-row connectivity payloads, in
@@ -720,7 +726,7 @@ def merge_connectivity_json(
 # B6: top-level driver
 # ---------------------------------------------------------------------------
 
-def export_to_glennht_gpu(
+def export_to_plot3d_flatten_deck(
     blocks: List[Block],
     out_dir: str,
     case_name: str,
@@ -736,7 +742,7 @@ def export_to_glennht_gpu(
     write_grid: bool = True,
     tagging_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, str]:
-    """Single-call happy path: Plot3D blocks -> glennht-gpu case files.
+    """Single-call happy path: Plot3D blocks -> plot3d-flatten deck case files.
 
     Runs the FULL :func:`plot3d.connectivity.connectivity` (never
     ``connectivity_fast`` -- see the module docstring / verification
@@ -775,7 +781,7 @@ def export_to_glennht_gpu(
         surface_specs (List[Dict], optional): Required when
             ``tagging="diagonals"`` (passed to
             :func:`tag_surfaces_from_diagonals`).
-        bcs (List[GpuInletBC | GpuOutletBC | GpuWallBC], optional): If
+        bcs (List[Plot3DFlattenInletBC | Plot3DFlattenOutletBC | Plot3DFlattenWallBC], optional): If
             given, written to ``{case_name}_boundary_conditions.yaml`` via
             :func:`write_boundary_conditions_yaml`.
         rotation (Dict, optional): Forwarded to

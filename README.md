@@ -46,7 +46,7 @@ For Mac. install homebrew and do `brew install metis` then add this to your ~/.z
 
 [Merging Blocks](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/merge_block_test.ipynb)
 
-[Export a mesh to the GlennHT-GPU graph format](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_GlennHT_GPU_GraphExport.ipynb)
+[Export and flatten a mesh with plot3d-flatten](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_Flatten.ipynb)
 
 [Learning Python with VSCode](https://www.youtube.com/watch?v=lZiK9e8b21M) 
 

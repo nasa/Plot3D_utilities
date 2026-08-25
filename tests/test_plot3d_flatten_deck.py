@@ -1,5 +1,5 @@
-"""Tests for the glennht-gpu export module (``plot3d.glennht.gpu`` +
-``plot3d.glennht.gpu_boundary_conditions``).
+"""Tests for the plot3d-flatten deck export module
+(``plot3d.glennht.plot3d_flatten_deck`` + ``plot3d.glennht.plot3d_flatten_bc``).
 
 Uses a tiny synthetic 2-block mesh (two adjacent 3x3x3-node unit-spaced
 cubes sharing one face) so :func:`plot3d.connectivity` -- which is slow on
@@ -26,10 +26,10 @@ import yaml
 from plot3d import Block, read_plot3D
 from plot3d.connectivity import connectivity
 from plot3d.glennht import (
-    GpuInletBC,
-    GpuOutletBC,
-    GpuWallBC,
-    export_to_glennht_gpu,
+    Plot3DFlattenInletBC,
+    Plot3DFlattenOutletBC,
+    Plot3DFlattenWallBC,
+    export_to_plot3d_flatten_deck,
     merge_connectivity_json,
     tag_surfaces_from_bc_codes,
     tag_surfaces_from_diagonals,
@@ -38,7 +38,7 @@ from plot3d.glennht import (
     write_boundary_conditions_yaml,
     write_connectivity_json,
 )
-from plot3d.glennht.gpu import UNMATCHED_INTERFACE_ID
+from plot3d.glennht.plot3d_flatten_deck import UNMATCHED_INTERFACE_ID
 
 
 # ---------------------------------------------------------------------------
@@ -356,19 +356,19 @@ def test_merge_connectivity_json_accepts_file_paths(tmp_path):
 # ---------------------------------------------------------------------------
 
 def test_write_boundary_conditions_yaml_roundtrip(tmp_path):
-    inlet = GpuInletBC(
+    inlet = Plot3DFlattenInletBC(
         name="m_inlet",
         surfaces=[1],
         total_pressure=101325.0,
         total_temperature=288.15,
     )
-    outlet = GpuOutletBC(
+    outlet = Plot3DFlattenOutletBC(
         name="m_outlet",
         surfaces=[2],
         back_pressure=90000.0,
         extrapolation_order=0,
     )
-    wall = GpuWallBC(
+    wall = Plot3DFlattenWallBC(
         name="blade_wall",
         surfaces=[3, 4, 5],
     )
@@ -423,7 +423,7 @@ def test_write_boundary_conditions_yaml_roundtrip(tmp_path):
 
 
 def test_gpu_bc_extra_fields_merge(tmp_path):
-    inlet = GpuInletBC(
+    inlet = Plot3DFlattenInletBC(
         name="downstream_inlet",
         surfaces=[101],
         total_pressure=200000.0,
@@ -439,11 +439,11 @@ def test_gpu_bc_extra_fields_merge(tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# 9: export_to_glennht_gpu driver
+# 9: export_to_plot3d_flatten_deck driver
 # ---------------------------------------------------------------------------
 
-def test_export_to_glennht_gpu_geometric(tmp_path, fixture_blocks):
-    paths = export_to_glennht_gpu(
+def test_export_to_plot3d_flatten_deck_geometric(tmp_path, fixture_blocks):
+    paths = export_to_plot3d_flatten_deck(
         fixture_blocks,
         str(tmp_path),
         "fixture",
@@ -465,9 +465,9 @@ def test_export_to_glennht_gpu_geometric(tmp_path, fixture_blocks):
         assert f["id"] in (1, 2, 3, 4, 5)
 
 
-def test_export_to_glennht_gpu_requires_nblades_with_rotation_angle(tmp_path, fixture_blocks):
+def test_export_to_plot3d_flatten_deck_requires_nblades_with_rotation_angle(tmp_path, fixture_blocks):
     with pytest.raises(ValueError):
-        export_to_glennht_gpu(
+        export_to_plot3d_flatten_deck(
             fixture_blocks,
             str(tmp_path),
             "fixture",
@@ -476,9 +476,9 @@ def test_export_to_glennht_gpu_requires_nblades_with_rotation_angle(tmp_path, fi
         )
 
 
-def test_export_to_glennht_gpu_requires_bc_codes_for_bc_codes_tagging(tmp_path, fixture_blocks):
+def test_export_to_plot3d_flatten_deck_requires_bc_codes_for_bc_codes_tagging(tmp_path, fixture_blocks):
     with pytest.raises(ValueError):
-        export_to_glennht_gpu(
+        export_to_plot3d_flatten_deck(
             fixture_blocks,
             str(tmp_path),
             "fixture",
@@ -486,9 +486,9 @@ def test_export_to_glennht_gpu_requires_bc_codes_for_bc_codes_tagging(tmp_path, 
         )
 
 
-def test_export_to_glennht_gpu_unknown_tagging(tmp_path, fixture_blocks):
+def test_export_to_plot3d_flatten_deck_unknown_tagging(tmp_path, fixture_blocks):
     with pytest.raises(ValueError):
-        export_to_glennht_gpu(
+        export_to_plot3d_flatten_deck(
             fixture_blocks,
             str(tmp_path),
             "fixture",
@@ -500,7 +500,7 @@ def test_export_to_glennht_gpu_unknown_tagging(tmp_path, fixture_blocks):
 # 10: (gated) stator round-trip against real code-tagged mesh
 # ---------------------------------------------------------------------------
 
-STATOR_DIR = os.environ.get("PLOT3D_GLENNHT_GPU_STATOR_DIR", "")
+STATOR_DIR = os.environ.get("PLOT3D_FLATTEN_DECK_STATOR_DIR", "")
 STATOR_XYZ = os.path.join(STATOR_DIR, "stator.xyz") if STATOR_DIR else ""
 STATOR_BC_CODES = os.path.join(STATOR_DIR, "stator.bc_codes.json") if STATOR_DIR else ""
 
@@ -508,13 +508,13 @@ skip_no_stator_data = pytest.mark.skipif(
     not (STATOR_DIR and os.path.exists(STATOR_XYZ) and os.path.exists(STATOR_BC_CODES)),
     reason=(
         "external code-tagged stator test data not found (set "
-        "PLOT3D_GLENNHT_GPU_STATOR_DIR to enable this test)"
+        "PLOT3D_FLATTEN_DECK_STATOR_DIR to enable this test)"
     ),
 )
 
 
 @skip_no_stator_data
-def test_export_to_glennht_gpu_stator_roundtrip(tmp_path):
+def test_export_to_plot3d_flatten_deck_stator_roundtrip(tmp_path):
     """End-to-end against the real face-code-tagged stator mesh (external data).
 
     This calls the FULL connectivity() on a real ~205x21x81-ish 5-block
@@ -528,7 +528,7 @@ def test_export_to_glennht_gpu_stator_roundtrip(tmp_path):
         bc_payload = json.load(fh)
     bc_codes = bc_payload["blocks"]
 
-    paths = export_to_glennht_gpu(
+    paths = export_to_plot3d_flatten_deck(
         blocks,
         str(tmp_path),
         "stator",

@@ -1,8 +1,9 @@
-# gpu_boundary_conditions.py
-"""GlennHT-GPU boundary-condition dataclasses and YAML fragment writer.
+# plot3d_flatten_bc.py
+"""plot3d-flatten deck boundary-condition dataclasses and YAML fragment
+writer.
 
 These mirror the ``boundary_conditions:`` list schema consumed by a
-glennht-gpu run configuration, covering scenarios such as:
+plot3d-flatten deck run configuration, covering scenarios such as:
 
 - a single mixing-plane rotor/stator pair (``blades_full_ring`` per BC);
 - a multi-row connected solve (surface-id convention ``100*row + {1..5}``,
@@ -26,15 +27,15 @@ from typing import Any, Dict, List, Optional
 import yaml
 
 __all__ = [
-    "GpuInletBC",
-    "GpuOutletBC",
-    "GpuWallBC",
+    "Plot3DFlattenInletBC",
+    "Plot3DFlattenOutletBC",
+    "Plot3DFlattenWallBC",
     "write_boundary_conditions_yaml",
 ]
 
 
 @dataclass(kw_only=True)
-class GpuInletBC:
+class Plot3DFlattenInletBC:
     """``type: inlet`` boundary condition.
 
     Args:
@@ -98,7 +99,7 @@ class GpuInletBC:
 
 
 @dataclass(kw_only=True)
-class GpuOutletBC:
+class Plot3DFlattenOutletBC:
     """``type: outlet`` boundary condition.
 
     Args:
@@ -112,7 +113,7 @@ class GpuOutletBC:
         mixing_plane_partner (str, optional): Name of the paired inlet BC
             on the downstream row.
         blades_full_ring (int, optional): Blade count for a full annulus.
-        extra (Dict[str, Any], optional): See :class:`GpuInletBC`.
+        extra (Dict[str, Any], optional): See :class:`Plot3DFlattenInletBC`.
     """
 
     name: str
@@ -146,7 +147,7 @@ class GpuOutletBC:
 
 
 @dataclass(kw_only=True)
-class GpuWallBC:
+class Plot3DFlattenWallBC:
     """``type: wall`` boundary condition.
 
     Args:
@@ -162,7 +163,7 @@ class GpuWallBC:
             frame (``rotation.per_block`` omega).
         wall_rotation_rate (float, optional): Explicit wall rotation rate
             override, rad/s, if different from the block's frame omega.
-        extra (Dict[str, Any], optional): See :class:`GpuInletBC`.
+        extra (Dict[str, Any], optional): See :class:`Plot3DFlattenInletBC`.
     """
 
     name: str
@@ -195,11 +196,11 @@ class GpuWallBC:
         return d
 
 
-GpuBC = Any  # GpuInletBC | GpuOutletBC | GpuWallBC, kept loose for isinstance-free duck typing
+Plot3DFlattenBC = Any  # Plot3DFlattenInletBC | Plot3DFlattenOutletBC | Plot3DFlattenWallBC, kept loose for isinstance-free duck typing
 
 
 def _boundary_conditions_yaml_text(
-    bcs: List[GpuBC],
+    bcs: List[Plot3DFlattenBC],
     *,
     rotation: Optional[Dict[str, Any]] = None,
 ) -> str:
@@ -212,7 +213,7 @@ def _boundary_conditions_yaml_text(
     would have written.
 
     Args:
-        bcs (List[GpuInletBC | GpuOutletBC | GpuWallBC]): The boundary
+        bcs (List[Plot3DFlattenInletBC | Plot3DFlattenOutletBC | Plot3DFlattenWallBC]): The boundary
             conditions to emit, in order.
         rotation (Dict[str, Any], optional): See
             :func:`write_boundary_conditions_yaml`.
@@ -229,7 +230,7 @@ def _boundary_conditions_yaml_text(
 
 
 def write_boundary_conditions_yaml(
-    bcs: List[GpuBC],
+    bcs: List[Plot3DFlattenBC],
     filename: str,
     *,
     rotation: Optional[Dict[str, Any]] = None,
@@ -237,14 +238,14 @@ def write_boundary_conditions_yaml(
     """Serialize a list of GPU BC dataclasses to a run-yaml fragment.
 
     Args:
-        bcs (List[GpuInletBC | GpuOutletBC | GpuWallBC]): The boundary
+        bcs (List[Plot3DFlattenInletBC | Plot3DFlattenOutletBC | Plot3DFlattenWallBC]): The boundary
             conditions to emit, in order.
         filename (str): Output path, e.g. ``"stator_boundary_conditions.yaml"``.
         rotation (Dict[str, Any], optional): If given, also emit a
             top-level ``rotation:`` block (e.g. ``{"omega_x": 0.0,
             "per_block": [{"blocks": [0, 1], "omega_x": -1792.7}]}``),
-            matching the ``rotation:`` block used in glennht-gpu run
-            configurations.
+            matching the ``rotation:`` block used in plot3d-flatten deck
+            run configurations.
 
     Returns:
         (str): The YAML text that was written (useful for tests/inspection).

@@ -8,22 +8,22 @@ from .class_definitions import JobFiles, JobControl, TurbModelInput, Plot3DParam
 # export functions
 from .export_functions import export_to_boundary_condition, export_to_job_file
 
-# glennht-gpu connectivity.json export
-from .gpu import (
+# plot3d-flatten deck export
+from .plot3d_flatten_deck import (
     write_connectivity_json,
     tag_surfaces_from_diagonals,
     tag_surfaces_from_bc_codes,
     tag_surfaces_geometric,
     write_bc_codes_json,
     merge_connectivity_json,
-    export_to_glennht_gpu,
+    export_to_plot3d_flatten_deck,
 )
 
-# glennht-gpu boundary-condition dataclasses + YAML fragment writer
-from .gpu_boundary_conditions import (
-    GpuInletBC,
-    GpuOutletBC,
-    GpuWallBC,
+# plot3d-flatten deck boundary-condition dataclasses + YAML fragment writer
+from .plot3d_flatten_bc import (
+    Plot3DFlattenInletBC,
+    Plot3DFlattenOutletBC,
+    Plot3DFlattenWallBC,
     write_boundary_conditions_yaml,
 )
 

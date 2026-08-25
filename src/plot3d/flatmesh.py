@@ -2,11 +2,12 @@
 """Flatten a multi-block structured (Plot3D) mesh into a solver-agnostic,
 standard-container finite-volume graph.
 
-This is a **general** (not glennht-specific) port of glennht-gpu's own flat
-mesh builder (``plot3d-rs::build_flat_mesh`` + ``metrics.rs``, and the
-periodic stamping from glennht-core's ``flat_mesh_convert.rs``) into numpy,
-extended with welded points + cell/face vertex connectivity (which
-glennht-gpu's own flat mesh does not keep).
+This implements the standard finite-volume flattening approach used by
+structured-mesh GPU CFD solvers: cell dual-graph numbering, per-cell
+volumes, and per-face area vectors computed as ``0.5*(d1 x d2)`` over each
+face's diagonals, plus periodic-face stamping -- all in numpy, extended
+with welded points + cell/face vertex connectivity that a bare flattener
+typically does not keep.
 
 For every cell the resulting :class:`FlatMesh` answers: who are my
 neighbors, what is the area vector of each shared face (for fluxes), and
@@ -134,7 +135,7 @@ def _collapsed_axis_value(lb: Sequence[int], ub: Sequence[int]) -> Optional[Tupl
     """Return ``(axis, value)`` for the constant axis of a normalised
     (min/max) ``lb``/``ub`` diagonal, or ``None`` if none is constant.
 
-    Same convention as ``plot3d.glennht.gpu._collapsed_axis_value``,
+    Same convention as ``plot3d.glennht.plot3d_flatten_deck._collapsed_axis_value``,
     reimplemented locally (it is six lines) to keep this module decoupled
     from the ``glennht`` subpackage.
     """
@@ -547,8 +548,9 @@ def flatten_mesh(
             ``rotation_angle_rad``/``rotation_axis`` when periodic_faces is
             rotational.
         surface_ids: ``{id: name}`` map (keys may be int or numeric str).
-        bcs: List of BC objects (e.g. ``GpuInletBC``/``GpuOutletBC``/
-            ``GpuWallBC``), duck-typed on ``.type``/``.surfaces`` (plus
+        bcs: List of BC objects (e.g. ``Plot3DFlattenInletBC``/
+            ``Plot3DFlattenOutletBC``/``Plot3DFlattenWallBC``), duck-typed
+            on ``.type``/``.surfaces`` (plus
             ``.rotating``/``.wall_rotation_rate`` for walls).
         weld_tol: Coincident-node welding tolerance.
 
