@@ -188,7 +188,8 @@ def _compute_periodic_lb_ub_orientation(
     return corrected_lb2, corrected_ub2, orientation
 
 
-def _build_periodic_export(df: pd.DataFrame, periodic_faces_temp: list) -> dict:
+def _build_periodic_export(df: pd.DataFrame, periodic_faces_temp: list,
+                           rotation_sign: int = 1) -> dict:
     """Build export dict from DataFrame with orientation, consistent with connectivity().
 
     Derives lb/ub from the DataFrame traversal order (first/last row) and computes
@@ -198,10 +199,32 @@ def _build_periodic_export(df: pd.DataFrame, periodic_faces_temp: list) -> dict:
     Args:
         df: DataFrame with columns i1,j1,k1,i2,j2,k2 from face matching.
         periodic_faces_temp: List of [face1, face2] Face pairs.
+        rotation_sign: Which pitch direction produced this match. ``+1`` means
+            face1 rotated by *+angle* landed on face2; ``-1`` means it took
+            *-angle*. Negative matches are stored swapped -- see below.
 
     Returns:
         Face match dict with block1, block2 sub-dicts and orientation.
     """
+    if rotation_sign < 0:
+        # This pair matched only when face1 was rotated by *-angle*, i.e.
+        # R(-a) @ face1 == face2, equivalently face1 == R(+a) @ face2. A
+        # connectivity.json carries a single global transformation_matrix and
+        # declares "Face_B = transformation_matrix @ Face_A", so that promise
+        # holds for every pair only if all pairs are stored in the same
+        # rotational direction. Swap the two sides here so the stored block1
+        # is always the one you rotate *forward* to reach block2; otherwise a
+        # consumer trusting the declared convention mis-rotates these pairs by
+        # twice the pitch.
+        df = df.rename(columns={'i1': 'i2', 'j1': 'j2', 'k1': 'k2',
+                                'i2': 'i1', 'j2': 'j1', 'k2': 'k1'})
+        # Rows arrived in the *old* face1's nested traversal order. lb/ub and
+        # _compute_orientation both read that ordering off the row sequence,
+        # so re-sort into the new face1's ascending I-J-K traversal -- which
+        # is also the "block1 is always ascending" half of the lb/ub convention.
+        df = df.sort_values(['i1', 'j1', 'k1']).reset_index(drop=True)
+        periodic_faces_temp = [periodic_faces_temp[1], periodic_faces_temp[0]]
+
     lb1 = [int(df.iloc[0]['i1']), int(df.iloc[0]['j1']), int(df.iloc[0]['k1'])]
     ub1 = [int(df.iloc[-1]['i1']), int(df.iloc[-1]['j1']), int(df.iloc[-1]['k1'])]
     lb2 = [int(df.iloc[0]['i2']), int(df.iloc[0]['j2']), int(df.iloc[0]['k2'])]
@@ -278,11 +301,13 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
             if face1.const_type == target_const and face2.const_type == target_const:
                 block1_rotated = rotate_block(blocks[face1.blockIndex], rotation_matrix1)
                 block2 = blocks[face2.blockIndex]
+                rotation_sign = 1
                 df, periodic_faces_temp, split_faces_temp = __periodicity_check__(
                     face1, face2, block1_rotated, block2)
 
                 if len(periodic_faces_temp) == 0:
                     block1_rotated = rotate_block(blocks[face1.blockIndex], rotation_matrix2)
+                    rotation_sign = -1
                     df, periodic_faces_temp, split_faces_temp = __periodicity_check__(
                         face1, face2, block1_rotated, block2)
 
@@ -292,7 +317,7 @@ def periodicity(blocks:List[Block],outer_faces:List[Dict[str,int]], matched_face
                     outer_faces_to_remove.append(periodic_faces_temp[0])
                     outer_faces_to_remove.append(periodic_faces_temp[1])
                     periodic_faces.append(periodic_faces_temp)
-                    periodic_faces_export.append(_build_periodic_export(df, periodic_faces_temp))
+                    periodic_faces_export.append(_build_periodic_export(df, periodic_faces_temp, rotation_sign))
                     split_faces.extend(split_faces_temp)
                     periodic_found = True
                     break
@@ -425,6 +450,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
                 t.set_description(f"Blk {face1.blockIndex} <-> {face2.blockIndex} | found {len(periodic_faces)}")
                 # Try +rotation first
                 block1_rotated = get_rotated(face1.blockIndex, sign=+1)
+                rotation_sign = 1
                 df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2, tol=tol)
                 # If no match, retry with -rotation. Without this we miss
                 # matches whose pitch direction is opposite to the (face1,
@@ -434,6 +460,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
                 # stale-index `non_matching` set was silently dropped.
                 if len(periodic_faces_temp) == 0:
                     block1_rotated = get_rotated(face1.blockIndex, sign=-1)
+                    rotation_sign = -1
                     df, periodic_faces_temp, split_faces_temp = __periodicity_check__(face1,face2,block1_rotated, block2, tol=tol)
                 
                 if len(periodic_faces_temp) > 0:
@@ -442,7 +469,7 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
                     outer_faces_to_remove.append(periodic_faces_temp[0])
                     outer_faces_to_remove.append(periodic_faces_temp[1])
                     periodic_faces.append(periodic_faces_temp)
-                    periodic_faces_export.append(_build_periodic_export(df, periodic_faces_temp))
+                    periodic_faces_export.append(_build_periodic_export(df, periodic_faces_temp, rotation_sign))
                     split_faces.extend(split_faces_temp)
                     periodic_found = True
                     break
