@@ -83,6 +83,8 @@ possible axis mappings between cross-plane faces.
 
 **This is why 10,469 faces fail verification — they need the swap.**
 
+![Same-axis vs cross-plane face pairs need an orientation flag beyond lb/ub, and different strip sizes put the point numbering out of sync](images/cross_plane_pair.png)
+
 ---
 
 ## 4. Investigation: First Unverified Entry

@@ -94,7 +94,7 @@ face_matches, outer_faces = connectivity_fast(blocks)
 The 8 permutation matrices are also available as `plot3d.PERMUTATION_MATRICES`.
 
 # Documentation
-- [Face Orientation: Cross-Plane Connectivity](docs/notes/unverified_connectivity_findings.md) — why cross-plane face connections need orientation flags beyond lb/ub, and how the 8-permutation system works
+- [Face Orientation: Cross-Plane Connectivity](docs/notes/cross_plane_pair.md) — why cross-plane face connections need orientation flags beyond lb/ub, and how the 8-permutation system works
 - [Presentation (PowerPoint)](docs/notes/unverified_connectivity_findings.pptx) — visual walkthrough of 2D→3D diagonal combinatorics
 
 # Rust Version

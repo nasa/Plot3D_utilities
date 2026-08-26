@@ -171,7 +171,7 @@ The older Python ``_compute_orientation()`` in ``connectivity.py`` produces an o
 
 Direction (forward/reverse) is encoded in the ``lb/ub`` values, not in the orientation vector. The ``_orient_vec_to_permutation()`` function converts this vector to a ``permutation_index`` for the unified system. The verification modules (``verify_connectivity`` / ``verify_periodicity``) test all 8 permutations to confirm the match.
 
-For a detailed analysis with diagrams, see the `Root Cause Analysis <https://github.com/nasa/Plot3D_utilities/blob/main/docs/notes/unverified_connectivity_findings.md>`_ document.
+For a detailed analysis with diagrams, see the `Root Cause Analysis <https://github.com/nasa/Plot3D_utilities/blob/main/docs/notes/cross_plane_pair.md>`_ document.
 
 
 Directed Diagonal for GHT_CONN Export
