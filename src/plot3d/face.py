@@ -514,8 +514,11 @@ class Face:
         tol_plane = max(tol_plane_dist, 1e-6 * max(1.0, Lc))
 
         c1 = Q1.mean(axis=0); c2 = Q2.mean(axis=0)
-        d1 = abs(float(self._plane_distance(c1[None, :], Q2[0], n2)))
-        d2 = abs(float(self._plane_distance(c2[None, :], Q1[0], n1)))
+        # c1/c2 are single points, so pass them 1-D: `(pts - p0) @ n` then
+        # returns a scalar. Passing them as (1, 3) yields a 1-element array,
+        # and float() on that is a hard TypeError under NumPy >= 2.
+        d1 = abs(float(self._plane_distance(c1, Q2[0], n2)))
+        d2 = abs(float(self._plane_distance(c2, Q1[0], n1)))
         if d1 > tol_plane or d2 > tol_plane:
             return 0.0
 

@@ -101,3 +101,5 @@ cython_debug/
 
 # Generated output from running the tutorial notebooks
 colab/wedge_out/
+colab/*.pickle
+colab/plot3d_utilities/
