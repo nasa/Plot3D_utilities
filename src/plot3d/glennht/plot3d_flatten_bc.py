@@ -34,6 +34,26 @@ __all__ = [
 ]
 
 
+class _BCDumper(yaml.SafeDumper):
+    """Dumper used only by this module, so the list-style override below
+    can't leak into unrelated ``yaml.safe_dump()`` calls elsewhere in the
+    process (PyYAML representers are registered per-``Dumper``-subclass,
+    so subclassing rather than patching ``yaml.SafeDumper`` directly keeps
+    this local)."""
+
+
+def _represent_list(dumper: yaml.Dumper, data: list):
+    """Inline (``[1, 2]``) for a list of plain scalars -- e.g. ``surfaces:``
+    or a ``rotation.per_block[].blocks:`` entry -- block-style (one item per
+    line) for anything containing a nested mapping or sequence, where an
+    inline dump would be unreadable."""
+    flow = all(isinstance(x, (int, float, str, bool, type(None))) for x in data)
+    return dumper.represent_sequence("tag:yaml.org,2002:seq", data, flow_style=flow)
+
+
+_BCDumper.add_representer(list, _represent_list)
+
+
 @dataclass(kw_only=True)
 class Plot3DFlattenInletBC:
     """``type: inlet`` boundary condition.
@@ -226,7 +246,7 @@ def _boundary_conditions_yaml_text(
         payload["rotation"] = rotation
     payload["boundary_conditions"] = [bc.to_dict() for bc in bcs]
 
-    return yaml.safe_dump(payload, sort_keys=False, default_flow_style=False)
+    return yaml.dump(payload, Dumper=_BCDumper, sort_keys=False, default_flow_style=False)
 
 
 def write_boundary_conditions_yaml(
