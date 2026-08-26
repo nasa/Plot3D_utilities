@@ -458,5 +458,71 @@ def test_to_vtu_writes_well_formed_xml(tmp_path, wedge_flatmesh):
     assert int(piece.get("NumberOfCells")) == fm.cell_vertices.shape[0]
 
 
+
+# ---------------------------------------------------------------------------
+# 10: float32 grids weld at the default tolerance
+#
+# Regression: the default weld tolerance used to be a flat 1e-8. A float32
+# grid stores each shared interface node twice, and the two copies can differ
+# by an ulp -- ~2.5e-06 where coordinates reach 21, i.e. 250x that default.
+# Those nodes then failed to weld, the interface node map came back
+# incomplete, and _neighbor_grid died on a bare KeyError. The real VSPT
+# stator (float32, coords to ~21) could not be flattened at all.
+# ---------------------------------------------------------------------------
+
+def _two_touching_blocks(dtype, x_offset=0.0):
+    """Two blocks sharing their I=IMAX / I=1 plane, at an optional offset so
+    the coordinate magnitude (and hence the float32 ulp) can be varied."""
+    def blk(x0, x1):
+        X, Y, Z = np.meshgrid(np.linspace(x0, x1, 5),
+                              np.linspace(0.0, 1.0, 4),
+                              np.linspace(0.0, 1.0, 3), indexing="ij")
+        return Block(np.ascontiguousarray(X, dtype=dtype),
+                     np.ascontiguousarray(Y, dtype=dtype),
+                     np.ascontiguousarray(Z, dtype=dtype))
+    return [blk(x_offset, x_offset + 1.0), blk(x_offset + 1.0, x_offset + 2.0)]
+
+
+def test_auto_weld_tol_scales_with_dtype_and_magnitude():
+    from plot3d.flatmesh import _auto_weld_tol
+
+    # float64 stays at the historical floor -- previous behaviour preserved.
+    assert _auto_weld_tol(_two_touching_blocks(np.float64, x_offset=20.0)) == 1e-8
+
+    # float32 opens up in proportion to coordinate magnitude, and must clear
+    # the ulp at that magnitude (which is what has to be bridged).
+    tol = _auto_weld_tol(_two_touching_blocks(np.float32, x_offset=20.0))
+    assert tol > 1e-8
+    assert tol >= np.spacing(np.float32(22.0))
+
+
+def test_flatten_float32_interface_welds_by_default():
+    """A float32 interface whose two copies differ by one ulp must still
+    weld -- and must produce the same graph as the exactly-coincident case."""
+    blocks = _two_touching_blocks(np.float32, x_offset=20.0)
+    face_matches, outer_faces = connectivity(blocks)
+
+    exact = flatten_mesh(blocks, face_matches, outer_faces)
+
+    # Nudge block1's copy of the shared plane by one ulp, as a real float32
+    # grid written by a mesher would.
+    blocks[1].X[0, :, :] = np.nextafter(blocks[1].X[0, :, :], np.float32(1e30))
+    nudged = flatten_mesh(blocks, face_matches, outer_faces)
+
+    assert nudged.points.shape == exact.points.shape, "one-ulp offset split the interface"
+    # The interface is interior: both sides have a real neighbour.
+    assert int((nudged.face_neighbor == -1).sum()) == int((exact.face_neighbor == -1).sum())
+
+
+def test_incomplete_weld_raises_a_useful_error():
+    """Too tight a tolerance must say so, not die on a bare KeyError."""
+    blocks = _two_touching_blocks(np.float32, x_offset=20.0)
+    face_matches, outer_faces = connectivity(blocks)
+    blocks[1].X[0, :, :] = np.nextafter(blocks[1].X[0, :, :], np.float32(1e30))
+
+    with pytest.raises(ValueError, match="weld_tol"):
+        flatten_mesh(blocks, face_matches, outer_faces, weld_tol=1e-12)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

@@ -253,6 +253,35 @@ def _gid_grid(offset_b: int, nci_b: int, ncj_b: int, axis: int, val: int,
 # Global point welding
 # ---------------------------------------------------------------------------
 
+def _auto_weld_tol(blocks: List[Block], floor: float = 1e-8) -> float:
+    """Smallest weld tolerance that can still bridge round-off between two
+    copies of the same node.
+
+    A fixed absolute tolerance cannot work for coordinate data of unknown
+    precision and scale. Two blocks that share an interface store that
+    interface's nodes twice, and in a ``float32`` grid the two copies differ
+    by up to an ulp at that coordinate -- around ``2.5e-06`` for a mesh whose
+    coordinates reach 21, which is 250x the historical ``1e-8`` default. The
+    nodes then fail to weld, the interface node map comes back incomplete,
+    and building the neighbour grid dies on a bare ``KeyError``.
+
+    Scaling by ``eps * max|coord|`` tracks the actual representable spacing:
+    it stays at *floor* for ``float64`` (preserving the previous behaviour)
+    and opens up just enough for ``float32``. It is still far below the
+    distance between genuinely distinct nodes -- a mesh where that is not
+    true cannot be represented unambiguously in its own dtype anyway.
+    """
+    eps = 0.0
+    scale = 0.0
+    for blk in blocks:
+        for arr in (blk.X, blk.Y, blk.Z):
+            eps = max(eps, float(np.finfo(arr.dtype).eps)
+                      if np.issubdtype(arr.dtype, np.floating) else 0.0)
+            if arr.size:
+                scale = max(scale, float(np.abs(arr).max()))
+    return max(floor, eps * scale)
+
+
 def _weld_all_points(blocks: List[Block], weld_tol: float):
     """Weld coincident nodes across ALL blocks into one global point array.
 
@@ -337,10 +366,26 @@ def _node_map_via_weld(NG1, lo1, hi1, axis1, NG2, lo2, hi2, axis2) -> Dict[Tuple
     rev = {int(NG2[n]): n for n in nodes2}
     nodes1 = _region_nodes(lo1, hi1, axis1)
     mapping = {}
+    missing = 0
     for n in nodes1:
         g = int(NG1[n])
         if g in rev:
             mapping[n] = rev[g]
+        else:
+            missing += 1
+    if missing:
+        # Every node of a conformal interface must have welded to its twin on
+        # the other side. If some did not, the two copies sat further apart
+        # than weld_tol -- almost always because the tolerance is too tight
+        # for the grid's dtype, not because the match is wrong. Say so here;
+        # otherwise the caller dies on an opaque KeyError several frames down.
+        raise ValueError(
+            f"conformal interface node map is incomplete: {missing} of "
+            f"{len(nodes1)} nodes on block1's face {lo1}->{hi1} did not weld "
+            f"to block2's face {lo2}->{hi2}. The two copies of those nodes are "
+            f"further apart than weld_tol; pass a larger weld_tol to "
+            f"flatten_mesh (see _auto_weld_tol for how the default is scaled)."
+        )
     return mapping
 
 
@@ -528,7 +573,7 @@ def flatten_mesh(
     periodicity: Optional[Dict[str, Any]] = None,
     surface_ids: Optional[Dict[Any, str]] = None,
     bcs: Optional[List[Any]] = None,
-    weld_tol: float = 1e-8,
+    weld_tol: Optional[float] = None,
 ) -> "FlatMesh":
     """Flatten a multi-block Plot3D mesh into a real finite-volume graph.
 
@@ -552,7 +597,10 @@ def flatten_mesh(
             ``Plot3DFlattenOutletBC``/``Plot3DFlattenWallBC``), duck-typed
             on ``.type``/``.surfaces`` (plus
             ``.rotating``/``.wall_rotation_rate`` for walls).
-        weld_tol: Coincident-node welding tolerance.
+        weld_tol: Coincident-node welding tolerance. Defaults to a value
+            scaled to the grid's dtype and coordinate magnitude (see
+            :func:`_auto_weld_tol`); a ``float32`` grid needs a looser
+            tolerance than a ``float64`` one to weld at all.
 
     Returns:
         FlatMesh: the flattened finite-volume graph.
@@ -571,6 +619,8 @@ def flatten_mesh(
     Nc = int(block_offset[-1])
 
     # --- 5. weld points (also needed by steps 1-2 for cell_vertices) -----
+    if weld_tol is None:
+        weld_tol = _auto_weld_tol(blocks)
     points, node_gid_arrays = _weld_all_points(blocks, weld_tol)
     Nn = points.shape[0]
 
@@ -1245,7 +1295,7 @@ def write_flat_mesh(
     periodicity: Optional[Dict[str, Any]] = None,
     surface_ids: Optional[Dict[Any, str]] = None,
     bcs: Optional[List[Any]] = None,
-    weld_tol: float = 1e-8,
+    weld_tol: Optional[float] = None,
 ) -> FlatMesh:
     """Build a :class:`FlatMesh` via :func:`flatten_mesh` and write it,
     dispatching the writer by ``path``'s extension (``.h5``, ``.npz``, or
