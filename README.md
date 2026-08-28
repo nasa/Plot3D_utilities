@@ -46,7 +46,9 @@ For Mac. install homebrew and do `brew install metis` then add this to your ~/.z
 
 [Merging Blocks](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/merge_block_test.ipynb)
 
-[Export and flatten a mesh with plot3d-flatten](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_Flatten.ipynb)
+[Flatten a mesh into a finite-volume graph](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_Flatten.ipynb)
+
+[Cross-plane connectivity: why some face matches need more than lb/ub](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_CrossPlaneConnectivity.ipynb)
 
 [Learning Python with VSCode](https://www.youtube.com/watch?v=lZiK9e8b21M) 
 
