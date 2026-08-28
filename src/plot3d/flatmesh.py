@@ -259,24 +259,30 @@ def _auto_weld_tol(blocks: List[Block], floor: float = 1e-8) -> float:
 
     A fixed absolute tolerance cannot work for coordinate data of unknown
     precision and scale. Two blocks that share an interface store that
-    interface's nodes twice, and in a ``float32`` grid the two copies differ
-    by up to an ulp at that coordinate -- around ``2.5e-06`` for a mesh whose
-    coordinates reach 21, which is 250x the historical ``1e-8`` default. The
-    nodes then fail to weld, the interface node map comes back incomplete,
-    and building the neighbour grid dies on a bare ``KeyError``.
+    interface's nodes twice, and the two copies are rarely bit-identical --
+    around ``2.5e-06`` apart for a ``float32`` grid whose coordinates reach
+    21 (250x the historical ``1e-8`` default), and, just as badly, up to a
+    few ``e-07`` apart for a ``float64`` array parsed from an *ASCII* grid
+    file, whose text formatting quantizes each coordinate to single-precision
+    digits regardless of what dtype NumPy stores it in afterward. The nodes
+    then fail to weld, the interface node map comes back incomplete, and
+    building the neighbour grid dies on a bare ``KeyError``.
 
-    Scaling by ``eps * max|coord|`` tracks the actual representable spacing:
-    it stays at *floor* for ``float64`` (preserving the previous behaviour)
-    and opens up just enough for ``float32``. It is still far below the
-    distance between genuinely distinct nodes -- a mesh where that is not
-    true cannot be represented unambiguously in its own dtype anyway.
+    The array's own ``dtype`` therefore cannot be trusted as a precision
+    bound by itself -- it says how the value is stored *now*, not how it was
+    produced. Floor the epsilon factor at ``float32`` precision regardless of
+    the array's actual dtype: this covers both cases above, and is still far
+    below the distance between genuinely distinct nodes for any mesh a
+    solver could use (two nodes that close would make the cells between them
+    degenerate). A ``float64`` array is only trusted for *better* than that
+    if it demonstrably is one -- i.e. this is a floor, not an override.
     """
-    eps = 0.0
+    eps = float(np.finfo(np.float32).eps)
     scale = 0.0
     for blk in blocks:
         for arr in (blk.X, blk.Y, blk.Z):
-            eps = max(eps, float(np.finfo(arr.dtype).eps)
-                      if np.issubdtype(arr.dtype, np.floating) else 0.0)
+            if np.issubdtype(arr.dtype, np.floating):
+                eps = max(eps, float(np.finfo(arr.dtype).eps))
             if arr.size:
                 scale = max(scale, float(np.abs(arr).max()))
     return max(floor, eps * scale)

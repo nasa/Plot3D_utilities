@@ -486,14 +486,48 @@ def _two_touching_blocks(dtype, x_offset=0.0):
 def test_auto_weld_tol_scales_with_dtype_and_magnitude():
     from plot3d.flatmesh import _auto_weld_tol
 
-    # float64 stays at the historical floor -- previous behaviour preserved.
-    assert _auto_weld_tol(_two_touching_blocks(np.float64, x_offset=20.0)) == 1e-8
+    # A dtype's own precision is not trusted as a bound below float32 --
+    # a float64 array can still carry only single-precision-quantized data
+    # (e.g. round-tripped through an ASCII grid file), so float64 gets the
+    # same float32-scaled tolerance as float32 itself, not the bare 1e-8
+    # floor. Both should be well above 1e-8 and roughly agree (same
+    # coordinate magnitude drives both).
+    tol64 = _auto_weld_tol(_two_touching_blocks(np.float64, x_offset=20.0))
+    tol32 = _auto_weld_tol(_two_touching_blocks(np.float32, x_offset=20.0))
+    assert tol64 > 1e-8
+    assert tol32 > 1e-8
+    assert tol64 == pytest.approx(tol32, rel=1e-9)
 
-    # float32 opens up in proportion to coordinate magnitude, and must clear
-    # the ulp at that magnitude (which is what has to be bridged).
-    tol = _auto_weld_tol(_two_touching_blocks(np.float32, x_offset=20.0))
-    assert tol > 1e-8
-    assert tol >= np.spacing(np.float32(22.0))
+    # Must clear the actual float32 ulp at this magnitude, since that's
+    # exactly the gap it exists to bridge.
+    assert tol32 >= np.spacing(np.float32(22.0))
+
+    # A tiny coordinate magnitude falls back to the absolute floor -- there's
+    # no meaningful ulp to bridge worth opening the tolerance for.
+    assert _auto_weld_tol(_two_touching_blocks(np.float64, x_offset=0.0)) == pytest.approx(
+        max(1e-8, np.finfo(np.float32).eps * 2.0)
+    )
+
+
+def test_flatten_ascii_quantized_float64_interface_welds_by_default():
+    """Regression: a *float64* array can still carry only single-precision
+    fidelity if it was parsed from an ASCII grid file, whose fixed-width text
+    formatting quantizes each coordinate independently of the runtime dtype.
+    colab/VSPT_ASCII.xyz reads as float64 yet had 7 interface nodes 2.4e-07
+    apart -- 24x the historical 1e-8 default -- which the dtype-only fix
+    (float32 gets a looser tolerance, float64 does not) missed entirely."""
+    blocks = _two_touching_blocks(np.float64, x_offset=20.0)
+    face_matches, outer_faces = connectivity(blocks)
+
+    exact = flatten_mesh(blocks, face_matches, outer_faces)
+
+    # A few e-07 of quantization noise on the shared plane, as an ASCII
+    # round-trip would introduce, while staying a float64 array throughout.
+    blocks[1].X[0, :, :] = blocks[1].X[0, :, :] + 2.4e-7
+    quantized = flatten_mesh(blocks, face_matches, outer_faces)
+
+    assert quantized.points.shape == exact.points.shape, "quantization noise split the interface"
+    assert int((quantized.face_neighbor == -1).sum()) == int((exact.face_neighbor == -1).sum())
 
 
 def test_flatten_float32_interface_welds_by_default():
