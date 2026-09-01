@@ -19,7 +19,7 @@ dependencies = [
 [project.optional-dependencies]
 hdf5 = ["h5py"]
 docs = ["sphinx>=7.4,<8", "sphinx-rtd-theme>=2.0,<3", "sphinx-autobuild>=2024.4,<2025"]
-examples = ["pyturbo-aero"]
+examples = ["pyturbo-aero", "jax"]
 
 [build-system]
 requires = ["hatchling"]
