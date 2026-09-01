@@ -104,3 +104,6 @@ colab/wedge_out/
 colab/flatten_out/
 colab/*.pickle
 colab/plot3d_utilities/
+
+# Sphinx build output
+docs/_build/

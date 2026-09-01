@@ -539,7 +539,7 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
     Three-step approach:
       Step 1 (fast): Same-size faces — try 8 permutations (4 direction + 4 transposed).
       Step 2 (subregion): Different-size faces — find smaller face's corners on larger
-             face to identify subregion, then try 8 permutations on subregion.
+      face to identify subregion, then try 8 permutations on subregion.
       Step 3 (fallback): Per-point geometric matching for any remaining cases.
 
     Args:

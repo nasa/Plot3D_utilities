@@ -174,6 +174,8 @@ Direction (forward/reverse) is encoded in the ``lb/ub`` values, not in the orien
 For a detailed analysis with diagrams, see the `Root Cause Analysis <https://github.com/nasa/Plot3D_utilities/blob/main/docs/notes/cross_plane_pair.md>`_ document.
 
 
+.. _connectivity:
+
 Directed Diagonal for GHT_CONN Export
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -218,8 +220,8 @@ This code has been tested using paraview 5.9. Modifications may need to be added
     
     **Part 2** the other code runs from paraview's python environment. 
 
-Part 1 - Processing the data locally for paraview import 
---------------------------------------------------------------
+Part 1 - Processing the data locally for paraview import
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The goal if this code is to create a pickle file that is read in part 2. This pickle file contains the matching faces and outer faces. 
 
 .. literalinclude:: ../_static/paraview_code_part1.py
@@ -229,8 +231,8 @@ The goal if this code is to create a pickle file that is read in part 2. This pi
 
 
 
-Part 2 - Calling Paraview in script mode 
----------------------------------------------------------
+Part 2 - Calling Paraview in script mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This part of the code shows how you can read the pickle file in part 1 from within paraview to display all your plots.
 
 This code was tested with Paraview version 5.9 https://www.paraview.org/download/ 

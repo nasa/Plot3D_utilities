@@ -3,19 +3,13 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Dict, List, Sequence, Tuple, Optional
-import inspect
-import sys
 
-if sys.platform != "win32":
-    try:
-        import pymetis  # type: ignore
-        HAS_PYMETIS = True
-    except Exception:  # pragma: no cover - optional dependency
-        pymetis = None  # type: ignore
-        HAS_PYMETIS = False
-else:
-    pymetis = None  # type: ignore
-    HAS_PYMETIS = False
+try:
+    import metis_rs  # type: ignore
+    HAS_METIS = True
+except Exception:  # pragma: no cover - optional dependency
+    metis_rs = None  # type: ignore
+    HAS_METIS = False
 
 
 # ---------------------------------------------------------------------------
@@ -125,7 +119,7 @@ def csr_from_adj_and_weights(
 
 
 # ---------------------------------------------------------------------------
-# pymetis compatibility wrapper
+# metis-rs wrapper
 # ---------------------------------------------------------------------------
 def _metis_part_graph_compat(
     nparts: int,
@@ -135,8 +129,7 @@ def _metis_part_graph_compat(
     eweights: Optional[List[int]] = None,
 ):
     """
-    Call pymetis.part_graph in a way that's compatible with multiple pymetis versions.
-    Tries keyword names first, then falls back to positional args.
+    Partition a CSR graph using metis-rs.
 
     Args:
         nparts (int): number of partitions
@@ -148,32 +141,14 @@ def _metis_part_graph_compat(
     Returns:
         (edgecut, parts)
     """
-    if not HAS_PYMETIS:
+    if not HAS_METIS:
         raise RuntimeError(
-            "pymetis is not available. On Windows it is skipped during install; "
-            "use Linux/macOS to enable METIS-based partitioning."
+            "metis-rs is not available. Install it with `pip install metis-rs`."
         )
 
-    sig_params = set(inspect.signature(pymetis.part_graph).parameters.keys())  # type: ignore[attr-defined]
-
-    # Prefer keyword args when supported
-    if {"xadj", "adjncy"}.issubset(sig_params):
-        kwargs = {"xadj": xadj, "adjncy": adjncy}
-        # Vertex weights
-        if "vwgt" in sig_params and vwgt is not None:
-            kwargs["vwgt"] = vwgt
-        elif "vweights" in sig_params and vwgt is not None:
-            kwargs["vweights"] = vwgt  # alternate name
-        # Edge weights
-        if "eweights" in sig_params and eweights is not None:
-            kwargs["eweights"] = eweights
-        elif "adjwgt" in sig_params and eweights is not None:
-            kwargs["adjwgt"] = eweights  # alternate name
-
-        return pymetis.part_graph(nparts, **kwargs) # type: ignore
-
-    # Fallback: positional signature (older builds)
-    return pymetis.part_graph(nparts, xadj, adjncy, vwgt, None, eweights) # type: ignore
+    n = len(xadj) - 1
+    graph = metis_rs.Graph(n, xadj, adjncy, adjwgt=eweights, vwgt=vwgt)
+    return metis_rs.partition(graph, nparts)
 
 
 # ---------------------------------------------------------------------------
@@ -188,7 +163,7 @@ def partition_from_face_matches(
     ignore_self_matches: bool = True,
 ) -> Tuple[List[int], Dict[int, List[int]], Dict[int, Dict[int, int]]]:
     """
-    Partition a graph derived from `face_matches` using pymetis.
+    Partition a graph derived from `face_matches` using metis-rs.
     
     Note:
         Aggregate controls how we combine weights when the same two blocks are connected by multiple faces.
@@ -209,10 +184,10 @@ def partition_from_face_matches(
     edge_w : Dict[int, Dict[int, int]]
         Edge weights.
     """
-    if not HAS_PYMETIS:
+    if not HAS_METIS:
         raise RuntimeError(
-            "METIS partitioning is disabled because pymetis is unavailable. "
-            "Install pymetis (Linux/macOS) or run on a platform where it is supported."
+            "METIS partitioning is disabled because metis-rs is unavailable. "
+            "Install it with `pip install metis-rs`."
         )
 
     n_blocks = len(block_sizes)

@@ -939,7 +939,7 @@ def flatten_mesh(
 
 
 # ---------------------------------------------------------------------------
-# h5py lazy import (optional dependency, mirrors graph.py's pymetis pattern)
+# h5py lazy import (optional dependency, mirrors graph.py's metis-rs pattern)
 # ---------------------------------------------------------------------------
 
 def _require_h5py():

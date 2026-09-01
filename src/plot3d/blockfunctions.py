@@ -496,6 +496,7 @@ def make_right_handed(
     other structured solvers require right-handed blocks.
 
     For each left-handed block the function:
+
     1. Reverses the chosen axis in the X, Y, Z arrays.
     2. Remaps all connectivity indices for that block:
        ``idx -> n - 1 - idx`` along the flipped axis.
