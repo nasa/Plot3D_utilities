@@ -39,10 +39,10 @@ just that stage.
 
 ## The two payoffs of flattening
 
-**Less data.** The 201 × 25 × 13 revolved block has 65,325 nodes. Because the
-duct is a body of revolution, every one of the 13 constant-θ planes carries
+**Less data.** The 201 × 25 × 37 revolved block has 185,925 nodes. Because the
+duct is a body of revolution, every one of the 37 constant-θ planes carries
 identical `(x, r)` information, so 5,025 nodes say exactly the same thing —
-13× less data, verified by an `axisymmetry_error` of ~1e-16.
+37× less data, verified by an `axisymmetry_error` of ~1e-16.
 
 **Faster code.** Once the mesh is a dense 2D array, the whole flow field is a
 single `(NI, NJ, 4)` array and the solver becomes array expressions that
@@ -132,7 +132,7 @@ gap is the 2D shock, which no quasi-1D model can represent.
 Four figures are produced:
 
 1. **domain overview**, before solving — the flattened 2D `(x, r)` mesh (wall
-   clustering visible) beside the revolved 3D wedge it came from;
+   clustering visible) beside the revolved 3D mesh it came from;
 2. **ghost cells** — the 2D domain with one ring of ghost-cell positions
    outside each boundary (inlet, outlet, axis, wall), plus a zoom at the
    throat wall where the clustering is tightest. The solver never stores these
@@ -149,11 +149,10 @@ answer** — that stage compares software, not flow accuracy.
 
 ## Notes
 
-* The mesh is revolved through a 90° wedge rather than the full 360°. The two
-  θ end planes are *symmetry planes*, not physical walls. A wedge keeps the
-  wireframe plot readable and the file small; for an axisymmetric flow it
-  carries the same information as a full revolve.
-* Node counts are chosen so `gcd(200, 24, 12) = 4` (and `gcd(40, 12, 6) = 2`
+* The mesh is a full 360° body of revolution — the first and last θ planes
+  sit at the same physical location, closing the mesh rather than leaving it
+  as a wedge slice.
+* Node counts are chosen so `gcd(200, 24, 36) = 4` (and `gcd(40, 12, 6) = 2`
   for the coarse mesh); the 3D wireframe is GCD-reduced before drawing, the
   same way `plot3d.plot_blocks` does it, and other counts can make it
   unusable.

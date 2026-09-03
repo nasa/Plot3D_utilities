@@ -1,13 +1,10 @@
 """Stage 2 - 3D mesh: revolve the wall radius into a Plot3D block.
 
 The duct is a body of revolution about the x-axis, so a 3D mesh is built by
-sweeping the meridional ``(x, r)`` node distribution through a range of angles.
-
-We sweep a **wedge** (90 degrees by default) instead of the full 360 degrees.
-The two end planes at theta = 0 and theta = wedge are *symmetry planes*, not
-physical walls.  A wedge keeps the wireframe plot readable and the mesh file
-small, and because the flow is axisymmetric it carries exactly the same
-information as a full revolve.
+sweeping the meridional ``(x, r)`` node distribution through a full 360 degree
+revolve.  The first and last theta planes (``theta = 0`` and ``theta = 360``)
+sit at the same physical location, closing the mesh into a real body of
+revolution rather than a wedge slice.
 
 Radial spacing uses a geometric **inflation layer** clustered at the wall, the
 way a viscous mesh would be built, so the flatten stage has something visibly
@@ -46,8 +43,8 @@ def radial_fractions(n_radial: int = 25, growth: float = 1.15) -> np.ndarray:
 def revolve_duct(x: np.ndarray,
                  r_wall: np.ndarray,
                  n_radial: int = 25,
-                 n_theta: int = 13,
-                 wedge_deg: float = 90.0,
+                 n_theta: int = 37,
+                 revolve_deg: float = 360.0,
                  growth: float = 1.15) -> Block:
     """Revolve the wall radius curve into a 3D :class:`plot3d.Block`.
 
@@ -62,15 +59,19 @@ def revolve_duct(x: np.ndarray,
         x (np.ndarray): Axial stations, shape ``(ni,)``.
         r_wall (np.ndarray): Wall radius at those stations, shape ``(ni,)``.
         n_radial (int, optional): Nodes from axis to wall. Defaults to 25.
-        n_theta (int, optional): Nodes across the wedge. Defaults to 13.
-        wedge_deg (float, optional): Wedge angle in degrees. Defaults to 90.0.
+        n_theta (int, optional): Nodes around the revolve. Defaults to 37.
+        revolve_deg (float, optional): Revolve angle in degrees. Defaults to
+            360.0 (a full body of revolution).
         growth (float, optional): Inflation-layer growth ratio. Defaults to 1.15.
 
     Returns:
         Block: Block of shape ``(ni, n_radial, n_theta)``.
     """
     s = radial_fractions(n_radial, growth)
-    theta = np.radians(np.linspace(0.0, wedge_deg, n_theta))
+    # Swept negative: with r increasing in j and Y/Z = r*sin/cos(theta), sweeping
+    # theta positive with k makes (i, j, k) -> (x, y, z) left-handed (Block.cell_volumes
+    # -- and so plot3d.flatten_mesh -- would report every cell volume as negative).
+    theta = np.radians(np.linspace(0.0, -revolve_deg, n_theta))
 
     r2d = r_wall[:, None] * s[None, :]                  # (ni, n_radial)
 

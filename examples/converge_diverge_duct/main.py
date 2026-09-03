@@ -52,10 +52,10 @@ from euler_solver_flatten import (Config, initial_condition,
 SCRIPT_DIR = Path(__file__).resolve().parent
 MESH_FILE = SCRIPT_DIR / "duct_3d.xyz"
 
-# Production mesh.  gcd(200, 24, 12) = 4, so the GCD-reduced 3D wireframe
+# Production mesh.  gcd(200, 24, 36) = 4, so the GCD-reduced 3D wireframe
 # (the same reduction plot3d's plot_blocks uses) stays clean; other node
 # counts can make it unusable.
-N_AXIAL, N_RADIAL, N_THETA = 201, 25, 13
+N_AXIAL, N_RADIAL, N_THETA = 201, 25, 37
 # Comparison mesh: gcd(40, 12, 6) = 2, same reasoning.
 C_AXIAL, C_RADIAL, C_THETA = 41, 13, 7
 COMPARE_ITERS = 50
@@ -171,7 +171,7 @@ def draw_wireframe_3d(ax, block: Block) -> None:
 
 def figure_domain(block: Block, x2d: np.ndarray, r2d: np.ndarray,
                   n3: int, n2: int) -> None:
-    """Figure 1: the flattened 2D mesh next to the 3D wedge it came from.
+    """Figure 1: the flattened 2D mesh next to the 3D mesh it came from.
 
     Args:
         block (Block): The revolved 3D block.
@@ -188,9 +188,9 @@ def figure_domain(block: Block, x2d: np.ndarray, r2d: np.ndarray,
 
     ax3d = fig.add_subplot(1, 2, 2, projection="3d")
     draw_wireframe_3d(ax3d, block)
-    ax3d.set_title(f"revolved 3D wedge - {n3} nodes\n"
-                   f"{block.IMAX} x {block.JMAX} x {block.KMAX}, 90 deg, "
-                   "GCD-reduced for drawing")
+    ax3d.set_title(f"revolved 3D mesh - {n3} nodes\n"
+                   f"{block.IMAX} x {block.JMAX} x {block.KMAX}, full 360 deg "
+                   "revolve, GCD-reduced for drawing")
     fig.suptitle("Figure 1 - the domain the solver will run on")
     fig.tight_layout()
 
@@ -316,7 +316,7 @@ def main() -> None:
     wall_frac, axis_frac, cluster = inflation_report(N_RADIAL)
     print(f"  block            : {block.IMAX} x {block.JMAX} x {block.KMAX}"
           f"  ({block.X.size} nodes)")
-    print(f"  wedge            : 90 deg (the two theta planes are symmetry planes)")
+    print(f"  revolve          : 360 deg (full body of revolution)")
     print(f"  wall cell height : {100 * wall_frac:.3f}% of local R")
     print(f"  axis cell height : {100 * axis_frac:.3f}% of local R")
     print(f"  clustering ratio : {cluster:.1f} : 1")
