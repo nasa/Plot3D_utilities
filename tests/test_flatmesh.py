@@ -558,5 +558,605 @@ def test_incomplete_weld_raises_a_useful_error():
         flatten_mesh(blocks, face_matches, outer_faces, weld_tol=1e-12)
 
 
+# ---------------------------------------------------------------------------
+# 11: welding is scoped to DECLARED interfaces, not a global radius
+#
+# Regression for the ECEF over-merge bug. `_auto_weld_tol` scales a float32
+# noise floor by absolute coordinate magnitude (correctly -- ASCII/float32
+# quantization is a fixed number of significant digits, so its absolute size
+# grows with distance from the origin), which at ECEF scale (~6.4e6) gives
+# weld_tol ~= 0.76. `_weld_all_points` used to feed that straight into ONE
+# global `cKDTree.query_pairs(r=weld_tol)` over every point in the mesh, so
+# every node of `_two_touching_blocks` -- real spacing 0.25-0.5 -- collapsed
+# into a single point (verified against the pre-fix code: points.shape was
+# (1, 3), 108 real nodes gone).
+#
+# The fix stops deciding "same node?" by distance alone: candidate pairs now
+# come from `matched_faces`, i.e. interfaces `connectivity()` already vetted
+# by shape/corner/orientation matching. A loose tolerance can then only blur
+# nodes that are already declared to correspond.
+# ---------------------------------------------------------------------------
+
+_ECEF_OFFSET = 6.4e6  # metres from Earth's centre -- the reported failing scale
+
+
+def test_ecef_scale_declared_interface_still_welds():
+    """The reported bug, fixed: two blocks translated to ECEF scale whose
+    shared interface `connectivity()` declares must flatten to exactly the
+    same graph as the identical pair sitting at the origin -- both with a
+    bit-identical interface and with realistic float64 round-off on it."""
+    from plot3d.flatmesh import _auto_weld_tol
+
+    reference = _two_touching_blocks(np.float64, x_offset=0.0)
+    ref_matches, ref_outer = connectivity(reference)
+    ref_fm = flatten_mesh(reference, ref_matches, ref_outer)
+    # 5x4x3 nodes per block, the shared 4x3 I-plane welded once: 60+60-12.
+    assert ref_fm.points.shape == (108, 3)
+
+    blocks = _two_touching_blocks(np.float64, x_offset=_ECEF_OFFSET)
+    face_matches, outer_faces = connectivity(blocks)
+    assert len(face_matches) == 1, "the shared interface must still be detected"
+
+    # The tolerance really is enormous in absolute terms at this magnitude --
+    # far larger than the grid's own 0.25 spacing. That is exactly the input
+    # that used to collapse the mesh, and must now be harmless.
+    weld_tol = _auto_weld_tol(blocks)
+    assert weld_tol > 0.5
+    assert weld_tol > 0.25  # > the mesh's own node spacing
+
+    exact = flatten_mesh(blocks, face_matches, outer_faces)
+    assert exact.points.shape == ref_fm.points.shape
+    assert exact.face_owner.shape == ref_fm.face_owner.shape
+    assert int((exact.face_neighbor == -1).sum()) == int((ref_fm.face_neighbor == -1).sum())
+
+    # ...and with a few ULPs of float64 round-off on the shared plane, the
+    # noise a real translated grid actually carries at this magnitude
+    # (np.spacing(6.4e6) ~ 9.3e-10).
+    nudged_blocks = _two_touching_blocks(np.float64, x_offset=_ECEF_OFFSET)
+    for _ in range(4):
+        nudged_blocks[1].X[0, :, :] = np.nextafter(nudged_blocks[1].X[0, :, :], 1e30)
+    nudged = flatten_mesh(nudged_blocks, face_matches, outer_faces)
+    assert nudged.points.shape == ref_fm.points.shape, "ULP noise split the interface"
+    assert int((nudged.face_neighbor == -1).sum()) == int((ref_fm.face_neighbor == -1).sum())
+
+
+def test_ecef_scale_tolerance_bridges_noise_that_origin_scale_rejects():
+    """The magnitude scaling is doing real work, not just riding along: a
+    1e-06 interface discrepancy is well inside the ECEF-scale tolerance and
+    well outside the origin-scale one."""
+    at_origin = _two_touching_blocks(np.float64, x_offset=0.0)
+    origin_matches, origin_outer = connectivity(at_origin)
+    at_origin[1].X[0, :, :] += 1e-6
+    with pytest.raises(ValueError, match="weld_tol"):
+        flatten_mesh(at_origin, origin_matches, origin_outer)
+
+    at_ecef = _two_touching_blocks(np.float64, x_offset=_ECEF_OFFSET)
+    ecef_matches, ecef_outer = connectivity(at_ecef)
+    at_ecef[1].X[0, :, :] += 1e-6
+    assert flatten_mesh(at_ecef, ecef_matches, ecef_outer).points.shape == (108, 3)
+
+
+def test_undeclared_nearby_surfaces_are_never_merged():
+    """The failure mode no tolerance-only design could close: two surfaces
+    that are geometrically close but that `connectivity()` never declared as
+    a matching pair must stay distinct no matter how large weld_tol is,
+    because they were never welding candidates in the first place.
+
+    A blind global radius merges them by construction -- the pre-fix code
+    reduced this fixture to points.shape == (1, 3) at weld_tol=1.0, and a
+    *capped* tolerance would not have helped either, since the cap was
+    derived from within-block structural spacing and says nothing about two
+    unrelated blocks sitting near each other.
+    """
+    gap = 1e-3  # the two facing planes are 1e-03 apart -- 1000x under weld_tol
+    blocks = _two_touching_blocks(np.float64, x_offset=0.0)
+    blocks[1].X += gap  # slide block 1 off its neighbour: no shared interface
+
+    face_matches, outer_faces = connectivity(blocks)
+    assert face_matches == [], "premise: connectivity() declares no match here"
+
+    n_nodes = sum(b.IMAX * b.JMAX * b.KMAX for b in blocks)
+    assert n_nodes == 120
+
+    for weld_tol in (1e-8, gap * 10, 1.0):
+        fm = flatten_mesh(blocks, face_matches, outer_faces, weld_tol=weld_tol)
+        assert fm.points.shape == (n_nodes, 3), (
+            f"weld_tol={weld_tol} merged undeclared nodes"
+        )
+        # Every node really is geometrically distinct, so nothing was lost.
+        assert np.unique(fm.cell_vertices).size == n_nodes
+
+
+def test_periodic_partners_are_never_welded_even_when_coincident():
+    """Periodic partners must stay distinct nodes. They are excluded
+    structurally -- `_weld_all_points` only ever sees `matched_faces` -- not
+    by happening to fall outside weld_tol, so even an *exactly coincident*
+    pair declared as periodic survives as two separate points."""
+    blocks = _two_touching_blocks(np.float64, x_offset=0.0)
+    face_matches, outer_faces = connectivity(blocks)
+    assert len(face_matches) == 1
+
+    # Re-label the one genuine, exactly-coincident interface as periodic.
+    periodic_faces = list(face_matches)
+    fm = flatten_mesh(
+        blocks, [], outer_faces,
+        periodic_faces=periodic_faces,
+        periodicity={"rotation_axis": "x"},
+        weld_tol=1.0,
+    )
+
+    n_nodes = sum(b.IMAX * b.JMAX * b.KMAX for b in blocks)
+    assert fm.points.shape == (n_nodes, 3), "periodic partners were welded"
+    # The pairing itself still resolves (via the transform path), so the
+    # interface is a real interior edge of the graph on both sides.
+    assert int((fm.face_bc_type == BC_PERIODIC).sum()) > 0
+    assert np.all(fm.face_neighbor[fm.face_bc_type == BC_PERIODIC] >= 0)
+
+
+def test_ambiguous_face_internal_match_raises_instead_of_mismatching():
+    """Scoping welding to a declared face pair keeps nearest-neighbour
+    matching honest only while weld_tol stays well under that face's OWN
+    in-plane node spacing. When it does not, the nearest face-2 node can be
+    an adjacent node rather than the true twin -- that must fail loudly, not
+    silently wire up the wrong correspondence.
+
+    Here block 1's copy of the shared plane is slid half a node spacing
+    (1/6) along j, so every interior face-1 node is exactly equidistant from
+    two different face-2 nodes, and weld_tol (0.2) is comparable to the
+    face's own spacing (1/3).
+    """
+    blocks = _two_touching_blocks(np.float64, x_offset=0.0)
+    face_matches, outer_faces = connectivity(blocks)
+    assert len(face_matches) == 1
+
+    j_spacing = 1.0 / 3.0
+    weld_tol = 0.6 * j_spacing  # 0.2 -- same order as the face's own spacing
+
+    # Sanity: undisturbed, this interface welds cleanly even at that tolerance
+    # (the twins are bit-identical, so the nearest neighbour is unambiguous no
+    # matter how loose the radius is). The error below is caused by the
+    # ambiguity, not by the loose tolerance on its own.
+    assert flatten_mesh(
+        blocks, face_matches, outer_faces, weld_tol=weld_tol
+    ).points.shape == (108, 3)
+
+    blocks[1].Y[0, :, :] += j_spacing / 2.0
+
+    with pytest.raises(ValueError, match="ambiguous interface weld") as excinfo:
+        flatten_mesh(blocks, face_matches, outer_faces, weld_tol=weld_tol)
+    assert "weld_tol" in str(excinfo.value)
+
+    # A tolerance tight enough that neither candidate is reachable reports the
+    # other, pre-existing failure instead -- still a clear ValueError.
+    with pytest.raises(ValueError, match="weld_tol"):
+        flatten_mesh(blocks, face_matches, outer_faces, weld_tol=1e-9)
+
+
+# ---------------------------------------------------------------------------
+# 12: the individual guards inside `_weld_face_pair`.
+#
+# Section 11 exercises the guards only through `flatten_mesh`, where several
+# of them shadow each other -- deleting any single one still leaves another
+# raising on the same fixture, so those tests cannot tell them apart. These
+# drive `_weld_face_pair` directly, one guard per test, so that removing or
+# loosening one is caught.
+# ---------------------------------------------------------------------------
+
+def _plane(nu, nv, h=1.0):
+    """(nu*nv, 3) grid of nodes on x=0 with in-plane spacing `h`."""
+    u, v = np.meshgrid(np.arange(nu) * h, np.arange(nv) * h, indexing="ij")
+    return np.stack([np.zeros(u.size), u.ravel(), v.ravel()], axis=-1)
+
+
+def test_weld_face_pair_accepts_an_exact_interface():
+    from plot3d.flatmesh import _weld_face_pair
+
+    P = _plane(4, 3)
+    partner = _weld_face_pair(P, P.copy(), 1e-9, "A", "B")
+    assert np.array_equal(partner, np.arange(P.shape[0]))
+
+    # Node order on the two sides is unrelated -- the map is geometric.
+    perm = np.random.default_rng(0).permutation(P.shape[0])
+    partner = _weld_face_pair(P, P[perm], 1e-9, "A", "B")
+    assert np.allclose(P[perm][partner], P)
+
+
+def test_weld_face_pair_exempts_round_off_copies_but_not_nearby_distinct_nodes():
+    """The `candidate_sep > dup_tol` qualifier on the ambiguity guard, where
+    `dup_tol` is a *round-off* radius (`_coincidence_tol`), not weld_tol.
+
+    Two stored copies of one node (a collapsed/degenerate node) are exempt
+    from the tie check because `_weld_all_points` will union them anyway.
+    Anything further apart than round-off is two nodes as far as this module
+    can tell, so a tie between them must raise -- even when both sit well
+    inside weld_tol. (An earlier version exempted anything within weld_tol;
+    that let a pole whose copies differ by more than round-off weld to an
+    arbitrary copy per side and silently mis-wire the pole-adjacent cells'
+    neighbours, see `test_pole_on_declared_interface_...` below.)
+    """
+    from plot3d.flatmesh import _weld_face_pair
+
+    # (a) exempt: face 2 stores one node twice, bit-identically. With an
+    # exact duplicate the ratio test alone lets it through (d1 < 2*d0 is
+    # 0 < 0, false) -- so (a') is the case that actually exercises the
+    # `candidate_sep > dup_tol` qualifier.
+    P1 = np.array([[0.0, 0.1, 0.0]])
+    P2 = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+    assert _weld_face_pair(P1, P2, 0.5, "A", "B")[0] in (0, 1)
+
+    # (a') exempt: the two copies differ by a couple of float64 ULPs, the
+    # accumulated round-off of e.g. r*cos(theta) evaluated at r == 0.
+    P2 = np.array([[0.0, 0.0, 0.0], [0.0, 2 * np.spacing(0.1), 0.0]])
+    assert _weld_face_pair(P1, P2, 0.5, "A", "B")[0] in (0, 1)
+
+    # (b) NOT exempt: 1e-09 apart. Far inside weld_tol, but far outside
+    # round-off -- two such nodes cannot be welded deterministically.
+    P2 = np.array([[0.0, 0.0, 0.0], [0.0, 1e-9, 0.0]])
+    with pytest.raises(ValueError, match="ambiguous interface weld") as excinfo:
+        _weld_face_pair(P1, P2, 0.5, "A", "B")
+    assert "round-off" in str(excinfo.value)
+
+    # (c) not exempt: the two candidates are 1.0 apart -- genuinely different
+    # nodes -- and the face-1 node sits exactly between them.
+    P1 = np.array([[0.0, 0.5, 0.0]])
+    P2 = np.array([[0.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+    with pytest.raises(ValueError, match="ambiguous interface weld"):
+        _weld_face_pair(P1, P2, 0.9, "A", "B")
+
+
+def test_coincidence_tol_is_round_off_scaled_and_capped_by_weld_tol():
+    from plot3d.flatmesh import _coincidence_tol, _COINCIDENT_ULPS
+
+    P = np.array([[6.4e6, 0.0, 0.0]])
+    tol = _coincidence_tol(0.76, P)
+    assert tol == pytest.approx(_COINCIDENT_ULPS * np.spacing(6.4e6))
+    assert tol < 1e-7  # ~1.5e-08: seven orders of magnitude under weld_tol
+    # never looser than weld_tol itself
+    assert _coincidence_tol(1e-20, P) == 1e-20
+    # at the origin there is still a positive radius, so -0.0 / +0.0 group
+    assert _coincidence_tol(1.0, np.zeros((2, 3))) > 0.0
+
+
+def test_coincident_copy_pairs_groups_exact_and_round_off_copies_only():
+    from plot3d.flatmesh import _coincident_copy_pairs
+
+    def groups(P, tol):
+        a, b = _coincident_copy_pairs(P, tol)
+        parent = list(range(P.shape[0]))
+
+        def find(x):
+            while parent[x] != x:
+                x = parent[x]
+            return x
+        for i, j in zip(a.tolist(), b.tolist()):
+            parent[find(i)] = find(j)
+        return len({find(i) for i in range(P.shape[0])})
+
+    h = 1.0
+    P = np.array([[0, 0, 0], [0, 0, 0], [0, -0.0, np.spacing(1.0)],  # 3 copies
+                  [0, h, 0], [0, 2 * h, 0]], dtype=float)              # 2 real nodes
+    assert groups(P, 4 * np.spacing(1.0)) == 3
+    # at tol == 0 only bit-identical rows group (the 1-ULP copy is its own
+    # group); the real nodes a spacing apart are never chained either way
+    assert groups(P, 0.0) == 4
+    # a fully collapsed face of many bit-identical rows yields a linear
+    # number of pairs (grouped by sort), not n^2 radius-query pairs
+    big = np.zeros((5000, 3))
+    a, _ = _coincident_copy_pairs(big, 1e-12)
+    assert a.size == 4999
+    assert groups(big, 1e-12) == 1
+
+
+def test_weld_face_pair_ambiguity_margin_is_the_documented_factor():
+    """`_WELD_AMBIGUITY_MARGIN` is 2.0: a runner-up less than 2x the winner's
+    distance is a tie, one at more than 2x is a clear win. Pins the constant
+    from both sides, so raising or lowering it fails here."""
+    from plot3d.flatmesh import _weld_face_pair, _WELD_AMBIGUITY_MARGIN
+
+    assert _WELD_AMBIGUITY_MARGIN == 2.0
+
+    def ratio_case(r):
+        # Winner at d, runner-up at r*d. weld_tol is set above both distances
+        # (so `d1 <= weld_tol` holds) but below the candidates' separation (so
+        # they count as genuinely different nodes) -- leaving the ratio as the
+        # only thing that decides.
+        d = 0.2
+        # The second face-1 node sits exactly on the runner-up, so both face-2
+        # nodes are reached and the surjectivity guard stays out of the way.
+        P1 = np.array([[0.0, d, 0.0], [0.0, d + r * d, 0.0]])
+        P2 = np.array([[0.0, 0.0, 0.0], [0.0, d + r * d, 0.0]])
+        return _weld_face_pair(P1, P2, 0.5, "A", "B")
+
+    with pytest.raises(ValueError, match="ambiguous interface weld"):
+        ratio_case(1.9)  # inside the margin -> a tie
+    assert ratio_case(2.1)[0] == 0  # outside it -> accepted
+
+
+def test_weld_face_pair_guard_boundaries_are_exact():
+    """The comparison operators themselves, on values chosen to be exactly
+    representable so the boundary is hit dead-on rather than approached."""
+    from plot3d.flatmesh import _weld_face_pair
+
+    # `d1 <= weld_tol`: a runner-up sitting exactly ON the tolerance still
+    # counts as a candidate. d0 = 5/16, d1 = 1/2 = weld_tol, ratio 1.6 < 2.
+    P1 = np.array([[0.0, 0.3125, 0.0], [0.0, 0.8125, 0.0]])
+    P2 = np.array([[0.0, 0.0, 0.0], [0.0, 0.8125, 0.0]])
+    with pytest.raises(ValueError, match="ambiguous interface weld"):
+        _weld_face_pair(P1, P2, 0.5, "A", "B")
+
+    # `d1 < margin * d0`: a runner-up at exactly 2x the winner is a clear
+    # enough win to accept. d0 = 1/4, d1 = 1/2 = 2 * d0 exactly.
+    P1 = np.array([[0.0, 0.25, 0.0], [0.0, 0.75, 0.0]])
+    P2 = np.array([[0.0, 0.0, 0.0], [0.0, 0.75, 0.0]])
+    assert _weld_face_pair(P1, P2, 0.5, "A", "B").tolist() == [0, 1]
+
+    # `d0 > weld_tol`: a gap exactly at the tolerance welds, one past it does
+    # not. Pins that the acceptance radius really is weld_tol and not a
+    # multiple of it.
+    at = np.array([[0.0, 0.0, 0.0]])
+    assert _weld_face_pair(at, np.array([[0.0, 0.5, 0.0]]), 0.5, "A", "B").tolist() == [0]
+    with pytest.raises(ValueError, match="did not weld"):
+        _weld_face_pair(at, np.array([[0.0, 0.5625, 0.0]]), 0.5, "A", "B")
+
+
+def test_weld_face_pair_catches_a_whole_face_shifted_past_half_a_spacing():
+    """On a real interface the guards are stronger than the ratio test alone.
+
+    `_weld_face_pair`'s docstring notes that an isolated node pair whose noise
+    exceeds 2/3 of the spacing gets a wrong partner with a confident-looking
+    ratio. On a *face*, that cannot pass quietly: a wrong pick either collides
+    with another face-1 node's partner (injectivity) or orphans a face-2 node
+    (surjectivity). This pins that the layered guards cover the whole range
+    above h/2, so no plausible shift welds silently wrong.
+    """
+    from plot3d.flatmesh import _weld_face_pair
+
+    h = 1.0
+    P2 = _plane(5, 4, h)
+    for e in (0.0, 0.1 * h, 0.3 * h):  # below h/2: correct, and accepted
+        P1 = P2.copy()
+        P1[:, 1] += e
+        assert np.array_equal(_weld_face_pair(P1, P2, 0.9 * h, "A", "B"),
+                              np.arange(P2.shape[0])), f"e={e} mis-welded"
+
+    # Above h/2 every shift is refused. Which guard fires varies with the
+    # shift (ratio, then injectivity, then the plain out-of-tolerance check
+    # once the far edge runs off the end of face 2) -- what matters is that
+    # none of them lets a wrong correspondence through.
+    for e in (0.45 * h, 0.5 * h, 0.6 * h, 0.7 * h, 0.9 * h):
+        P1 = P2.copy()
+        P1[:, 1] += e
+        with pytest.raises(ValueError, match="ambiguous interface weld|did not weld"):
+            _weld_face_pair(P1, P2, 0.9 * h, "A", "B")
+
+    # Non-uniform noise behaves the same way.
+    rng = np.random.default_rng(0)
+    P1 = P2 + np.concatenate(
+        [np.zeros((P2.shape[0], 1)), rng.uniform(-0.5 * h, 0.5 * h, (P2.shape[0], 2))],
+        axis=1,
+    )
+    with pytest.raises(ValueError, match="ambiguous interface weld"):
+        _weld_face_pair(P1, P2, 0.9 * h, "A", "B")
+
+
+def test_weld_face_pair_rejects_a_many_to_one_collapse():
+    """The injectivity guard: distinct face-1 nodes must not all weld onto one
+    face-2 node unless they are themselves coincident."""
+    from plot3d.flatmesh import _weld_face_pair
+
+    # Two face-1 nodes 0.4 apart, one face-2 node between them.
+    P1 = np.array([[0.0, 0.0, 0.0], [0.0, 0.4, 0.0]])
+    P2 = np.array([[0.0, 0.2, 0.0]])
+    with pytest.raises(ValueError, match="ambiguous interface weld"):
+        _weld_face_pair(P1, P2, 0.3, "A", "B")
+
+    # ...but coincident face-1 copies of one node are fine (degenerate node).
+    P1 = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+    assert np.array_equal(_weld_face_pair(P1, np.array([[0.0, 0.0, 0.0]]),
+                                          1e-9, "A", "B"), [0, 0])
+
+
+def test_weld_face_pair_rejects_unreached_face2_nodes():
+    """The surjectivity guard. face1 -> face2 can be perfectly one-to-one
+    while face 2 carries extra nodes nothing welds to; those would otherwise
+    land in `points` as silent duplicates with no error raised anywhere."""
+    from plot3d.flatmesh import _weld_face_pair
+
+    P1 = _plane(3, 3)
+    P2 = np.vstack([P1, [[0.0, 10.0, 10.0]]])  # one surplus, far away
+    with pytest.raises(ValueError, match="no counterpart"):
+        _weld_face_pair(P1, P2, 1e-9, "A", "B")
+
+    # A surplus node coincident with a reached one is the degenerate case and
+    # stays legal.
+    P2 = np.vstack([P1, P1[0]])
+    assert _weld_face_pair(P1, P2, 1e-9, "A", "B").shape == (P1.shape[0],)
+
+
+def test_weld_face_pair_single_node_face():
+    """The k == 1 path: a face-2 side with exactly one node has no runner-up
+    to compare against, so the ambiguity guard must be skipped, not crash."""
+    from plot3d.flatmesh import _weld_face_pair
+
+    one = np.array([[1.0, 2.0, 3.0]])
+    assert _weld_face_pair(one, one.copy(), 1e-9, "A", "B").tolist() == [0]
+    with pytest.raises(ValueError, match="did not weld"):
+        _weld_face_pair(np.array([[0.0, 0.0, 0.0]]), one, 1e-9, "A", "B")
+
+
+def test_within_block_self_match_seam_is_welded():
+    """An O-grid branch cut arrives from `connectivity()` as a `matched_faces`
+    entry whose two sides name the SAME block. Welding is keyed on global flat
+    indices, so it must merge exactly like a cross-block interface -- this is
+    the within-block case real turbomachinery meshes actually depend on (the
+    shipped VSPT mesh has one).
+    """
+    from plot3d.flatmesh import _weld_all_points
+
+    # One block wrapped a full 360 degrees: its k=0 and k=KMAX planes are the
+    # same physical surface.
+    nr, nt, nx = 3, 9, 2
+    r = np.linspace(1.0, 2.0, nr)
+    th = np.linspace(0.0, 2.0 * np.pi, nt)  # th[-1] == th[0] (mod 2pi)
+    x = np.linspace(0.0, 1.0, nx)
+    X3, R3, T3 = np.meshgrid(x, r, th, indexing="ij")
+    blk = Block(np.ascontiguousarray(X3),
+                np.ascontiguousarray(R3 * np.cos(T3)),
+                np.ascontiguousarray(R3 * np.sin(T3)))
+    blocks = [blk]
+    seam = [{"block1": {"block_index": 0, "lb": [0, 0, 0], "ub": [nx - 1, nr - 1, 0]},
+             "block2": {"block_index": 0, "lb": [0, 0, nt - 1], "ub": [nx - 1, nr - 1, nt - 1]}}]
+
+    n_nodes = nx * nr * nt
+    points, ng = _weld_all_points(blocks, seam, 1e-9)
+    seam_nodes = nx * nr
+    assert points.shape == (n_nodes - seam_nodes, 3), "the branch cut did not weld"
+    assert np.array_equal(ng[0][:, :, 0], ng[0][:, :, nt - 1])
+
+    # Without the declaration nothing merges -- the seam is welded because it
+    # was declared, not because the two planes happen to coincide.
+    points_nodecl, _ = _weld_all_points(blocks, [], 1e-9)
+    assert points_nodecl.shape == (n_nodes, 3)
+
+
+def test_within_block_pole_line_is_documented_not_welded():
+    """Known, deliberate scope limit (see `_weld_all_points`): a collapsed
+    edge inside a block is a line, never a declared face, so its coincident
+    nodes each keep their own id. Asserted so the behaviour is pinned rather
+    than discovered downstream -- if a within-block collapse pass is ever
+    added, this test is the one to update.
+    """
+    from plot3d.flatmesh import _weld_all_points
+
+    nx, nr, nt = 2, 3, 4
+    r = np.linspace(0.0, 1.0, nr)  # r == 0 at j == 0 -> a pole line
+    th = np.linspace(0.0, 0.5, nt)
+    X3, R3, T3 = np.meshgrid(np.linspace(0.0, 1.0, nx), r, th, indexing="ij")
+    blk = Block(np.ascontiguousarray(X3),
+                np.ascontiguousarray(R3 * np.cos(T3)),
+                np.ascontiguousarray(R3 * np.sin(T3)))
+
+    points, ng = _weld_all_points([blk], [], 1e-9)
+    assert points.shape == (nx * nr * nt, 3)
+    # The pole nodes really are coincident, and really are distinct ids.
+    pole = np.array([[blk.X[0, 0, k], blk.Y[0, 0, k], blk.Z[0, 0, k]] for k in range(nt)])
+    assert np.allclose(pole, pole[0])
+    assert len({int(ng[0][0, 0, k]) for k in range(nt)}) == nt
+
+
+# ---------------------------------------------------------------------------
+# 13: a pole line lying IN a declared interface plane.
+#
+# Two blocks with an axis singularity (r == 0 at j == 0) stacked along x
+# share an i-plane that contains nt stored copies of the pole point on EACH
+# side. `connectivity()` declares this interface like any other. Before the
+# coincident-copy union in `_weld_all_points`, every side-1 copy welded to
+# whichever single side-2 copy cKDTree happened to return (k == 1 here);
+# `_node_map_via_weld` then mapped all of them to that copy and
+# `_neighbor_grid`'s min-over-corners resolved two of the four pole-ring
+# interface faces to the WRONG block-2 cell -- silently, with a different
+# wrong answer depending on which side was `block1`. The old global weld
+# never had the problem because all copies shared one id.
+# ---------------------------------------------------------------------------
+
+def _stacked_pole_blocks(nx=3, nr=3, nt=5, noise=0.0, noisy_blocks=(0, 1)):
+    def cyl(x0, x1, noisy):
+        x = np.linspace(x0, x1, nx)
+        r = np.linspace(0.0, 1.0, nr)  # pole at j == 0
+        th = np.linspace(0.0, 0.5 * np.pi, nt)
+        X3, R3, T3 = np.meshgrid(x, r, th, indexing="ij")
+        Y = R3 * np.cos(T3)
+        Z = R3 * np.sin(T3)
+        if noise and noisy:
+            # spread the pole copies so they are no longer identical
+            Y[:, 0, :] += noise * np.arange(nt)
+        return Block(np.ascontiguousarray(X3), np.ascontiguousarray(Y), np.ascontiguousarray(Z))
+    return [cyl(0.0, 0.5, 0 in noisy_blocks), cyl(0.5, 1.0, 1 in noisy_blocks)]
+
+
+def _every_interior_face_belongs_to_both_its_cells(fm):
+    for f in np.flatnonzero(fm.face_neighbor >= 0):
+        fv = set(fm.face_vertices[f].tolist())
+        assert fv <= set(fm.cell_vertices[fm.face_owner[f]].tolist()), int(f)
+        assert fv <= set(fm.cell_vertices[fm.face_neighbor[f]].tolist()), int(f)
+
+
+def _unordered_interior_edges(fm):
+    interior = np.flatnonzero(fm.face_neighbor >= 0)
+    return {frozenset((int(fm.face_owner[f]), int(fm.face_neighbor[f]))) for f in interior}
+
+
+def test_pole_on_declared_interface_resolves_the_same_graph_from_either_side():
+    from plot3d.flatmesh import _weld_all_points
+
+    nx, nr, nt = 3, 3, 5
+    blocks = _stacked_pole_blocks(nx, nr, nt)
+    matches, outer = connectivity(blocks)
+    assert len(matches) == 1, "premise: connectivity() declares the shared plane"
+    swapped = [{"block1": matches[0]["block2"], "block2": matches[0]["block1"]}]
+
+    graphs = []
+    for mf in (matches, swapped):
+        fm = flatten_mesh(blocks, mf, outer, weld_tol=1e-9)
+        _every_interior_face_belongs_to_both_its_cells(fm)
+        graphs.append(fm)
+
+    # The pole point on the interface is ONE id, shared by both sides, in
+    # both orientations; the pole copies one node-layer away stay distinct
+    # (the documented within-block scope limit).
+    expected_points = 2 * (nx - 1) * nr * nt + (nr - 1) * nt + 1
+    for fm in graphs:
+        assert fm.points.shape == (expected_points, 3)
+    assert graphs[0].points.shape == graphs[1].points.shape
+    assert _unordered_interior_edges(graphs[0]) == _unordered_interior_edges(graphs[1])
+
+    for mf in (matches, swapped):
+        _, ng = _weld_all_points(blocks, mf, 1e-9)
+        ids = {int(ng[0][nx - 1, 0, k]) for k in range(nt)} | {int(ng[1][0, 0, k]) for k in range(nt)}
+        assert len(ids) == 1, ids
+
+
+def test_pole_copies_differing_by_round_off_are_still_one_id():
+    """Copies that differ by accumulated float64 round-off (not bit-identical)
+    are grouped too -- the coincidence radius is ULP-scaled, not zero."""
+    from plot3d.flatmesh import _weld_all_points
+
+    nx, nr, nt = 3, 3, 5
+    blocks = _stacked_pole_blocks(nx, nr, nt, noise=np.spacing(1.0))
+    matches, outer = connectivity(blocks)
+    assert len(matches) == 1
+    fm = flatten_mesh(blocks, matches, outer, weld_tol=1e-9)
+    _every_interior_face_belongs_to_both_its_cells(fm)
+    _, ng = _weld_all_points(blocks, matches, 1e-9)
+    ids = {int(ng[0][nx - 1, 0, k]) for k in range(nt)} | {int(ng[1][0, 0, k]) for k in range(nt)}
+    assert len(ids) == 1
+
+
+def test_pole_copies_differing_by_more_than_round_off_fail_loudly():
+    """One side stores the pole bit-identically, the other with its copies
+    spread 1e-09 apart -- inside weld_tol, far outside round-off. There is no
+    deterministic pairing, so this must be a ValueError (whichever side the
+    search runs from), not a silently mis-wired neighbour."""
+    nx, nr, nt = 3, 3, 5
+    blocks = _stacked_pole_blocks(nx, nr, nt, noise=1e-9, noisy_blocks=(1,))
+    matches, outer = connectivity(blocks)
+    assert len(matches) == 1
+    swapped = [{"block1": matches[0]["block2"], "block2": matches[0]["block1"]}]
+    # exact side -> spread side: the spread copies nobody reached are orphans
+    with pytest.raises(ValueError, match="no counterpart"):
+        flatten_mesh(blocks, matches, outer, weld_tol=1e-6)
+    # spread side -> exact side: distinct nodes collapse onto one copy
+    with pytest.raises(ValueError, match="not one-to-one"):
+        flatten_mesh(blocks, swapped, outer, weld_tol=1e-6)
+
+    # Whereas copies spread IDENTICALLY on both sides pair up one-to-one with
+    # zero residual: that is an unambiguous (if odd) correspondence, and the
+    # graph it yields is consistent.
+    blocks = _stacked_pole_blocks(nx, nr, nt, noise=1e-9, noisy_blocks=(0, 1))
+    matches, outer = connectivity(blocks)
+    fm = flatten_mesh(blocks, matches, outer, weld_tol=1e-6)
+    _every_interior_face_belongs_to_both_its_cells(fm)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

@@ -169,6 +169,30 @@ def _region_nodes(lo: Sequence[int], hi: Sequence[int], axis: int) -> List[Tuple
     return nodes
 
 
+def _face_region(side: Dict[str, Any]) -> Optional[Tuple[int, List[int], List[int], int, int]]:
+    """``(block_index, lo, hi, axis, value)`` for one side (``block1`` or
+    ``block2``) of a ``matched_faces``/``periodic_faces`` entry.
+
+    ``lb``/``ub`` are normalised to min/max order (their traversal ordering
+    carries direction information that this module deliberately does not
+    use -- see the module docstring) and the axis the face is constant on is
+    recovered from them. Returns ``None`` when the entry does not describe a
+    plane (no collapsed axis), which the callers skip.
+
+    :func:`_weld_all_points` and :func:`flatten_mesh` both go through this one
+    helper, so the node set welded for a declared match is by construction the
+    same node set :func:`_node_map_via_weld` later reads back.
+    """
+    lb, ub = list(side["lb"]), list(side["ub"])
+    lo = [min(lb[d], ub[d]) for d in range(3)]
+    hi = [max(lb[d], ub[d]) for d in range(3)]
+    ax = _collapsed_axis_value(lo, hi)
+    if ax is None:
+        return None
+    axis, val = ax
+    return int(side["block_index"]), lo, hi, axis, val
+
+
 # ---------------------------------------------------------------------------
 # Per-family face metrics: S = 0.5*(d1 x d2), d1=p2-p0, d2=p3-p1,
 # centroid = 0.25*(p0+p1+p2+p3). Corner orderings are exactly the ones
@@ -276,6 +300,22 @@ def _auto_weld_tol(blocks: List[Block], floor: float = 1e-8) -> float:
     solver could use (two nodes that close would make the cells between them
     degenerate). A ``float64`` array is only trusted for *better* than that
     if it demonstrably is one -- i.e. this is a floor, not an override.
+
+    Note on magnitude scaling
+    -------------------------
+    ``eps * scale`` is deliberately scaled by the largest *absolute*
+    coordinate, not by the mesh's local extent or spacing: ASCII/float32
+    quantization error is a fixed number of significant digits, so it grows
+    with distance from the origin. On an ECEF-scale mesh (``|x| ~ 6.4e6``)
+    that yields a tolerance of order ``0.76`` -- huge in absolute terms.
+    That is safe *only* because :func:`_weld_all_points` never applies this
+    tolerance globally: it is a per-declared-interface acceptance radius
+    between two node sets ``connectivity()`` already agreed correspond, not a
+    radius within which any two points anywhere in the mesh get merged. An
+    over-generous tolerance can therefore no longer reach an unrelated nearby
+    surface; the worst it can do is trip the ambiguity guard in
+    :func:`_weld_face_pair` on an interface whose own node spacing is
+    comparable to it, which fails loudly rather than silently mis-welding.
     """
     eps = float(np.finfo(np.float32).eps)
     scale = 0.0
@@ -288,18 +328,349 @@ def _auto_weld_tol(blocks: List[Block], floor: float = 1e-8) -> float:
     return max(floor, eps * scale)
 
 
-def _weld_all_points(blocks: List[Block], weld_tol: float):
-    """Weld coincident nodes across ALL blocks into one global point array.
+#: How much closer than the runner-up the chosen partner has to be before a
+#: nearest-neighbour weld is trusted. See :func:`_weld_face_pair`.
+_WELD_AMBIGUITY_MARGIN = 2.0
 
-    A single tolerance-based union-find over every block's node coordinates
-    naturally: keeps interior nodes unique, merges conformal cross-block
-    interface nodes (they are exactly coincident), and leaves periodic
-    partner nodes distinct (they are rotated/translated copies, not
-    coincident -- so they are never within ``weld_tol`` of each other).
+#: Two stored nodes closer than this many float64 ULPs of the face's
+#: coordinate magnitude are *copies* of one physical node (a collapsed edge /
+#: pole point written several times), not two nodes. See
+#: :func:`_coincidence_tol`.
+_COINCIDENT_ULPS = 16
+
+
+def _coincidence_tol(weld_tol: float, *arrays: np.ndarray) -> float:
+    """Radius below which two stored nodes of one face count as copies of the
+    same point: :data:`_COINCIDENT_ULPS` float64 ULPs at the largest absolute
+    coordinate involved, never more than ``weld_tol``.
+
+    This is deliberately a *round-off* radius and nothing like ``weld_tol``.
+    ``weld_tol`` is the cross-side acceptance radius and may legitimately be
+    loose (~0.76 on an ECEF-scale mesh); using it to decide which nodes of
+    one face are copies of each other would, on a face whose spacing is
+    below it, chain adjacent nodes into one -- the very over-merge this
+    module exists to prevent. No representable mesh has adjacent nodes a
+    few float64 ULPs apart, so this radius can only ever group stored copies
+    of a single point (bit-identical, or differing by accumulated round-off
+    such as ``r*cos(theta)`` at ``r == 0``).
+    """
+    scale = 0.0
+    for a in arrays:
+        if a.size:
+            scale = max(scale, float(np.abs(a).max()))
+    return min(float(weld_tol), _COINCIDENT_ULPS * float(np.spacing(scale)))
+
+
+def _coincident_copy_pairs(P: np.ndarray, tol: float) -> Tuple[np.ndarray, np.ndarray]:
+    """Index pairs ``(a, b)`` chaining together every group of rows of ``P``
+    that are stored copies of one physical point: bit-identical rows, plus
+    rows within ``tol`` of each other. Feeding the pairs to union-find
+    collapses each group to one id.
+
+    Bit-identical rows are grouped by sorting (``np.unique``), so a fully
+    collapsed face of thousands of identical rows yields a linear number of
+    pairs; the radius query only runs over the *distinct* stored values,
+    of which a real mesh has a handful per pole point.
+    """
+    n = P.shape[0]
+    if n < 2:
+        return np.zeros(0, dtype=np.int64), np.zeros(0, dtype=np.int64)
+    _, first, inv = np.unique(P, axis=0, return_index=True, return_inverse=True)
+    inv = np.asarray(inv, dtype=np.int64).reshape(-1)
+    first = np.asarray(first, dtype=np.int64).reshape(-1)
+    order = np.argsort(inv, kind="stable")
+    s = inv[order]
+    same = s[1:] == s[:-1]
+    a = [order[:-1][same]]
+    b = [order[1:][same]]
+    if first.size >= 2 and tol > 0.0:
+        near = cKDTree(P[first]).query_pairs(r=tol, output_type="ndarray")
+        near = np.asarray(near, dtype=np.int64).reshape(-1, 2)
+        if near.size:
+            a.append(first[near[:, 0]])
+            b.append(first[near[:, 1]])
+    return (np.concatenate(a).astype(np.int64, copy=False),
+            np.concatenate(b).astype(np.int64, copy=False))
+
+
+def _face_flat_indices(offset: int, IMAX: int, JMAX: int,
+                       nodes: List[Tuple[int, int, int]]) -> np.ndarray:
+    """Row indices into the concatenated all-blocks coordinate array for a
+    block's ``(i,j,k)`` nodes. Must match the Fortran-order ``ravel`` used to
+    build that array."""
+    arr = np.asarray(nodes, dtype=np.int64).reshape(-1, 3)
+    return offset + arr[:, 0] + IMAX * arr[:, 1] + IMAX * JMAX * arr[:, 2]
+
+
+def _weld_face_pair(P1: np.ndarray, P2: np.ndarray, weld_tol: float,
+                    desc1: str, desc2: str) -> np.ndarray:
+    """Correspondence from one declared interface's face-1 nodes to its
+    face-2 nodes, by nearest neighbour *within that face pair only*.
+
+    Returns the index into ``P2`` of each row of ``P1``'s partner.
+
+    Correctness argument. The caller only ever passes two node sets that
+    ``connectivity()`` already declared to be two stored copies of the same
+    physical surface, so "which face-2 node is this face-1 node's twin" is
+    the only question left. If a face-1 node's twin is within ``weld_tol``
+    (the premise of welding at all) and no *other* face-2 node is, then the
+    nearest neighbour is provably the twin. Both halves of that are checked:
+
+    - ``d0 > weld_tol``: no candidate at all -- the two copies of that node
+      sit further apart than the tolerance. Same condition (and same advice)
+      as the incomplete-weld error :func:`_node_map_via_weld` used to raise
+      several frames later.
+    - a *second* candidate inside ``weld_tol`` makes the pick unprovable.
+      That is reported as an error when the two candidates are different
+      stored locations *and* the nearest is not clearly nearer
+      (``d1 < _WELD_AMBIGUITY_MARGIN * d0``, i.e. the runner-up is within a
+      factor of the winner rather than a whole grid spacing away). The
+      ratio qualifier keeps an ordinary production mesh -- whose interface
+      noise is orders of magnitude below its node spacing -- from failing
+      on a tolerance that is loose but harmless.
+
+    Stored copies of one node. A collapsed edge (an O-grid pole line lying
+    in the interface plane) stores one physical point several times on
+    *each* side. Those copies are exempt from the ambiguity check, from the
+    injectivity check (several face-1 copies landing on one face-2 copy)
+    and from the surjectivity check (face-2 copies nothing landed on) --
+    but "copy" means coincident to *round-off*, :func:`_coincidence_tol`,
+    never "within ``weld_tol``". The caller then unions all copies on both
+    sides into one id (:func:`_coincident_copy_pairs`), which is what makes
+    the neighbour-cell lookup in :func:`_neighbor_grid` well defined: with
+    one id per pole point, :func:`_node_map_via_weld` maps every copy to
+    the highest-index copy on the other side and ``_neighbor_grid``'s
+    min-over-corners ignores it. Copies that differ by *more* than
+    round-off cannot be told from two adjacent nodes and are refused here
+    (ambiguous / not one-to-one), because welding them by nearest neighbour
+    would pick an arbitrary copy per side and silently wire pole-adjacent
+    cells to the wrong neighbour -- the previous version of this check
+    exempted anything within ``weld_tol`` and did exactly that.
+
+    A third check closes the other direction: every face-2 node must be
+    reached by some face-1 node too (exempting round-off copies of a node
+    that was reached). Without it, a declared match whose two sides do not
+    cover the same node set leaves the surplus face-2 nodes silently
+    unwelded -- duplicate rows in ``points``, no error.
+
+    Stated limitation. Let ``e`` be the interface's duplication noise and
+    ``h`` that interface's own in-plane node spacing, with ``weld_tol >= e``
+    (the premise of welding at all -- a tolerance below the noise makes the
+    ``d0 > weld_tol`` check fire instead). Nearest-neighbour picks the wrong
+    partner once ``e > h/2``. Between ``h/2`` and ``2h/3`` the ratio test
+    catches it directly (at ``e = 0.6h`` the true twin is the runner-up at
+    ``0.6h`` against a winner at ``0.4h``, a ratio of 1.5 < 2). At
+    ``e >= 2h/3`` the ratio reaches 2 and the wrong pick looks confident on
+    its own (``e = 0.7h``: winner ``0.3h``, runner-up ``0.7h``, ratio 2.33).
+    In isolation nothing could tell -- but on an actual *face* the
+    injectivity and surjectivity checks pick it up instead, because a
+    shifted node's wrong partner is some other node's right one, so the
+    shift either collides or orphans. The gap is therefore theoretical for
+    a real interface;
+    ``test_weld_face_pair_catches_a_whole_face_shifted_past_half_a_spacing``
+    pins the whole range above ``h/2`` as caught. Every failure of this
+    function is a ``ValueError``; nothing is welded silently wrong, and no
+    outcome can reach geometry outside the declared interface.
+    """
+    n1 = P1.shape[0]
+    dup_tol = _coincidence_tol(weld_tol, P1, P2)
+    tree2 = cKDTree(P2)
+    k = 2 if P2.shape[0] >= 2 else 1
+    dist, jdx = tree2.query(P1, k=k)
+    dist = np.asarray(dist, dtype=np.float64).reshape(n1, k)
+    jdx = np.asarray(jdx, dtype=np.int64).reshape(n1, k)
+
+    d0 = dist[:, 0]
+    i0 = jdx[:, 0]
+
+    far = d0 > weld_tol
+    if np.any(far):
+        raise ValueError(
+            f"conformal interface node map is incomplete: {int(far.sum())} of "
+            f"{n1} nodes on {desc1} did not weld to {desc2} (worst gap "
+            f"{float(d0[far].max()):.6g}). The two copies of those nodes are "
+            f"further apart than weld_tol={weld_tol:.6g}; pass a larger "
+            f"weld_tol to flatten_mesh (see _auto_weld_tol for how the "
+            f"default is scaled)."
+        )
+
+    if k == 2:
+        d1 = dist[:, 1]
+        i1 = jdx[:, 1]
+        candidate_sep = np.linalg.norm(P2[i0] - P2[i1], axis=1)
+        ambiguous = (
+            (d1 <= weld_tol)
+            & (candidate_sep > dup_tol)
+            & (d1 < _WELD_AMBIGUITY_MARGIN * d0)
+        )
+        if np.any(ambiguous):
+            # Report the least decisive pick. d0 > 0 wherever `ambiguous`
+            # holds (d1 < 2*d0 is false at d0 == 0), so the ratio is finite.
+            amb = np.flatnonzero(ambiguous)
+            w = int(amb[np.argmin(d1[amb] / d0[amb])])
+            raise ValueError(
+                f"ambiguous interface weld: {int(ambiguous.sum())} of {n1} "
+                f"nodes on {desc1} are within weld_tol={weld_tol:.6g} of two "
+                f"different nodes on {desc2} without a clear winner (worst "
+                f"case: nearest {float(d0[w]):.6g}, next {float(d1[w]):.6g}, "
+                f"the two candidates {float(candidate_sep[w]):.6g} apart). "
+                f"Either weld_tol is comparable to this interface's own node "
+                f"spacing, so nearest-neighbour welding could pick an "
+                f"adjacent node instead of the true twin (pass a smaller "
+                f"weld_tol to flatten_mesh), or the interface stores several "
+                f"copies of one node that differ by more than round-off, "
+                f"which cannot be welded deterministically."
+            )
+
+    # Injectivity. Two *distinct* face-1 nodes collapsing onto one face-2 node
+    # would weld them to each other -- an over-merge inside the declared
+    # interface. Tolerated only when they are themselves round-off copies of
+    # one stored point (the collapsed/degenerate-node case). Grouped with
+    # reduceat rather than a per-group boolean scan so a face with many
+    # duplicate groups stays O(n log n) instead of O(n^2).
+    order = np.argsort(i0, kind="stable")
+    s = i0[order]
+    starts = np.flatnonzero(np.concatenate(([True], s[1:] != s[:-1])))
+    counts = np.diff(np.concatenate((starts, [s.size])))
+    if np.any(counts > 1):
+        Ps = P1[order]
+        spread = np.linalg.norm(
+            np.maximum.reduceat(Ps, starts, axis=0)
+            - np.minimum.reduceat(Ps, starts, axis=0),
+            axis=1,
+        )
+        over = (counts > 1) & (spread > dup_tol)
+        if np.any(over):
+            w = int(np.argmax(over))
+            raise ValueError(
+                f"ambiguous interface weld: {int(counts[w])} "
+                f"distinct nodes on {desc1}, spanning {float(spread[w]):.6g}, "
+                f"all weld to the same node on {desc2}. The declared match is "
+                f"not one-to-one at weld_tol={weld_tol:.6g}; pass a "
+                f"smaller weld_tol to flatten_mesh, or check the "
+                f"connectivity entry for this interface."
+            )
+
+    # Surjectivity. The checks above only constrain face 1 -> face 2. A
+    # declared conformal match is one-to-one, so every face-2 node must be
+    # reached as well; a face-2 node nothing welded to would otherwise sit in
+    # `points` as a silent duplicate of its face-1 twin (exactly the symptom
+    # this module exists to remove), with no error anywhere. The benign case
+    # is again a round-off copy of a node that *was* reached -- a collapsed /
+    # degenerate node -- which the caller unions with it afterwards.
+    welded = np.zeros(P2.shape[0], dtype=bool)
+    welded[i0] = True
+    if not welded.all():
+        missing = np.flatnonzero(~welded)
+        gap = np.asarray(
+            cKDTree(P2[welded]).query(P2[missing], k=1)[0], dtype=np.float64
+        ).reshape(-1)
+        stray = missing[gap > dup_tol]
+        if stray.size:
+            raise ValueError(
+                f"conformal interface node map is incomplete: {int(stray.size)} "
+                f"of {P2.shape[0]} nodes on {desc2} have no counterpart on "
+                f"{desc1} (worst isolation {float(gap.max()):.6g}). The two "
+                f"sides of this declared match do not describe the same node "
+                f"set at weld_tol={weld_tol:.6g}; check the connectivity entry "
+                f"for this interface."
+            )
+
+    return i0
+
+
+def _weld_all_points(blocks: List[Block], matched_faces: List[Dict[str, Any]],
+                     weld_tol: float):
+    """Weld coincident nodes across blocks into one global point array.
+
+    Welding is scoped to the interfaces ``connectivity()`` *declared*, never
+    applied as a global radius. For every entry in ``matched_faces`` the two
+    faces' node sets are enumerated (:func:`_region_nodes`, the same helper
+    :func:`_node_map_via_weld` reads back afterwards) and each face-1 node is
+    unioned with its nearest face-2 node when that node is within
+    ``weld_tol`` (:func:`_weld_face_pair`). Union-find then makes the
+    relation transitive, so a node shared by three or more blocks -- reached
+    through several declared interfaces -- still collapses to one id.
+
+    Everything else keeps its own singleton id: interior nodes, boundary
+    nodes, and any two nodes that merely happen to sit close together
+    without a declared interface between them. That last case is the point
+    of the design. A single global ``cKDTree.query_pairs(r=weld_tol)``
+    (what this used to do) decides "same node" from distance alone, so at
+    large coordinate magnitude -- where the tolerance has to be loose to
+    bridge ASCII/float32 quantization noise, ~0.76 for an ECEF-scale mesh --
+    it silently merges genuinely distinct sub-tolerance nodes anywhere in the
+    mesh, including two unrelated surfaces (a rotor tip and a casing wall)
+    that are simply near each other. ``connectivity()``'s shape/corner/
+    orientation matching is far more discriminating than proximity, and two
+    unrelated surfaces never appear together in ``matched_faces`` no matter
+    how close they sit.
+
+    ``periodic_faces`` are deliberately *not* accepted here. Periodic
+    partners are rotated/translated copies that must stay distinct, and
+    excluding them structurally is stronger than the old guarantee, which
+    relied on them merely happening to land outside ``weld_tol``.
+
+    Scope note -- what is and is not merged *within* one block
+    ----------------------------------------------------------
+    ``union`` operates on global flat indices, so a ``matched_faces`` entry
+    whose two sides name the *same* ``block_index`` -- an O-grid branch-cut
+    seam, which ``connectivity()`` emits as an ordinary self-match -- welds
+    exactly like any cross-block interface. That is the common
+    turbomachinery within-block case and it is covered.
+
+    A *pole line* (a collapsed edge: many ``(i,j,k)`` tuples at one physical
+    point, an O-grid axis singularity) running through the *interior* of a
+    block is not, because it is a line rather than a declared plane and so
+    never appears in ``matched_faces`` at all. The previous global-radius
+    weld merged such nodes as a side effect; this one leaves them as N
+    coincident rows in ``points``. That is a deliberate scope limit, not an
+    oversight: recovering it means a proximity pass, and a proximity pass is
+    precisely what this function exists to stop applying to a whole mesh. If
+    it is ever needed it belongs in a *separate*, within-block-only pass at
+    a round-off-only threshold (:func:`_coincidence_tol` -- nothing like
+    ``weld_tol``), not in the interface logic here.
+
+    Where a pole line lies *in* a declared interface plane, though, every
+    stored copy of each pole point on *both* sides is unioned into one id
+    (:func:`_coincident_copy_pairs`, at that same round-off threshold). That
+    is not a courtesy: :func:`_neighbor_grid` resolves the neighbour cell
+    across the interface as the min over the four mapped corner indices, so
+    if the copies on the far side kept distinct ids, nearest-neighbour would
+    weld all of this side's copies to *one* arbitrary far-side copy and the
+    pole-adjacent cells would be wired to the wrong neighbour -- silently,
+    and differently depending on which side was ``block1``. So a pole point
+    is one id on the interface and N ids one node-layer away; that mismatch
+    affects only ``points`` row counts, never the graph, whose volumes and
+    areas come from coordinates.
+
+    Detectability note. This function no longer masks a missing
+    ``connectivity()`` entry by welding its nodes anyway -- but it never
+    repaired one either. Welding sets point ids only; ``face_owner`` /
+    ``face_neighbor`` come from ``matched_faces``, so an undeclared
+    interface was, and still is, emitted as two physical boundary patches
+    with ``face_neighbor == -1`` in the middle of the domain. That remains
+    the symptom to look for; the change adds duplicated ``points`` rows
+    alongside it.
+
+    Args:
+        blocks: the multi-block mesh.
+        matched_faces: block-to-block interface declarations, the shape
+            :func:`flatten_mesh` receives (``block1``/``block2`` sub-dicts
+            with ``block_index``/``lb``/``ub``).
+        weld_tol: per-interface acceptance radius (see
+            :func:`_auto_weld_tol`).
 
     Returns:
         points (Nn,3) float64, node_gid_arrays (list of (IMAX,JMAX,KMAX)
         int64 arrays, one per block, mapping local (i,j,k) -> global id).
+
+    Raises:
+        ValueError: a declared interface could not be welded one-to-one --
+            some face-1 node has no partner within ``weld_tol``, its partner
+            is not unambiguous, several distinct face-1 nodes share one
+            partner, or some face-2 node is reached by nothing (see
+            :func:`_weld_face_pair`).
     """
     coords_list = []
     offsets = [0]
@@ -334,11 +705,40 @@ def _weld_all_points(blocks: List[Block], weld_tol: float):
             else:
                 parent[ra] = rb
 
-    if N > 0:
-        tree = cKDTree(all_coords)
-        pairs = tree.query_pairs(r=weld_tol, output_type="ndarray")
-        for a, b in pairs:
+    for fm in (matched_faces or []):
+        side1 = _face_region(fm["block1"])
+        side2 = _face_region(fm["block2"])
+        if side1 is None or side2 is None:
+            continue
+        b1, lo1, hi1, axis1, _v1 = side1
+        b2, lo2, hi2, axis2, _v2 = side2
+
+        nodes1 = _region_nodes(lo1, hi1, axis1)
+        nodes2 = _region_nodes(lo2, hi2, axis2)
+        if not nodes1 or not nodes2:
+            continue
+
+        g1 = _face_flat_indices(offsets[b1], shapes[b1][0], shapes[b1][1], nodes1)
+        g2 = _face_flat_indices(offsets[b2], shapes[b2][0], shapes[b2][1], nodes2)
+        P1 = np.asarray(all_coords[g1], dtype=np.float64)
+        P2 = np.asarray(all_coords[g2], dtype=np.float64)
+
+        partner = _weld_face_pair(
+            P1, P2, weld_tol,
+            f"block {b1}'s face {lo1}->{hi1}",
+            f"block {b2}'s face {lo2}->{hi2}",
+        )
+        for a, b in zip(g1.tolist(), g2[partner].tolist()):
             union(int(a), int(b))
+
+        # Stored copies of one node *within* either side (a pole point lying
+        # in this interface plane) become one id -- see the scope note above
+        # for why the neighbour lookup depends on it. Round-off radius only.
+        dup_tol = _coincidence_tol(weld_tol, P1, P2)
+        for g, P in ((g1, P1), (g2, P2)):
+            ca, cb = _coincident_copy_pairs(P, dup_tol)
+            for a, b in zip(g[ca].tolist(), g[cb].tolist()):
+                union(int(a), int(b))
 
     roots = np.array([find(i) for i in range(N)], dtype=np.int64)
     uniq_roots, welded_id = np.unique(roots, return_inverse=True)
@@ -369,6 +769,13 @@ def _node_map_via_weld(NG1, lo1, hi1, axis1, NG2, lo2, hi2, axis2) -> Dict[Tuple
     recovered from the shared global point id -- exact, no assumption
     about traversal direction or axis swap."""
     nodes2 = _region_nodes(lo2, hi2, axis2)
+    # Where several block-2 nodes share one id (the stored copies of a pole
+    # point lying in this face, unioned by _weld_all_points), the last one
+    # enumerated wins -- i.e. the copy with the highest index along the
+    # collapsed direction, since _region_nodes walks u then v ascending.
+    # _neighbor_grid relies on that: it takes the min over a cell-face's four
+    # mapped corners, so the highest-index copy never displaces the index the
+    # non-collapsed corners establish.
     rev = {int(NG2[n]): n for n in nodes2}
     nodes1 = _region_nodes(lo1, hi1, axis1)
     mapping = {}
@@ -471,6 +878,9 @@ def _neighbor_grid(mapping, axis1, val1, u0, nu, v0, nv,
                 loc[v_axis1] = v + dv
                 corners1.append((loc[0], loc[1], loc[2]))
             corners2 = [mapping[c] for c in corners1]
+            # min over the four corners tolerates a collapsed corner (a pole
+            # copy) as long as `mapping` sends it to the highest-index copy,
+            # which _node_map_via_weld guarantees -- see the comment there.
             u2_lo = min(c[u_axis2] for c in corners2)
             v2_lo = min(c[v_axis2] for c in corners2)
             loc2 = [0, 0, 0]
@@ -606,7 +1016,13 @@ def flatten_mesh(
         weld_tol: Coincident-node welding tolerance. Defaults to a value
             scaled to the grid's dtype and coordinate magnitude (see
             :func:`_auto_weld_tol`); a ``float32`` grid needs a looser
-            tolerance than a ``float64`` one to weld at all.
+            tolerance than a ``float64`` one to weld at all. It is applied
+            *only* between the two sides of an interface declared in
+            ``matched_faces`` -- never as a global merge radius -- so it
+            cannot merge unrelated nearby geometry however loose it is (see
+            :func:`_weld_all_points`). Too tight a value, or one comparable
+            to a declared interface's own node spacing, raises
+            ``ValueError`` rather than silently mis-welding.
 
     Returns:
         FlatMesh: the flattened finite-volume graph.
@@ -627,7 +1043,9 @@ def flatten_mesh(
     # --- 5. weld points (also needed by steps 1-2 for cell_vertices) -----
     if weld_tol is None:
         weld_tol = _auto_weld_tol(blocks)
-    points, node_gid_arrays = _weld_all_points(blocks, weld_tol)
+    # Only `matched_faces` -- `periodic_faces` partners are rotated/translated
+    # copies and must never be welded (see _weld_all_points).
+    points, node_gid_arrays = _weld_all_points(blocks, matched_faces, weld_tol)
     Nn = points.shape[0]
 
     # --- 1-2. cell numbering, volume, centroid, vertices -----------------
@@ -732,21 +1150,14 @@ def flatten_mesh(
     global_rotation_angle = periodicity.get("rotation_angle_rad")
 
     def _process_match(fm: Dict[str, Any], is_periodic: bool) -> None:
-        b1i = int(fm["block1"]["block_index"])
-        b2i = int(fm["block2"]["block_index"])
-        lb1, ub1 = list(fm["block1"]["lb"]), list(fm["block1"]["ub"])
-        lb2, ub2 = list(fm["block2"]["lb"]), list(fm["block2"]["ub"])
-        lo1 = [min(lb1[d], ub1[d]) for d in range(3)]
-        hi1 = [max(lb1[d], ub1[d]) for d in range(3)]
-        lo2 = [min(lb2[d], ub2[d]) for d in range(3)]
-        hi2 = [max(lb2[d], ub2[d]) for d in range(3)]
-
-        ax1 = _collapsed_axis_value(lo1, hi1)
-        ax2 = _collapsed_axis_value(lo2, hi2)
-        if ax1 is None or ax2 is None:
+        # Same helper _weld_all_points used, so the node set welded for this
+        # match and the node set read back below cannot diverge.
+        side1 = _face_region(fm["block1"])
+        side2 = _face_region(fm["block2"])
+        if side1 is None or side2 is None:
             return
-        axis1, val1 = ax1
-        axis2, val2 = ax2
+        b1i, lo1, hi1, axis1, val1 = side1
+        b2i, lo2, hi2, axis2, val2 = side2
 
         blk1, blk2 = blocks[b1i], blocks[b2i]
         NG1, NG2 = node_gid_arrays[b1i], node_gid_arrays[b2i]
