@@ -27,7 +27,7 @@ Partitioning is backed by [metis-rs](https://pypi.org/project/metis-rs/), a pure
 
 [Merging Blocks](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/merge_block_test.ipynb)
 
-[Flatten a mesh into a finite-volume graph](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_Flatten.ipynb)
+[Flatten a mesh into a finite-volume graph, and solve on it: a converging-diverging duct](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_Flatten.ipynb)
 
 [Cross-plane connectivity: why some face matches need more than lb/ub](https://colab.research.google.com/github/nasa/Plot3D_utilities/blob/main/colab/Plot3D_CrossPlaneConnectivity.ipynb)
 
