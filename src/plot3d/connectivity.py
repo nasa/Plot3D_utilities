@@ -64,26 +64,192 @@ from itertools import product, combinations
 from tqdm import trange
 import numpy as np
 import pandas as pd
-from typing import List, Tuple
+from typing import Callable, List, Optional, Tuple
 import math
+import warnings
 from .point_match import point_match
+from .permutation import PERMUTATION_MATRICES, patch_from_bounds
+from . import correspondence
 from copy import deepcopy
 
 
-PERMUTATION_MATRICES = np.array([
-    [[ 1,  0], [ 0,  1]],   # 0: identity
-    [[-1,  0], [ 0,  1]],   # 1: u reversed
-    [[ 1,  0], [ 0, -1]],   # 2: v reversed
-    [[-1,  0], [ 0, -1]],   # 3: both reversed
-    [[ 0,  1], [ 1,  0]],   # 4: swapped
-    [[ 0, -1], [ 1,  0]],   # 5: swap + u reversed
-    [[ 0,  1], [-1,  0]],   # 6: swap + v reversed
-    [[ 0, -1], [-1,  0]],   # 7: swap + both reversed
-], dtype=np.int8)
-"""8 canonical 2x2 signed permutation matrices.
+# ---------------------------------------------------------------------------
+# Adaptive node-matching tolerance
+# ---------------------------------------------------------------------------
+#
+# A fixed absolute tolerance silently assumes coordinates are of order 1.
+# Coordinate storage (binary f32, or ASCII written with a fixed number of
+# significant digits) loses precision proportionally to magnitude, so two
+# stored copies of the same physical interface node can differ by far more
+# than a fixed 1e-6 on a mesh whose coordinates are large. `connectivity`
+# and `connectivity_fast` derive their tolerance from the mesh itself via
+# `adaptive_tolerance` instead of a hardcoded constant.
 
-Bit encoding: ``index = u_reversed | (v_reversed << 1) | (swapped << 2)``
-"""
+#: Absolute floor for the matching tolerance -- the value used
+#: unconditionally before the tolerance became adaptive.
+#: :func:`adaptive_tolerance` never returns anything smaller, so no
+#: interface detected before this change can be lost by it.
+TOL_FLOOR = 1e-6
+
+#: Relative coordinate-storage noise model: one part in ``10**6``. Chosen so
+#: the adaptive tolerance is a strict generalisation of the historical fixed
+#: constant -- at coordinate magnitude 1 the two agree bit-for-bit.
+_TOL_RELATIVE_NOISE = 1e-6
+
+#: Fraction of the mesh's finest cell corner-to-corner distance that the
+#: tolerance is never permitted to exceed.
+_TOL_SPACING_FRACTION = 0.25
+
+#: The 13 index offsets that enumerate every unordered pair of corners of a
+#: hexahedral cell exactly once: 3 edges, 6 face diagonals, 4 body
+#: diagonals. Each pair of the 8 corners differs by some ``(di, dj, dk)`` in
+#: ``{-1, 0, 1}^3 \ {0}``; taking the sign in which the first non-zero
+#: component is positive picks one of the two orderings.
+CELL_CORNER_OFFSETS: List[Tuple[int, int, int]] = [
+    (1, 0, 0),
+    (0, 1, 0),
+    (0, 0, 1),
+    (1, 1, 0),
+    (1, -1, 0),
+    (1, 0, 1),
+    (1, 0, -1),
+    (0, 1, 1),
+    (0, 1, -1),
+    (1, 1, 1),
+    (1, 1, -1),
+    (1, -1, 1),
+    (1, -1, -1),
+]
+
+
+def _coordinate_magnitude(blocks: List[Block]) -> float:
+    """Largest finite ``|coordinate|`` anywhere in ``blocks`` (``0.0`` if
+    ``blocks`` is empty or contains no finite coordinate).
+
+    Mirrors ``connectivity::coordinate_magnitude`` (plot3d-rs commit
+    c7e9cf6, ``src/connectivity.rs``). Non-finite coordinates are ignored so
+    a stray NaN/inf cannot poison the tolerance for the whole mesh.
+    """
+    best = 0.0
+    for block in blocks:
+        for arr in (block.X, block.Y, block.Z):
+            finite = arr[np.isfinite(arr)]
+            if finite.size:
+                local_max = float(np.abs(finite).max())
+                if local_max > best:
+                    best = local_max
+    return best
+
+
+def _axis_slice_pair(n: int, offset: int) -> Optional[Tuple[slice, slice]]:
+    """Return the ``(source, shifted)`` slice pair for one axis of length
+    ``n`` under a ``{-1, 0, 1}`` offset, or ``None`` when ``n`` is too small
+    to support a nonzero offset (fewer than 2 nodes along that axis)."""
+    if offset == 0:
+        return slice(0, n), slice(0, n)
+    if n < 2:
+        return None
+    if offset == 1:
+        return slice(0, n - 1), slice(1, n)
+    return slice(1, n), slice(0, n - 1)  # offset == -1
+
+
+def _min_cell_corner_spacing(blocks: List[Block]) -> Optional[float]:
+    """Smallest non-zero distance between any two corners of one cell (an
+    edge, a face diagonal, or a body diagonal) anywhere in ``blocks``.
+
+    Mirrors ``connectivity::min_cell_corner_spacing`` (plot3d-rs commit
+    c7e9cf6). Diagonals are included, not just edges, because on a sheared
+    cell the short face diagonal -- not an edge -- can be the nearest other
+    corner. Exactly coincident corners are skipped rather than returning
+    zero: collapsed edges are common and legitimate in structured grids
+    (O-grid pole lines, singular axes), and their zero separation says
+    nothing about mesh resolution.
+
+    Vectorized per block/offset via shifted-array numpy slicing across the
+    13 :data:`CELL_CORNER_OFFSETS` -- not a per-cell Python loop -- so this
+    stays fast on multi-million-node meshes.
+
+    Returns ``None`` when no non-zero corner pair exists at all (e.g. every
+    block is a single node, or every corner pair is exactly coincident).
+    """
+    best_sq = math.inf
+    for block in blocks:
+        ni, nj, nk = block.IMAX, block.JMAX, block.KMAX
+        for di, dj, dk in CELL_CORNER_OFFSETS:
+            si = _axis_slice_pair(ni, di)
+            sj = _axis_slice_pair(nj, dj)
+            sk = _axis_slice_pair(nk, dk)
+            if si is None or sj is None or sk is None:
+                continue
+            a_sl = (si[0], sj[0], sk[0])
+            b_sl = (si[1], sj[1], sk[1])
+            dx = block.X[a_sl] - block.X[b_sl]
+            dy = block.Y[a_sl] - block.Y[b_sl]
+            dz = block.Z[a_sl] - block.Z[b_sl]
+            d_sq = dx * dx + dy * dy + dz * dz
+            # `> 0.0` skips exactly coincident corners; NaN comparisons are
+            # False, so non-finite coordinates are skipped too.
+            positive = d_sq > 0.0
+            if np.any(positive):
+                local_min = float(d_sq[positive].min())
+                if local_min < best_sq:
+                    best_sq = local_min
+    if not math.isfinite(best_sq):
+        return None
+    return math.sqrt(best_sq)
+
+
+def adaptive_tolerance(blocks: List[Block]) -> float:
+    """Derive the node-matching tolerance for ``blocks`` from the mesh
+    itself.
+
+    Mirrors plot3d-rs ``connectivity::adaptive_tolerance`` (commit
+    c7e9cf6, ``src/connectivity.rs``).
+
+    A fixed absolute tolerance silently encodes an assumption that
+    coordinates are of order 1. Coordinate *storage* loses precision in
+    proportion to magnitude, so two copies of the same physical interface
+    node -- one written by each of the two blocks that share it -- can
+    differ by an amount that grows with the coordinate magnitude, and a
+    fixed ``1e-6`` stops bridging that gap well before "exotic" magnitudes.
+
+    Formula::
+
+        scale = max |coordinate|
+        noise = _TOL_RELATIVE_NOISE * scale
+        h     = min non-zero distance between two corners of one cell
+                (edges, face diagonals and body diagonals)
+        tol   = clamp(noise, TOL_FLOOR, max(TOL_FLOOR, _TOL_SPACING_FRACTION * h))
+
+    **Floor** (:data:`TOL_FLOOR`, ``1e-6``): the result is never below the
+    historical fixed constant, so this cannot remove a match that is found
+    today. Meshes with coordinates of magnitude <= 1 get exactly
+    ``1e-6``, bit-for-bit, and skip the (more expensive) spacing pass
+    entirely.
+
+    **Ceiling** (a quarter of the finest cell corner spacing): bounds the
+    false-positive risk of a node finding the *wrong* partner once storage
+    noise pushes its true partner just outside tolerance. ``h`` is the
+    smallest distance between any two corners of one cell (not just edges,
+    since a sheared cell's short face diagonal can be closer than an edge),
+    so bounding the tolerance at ``0.25 * h`` keeps every wrong corner at
+    least three tolerances from the true partner.
+    """
+    scale = _coordinate_magnitude(blocks)
+    noise = _TOL_RELATIVE_NOISE * scale
+    # `not math.isfinite(noise)` also covers a NaN `noise`, which must fall
+    # through to the safe historical value rather than propagate.
+    if not math.isfinite(noise) or noise <= TOL_FLOOR:
+        # Ordinary, order-one meshes: bit-identical to the historical
+        # constant, and no spacing pass is performed at all.
+        return TOL_FLOOR
+    h = _min_cell_corner_spacing(blocks)
+    if h is None:
+        # Nothing to measure the mesh against (single-node blocks, or every
+        # corner pair coincident). Keep the historical value.
+        return TOL_FLOOR
+    return max(TOL_FLOOR, min(noise, _TOL_SPACING_FRACTION * h))
 
 
 def _orient_vec_to_permutation(orient_vec: list, lb1: list, ub1: list,
@@ -397,8 +563,13 @@ def _try_permutations_with_transpose(block1: Block, lb1: list, ub1: list,
     * **Transposed comparison** -- reshape face2's points to its 2-D grid
       shape, transpose the two spatial axes, re-flatten, and compare.
 
-    The first permutation that produces a full match (all point distances
-    below *tol*) is accepted and the function returns immediately.
+    Every one of the 8 permutations is scanned (not just the first
+    passing one): if exactly one produces a full match (all point
+    distances below *tol*), it is accepted. If zero pass, there is no
+    match. If more than one permutation passes, the match is *ambiguous* --
+    the patch geometry is too symmetric to certify a single correspondence
+    -- and is rejected just like the zero-pass case (mirrors
+    ``correspondence.certify_correspondence``'s ``Ambiguous`` semantics).
 
     Parameters
     ----------
@@ -418,11 +589,16 @@ def _try_permutations_with_transpose(block1: Block, lb1: list, ub1: list,
     tuple of (bool, pandas.DataFrame)
         ``(True, df)`` on success, where *df* has columns
         ``i1, j1, k1, i2, j2, k2`` mapping every matched point.
-        ``(False, empty_df)`` if no permutation produces a match.
+        ``(False, empty_df)`` if no permutation produces a match, or if
+        more than one does (ambiguous).
     """
     pts1 = _extract_face_points(block1, lb1, ub1)
     idx1 = _extract_face_indices(lb1, ub1)
     n_outer1, n_inner1 = _varying_dims(lb1, ub1)
+
+    # Each candidate is a thunk building the match DataFrame, deferred so an
+    # ambiguous outcome (more than one candidate) never pays that cost.
+    candidates: List = []
 
     for perm_lb, perm_ub in _generate_face2_permutations(lb2, ub2):
         # --- Direct comparison ---
@@ -430,11 +606,13 @@ def _try_permutations_with_transpose(block1: Block, lb1: list, ub1: list,
         if pts1.shape == pts2.shape:
             diffs = np.linalg.norm(pts1 - pts2, axis=1)
             if diffs.max() < tol:
-                idx2 = _extract_face_indices(perm_lb, perm_ub)
-                match_location = [{'i1': idx1[n][0], 'j1': idx1[n][1], 'k1': idx1[n][2],
-                                   'i2': idx2[n][0], 'j2': idx2[n][1], 'k2': idx2[n][2]}
-                                  for n in range(len(idx1))]
-                return True, pd.DataFrame(match_location)
+                def _build_direct(perm_lb=perm_lb, perm_ub=perm_ub):
+                    idx2 = _extract_face_indices(perm_lb, perm_ub)
+                    match_location = [{'i1': idx1[n][0], 'j1': idx1[n][1], 'k1': idx1[n][2],
+                                       'i2': idx2[n][0], 'j2': idx2[n][1], 'k2': idx2[n][2]}
+                                      for n in range(len(idx1))]
+                    return pd.DataFrame(match_location)
+                candidates.append(_build_direct)
 
         # --- Transposed comparison ---
         n_outer2, n_inner2 = _varying_dims(perm_lb, perm_ub)
@@ -445,13 +623,19 @@ def _try_permutations_with_transpose(block1: Block, lb1: list, ub1: list,
             if pts1.shape == pts2_T.shape:
                 diffs = np.linalg.norm(pts1 - pts2_T, axis=1)
                 if diffs.max() < tol:
-                    idx2_arr = np.array(_extract_face_indices(perm_lb, perm_ub))
-                    idx2_2d = idx2_arr.reshape(n_outer2, n_inner2, 3)
-                    idx2_T = idx2_2d.transpose(1, 0, 2).reshape(-1, 3)
-                    match_location = [{'i1': idx1[n][0], 'j1': idx1[n][1], 'k1': idx1[n][2],
-                                       'i2': int(idx2_T[n][0]), 'j2': int(idx2_T[n][1]), 'k2': int(idx2_T[n][2])}
-                                      for n in range(len(idx1))]
-                    return True, pd.DataFrame(match_location)
+                    def _build_transposed(perm_lb=perm_lb, perm_ub=perm_ub,
+                                           n_outer2=n_outer2, n_inner2=n_inner2):
+                        idx2_arr = np.array(_extract_face_indices(perm_lb, perm_ub))
+                        idx2_2d = idx2_arr.reshape(n_outer2, n_inner2, 3)
+                        idx2_T = idx2_2d.transpose(1, 0, 2).reshape(-1, 3)
+                        match_location = [{'i1': idx1[n][0], 'j1': idx1[n][1], 'k1': idx1[n][2],
+                                           'i2': int(idx2_T[n][0]), 'j2': int(idx2_T[n][1]), 'k2': int(idx2_T[n][2])}
+                                          for n in range(len(idx1))]
+                        return pd.DataFrame(match_location)
+                    candidates.append(_build_transposed)
+
+    if len(candidates) == 1:
+        return True, candidates[0]()
 
     return False, pd.DataFrame(columns=['i1','j1','k1','i2','j2','k2'])
 
@@ -645,7 +829,9 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
 
     # ── Step 3: Fallback — per-point geometric matching ──
     # Handles edge cases where Steps 1-2 don't find a match.
+    step3_used = False
     if len(df) == 0:
+        step3_used = True
         match_location = list()
 
         X1 = select_multi_dimensional(block1.X, (I1[0],I1[1]),(J1[0],J1[1]),(K1[0],K1[1]))
@@ -745,6 +931,24 @@ def get_face_intersection(face1:Face,face2:Face,block1:Block,block2:Block,tol:fl
                 matched_area = _face_point_count([ilb1, jlb1, klb1], [iub1, jub1, kub1])
                 if matched_area > 0 and len(df) < matched_area:
                     df = pd.DataFrame()  # Not a face — only partial (edge) coverage
+                elif step3_used and len(df) >= 4:
+                    # Step 3's per-point point_match loop has no structural
+                    # notion of a permutation: it can accept points that
+                    # happen to satisfy the head-count check above (matched
+                    # count == claimed sub-patch area) while not actually
+                    # forming a valid bijective structured correspondence
+                    # (e.g. all matches clustered in one corner). Certify the
+                    # claimed sub-patch node-for-node before accepting it.
+                    ilb2, jlb2, klb2 = int(df['i2'].min()), int(df['j2'].min()), int(df['k2'].min())
+                    iub2, jub2, kub2 = int(df['i2'].max()), int(df['j2'].max()), int(df['k2'].max())
+                    try:
+                        patch1 = patch_from_bounds(face1.blockIndex,
+                                                    (ilb1, jlb1, klb1), (iub1, jub1, kub1))
+                        patch2 = patch_from_bounds(face2.blockIndex,
+                                                    (ilb2, jlb2, klb2), (iub2, jub2, kub2))
+                        correspondence.certify_correspondence(block1, patch1, block2, patch2, tol)
+                    except correspondence.MappingFailure:
+                        df = pd.DataFrame()  # Head count matched, but not a certified structured match
 
             # Do a final check after doing all these checks
             if len(df)>=4:       # Greater than 4 because match can occur with simply 4 corners but the interior doesn't match.
@@ -964,7 +1168,237 @@ def _phase3_overlaps_existing(bi, lb1, ub1, bj, lb2, ub2, face_matches):
             return True
     return False
 
-def connectivity_fast(blocks:List[Block], use_minmax:bool=False):
+def _perm_idx_from_declared_bounds(lb1: list, ub1: list, lb2: list, ub2: list) -> Optional[int]:
+    """Reconstruct the ``correspondence.py``-canonical permutation index
+    directly from a face-match proposal's own directed ``lb``/``ub`` bounds.
+
+    The directed ``lb1 -> ub1`` / ``lb2 -> ub2`` traversal *is* the ground
+    truth established when the match was found (Phase 1/2/3's node-by-node,
+    row-for-row correspondence): row *n* of face1's directed traversal
+    physically coincides with row *n* of face2's directed traversal. That
+    fact alone is enough to derive which of the 8
+    :data:`PERMUTATION_MATRICES` maps patch_a's *ascending*
+    (``Patch``-normalized) grid onto patch_b's ascending grid -- exactly
+    what :func:`correspondence.certify_permutation` needs.
+
+    Deliberately does **not** read the proposal's ``orientation`` dict's own
+    ``permutation_matrix`` value: that field is computed by
+    ``_orient_vec_to_permutation`` for the JSON/GHT-export bit convention,
+    whose ``u_reversed``/``v_reversed`` bits are keyed to face1's own axis
+    order rather than to face2's ascending-canonical axis order used here
+    and in ``correspondence.py``. For an in-plane (non-swapped) match the
+    two conventions coincide, but for a cross-plane (swapped) match they
+    can disagree on which bit means which axis -- confirmed against a real
+    two-block cross-plane mesh fixture, where the exported
+    ``permutation_matrix`` names permutation 6 but the geometrically
+    correct (and only certifying) permutation is 5. Recomputing from the
+    bounds directly sidesteps that mismatch rather than propagating it into
+    spurious full-resolution rejections of genuinely valid matches.
+
+    Returns ``None`` if the two faces' dimensions admit no structured
+    mapping at all (``certify_permutation``/``certify_correspondence`` will
+    raise :class:`correspondence.IncompatibleDimensions` in that case too --
+    this is just an early exit).
+    """
+    ca1 = _constant_axis(lb1, ub1)
+    ca2 = _constant_axis(lb2, ub2)
+    if ca1 < 0 or ca2 < 0:
+        return None
+    u1, v1 = (d for d in range(3) if d != ca1)
+    u2c, v2c = (d for d in range(3) if d != ca2)
+
+    n_u1 = abs(ub1[u1] - lb1[u1]) + 1
+    n_v1 = abs(ub1[v1] - lb1[v1]) + 1
+    n_u2c = abs(ub2[u2c] - lb2[u2c]) + 1
+    n_v2c = abs(ub2[v2c] - lb2[v2c]) + 1
+
+    step1 = lambda d: 1 if ub1[d] >= lb1[d] else -1
+    step2 = lambda d: 1 if ub2[d] >= lb2[d] else -1
+
+    if n_u1 == n_u2c and n_v1 == n_v2c:
+        swapped = False
+        u_reversed = step1(u1) != step2(u2c)
+        v_reversed = step1(v1) != step2(v2c)
+    elif n_u1 == n_v2c and n_v1 == n_u2c:
+        swapped = True
+        u_reversed = step1(v1) != step2(u2c)
+        v_reversed = step1(u1) != step2(v2c)
+    else:
+        return None
+
+    return int(u_reversed) | (int(v_reversed) << 1) | (int(swapped) << 2)
+
+
+def _declared_perm_idx(orientation: Optional[dict], lb1: list, ub1: list,
+                        lb2: list, ub2: list) -> Optional[int]:
+    """``None`` if ``proposal`` carries no usable declared orientation
+    (e.g. a self-match record, which has no ``orientation`` key at all);
+    otherwise the correspondence.py-canonical permutation index for it.
+
+    Gate: ``orientation`` must be present with a populated
+    ``permutation_matrix`` -- connectivity.py's own signal that this is a
+    structured face match with a known orientation. The index itself comes
+    from :func:`_perm_idx_from_declared_bounds`, not from the matrix's own
+    value -- see that function's docstring for why.
+    """
+    if not orientation or orientation.get('permutation_matrix') is None:
+        return None
+    return _perm_idx_from_declared_bounds(lb1, ub1, lb2, ub2)
+
+
+def _failure_severity(exc: correspondence.MappingFailure) -> float:
+    """Sort key for picking the "worst" of several :class:`MappingFailure`.
+
+    :class:`ExceedsTolerance` carries an actual discrepancy distance, so
+    failures are ranked by it. :class:`Ambiguous`/:class:`IncompatibleDimensions`
+    carry no comparable distance -- treated as maximally severe (``inf``) so
+    they are never silently hidden behind a merely-close ``ExceedsTolerance``.
+    """
+    if isinstance(exc, correspondence.ExceedsTolerance):
+        return exc.worst.distance
+    return math.inf
+
+
+def _describe_failure(exc: correspondence.MappingFailure) -> str:
+    """Human-readable one-line description of a certification failure, for
+    the aggregated :func:`revalidate_full_resolution` warning."""
+    if isinstance(exc, correspondence.ExceedsTolerance):
+        w = exc.worst
+        return (f"distance {w.distance:e} at A{w.node_a} <-> B{w.node_b} "
+                f"(permutation {exc.best_permutation})")
+    if isinstance(exc, correspondence.Ambiguous):
+        return f"ambiguous across permutations {exc.permutations}"
+    if isinstance(exc, correspondence.IncompatibleDimensions):
+        return f"incompatible dimensions {exc.dims_a} vs {exc.dims_b}"
+    return str(exc)
+
+
+def revalidate_full_resolution(
+    blocks: List[Block],
+    proposed: List[dict],
+    transforms: List[Callable[[np.ndarray], np.ndarray]],
+    tol: float,
+    stage: str,
+) -> Tuple[List[dict], List[dict]]:
+    """Re-certify every reduced-grid face-match proposal against the
+    ORIGINAL full-resolution ``blocks``.
+
+    Mirrors plot3d-rs ``connectivity::revalidate_full_resolution`` (commit
+    ``0e1b1a1``). GCD reduction can occasionally produce a proposal that
+    looks valid on the coarse grid but does not actually hold node-for-node
+    at full resolution (e.g. an interior node perturbed independently of its
+    neighbours during mesh generation, invisible at reduced resolution).
+    ``blocks`` must be the untouched, full-resolution mesh -- never the
+    GCD-reduced copy -- since the whole point is to check against data the
+    reduced grid could not see.
+
+    Each ``transform`` in ``transforms`` is tried in order (first one that
+    certifies wins); a proposal that carries a declared orientation (a
+    populated ``orientation.permutation_matrix``) must certify AS DECLARED
+    via :func:`correspondence.certify_permutation` -- no search, so a wrong
+    declared orientation is a definite failure, never silently replaced by a
+    different one found via search. An undeclared proposal (no
+    ``orientation`` key, e.g. a self-match record) is searched via
+    :func:`correspondence.certify_correspondence`.
+
+    A single aggregated ``RuntimeWarning`` is raised (not one per rejected
+    proposal) naming the count of demotions and the worst-case discrepancy
+    among them, pulled from whichever :class:`correspondence.MappingFailure`
+    subclass each rejection raised.
+
+    Returns:
+        (kept, rejected): the proposals that certified, and the ones that
+        did not (in original relative order within ``proposed``).
+    """
+    kept: List[dict] = []
+    rejected: List[dict] = []
+    worst_per_rejection: List[correspondence.MappingFailure] = []
+
+    for proposal in proposed:
+        b1 = proposal['block1']
+        b2 = proposal['block2']
+        patch1 = patch_from_bounds(b1['block_index'], b1['lb'], b1['ub'])
+        patch2 = patch_from_bounds(b2['block_index'], b2['lb'], b2['ub'])
+        block1 = blocks[b1['block_index']]
+        block2 = blocks[b2['block_index']]
+
+        declared_idx = _declared_perm_idx(
+            proposal.get('orientation'), b1['lb'], b1['ub'], b2['lb'], b2['ub'])
+
+        attempt_failures: List[correspondence.MappingFailure] = []
+        certified = False
+        for transform in transforms:
+            try:
+                if declared_idx is not None:
+                    correspondence.certify_permutation(
+                        block1, patch1, block2, patch2, declared_idx, tol,
+                        transform=transform)
+                else:
+                    correspondence.certify_correspondence(
+                        block1, patch1, block2, patch2, tol,
+                        transform=transform)
+                certified = True
+                break
+            except correspondence.MappingFailure as exc:
+                attempt_failures.append(exc)
+
+        if certified:
+            kept.append(proposal)
+        else:
+            rejected.append(proposal)
+            if attempt_failures:
+                # Best (closest-to-passing) attempt across the transforms
+                # tried represents this proposal's failure.
+                worst_per_rejection.append(min(attempt_failures, key=_failure_severity))
+
+    if rejected:
+        if worst_per_rejection:
+            worst = max(worst_per_rejection, key=_failure_severity)
+            worst_desc = _describe_failure(worst)
+        else:
+            worst_desc = "no diagnostic available"
+        warnings.warn(
+            f"{stage}: demoted {len(rejected)} proposal(s) that failed "
+            f"full-resolution re-certification (worst: {worst_desc})",
+            RuntimeWarning, stacklevel=2)
+
+    return kept, rejected
+
+
+def demote_to_outer(outer_faces: List[dict], rejected: List[dict]) -> None:
+    """Append both faces of each rejected proposal to ``outer_faces`` IN PLACE.
+
+    Mirrors plot3d-rs ``connectivity::demote_to_outer`` (commit ``0e1b1a1``).
+    Deduplicates by ``(block_index, lb, ub)`` against faces already present
+    in ``outer_faces`` and against faces from other rejected proposals in
+    this same batch. Newly-appended faces get fresh sequential ``id`` values
+    continuing from the highest ``id`` already present in ``outer_faces``,
+    following the same convention :func:`connectivity` uses when it first
+    builds ``outer_faces_formatted`` (sequential ``id`` starting at 1).
+    """
+    seen = {
+        (o['block_index'], tuple(o['lb']), tuple(o['ub']))
+        for o in outer_faces
+    }
+    next_id = max((o['id'] for o in outer_faces), default=0) + 1
+
+    for proposal in rejected:
+        for side in ('block1', 'block2'):
+            face = proposal[side]
+            key = (face['block_index'], tuple(face['lb']), tuple(face['ub']))
+            if key in seen:
+                continue
+            seen.add(key)
+            outer_faces.append({
+                'lb': list(face['lb']),
+                'ub': list(face['ub']),
+                'id': next_id,
+                'block_index': face['block_index'],
+            })
+            next_id += 1
+
+
+def connectivity_fast(blocks:List[Block], use_minmax:bool=False, tol: Optional[float] = None):
     """Find connectivity by GCD-reducing blocks first for speed.
 
     Computes the minimum GCD across all block dimensions, reduces all blocks
@@ -979,25 +1413,50 @@ def connectivity_fast(blocks:List[Block], use_minmax:bool=False):
             order (IMIN,JMIN,KMIN → IMAX,JMAX,KMAX) and recompute the
             permutation matrix accordingly.  Default is False (traversal
             order).
+        tol (float, Optional): Euclidean node-matching tolerance. Defaults
+            to ``None``, which derives the tolerance from ``blocks`` via
+            :func:`adaptive_tolerance`. The tolerance is always derived
+            from the full-resolution ``blocks`` passed in here, *before*
+            GCD reduction -- reduction leaves storage noise unchanged but
+            multiplies cell size by the GCD, so deriving from the reduced
+            grid would give a ceiling up to ``gcd`` times looser. This
+            matches plot3d-rs's ``connectivity_fast`` invariant that it and
+            :func:`connectivity` use one tolerance for a given mesh.
 
     Returns:
         (List[Dict]): Face matches with orientation info.
         (List[Dict]): Outer (non-connected) faces.
     """
+    resolved_tol = tol if tol is not None else adaptive_tolerance(blocks)
     gcd_to_use = compute_min_gcd(blocks)
     print(f"gcd to use {gcd_to_use}")
     new_blocks = reduce_blocks(deepcopy(blocks), gcd_to_use)
 
     # Find Connectivity
-    face_matches, outer_faces_formatted = connectivity(new_blocks)
+    face_matches, outer_faces_formatted = connectivity(new_blocks, tol=resolved_tol)
     # scale it up
     scale_face_bounds(face_matches, gcd_to_use)
     scale_face_bounds(outer_faces_formatted, gcd_to_use)
+
+    # GCD reduction can occasionally produce a proposal that looks valid on
+    # the coarse grid but doesn't actually hold node-for-node at full
+    # resolution (e.g. an interior node perturbed independently of its
+    # neighbors during mesh generation, invisible at reduced resolution).
+    # Re-certify every scaled-up proposal against the original,
+    # full-resolution `blocks` before returning it.
+    if gcd_to_use > 1:
+        kept, rejected = revalidate_full_resolution(
+            blocks, face_matches, transforms=[lambda p: p], tol=resolved_tol,
+            stage="connectivity_fast",
+        )
+        face_matches = kept
+        demote_to_outer(outer_faces_formatted, rejected)
+
     if use_minmax:
         face_matches = normalize_face_matches(face_matches)
     return face_matches, outer_faces_formatted
 
-def connectivity(blocks:List[Block]):
+def connectivity(blocks:List[Block], tol: Optional[float] = None):
     """Returns a dictionary outlining the connectivity of the blocks along with any exterior surfaces.
 
     Each face match dict includes an ``orientation`` sub-dict with:
@@ -1009,26 +1468,32 @@ def connectivity(blocks:List[Block]):
 
     Args:
         blocks (List[Block]): List of all blocks in multi-block plot3d mesh
+        tol (float, Optional): Euclidean node-matching tolerance. Defaults
+            to ``None``, which derives the tolerance from ``blocks`` via
+            :func:`adaptive_tolerance`. Passing :data:`TOL_FLOOR` reproduces
+            the fixed-tolerance behaviour this module had before the
+            tolerance became adaptive.
 
     Returns:
         (List[Dict]): All matching faces formatted as a list of { 'block1': {'block_index', 'lb', 'ub'} }
         (List[Dict]): All exterior surfaces formatted as a list of { 'block_index', 'lb', 'ub', 'id' }
 
     """
+    resolved_tol = tol if tol is not None else adaptive_tolerance(blocks)
 
-    outer_faces = list()      
+    outer_faces = list()
     face_matches = list()
     matches_to_remove = list()
     temp = [get_outer_faces(b) for b in blocks]
     block_outer_faces = [t[0] for t in temp]
-    combos = candidate_neighbor_pairs(blocks) # AABB overlap pairs (i < j)
+    combos = candidate_neighbor_pairs(blocks, resolved_tol) # AABB overlap pairs (i < j)
 
     t = trange(len(combos))
     for indx in t:     # block i
         i,j = combos[indx]
         t.set_description(f"Checking connections block {i} with {j}")
         # Takes 2 blocks, gets the matching faces exterior faces of both blocks 
-        df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j],block_outer_faces[i],block_outer_faces[j])    # This function finds partial matches between blocks
+        df_matches, blocki_outerfaces, blockj_outerfaces = find_matching_blocks(blocks[i],blocks[j],block_outer_faces[i],block_outer_faces[j],resolved_tol)    # This function finds partial matches between blocks
         [o.set_block_index(i) for o in blocki_outerfaces]
         [o.set_block_index(j) for o in blockj_outerfaces]
         block_outer_faces[i] = blocki_outerfaces
@@ -1114,7 +1579,7 @@ def connectivity(blocks:List[Block]):
                 continue
             for bj in neighbors[bi]:
                 for fresh_face in fresh_all[bj]:
-                    df, _, _ = get_face_intersection(face, fresh_face, blocks[bi], blocks[bj])
+                    df, _, _ = get_face_intersection(face, fresh_face, blocks[bi], blocks[bj], resolved_tol)
                     if len(df) < 4:
                         continue
                     if __check_edge(df):

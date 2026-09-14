@@ -6,6 +6,8 @@ import numpy.typing as npt
 import math
 from math import degrees
 
+from .geometry import coincidence_count
+
 
 class Face:
     x: npt.NDArray
@@ -618,19 +620,6 @@ class Face:
         P = np.stack([X, Y, Z], axis=-1).reshape(-1, 3).astype(float)
         return P
 
-    @staticmethod
-    def _quantize_points(P: np.ndarray, tol: float) -> np.ndarray:
-        """Quantize 3D points to an integer grid at spacing 'tol' for robust equality."""
-        s = tol if tol > 0 else 1e-12
-        return np.round(P / s).astype(np.int64)
-
-    @staticmethod
-    def _row_view(a: np.ndarray) -> np.ndarray:
-        """Create a 1D view of rows to use with np.intersect1d."""
-        if not a.flags["C_CONTIGUOUS"]:
-            a = np.ascontiguousarray(a)
-        return a.view([("", a.dtype)] * a.shape[1])
-
     def shared_point_fraction(
         self,
         other: "Face",
@@ -649,14 +638,8 @@ class Face:
         if P1.size == 0 or P2.size == 0:
             return 0.0
 
-        Q1 = self._quantize_points(P1, tol_xyz)
-        Q2 = self._quantize_points(P2, tol_xyz)
-
-        v1 = self._row_view(Q1)
-        v2 = self._row_view(Q2)
-        inter = np.intersect1d(v1, v2, assume_unique=False)
-        shared = int(inter.size)
-        denom = min(Q1.shape[0], Q2.shape[0])
+        shared = coincidence_count(P1, P2, tol_xyz)
+        denom = min(P1.shape[0], P2.shape[0])
         return (shared / denom) if denom > 0 else 0.0
 
     def touches_by_nodes(
@@ -681,14 +664,8 @@ class Face:
         if P1.size == 0 or P2.size == 0:
             return False
 
-        Q1 = self._quantize_points(P1, tol_xyz)
-        Q2 = self._quantize_points(P2, tol_xyz)
+        shared = coincidence_count(P1, P2, tol_xyz)
 
-        v1 = self._row_view(Q1)
-        v2 = self._row_view(Q2)
-        inter = np.intersect1d(v1, v2, assume_unique=False)
-        shared = int(inter.size)
-
-        denom = min(Q1.shape[0], Q2.shape[0])
+        denom = min(P1.shape[0], P2.shape[0])
         frac = (shared / denom) if denom > 0 else 0.0
         return (shared >= min_shared_abs) and (frac >= min_shared_frac)

@@ -5,7 +5,7 @@ import os, warnings
 from .block import Block
 from .blockfunctions import rotate_block, get_outer_bounds, block_connection_matrix,split_blocks, plot_blocks, reduce_blocks, find_matching_faces, compute_min_gcd, scale_face_bounds, constant_axis, make_right_handed
 from .block_merging_mixed_facepairs import combine_nxnxn_cubes_mixed_pairs
-from .connectivity import find_matching_blocks, get_face_intersection, connectivity_fast, face_matches_to_dict, PERMUTATION_MATRICES, normalize_face_matches
+from .connectivity import find_matching_blocks, get_face_intersection, connectivity_fast, face_matches_to_dict, PERMUTATION_MATRICES, normalize_face_matches, adaptive_tolerance, TOL_FLOOR
 from .face import Face
 from .facefunctions import create_face_from_diagonals, get_outer_faces, find_bounding_faces,split_face,find_face_nearest_point,match_faces_dict_to_list,outer_face_dict_to_list,find_closest_block
 from .read import read_plot3D, read_ap_nasa
@@ -27,3 +27,11 @@ from .normals import (index_space_normal, compute_permutation_matrix,
                       validate_connectivity, compute_all_normals,
                       export_normals_json, import_normals_json, plot_face_normals)
 from .flatmesh import flatten_mesh, FlatMesh, write_flat_mesh, read_flat_mesh
+from .mesh_quality import (
+    Handedness, Severity, CellLocation, Violation, Thresholds,
+    MeshQualityReport, ElementType, BlockElementSummary, ElementInventory,
+    cell_signed_volume, cell_volume_divergence, cell_has_collapsed_edge,
+    cell_aspect_ratio, cell_skewness, cell_distinct_node_count, cell_centroid,
+    block_handedness, make_block_right_handed,
+    run_all, element_type_inventory,
+)

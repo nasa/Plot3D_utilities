@@ -27,7 +27,7 @@ of whether ``permutation_index`` is -1.
 
 from .block import Block
 from .blockfunctions import reduce_blocks, rotate_block, scale_face_bounds, constant_axis
-from .connectivity import PERMUTATION_MATRICES
+from .permutation import PERMUTATION_MATRICES, extract_canonical_grid, apply_permutation
 from .periodicity import create_rotation_matrix
 from typing import List, Optional, Tuple
 from copy import deepcopy
@@ -59,48 +59,6 @@ def get_bounds(face: dict) -> Tuple[tuple, tuple]:
                 tuple(max(a, b) for a, b in zip(c1, c2)))
     else:
         raise KeyError("Face dict must have 'lo'/'hi' or 'lb'/'ub' keys")
-
-
-def extract_canonical_grid(block: Block, lb: list, ub: list) -> Tuple[np.ndarray, int, int]:
-    """Extract face as a canonical 2D grid (nu, nv, 3) in ascending index order.
-
-    Finds the constant axis, then extracts points with the first varying axis
-    as the outer loop (u) and the second as the inner loop (v), both ascending.
-
-    Args:
-        block: Block to extract from.
-        lb: Lower diagonal corner [i, j, k].
-        ub: Upper diagonal corner [i, j, k].
-
-    Returns:
-        (grid, nu, nv) where grid has shape (nu, nv, 3).
-
-    Raises:
-        ValueError: If no constant axis is found.
-    """
-    lo = [min(lb[d], ub[d]) for d in range(3)]
-    hi = [max(lb[d], ub[d]) for d in range(3)]
-
-    const_dim = constant_axis(lo, hi)
-    if const_dim < 0:
-        raise ValueError(f"No constant axis found: lo={lo}, hi={hi}")
-
-    vary = [d for d in range(3) if d != const_dim]
-    d0, d1 = vary
-    nu = hi[d0] - lo[d0] + 1
-    nv = hi[d1] - lo[d1] + 1
-
-    grid = np.empty((nu, nv, 3))
-    idx = [0, 0, 0]
-    idx[const_dim] = lo[const_dim]
-    for u in range(nu):
-        idx[d0] = lo[d0] + u
-        for v in range(nv):
-            idx[d1] = lo[d1] + v
-            grid[u, v] = [block.X[idx[0], idx[1], idx[2]],
-                          block.Y[idx[0], idx[1], idx[2]],
-                          block.Z[idx[0], idx[1], idx[2]]]
-    return grid, nu, nv
 
 
 def _get_point(block: Block, ijk: list) -> np.ndarray:
@@ -155,31 +113,6 @@ def extract_directed_grid(block: Block, lb: list, ub: list) -> Tuple[np.ndarray,
                                   block.Y[idx[0], idx[1], idx[2]],
                                   block.Z[idx[0], idx[1], idx[2]]]
     return grid, nu, nv
-
-
-def apply_permutation(grid: np.ndarray, perm_idx: int) -> np.ndarray:
-    """Apply a pre-computed permutation matrix to a 2D face grid.
-
-    Uses bit operations on ``perm_idx`` (0-7) to flip and/or transpose the grid.
-    The permutation matrix is looked up from ``PERMUTATION_MATRICES``, not recalculated.
-
-    Bit encoding: ``perm_idx = u_reversed | (v_reversed << 1) | (swapped << 2)``
-
-    Args:
-        grid: Face grid with shape (nu, nv, 3).
-        perm_idx: Permutation index 0-7.
-
-    Returns:
-        Permuted grid with shape (out_nu, out_nv, 3).
-    """
-    g = grid
-    if perm_idx & 1:
-        g = g[::-1, :, :]    # flip u
-    if perm_idx & 2:
-        g = g[:, ::-1, :]    # flip v
-    if perm_idx & 4:
-        g = g.transpose(1, 0, 2)  # swap u, v
-    return np.ascontiguousarray(g)
 
 
 def verify_match(pts_a: np.ndarray, pts_b: np.ndarray, tol: float) -> bool:

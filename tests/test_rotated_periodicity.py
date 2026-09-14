@@ -213,3 +213,133 @@ def _check_permutation(blocks, pair, rotation_matrix, tol, label):
     assert n_matched == len(pts1), (
         f"{label}: permutation matrix matched {n_matched}/{len(pts1)} points"
     )
+
+
+# ---------------------------------------------------------------------
+# A5: full-resolution re-validation after GCD reduction
+#
+# `rotated_periodicity` GCD-reduces `blocks` for speed, then finds periodic
+# pairs on the coarse grid. A proposal that looks valid there can fail once
+# every full-resolution node is checked (an interior node perturbed
+# independently of its neighbours, invisible to the reduced grid). These
+# tests cover:
+#   1. A no-op regression on the known-good VSPT mesh -- re-validation must
+#      not change anything when everything genuinely certifies.
+#   2. A constructed case where a full-resolution-only interior node is
+#      perturbed beyond tolerance -- the pair must be demoted from BOTH the
+#      dict-form (`periodic_faces_export`/`outer_faces_export`) AND the
+#      parallel Face-object-form (`periodic_faces`/`outer_faces_all`)
+#      return channels, with a RuntimeWarning.
+# ---------------------------------------------------------------------
+
+import warnings as _warnings
+
+from plot3d.block import Block
+from plot3d.blockfunctions import compute_min_gcd
+from plot3d.facefunctions import get_outer_faces
+from plot3d.periodicity import rotated_periodicity
+
+
+@skip_no_mesh
+def test_rotated_periodicity_a5_no_op_on_known_good_mesh(mesh_data):
+    """A5 re-validation must be a no-op on the known-good VSPT mesh: GCD
+    reduction must actually be in play (gcd > 1) for this to be meaningful,
+    and every reduced-grid proposal must survive full-resolution
+    certification -- no RuntimeWarning, and the dict-form/Face-form channels
+    must agree on counts (nothing silently demoted from one but not both).
+    """
+    blocks, face_matches, periodic_export_baseline, _ = mesh_data
+    gcd = compute_min_gcd(blocks)
+    assert gcd > 1, "fixture must exercise GCD reduction for this check to be meaningful"
+
+    from plot3d import connectivity_fast
+    _, outer_faces = connectivity_fast(blocks)
+    rotation_angle_deg = 360.0 / NBLADES
+
+    with _warnings.catch_warnings(record=True) as caught:
+        _warnings.simplefilter("always")
+        periodic_export, outer_export, periodic_faces, outer_faces_all = rotated_periodicity(
+            blocks, face_matches, outer_faces,
+            rotation_angle=rotation_angle_deg, rotation_axis=ROTATION_AXIS,
+        )
+
+    demotions = [w for w in caught
+                 if issubclass(w.category, RuntimeWarning)
+                 and "rotated_periodicity" in str(w.message)]
+    assert not demotions, f"unexpected demotions on known-good mesh: {[str(w.message) for w in demotions]}"
+    assert len(periodic_export) == len(periodic_faces)
+    assert len(outer_export) == len(outer_faces_all)
+    assert len(periodic_export) == len(periodic_export_baseline)
+    assert len(periodic_export) > 0
+
+
+def _wedge_block(nx: int = 3, ntheta: int = 5, nr: int = 3,
+                  rotation_deg: float = 20.0) -> Block:
+    """A single-block angular wedge sector spanning exactly `rotation_deg`
+    about the x-axis, self-periodic between its J=0 and J=ntheta-1 faces
+    (rotating J=0 forward by `rotation_deg` about x lands exactly on
+    J=ntheta-1). `(nx-1, ntheta-1, nr-1) = (2, 4, 2)` so
+    `compute_min_gcd` == 2 -- GCD reduction skips the i=1/k=1 interior
+    layers, leaving them full-resolution-only.
+    """
+    from math import radians
+    i_idx = np.arange(nx, dtype=float)
+    j_idx = np.arange(ntheta, dtype=float)
+    k_idx = np.arange(nr, dtype=float)
+    I, J, K = np.meshgrid(i_idx, j_idx, k_idx, indexing="ij")
+    theta_full = radians(rotation_deg)
+    theta = J * (theta_full / (ntheta - 1))
+    r = 1.0 + K
+    X = I
+    Y = r * np.cos(theta)
+    Z = r * np.sin(theta)
+    return Block(X, Y, Z)
+
+
+def test_rotated_periodicity_a5_demotes_full_resolution_only_perturbation():
+    """A full-resolution-only interior node (i=1, skipped by GCD=2
+    reduction) is perturbed beyond tolerance on the J=ntheta-1 face. The
+    coarse (reduced) grid only samples i in {0, 2}, so it never sees the
+    perturbation and finds the pair periodic; full-resolution
+    re-validation must catch it and demote the pair from both return
+    channels, with a RuntimeWarning naming `rotated_periodicity`.
+    """
+    rotation_deg = 20.0
+    block = _wedge_block(rotation_deg=rotation_deg)
+    assert compute_min_gcd([block]) == 2
+
+    # Perturb the i=1 (full-resolution-only) node on the J=ntheta-1 face,
+    # well beyond the default tol=1e-4.
+    block.Y[1, -1, 0] += 0.05
+
+    faces, _ = get_outer_faces(block)
+    for f in faces:
+        f.set_block_index(0)
+    outer_faces = [f.to_dict() for f in faces]
+
+    with _warnings.catch_warnings(record=True) as caught:
+        _warnings.simplefilter("always")
+        periodic_export, outer_export, periodic_faces, outer_faces_all = rotated_periodicity(
+            [block], matched_faces=[], outer_faces=outer_faces,
+            rotation_angle=rotation_deg, rotation_axis="x",
+            ReduceMesh=True, tol=1e-4,
+        )
+
+    demotions = [w for w in caught
+                 if issubclass(w.category, RuntimeWarning)
+                 and "rotated_periodicity" in str(w.message)]
+    assert demotions, "expected a RuntimeWarning demoting the perturbed pair"
+
+    # Dict-form channel: the pair must not appear as periodic.
+    assert periodic_export == []
+    # Face-object-form channel must agree: also empty, and both faces of
+    # the demoted pair must have been appended to outer_faces_all instead
+    # -- this is the dual-channel bookkeeping under test.
+    assert periodic_faces == []
+    j_const_outer = [f for f in outer_faces_all if f.JMIN == f.JMAX]
+    assert len(j_const_outer) == 2, (
+        "expected both J-constant faces of the demoted pair to land in "
+        f"the Face-object outer_faces_all channel, got {len(j_const_outer)}"
+    )
+    # Dict-form outer channel must agree in count with the Face-form one.
+    assert len(outer_export) == len(outer_faces_all)

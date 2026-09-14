@@ -1,11 +1,20 @@
 from typing import List, Dict, Tuple, Optional
 from itertools import combinations_with_replacement, permutations
 import numpy as np
+import warnings
 from .block import Block
 from .blockfunctions import rotate_block, reduce_blocks, compute_min_gcd, scale_face_bounds
 from .face import Face
 from .facefunctions import outer_face_dict_to_list,match_faces_dict_to_list, create_face_from_diagonals, find_bounding_faces, split_face
-from .connectivity import get_face_intersection, _compute_orientation, _orient_vec_to_permutation, PERMUTATION_MATRICES
+from .connectivity import (
+    get_face_intersection, _compute_orientation, _orient_vec_to_permutation,
+    PERMUTATION_MATRICES, _face_point_count,
+    revalidate_full_resolution, demote_to_outer,
+    _declared_perm_idx, _failure_severity, _describe_failure,
+)
+from .geometry import coincidence_count
+from .permutation import patch_from_bounds
+from .correspondence import certify_correspondence, certify_permutation, MappingFailure, CertifiedMapping
 import pandas as pd
 from math import cos, radians, sin, sqrt, acos
 from copy import deepcopy
@@ -186,6 +195,89 @@ def _compute_periodic_lb_ub_orientation(
             orientation[d1] = d2
 
     return corrected_lb2, corrected_ub2, orientation
+
+
+def _shift_transform(axis_idx: int, shift_amount: float):
+    """Build a `certify_correspondence` ``transform`` for a pure per-pair
+    axis translation.
+
+    `translational_periodicity` relates two faces by ``point_L + shift ≈
+    point_U`` along `axis_idx` (see `_compute_periodic_lb_ub_orientation`'s
+    own ``p1_lb[shift_axis] += shift_amount`` convention, which this
+    mirrors). `certify_correspondence` compares ``grid_a`` against
+    ``transform(grid_b)``, so bringing U's grid into L's frame means
+    subtracting the shift back off, not adding it.
+    """
+    def _apply(pts: np.ndarray) -> np.ndarray:
+        out = np.array(pts, dtype=float, copy=True)
+        out[..., axis_idx] -= shift_amount
+        return out
+    return _apply
+
+
+def _locate_and_certify_periodic_patch(
+    fL: Face, blkL: Block, fU: Face, blkU: Block,
+    axis_idx: int, shift_amt: float, tol: float,
+) -> Optional[Tuple[list, list, list, list, 'CertifiedMapping']]:
+    """Locate the sub-range on face U overlapping face L's FULL extent under
+    a pure per-pair axis translation, then certify the pair node-for-node.
+
+    `translational_periodicity`'s coverage-fraction tests (`faces_match`'s
+    `touches_by_nodes`/orthogonal precheck, and the oblique-fallback's
+    footprint-overlap gate) only ever answer "do these faces touch enough to
+    count as periodic" -- they never pin down an explicit claimed sub-patch,
+    so nothing downstream can be node-for-node certified. This locates that
+    sub-patch and certifies it, mirroring `connectivity.get_face_intersection`
+    Step 2's "find the smaller face's corners on the larger face" technique,
+    specialized to a known pure-axis translation: because the shift is along
+    `axis_idx` only, the two in-plane coordinates are untouched by it, so
+    locating the sub-region is a plain nearest-node corner lookup (the
+    existing `_compute_periodic_lb_ub_orientation` helper already does
+    exactly this) -- no general corner search is required. What Step 2 does
+    with `_find_corner_on_face`'s exact-match search, this does with a
+    KDTree nearest-neighbor query instead, because the match is only
+    provisional until certification below re-checks it in full.
+
+    Callers must only invoke this once their own coverage-fraction precheck
+    already indicates ``fL`` is (essentially) fully covered by ``fU`` --
+    ``fL``'s own full index range becomes the claimed patch on the L side,
+    unconditionally. `certify_correspondence` is what actually confirms or
+    rejects this: it checks every node of the claimed patch (not just the
+    two corners used to locate it), so a proposal accidentally accepted by
+    the coverage-fraction test (e.g. two interior nodes with swapped roles,
+    still individually coincident somewhere in the other face's point cloud)
+    is caught here even though it fooled the coverage test.
+
+    Returns ``(lb1, ub1, lb2, ub2, certified)`` on success. Returns ``None``
+    on `correspondence.MappingFailure` (or a degenerate located region that
+    is not a valid single-constant-axis `Patch`) -- callers must treat this
+    exactly like "no match", never fall back to the uncertified location.
+    """
+    lb1 = [fL.IMIN, fL.JMIN, fL.KMIN]
+    ub1 = [fL.IMAX, fL.JMAX, fL.KMAX]
+    lb2_full = [fU.IMIN, fU.JMIN, fU.KMIN]
+    ub2_full = [fU.IMAX, fU.JMAX, fU.KMAX]
+
+    lb2, ub2, _orient = _compute_periodic_lb_ub_orientation(
+        blkL, lb1, ub1, blkU, lb2_full, ub2_full,
+        shift_axis=axis_idx, shift_amount=shift_amt)
+
+    try:
+        patch1 = patch_from_bounds(fL.blockIndex, lb1, ub1)
+        patch2 = patch_from_bounds(fU.blockIndex, lb2, ub2)
+    except ValueError:
+        # Corners snapped to a degenerate region (not a single-constant-axis
+        # box) -- not a valid patch to certify.
+        return None
+
+    try:
+        certified = certify_correspondence(
+            blkL, patch1, blkU, patch2, tol,
+            transform=_shift_transform(axis_idx, shift_amt))
+    except MappingFailure:
+        return None
+
+    return lb1, ub1, lb2, ub2, certified
 
 
 def _build_periodic_export(df: pd.DataFrame, periodic_faces_temp: list,
@@ -399,6 +491,11 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
             - **outer_faces_all** (List[Face]): This is a list of outer faces save as a list of Faces
     """
     gcd_to_use = 1
+    # Retain a reference to the original full-resolution blocks BEFORE any
+    # reduction below reassigns `blocks` -- A5 full-resolution re-validation
+    # (at the end of this function) must certify against these, never
+    # against the GCD-reduced copy.
+    full_res_blocks = blocks
     if ReduceMesh:
         gcd_to_use = compute_min_gcd(blocks)
         blocks = reduce_blocks(deepcopy(blocks),gcd_to_use)
@@ -534,7 +631,91 @@ def rotated_periodicity(blocks:List[Block], matched_faces:List[Dict[str,int]], o
         outer_faces_all[j].I *= gcd_to_use
         outer_faces_all[j].J *= gcd_to_use
         outer_faces_all[j].K *= gcd_to_use
+
+    # A5: full-resolution re-validation after GCD reduction. GCD reduction
+    # can occasionally produce a proposal that looks valid on the coarse
+    # grid but does not actually hold node-for-node at full resolution.
+    # Re-certify every scaled-up proposal against the ORIGINAL,
+    # full-resolution `full_res_blocks` (never the reduced `blocks`) before
+    # returning it. Both the +angle and -angle rotations are offered as
+    # candidate transforms: `_build_periodic_export` already normalizes
+    # every stored pair so block1 rotated *forward* reaches block2, but
+    # trying both here is cheap insurance against that convention rather
+    # than a second, independent assumption to keep in sync.
+    if ReduceMesh and gcd_to_use > 1:
+        t_fwd = lambda pts, R=rotation_matrix_pos: pts @ R.T
+        t_bwd = lambda pts, R=rotation_matrix_neg: pts @ R.T
+        kept, rejected = revalidate_full_resolution(
+            full_res_blocks, periodic_faces_export, transforms=[t_fwd, t_bwd],
+            tol=tol, stage="rotated_periodicity",
+        )
+        if rejected:
+            # Keep the parallel Face-object-form return channel
+            # (`periodic_faces`/`outer_faces_all`) in sync with the
+            # dict-form channel: `periodic_faces_export` and `periodic_faces`
+            # have been built and filtered in lockstep everywhere above, so
+            # they are still index-aligned here -- match rejected dicts back
+            # to their Face-tuple by identity (revalidate_full_resolution
+            # never copies the proposal dicts it is given).
+            rejected_ids = {id(r) for r in rejected}
+            new_periodic_faces = []
+            for export_rec, face_pair in zip(periodic_faces_export, periodic_faces):
+                if id(export_rec) in rejected_ids:
+                    outer_faces_all.append(face_pair[0])
+                    outer_faces_all.append(face_pair[1])
+                else:
+                    new_periodic_faces.append(face_pair)
+            periodic_faces = new_periodic_faces
+        periodic_faces_export = kept
+        demote_to_outer(outer_faces_export, rejected)
+
     return periodic_faces_export, outer_faces_export, periodic_faces, outer_faces_all
+
+def _median_inplane_spacing(face: Face, block: Block) -> Optional[float]:
+    """Median edge length on the face (in-plane), used to derive an
+    adaptive per-pair tolerance in `translational_periodicity`.
+
+    Returns None when the face has too few in-plane points to measure any
+    spacing from (a degenerate 1xN or 0xN footprint) — callers must treat
+    this as "no tolerance derivable", never fabricate a value.
+    """
+    I0, I1, J0, J1, K0, K1 = face.IMIN, face.IMAX, face.JMIN, face.JMAX, face.KMIN, face.KMAX
+    X, Y, Z = block.X, block.Y, block.Z
+    if face.const_type == 0:  # I const → vary (J,K)
+        i = I0
+        x = X[i, J0:J1+1, K0:K1+1]; y = Y[i, J0:J1+1, K0:K1+1]; z = Z[i, J0:J1+1, K0:K1+1]
+    elif face.const_type == 1:  # J const → vary (I,K)
+        j = J0
+        x = X[I0:I1+1, j, K0:K1+1]; y = Y[I0:I1+1, j, K0:K1+1]; z = Z[I0:I1+1, j, K0:K1+1]
+    else:  # K const → vary (I,J)
+        k = K0
+        x = X[I0:I1+1, J0:J1+1, k]; y = Y[I0:I1+1, J0:J1+1, k]; z = Z[I0:I1+1, J0:J1+1, k]
+    s = []
+    if x.shape[0] > 1:
+        dx = np.diff(x, axis=0); dy = np.diff(y, axis=0); dz = np.diff(z, axis=0)
+        s.append(np.sqrt(dx*dx + dy*dy + dz*dz))
+    if x.shape[1] > 1:
+        dx = np.diff(x, axis=1); dy = np.diff(y, axis=1); dz = np.diff(z, axis=1)
+        s.append(np.sqrt(dx*dx + dy*dy + dz*dz))
+    if not s:
+        return None
+    return float(np.median(np.concatenate([v.ravel() for v in s])))
+
+
+def _combine_pair_spacings(sA: Optional[float], sB: Optional[float]) -> Optional[float]:
+    """Combine two per-face in-plane spacing estimates into one adaptive
+    absolute tolerance for `translational_periodicity`.
+
+    Both None → None (no data on either side, tolerance is not derivable).
+    Exactly one None → falls back to the other side's value (never averages
+    a None with a number). Otherwise ~3% of the larger spacing, floored at
+    1e-4.
+    """
+    if sA is None and sB is None:
+        return None
+    s = max(v for v in (sA, sB) if v is not None)
+    return max(0.03 * s, 1e-4)
+
 
 def translational_periodicity(
     blocks: List[Block],
@@ -656,38 +837,20 @@ def translational_periodicity(
     def B(which: str, idx: int) -> Block:
         return {"orig": blocks_r, "up": blocks_up, "dn": blocks_dn}[which][idx]
 
-    # 4) Helpers for adaptive tolerance
-    def _median_inplane_spacing(face: Face, block: Block) -> float:
-        """Median edge length on the face (in-plane)."""
-        I0,I1,J0,J1,K0,K1 = face.IMIN,face.IMAX,face.JMIN,face.JMAX,face.KMIN,face.KMAX
-        X,Y,Z = block.X, block.Y, block.Z
-        if face.const_type == 0:  # I const → vary (J,K)
-            i = I0
-            x = X[i,J0:J1+1,K0:K1+1]; y = Y[i,J0:J1+1,K0:K1+1]; z = Z[i,J0:J1+1,K0:K1+1]
-        elif face.const_type == 1:  # J const → vary (I,K)
-            j = J0
-            x = X[I0:I1+1,j,K0:K1+1]; y = Y[I0:I1+1,j,K0:K1+1]; z = Z[I0:I1+1,j,K0:K1+1]
-        else:  # K const → vary (I,J)
-            k = K0
-            x = X[I0:I1+1,J0:J1+1,k]; y = Y[I0:I1+1,J0:J1+1,k]; z = Z[I0:I1+1,J0:J1+1,k]
-        s = []
-        if x.shape[0] > 1:
-            dx = np.diff(x, axis=0); dy = np.diff(y, axis=0); dz = np.diff(z, axis=0)
-            s.append(np.sqrt(dx*dx + dy*dy + dz*dz))
-        if x.shape[1] > 1:
-            dx = np.diff(x, axis=1); dy = np.diff(y, axis=1); dz = np.diff(z, axis=1)
-            s.append(np.sqrt(dx*dx + dy*dy + dz*dz))
-        if not s: return 1.0
-        return float(np.median(np.concatenate([v.ravel() for v in s])))
+    # 4) Helpers for adaptive tolerance (module-level: see
+    #    `_median_inplane_spacing`/`_combine_pair_spacings` above)
+    def _pair_tol(fA: Face, fB: Face) -> Optional[float]:
+        """Adaptive absolute tolerance per pair (use global override if provided).
 
-    def _pair_tol(fA: Face, fB: Face) -> float:
-        """Adaptive absolute tolerance per pair (use global override if provided)."""
+        Returns None when neither face has enough in-plane points to
+        estimate a spacing from — callers must skip the pair rather than
+        match it against a fabricated tolerance.
+        """
         if node_tol_xyz is not None:
             return float(node_tol_xyz)
         sA = _median_inplane_spacing(fA, B("orig", fA.BlockIndex))
         sB = _median_inplane_spacing(fB, B("orig", fB.BlockIndex))
-        # ~3% of local in-plane spacing; floor at 1e-4 (tune if needed)
-        return max(0.03 * max(sA, sB), 1e-4)
+        return _combine_pair_spacings(sA, sB)
 
     # 5) General orthogonal-plane precheck (works for x/y/z periodicity)
     def _orthogonal_precheck(fA: Face, fB: Face, bA: Block, bB: Block,
@@ -711,19 +874,15 @@ def translational_periodicity(
             PA[:,2] += d_axis_local
             projA, projB = PA[:,:2], PB[:,:2]          # (x,y)
 
-        QA = np.round(projA / tol).astype(np.int64)
-        QB = np.round(projB / tol).astype(np.int64)
-        if not QA.flags["C_CONTIGUOUS"]: QA = np.ascontiguousarray(QA)
-        if not QB.flags["C_CONTIGUOUS"]: QB = np.ascontiguousarray(QB)
-        vA = QA.view([('', QA.dtype)] * QA.shape[1]).reshape(-1)
-        vB = QB.view([('', QB.dtype)] * QB.shape[1]).reshape(-1)
-        inter = np.intersect1d(vA, vB, assume_unique=False)
-        return inter.size >= max(min_shared_abs, int(min_shared_frac * min(len(vA), len(vB))))
+        shared = coincidence_count(projA, projB, tol)
+        return shared >= max(min_shared_abs, int(min_shared_frac * min(len(projA), len(projB))))
 
     # 6) Node-sharing matcher using per-pair tol + precheck
     def faces_match(fL: Face, fU: Face) -> Tuple[bool, str]:
         bl, bu = fL.BlockIndex, fU.BlockIndex
         tol_pair = _pair_tol(fL, fU)
+        if tol_pair is None:
+            return False, ""
 
         # Fast precheck on orthogonal plane (lower up vs upper orig)
         if _orthogonal_precheck(fL, fU, B("orig", bl), B("orig", bu), d_axis, tol_pair, axis):
@@ -782,25 +941,25 @@ def translational_periodicity(
     def _face_key(f: Face) -> Tuple:
         return (f.BlockIndex, f.IMIN, f.JMIN, f.KMIN, f.IMAX, f.JMAX, f.KMAX)
 
-    def _record_match(fL: Face, fU: Face, mode: str, shift_amt: float) -> None:
-        """Build the export record + pair entry for one matched pair.
+    def _record_match(
+        fL: Face, fU: Face, mode: str,
+        loc: Tuple[list, list, list, list, 'CertifiedMapping'],
+    ) -> None:
+        """Build the export record + pair entry for one certified matched pair.
 
-        ``shift_amt`` is the SIGNED translation that maps face L onto
-        face U along the periodic axis.
+        ``loc`` is the ``(lb1, ub1, lb2, ub2, certified)`` tuple returned by
+        `_locate_and_certify_periodic_patch`: ``lb2``/``ub2`` are the
+        located (not merely fU's raw full-face) sub-range, and the
+        certified permutation/plane -- not a corners-only orientation
+        vector -- drive the orientation fields, consistent with how
+        `correspondence.CertifiedMapping.plane` already matches
+        `connectivity._orient_vec_to_permutation`'s 'in-plane'/'cross-plane'
+        convention (see `correspondence._plane_for`).
         """
         m = mapping_minmax(fL, fU)
         periodic_pairs_r.append((fL, fU, m))
-        lb1 = [fL.IMIN, fL.JMIN, fL.KMIN]
-        ub1 = [fL.IMAX, fL.JMAX, fL.KMAX]
-        lb2 = [fU.IMIN, fU.JMIN, fU.KMIN]
-        ub2 = [fU.IMAX, fU.JMAX, fU.KMAX]
-        blk1_orig = B("orig", fL.BlockIndex)
-        blk2_orig = B("orig", fU.BlockIndex)
-        lb2, ub2, orient = _compute_periodic_lb_ub_orientation(
-            blk1_orig, lb1, ub1, blk2_orig, lb2, ub2,
-            shift_axis=axis_idx, shift_amount=shift_amt)
-        perm_idx, plane = _orient_vec_to_permutation(orient, lb1, ub1, lb2, ub2)
-        export_perm = -1 if plane == 'in-plane' else perm_idx
+        lb1, ub1, lb2, ub2, certified = loc
+        export_perm = -1 if certified.plane == 'in-plane' else certified.permutation_index
         periodic_export.append({
             "block1": {"block_index": fL.BlockIndex,
                        "lb": lb1, "ub": ub1},
@@ -808,8 +967,8 @@ def translational_periodicity(
                        "lb": lb2, "ub": ub2},
             "orientation": {
                 "permutation_index": export_perm,
-                "plane": plane,
-                "permutation_matrix": PERMUTATION_MATRICES[perm_idx].tolist(),
+                "plane": certified.plane,
+                "permutation_matrix": PERMUTATION_MATRICES[certified.permutation_index].tolist(),
             },
             "mapping": m,
             "mode": mode
@@ -835,17 +994,13 @@ def translational_periodicity(
 
         matched_j = -1
         matched_mode = ""
+        matched_loc = None
         for rank in order:
             j = int(rank)
             fU = upper_pool[j]
             ok, mode = faces_match(fL, fU)
-            if ok:
-                matched_j = j
-                matched_mode = mode
-                break
-
-        if matched_j >= 0:
-            fU = upper_pool[matched_j]
+            if not ok:
+                continue
             blk1_orig = B("orig", fL.BlockIndex)
             blk2_orig = B("orig", fU.BlockIndex)
             arr1 = [blk1_orig.X, blk1_orig.Y, blk1_orig.Z][axis_idx]
@@ -853,7 +1008,27 @@ def translational_periodicity(
             p1_val = arr1[fL.IMIN, fL.JMIN, fL.KMIN]
             p2_val = arr2[fU.IMIN, fU.JMIN, fU.KMIN]
             shift_amt = d_axis if p1_val < p2_val else -d_axis
-            _record_match(fL, fU, matched_mode, shift_amt)
+            tol_pair = _pair_tol(fL, fU)
+            if tol_pair is None:
+                continue
+            # A coverage-fraction pass (`faces_match`) is only provisional --
+            # locate the actual overlapping sub-patch and certify it
+            # node-for-node before accepting. A candidate that fails here is
+            # treated exactly like a `faces_match` rejection: keep trying
+            # the next-nearest upper face rather than accepting the
+            # uncertified location.
+            loc = _locate_and_certify_periodic_patch(
+                fL, blk1_orig, fU, blk2_orig, axis_idx, shift_amt, tol_pair)
+            if loc is None:
+                continue
+            matched_j = j
+            matched_mode = mode
+            matched_loc = loc
+            break
+
+        if matched_j >= 0:
+            fU = upper_pool[matched_j]
+            _record_match(fL, fU, matched_mode, matched_loc)
             consumed_keys.add(_face_key(fL))
             consumed_keys.add(_face_key(fU))
             # Remove matched upper face from pool and centroids
@@ -910,6 +1085,12 @@ def translational_periodicity(
             """
             P = _pts(f)
             orth = np.delete(P, axis_idx, axis=1)
+            # Intentionally left as round(x/tol) bucketing (not
+            # geometry.coincidence_count): this is a cheap PRUNE for
+            # footprint-quality classification, not a coincidence decision.
+            # The real accept/reject test is the distance-based
+            # coincidence_count check in _match_pair below, which is already
+            # fixed for the bin-boundary bug.
             keys = np.round(orth / tol).astype(np.int64)
             out: Dict[Tuple[int, int], float] = {}
             ax_vals = P[:, axis_idx]
@@ -935,7 +1116,7 @@ def translational_periodicity(
                 return None  # not a height field over the orthogonal plane
             return out
 
-        def _match_pair(fA: Face, fB: Face, tol: float):
+        def _match_pair(fA: Face, fB: Face, tol: Optional[float]):
             """Try to match A onto B by a pure axis translation.
 
             Returns ``(n_common, frac_small, d_pair)`` or None. Works for
@@ -948,7 +1129,13 @@ def translational_periodicity(
             % even on exactly-periodic meshes): discovery has to be
             conservative because the result is consumed as an exact
             index-mapped interface by the solver.
+
+            ``tol=None`` means no tolerance could be derived for this pair
+            (e.g. a degenerate face) — declines to match rather than
+            comparing against a missing tolerance.
             """
+            if tol is None:
+                return None
             mA = _orth_map(fA, tol)
             mB = _orth_map(fB, tol)
             if mA is None or mB is None:
@@ -974,16 +1161,20 @@ def translational_periodicity(
             PA = _pts(fA).copy()
             PA[:, axis_idx] += d_pair
             PB = _pts(fB)
-            QA = np.unique(np.round(PA / tol).astype(np.int64), axis=0)
-            QB = np.unique(np.round(PB / tol).astype(np.int64), axis=0)
-            vA = QA.view([('', QA.dtype)] * QA.shape[1]).reshape(-1)
-            vB = QB.view([('', QB.dtype)] * QB.shape[1]).reshape(-1)
-            inter = np.intersect1d(vA, vB, assume_unique=True)
+            # Dedup by quantized position (a coarse tol-grid is fine here --
+            # this only decides which points are "the same node" within one
+            # side, it is not the coincidence decision between sides). The
+            # actual accept/reject coincidence test below is distance-based.
+            _, idxA = np.unique(np.round(PA / tol), axis=0, return_index=True)
+            _, idxB = np.unique(np.round(PB / tol), axis=0, return_index=True)
+            QA = PA[idxA]
+            QB = PB[idxB]
+            shared = coincidence_count(QA, QB, tol)
             n_3d_small = min(len(QA), len(QB))
             need = max(min_shared_abs, int(0.95 * n_3d_small))
-            if inter.size < need:
+            if shared < need:
                 return None
-            return int(inter.size), inter.size / max(n_3d_small, 1), d_pair
+            return int(shared), shared / max(n_3d_small, 1), d_pair
 
         # Test all remaining pairs; faces may match PARTIALLY (an unsplit
         # pitch face can host several smaller counterparts), so only the
@@ -993,6 +1184,8 @@ def translational_periodicity(
             for ib in range(ia + 1, len(remaining_faces)):
                 fA, fB = remaining_faces[ia], remaining_faces[ib]
                 tol_pair = _pair_tol(fA, fB)
+                if tol_pair is None:
+                    continue
                 hit = _match_pair(fA, fB, tol_pair)
                 if hit is not None:
                     n_common, frac_small, d_pair = hit
@@ -1013,13 +1206,23 @@ def translational_periodicity(
             # frac_small (3D-intersection coverage of the smaller side)
             # ≥ 0.95 retires that side from further pairing.
             if len(_pts(fA)) <= len(_pts(fB)):
-                _record_match(fA, fB, f"{axis}_oblique_pair", d_pair)
-                if frac_small >= 0.95:
-                    fully_used.add(kA)
+                small, large, shift_amt = fA, fB, d_pair
             else:
-                _record_match(fB, fA, f"{axis}_oblique_pair", -d_pair)
-                if frac_small >= 0.95:
-                    fully_used.add(kB)
+                small, large, shift_amt = fB, fA, -d_pair
+            # `_match_pair`'s footprint-overlap gate is a PRUNE (its own
+            # docstring: verification is "the distance-based coincidence_count
+            # check"), not full node-for-node certification -- it never
+            # located an explicit sub-patch on the (possibly larger) other
+            # side. Do that now and certify before accepting.
+            blk_small = B("orig", small.BlockIndex)
+            blk_large = B("orig", large.BlockIndex)
+            loc = _locate_and_certify_periodic_patch(
+                small, blk_small, large, blk_large, axis_idx, shift_amt, tol_pair)
+            if loc is None:
+                continue
+            _record_match(small, large, f"{axis}_oblique_pair", loc)
+            if frac_small >= 0.95:
+                fully_used.add(_face_key(small))
 
     # 9) scale back up
     scale_face_bounds(periodic_export, gcd_to_use)
@@ -1030,6 +1233,102 @@ def translational_periodicity(
         gL.I *= gcd_to_use; gL.J *= gcd_to_use; gL.K *= gcd_to_use
         gU.I *= gcd_to_use; gU.J *= gcd_to_use; gU.K *= gcd_to_use
         periodic_pairs.append((gL, gU, m))
+
+    # 9b) A5: full-resolution re-validation after GCD reduction. Unlike
+    # `rotated_periodicity`'s single global forward/backward rotation, each
+    # pair here carries its own per-pair axis shift, so a shared
+    # `transforms` list doesn't fit -- re-derive each proposal's own
+    # `shift_amt`/tolerance from the ORIGINAL full-resolution `blocks`
+    # (never `blocks_r`, the internally-reduced copy) and certify inline
+    # rather than over-generalizing `revalidate_full_resolution` for this
+    # one caller.
+    if gcd_to_use > 1:
+        def _pair_tol_full(fA: Face, blkA: Block, fB: Face, blkB: Block) -> float:
+            """Per-pair tolerance for full-resolution re-validation, mirroring
+            `_pair_tol` above but sourced from the FULL-RESOLUTION blocks.
+            Falls back to the same 1e-4 floor `_combine_pair_spacings` uses
+            when neither face has enough in-plane points to measure -- a
+            proposal that reached this point already matched at reduced
+            resolution, so re-validation must not silently skip it for lack
+            of a derivable tolerance.
+            """
+            if node_tol_xyz is not None:
+                return float(node_tol_xyz)
+            sA = _median_inplane_spacing(fA, blkA)
+            sB = _median_inplane_spacing(fB, blkB)
+            combined = _combine_pair_spacings(sA, sB)
+            return combined if combined is not None else 1e-4
+
+        revalidated_export: List[Dict[str, Dict[str, int]]] = []
+        revalidated_pairs: List[Tuple[Face, Face, Dict[str,str]]] = []
+        rejected: List[dict] = []
+        rejected_failures: List[MappingFailure] = []
+
+        for exp, pair in zip(periodic_export, periodic_pairs):
+            b1, b2 = exp['block1'], exp['block2']
+            bi1, bi2 = b1['block_index'], b2['block_index']
+            block1_full = blocks[bi1]
+            block2_full = blocks[bi2]
+            try:
+                patch1 = patch_from_bounds(bi1, b1['lb'], b1['ub'])
+                patch2 = patch_from_bounds(bi2, b2['lb'], b2['ub'])
+            except ValueError:
+                rejected.append(exp)
+                continue
+
+            fL_full, fU_full = pair[0], pair[1]
+            tol_pair = _pair_tol_full(fL_full, block1_full, fU_full, block2_full)
+
+            # Recover this proposal's own +/- d_axis shift sign the same
+            # way it was originally derived in step 8: compare the axis
+            # coordinate of each patch's lb corner on the (unshifted)
+            # full-resolution blocks. `d_axis` is a physical distance, so
+            # it is unaffected by GCD reduction and reusable as-is here.
+            arr1 = [block1_full.X, block1_full.Y, block1_full.Z][axis_idx]
+            arr2 = [block2_full.X, block2_full.Y, block2_full.Z][axis_idx]
+            p1_val = arr1[tuple(b1['lb'])]
+            p2_val = arr2[tuple(b2['lb'])]
+            shift_amt = d_axis if p1_val < p2_val else -d_axis
+            transform = _shift_transform(axis_idx, shift_amt)
+
+            declared_idx = _declared_perm_idx(
+                exp.get('orientation'), b1['lb'], b1['ub'], b2['lb'], b2['ub'])
+            try:
+                if declared_idx is not None:
+                    certify_permutation(
+                        block1_full, patch1, block2_full, patch2,
+                        declared_idx, tol_pair, transform=transform)
+                else:
+                    certify_correspondence(
+                        block1_full, patch1, block2_full, patch2,
+                        tol_pair, transform=transform)
+            except MappingFailure as exc:
+                rejected.append(exp)
+                rejected_failures.append(exc)
+                continue
+
+            revalidated_export.append(exp)
+            revalidated_pairs.append(pair)
+
+        periodic_export = revalidated_export
+        periodic_pairs = revalidated_pairs
+
+        if rejected:
+            # Rebind the local `outer_faces` name (never mutate the
+            # caller's own list) so the un-touched step 10 filter below
+            # naturally keeps demoted proposals as outer faces.
+            outer_faces = list(outer_faces)
+            demote_to_outer(outer_faces, rejected)
+            if rejected_failures:
+                worst = max(rejected_failures, key=_failure_severity)
+                worst_desc = _describe_failure(worst)
+            else:
+                worst_desc = "no diagnostic available"
+            warnings.warn(
+                f"translational_periodicity: demoted {len(rejected)} "
+                f"proposal(s) that failed full-resolution re-certification "
+                f"(worst: {worst_desc})",
+                RuntimeWarning, stacklevel=2)
 
     # 10) remove periodic from outer_faces (keep 'id' on remaining)
     periodic_keys = set()
@@ -1203,16 +1502,47 @@ def __periodicity_check__(face1:Face, face2:Face,block1:Block,block2:Block,tol:f
             # It's an edge or degenerate, not a face
             return pd.DataFrame(), periodic_faces, split_faces_out
 
+        ilb1, jlb1, klb1 = int(df['i1'].min()), int(df['j1'].min()), int(df['k1'].min())
+        iub1, jub1, kub1 = int(df['i1'].max()), int(df['j1'].max()), int(df['k1'].max())
+        ilb2, jlb2, klb2 = int(df['i2'].min()), int(df['j2'].min()), int(df['k2'].min())
+        iub2, jub2, kub2 = int(df['i2'].max()), int(df['j2'].max()), int(df['k2'].max())
+
+        # Completeness check: the KDTree nearest-neighbor match must cover
+        # every point of the claimed sub-patch, not just a partial subset
+        # (e.g. two faces that only share an edge/corner strip can still
+        # produce >=4 non-collinear point pairs and pass the edge check
+        # above). Mirrors connectivity.py's get_face_intersection, which
+        # applies the exact same standard: reject iff the matched-point
+        # count is less than the sub-patch's index-space area.
+        matched_area = _face_point_count([ilb1, jlb1, klb1], [iub1, jub1, kub1])
+        if matched_area > 0 and len(df) < matched_area:
+            return pd.DataFrame(), periodic_faces, split_faces_out
+
+        # Full node-for-node certification: confirm every node of the
+        # claimed sub-patch corresponds under exactly one of the 8
+        # structured permutations, not just the KDTree's nearest-neighbor
+        # proposal. `block1` is already the pre-rotated copy that produced
+        # the KDTree match above (the caller rotates one side before
+        # calling this function; the swap earlier in this function keeps
+        # `block1`/`block2` and `pts1`/`pts2` in lockstep), so both patches
+        # are already expressed in the same frame -- no further transform.
+        patch1 = patch_from_bounds(face1.blockIndex, [ilb1, jlb1, klb1], [iub1, jub1, kub1])
+        patch2 = patch_from_bounds(face2.blockIndex, [ilb2, jlb2, klb2], [iub2, jub2, kub2])
+        try:
+            certify_correspondence(block1, patch1, block2, patch2, tol, transform=None)
+        except MappingFailure:
+            return pd.DataFrame(), periodic_faces, split_faces_out
+
         # Create Face objects from matched region
         f1 = create_face_from_diagonals(block1,
-            [int(df['i1'].min()), int(df['j1'].min()), int(df['k1'].min())],
-            [int(df['i1'].max()), int(df['j1'].max()), int(df['k1'].max())])
+            [ilb1, jlb1, klb1],
+            [iub1, jub1, kub1])
         f1.set_block_index(face1.blockIndex)
         f1.set_face_id(face1.id)
 
         f2 = create_face_from_diagonals(block2,
-            [int(df['i2'].min()), int(df['j2'].min()), int(df['k2'].min())],
-            [int(df['i2'].max()), int(df['j2'].max()), int(df['k2'].max())])
+            [ilb2, jlb2, klb2],
+            [iub2, jub2, kub2])
         f2.set_block_index(face2.blockIndex)
         f2.set_face_id(face2.id)
 
