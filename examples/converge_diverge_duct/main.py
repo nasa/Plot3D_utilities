@@ -14,8 +14,9 @@ Stages
 2. 3D mesh     - revolve it into a Plot3D block, write and read it back
                  (:mod:`duct_mesh`).
 3. Flatten     - collapse the axisymmetric block to a 2D meridional mesh
-                 (:mod:`duct_flatten`), then look at the domain and at where
-                 the boundary-condition ghost cells live (Figures 1 and 2).
+                 (:mod:`plot3d.meridional_flatten`), then look at the domain
+                 and at where the boundary-condition ghost cells live
+                 (Figures 1 and 2).
 4. Solve       - 2D axisymmetric Euler with JAX (:mod:`euler_solver_flatten`),
                  compared against that 1D prediction.
 5. Compare     - the same solver written as nested Python loops
@@ -34,15 +35,14 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-from plot3d import Block, read_plot3D, reduce_blocks, write_plot3D
+from plot3d import (Block, read_plot3D, reduce_blocks, write_plot3D,
+                    analytic_volume, axisymmetry_error, build_metrics,
+                    enclosed_volume, flatten_to_meridional, node_count_reduction)
 
 import quasi1d
-from duct_flatten import (axisymmetry_error, flatten_to_meridional,
-                          node_count_reduction)
 from duct_geometry import area_ratio, duct_radius, throat
 from duct_mesh import inflation_report, revolve_duct
-from euler_metrics import (analytic_volume, build_metrics, enclosed_volume,
-                           ghost_cell_centres, to_jax)
+from euler_metrics import ghost_cell_centres, to_jax
 from euler_physics import mach, primitives
 from euler_solver_block import solve as solve_block
 from euler_solver_flatten import (Config, initial_condition,

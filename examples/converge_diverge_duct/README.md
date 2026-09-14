@@ -24,8 +24,7 @@ No arguments, no input files. Takes about 10 seconds on a laptop CPU.
 |---|---|
 | `duct_geometry.py` | Bézier wall radius `R(x)` in the meridional plane. |
 | `duct_mesh.py` | Revolve `(x, R)` about the x-axis into a `plot3d.Block`, with a wall-clustered inflation layer. |
-| `duct_flatten.py` | Collapse the axisymmetric 3D block back to a 2D `(x, r)` node grid. |
-| `euler_metrics.py` | Node grid → axisymmetric cell volumes, face areas and face normals. |
+| `euler_metrics.py` | JAX conversion and ghost-cell-centre helpers for the Euler solver (cell volumes, face areas and face normals now come from `plot3d.meridional_flatten`). |
 | `euler_physics.py` | Gas model, state conversions, Rusanov flux, isentropic relations. |
 | `euler_bc.py` | Ghost-cell boundary conditions: subsonic inlet, back-pressure outlet, slip wall / axis. |
 | `euler_solver_flatten.py` | The vectorized solver, JIT-compiled with JAX. |

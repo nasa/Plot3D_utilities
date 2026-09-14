@@ -1,153 +1,39 @@
-"""Stage 4a - Metrics: turn the 2D node grid into finite-volume geometry.
+"""Stage 4a - Metrics: JAX/BC-specific glue on top of plot3d's meridional metrics.
 
-The solver never looks at node coordinates again.  All it needs is, per cell, a
-volume and a source area, and per face, an area-like weight and a unit normal.
-
-Everything is **axisymmetric**: the 2D ``(x, r)`` mesh represents a full body of
-revolution, so a cell's true volume is ``2*pi * integral(r dA)`` and a face's
-true area is ``2*pi * integral(r dL)``.  The common ``2*pi`` divides out of the
-finite-volume balance, so we store the per-radian quantities::
-
-    vol   = area * r_centroid        (cell volume  / 2*pi)
-    s     = length * r_midpoint      (face area    / 2*pi)
-
-Two things fall out of this for free:
-
-* the axis is not a singularity - ``sj[:, 0]`` is exactly zero because ``r = 0``
-  there, so no flux can cross the axis no matter what the ghost state is;
-* the duct's real area variation (``A ~ r**2``) is built into the metrics, so
-  the 2D solve reproduces the 3D body of revolution exactly.
-
-Index convention for a node grid of shape ``(NI+1, NJ+1)``:
-
-* cells ``(NI, NJ)``; ``j = 0`` touches the axis, ``j = NJ-1`` touches the wall
-* i-faces ``(NI+1, NJ)`` - constant-i faces, normal points toward +i
-* j-faces ``(NI, NJ+1)`` - constant-j faces, normal points toward +j
+Cell volumes, face weights and face normals now live in
+:mod:`plot3d.meridional_flatten` (``build_metrics`` / ``MeridionalMetrics``).
+This module keeps only what must not become a library dependency: converting
+those metrics to/from JAX arrays, and reconstructing ghost-cell positions for
+this example's own Euler boundary-condition scheme.
 """
-from typing import NamedTuple
-
 import numpy as np
 
-
-class Metrics(NamedTuple):
-    """Finite-volume geometry of the flattened meridional mesh.
-
-    A :class:`typing.NamedTuple` of arrays is automatically a valid JAX pytree,
-    so this can be passed straight through ``jax.jit`` with no registration.
-    """
-    xc: np.ndarray    # (NI, NJ)    cell centroid x
-    rc: np.ndarray    # (NI, NJ)    cell centroid r
-    area: np.ndarray  # (NI, NJ)    planar (x, r) cell area
-    vol: np.ndarray   # (NI, NJ)    cell volume per radian = area * rc
-    si: np.ndarray    # (NI+1, NJ)  i-face weight = length * r_mid
-    nix: np.ndarray   # (NI+1, NJ)  i-face unit normal, x component
-    nir: np.ndarray   # (NI+1, NJ)  i-face unit normal, r component
-    sj: np.ndarray    # (NI, NJ+1)  j-face weight = length * r_mid
-    njx: np.ndarray   # (NI, NJ+1)  j-face unit normal, x component
-    njr: np.ndarray   # (NI, NJ+1)  j-face unit normal, r component
+from plot3d import MeridionalMetrics
 
 
-def build_metrics(x2d: np.ndarray, r2d: np.ndarray) -> Metrics:
-    """Build cell volumes, face weights and face normals from a node grid.
+def to_jax(metrics: MeridionalMetrics) -> MeridionalMetrics:
+    """Copy a :class:`MeridionalMetrics` onto the JAX default device as float64 arrays.
 
     Args:
-        x2d (np.ndarray): Node x coordinates, shape ``(NI+1, NJ+1)``.
-        r2d (np.ndarray): Node r coordinates, shape ``(NI+1, NJ+1)``.
+        metrics (MeridionalMetrics): Metrics holding numpy arrays.
 
     Returns:
-        Metrics: Geometry arrays as plain numpy (convert with :func:`to_jax`).
-    """
-    x = np.asarray(x2d, dtype=float)
-    r = np.asarray(r2d, dtype=float)
-
-    # --- cells: corners in counter-clockwise order in the (x, r) plane -------
-    x0, r0 = x[:-1, :-1], r[:-1, :-1]
-    x1, r1 = x[1:, :-1], r[1:, :-1]
-    x2, r2 = x[1:, 1:], r[1:, 1:]
-    x3, r3 = x[:-1, 1:], r[:-1, 1:]
-
-    # Shoelace formula written as two triangle cross products.
-    area = 0.5 * np.abs((x2 - x0) * (r3 - r1) - (x3 - x1) * (r2 - r0))
-    xc = 0.25 * (x0 + x1 + x2 + x3)
-    rc = 0.25 * (r0 + r1 + r2 + r3)
-    vol = area * rc
-
-    # --- i-faces: node (i, j) -> node (i, j+1), tangent points toward +j -----
-    dxi = x[:, 1:] - x[:, :-1]
-    dri = r[:, 1:] - r[:, :-1]
-    li = np.sqrt(dxi ** 2 + dri ** 2)
-    # Rotating the tangent by -90 degrees gives the +i-pointing normal.
-    nix = dri / li
-    nir = -dxi / li
-    si = li * 0.5 * (r[:, 1:] + r[:, :-1])
-
-    # --- j-faces: node (i, j) -> node (i+1, j), tangent points toward +i -----
-    dxj = x[1:, :] - x[:-1, :]
-    drj = r[1:, :] - r[:-1, :]
-    lj = np.sqrt(dxj ** 2 + drj ** 2)
-    # Rotating the tangent by +90 degrees gives the +j-pointing normal.
-    njx = -drj / lj
-    njr = dxj / lj
-    sj = lj * 0.5 * (r[1:, :] + r[:-1, :])
-
-    return Metrics(xc=xc, rc=rc, area=area, vol=vol,
-                   si=si, nix=nix, nir=nir,
-                   sj=sj, njx=njx, njr=njr)
-
-
-def to_jax(metrics: Metrics) -> Metrics:
-    """Copy a :class:`Metrics` onto the JAX default device as float64 arrays.
-
-    Args:
-        metrics (Metrics): Metrics holding numpy arrays.
-
-    Returns:
-        Metrics: The same fields as ``jax.numpy`` arrays.
+        MeridionalMetrics: The same fields as ``jax.numpy`` arrays.
     """
     import jax.numpy as jnp
-    return Metrics(*[jnp.asarray(f, dtype=jnp.float64) for f in metrics])
+    return MeridionalMetrics(*[jnp.asarray(f, dtype=jnp.float64) for f in metrics])
 
 
-def to_numpy(metrics: Metrics) -> Metrics:
-    """Copy a :class:`Metrics` back to plain numpy for the loop-based solver.
-
-    Args:
-        metrics (Metrics): Metrics holding numpy or jax arrays.
-
-    Returns:
-        Metrics: The same fields as numpy ``float64`` arrays.
-    """
-    return Metrics(*[np.asarray(f, dtype=float) for f in metrics])
-
-
-def enclosed_volume(metrics: Metrics) -> float:
-    """Total duct volume implied by the metrics, ``2*pi * sum(vol)``.
+def to_numpy(metrics: MeridionalMetrics) -> MeridionalMetrics:
+    """Copy a :class:`MeridionalMetrics` back to plain numpy for the loop-based solver.
 
     Args:
-        metrics (Metrics): Mesh metrics.
+        metrics (MeridionalMetrics): Metrics holding numpy or jax arrays.
 
     Returns:
-        float: Volume of the full body of revolution.
+        MeridionalMetrics: The same fields as numpy ``float64`` arrays.
     """
-    return float(2.0 * np.pi * np.sum(np.asarray(metrics.vol)))
-
-
-def analytic_volume(x: np.ndarray, r_wall: np.ndarray) -> float:
-    """Volume of the body of revolution, ``integral(pi R**2) dx``.
-
-    Trapezoidal rule written out by hand (``np.trapezoid`` is numpy >= 2.0
-    only and ``np.trapz`` has since been removed, so neither name is safe).
-
-    Args:
-        x (np.ndarray): Axial stations.
-        r_wall (np.ndarray): Wall radius at those stations.
-
-    Returns:
-        float: The reference volume :func:`enclosed_volume` should match.
-    """
-    x = np.asarray(x, dtype=float)
-    a = np.pi * np.asarray(r_wall, dtype=float) ** 2
-    return float(np.sum(0.5 * (a[1:] + a[:-1]) * np.diff(x)))
+    return MeridionalMetrics(*[np.asarray(f, dtype=float) for f in metrics])
 
 
 def ghost_cell_centres(xc: np.ndarray, rc: np.ndarray) -> dict:
@@ -180,8 +66,9 @@ def ghost_cell_centres(xc: np.ndarray, rc: np.ndarray) -> dict:
 
 if __name__ == "__main__":
     from duct_geometry import duct_radius
-    from duct_flatten import flatten_to_meridional
     from duct_mesh import revolve_duct
+    from plot3d import (analytic_volume, build_metrics, enclosed_volume,
+                         flatten_to_meridional)
 
     x, r_wall = duct_radius(201)
     block = revolve_duct(x, r_wall)

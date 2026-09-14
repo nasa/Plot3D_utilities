@@ -12,6 +12,20 @@ Maintain release notes here so the published documentation reflects important ch
 
 Add a new section for each release and summarise highlights in bullet form.
 
+v1.13.0 - 2026-09-14
+--------------------
+* Added ``meridional_flatten.py``: promotes the ``converge_diverge_duct``
+  example's hand-rolled axisymmetric flatten + 2D finite-volume metrics
+  (``block_radius``, ``axisymmetry_error``, ``flatten_to_meridional``,
+  ``node_count_reduction``, ``MeridionalMetrics``, ``build_metrics``,
+  ``enclosed_volume``, ``analytic_volume``) into the published library.
+  Deliberately distinct from ``flatmesh.flatten_mesh``/``FlatMesh``
+  (multi-block 3D -> unstructured finite-volume graph) and from
+  ``glennht.plot3d_flatten_deck`` (GlennHT export format). The example now
+  imports these from ``plot3d`` instead of defining them locally; behavior
+  is unchanged (verified against the example's straight-pipe residual,
+  axisymmetry-error, and duct-volume-vs-analytic-volume checks).
+
 v1.12.0 - 2026-09-14
 --------------------
 Ported a set of correctness fixes and a new module from the sibling Rust

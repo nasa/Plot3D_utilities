@@ -1,6 +1,6 @@
 [project]
 name = "plot3d"
-version = "1.12.0"
+version = "1.13.0"
 description = "Plot3D python utilities for reading and writing and also finding connectivity between blocks"
 authors = [{ name = "Paht Juangphanich", email = "paht.juangphanich@nasa.gov" }]
 readme = "README.md"

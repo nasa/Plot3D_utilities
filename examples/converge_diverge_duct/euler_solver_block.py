@@ -21,7 +21,7 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
-from euler_metrics import Metrics
+from plot3d import MeridionalMetrics as Metrics
 
 GAMMA = 1.4
 CP = 1005.0
@@ -356,12 +356,11 @@ def solve(metrics: Metrics,
 if __name__ == "__main__":
     import time
 
-    from duct_flatten import flatten_to_meridional
     from duct_geometry import duct_radius
     from duct_mesh import revolve_duct
-    from euler_metrics import build_metrics
-    from euler_solver_flatten import Config, initial_condition
     from euler_metrics import to_jax
+    from euler_solver_flatten import Config, initial_condition
+    from plot3d import build_metrics, flatten_to_meridional
 
     x, r_wall = duct_radius(41)
     block = revolve_duct(x, r_wall, n_radial=13, n_theta=7)

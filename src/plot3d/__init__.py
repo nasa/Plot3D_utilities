@@ -27,6 +27,9 @@ from .normals import (index_space_normal, compute_permutation_matrix,
                       validate_connectivity, compute_all_normals,
                       export_normals_json, import_normals_json, plot_face_normals)
 from .flatmesh import flatten_mesh, FlatMesh, write_flat_mesh, read_flat_mesh
+from .meridional_flatten import (block_radius, axisymmetry_error, flatten_to_meridional,
+                                  node_count_reduction, MeridionalMetrics, build_metrics,
+                                  enclosed_volume, analytic_volume)
 from .mesh_quality import (
     Handedness, Severity, CellLocation, Violation, Thresholds,
     MeshQualityReport, ElementType, BlockElementSummary, ElementInventory,

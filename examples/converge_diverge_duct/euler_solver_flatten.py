@@ -42,15 +42,15 @@ jax.config.update("jax_enable_x64", True)  # must happen before any array work
 import jax.numpy as jnp  # noqa: E402
 
 from euler_bc import inlet_ghost, outlet_ghost, reflect_ghost  # noqa: E402
-from euler_metrics import Metrics  # noqa: E402
 from euler_physics import (GAMMA, R_GAS, conservative, mach_from_p_ratio,  # noqa: E402
                            primitives, rusanov, sound_speed, t_over_t0)
+from plot3d import MeridionalMetrics as Metrics  # noqa: E402
 
 
 class Config(NamedTuple):
     """Boundary conditions and CFL number for a run.
 
-    Like :class:`euler_metrics.Metrics`, a ``NamedTuple`` is already a JAX
+    Like :class:`plot3d.MeridionalMetrics`, a ``NamedTuple`` is already a JAX
     pytree, so this passes through ``jax.jit`` without any registration.
     """
     p0: float = 2.0e5      #: inlet stagnation pressure, Pa
@@ -254,7 +254,8 @@ def straight_pipe_residual(ni: int = 41, nj: int = 13,
     """
     import numpy as np
 
-    from euler_metrics import build_metrics, to_jax
+    from euler_metrics import to_jax
+    from plot3d import build_metrics
 
     x = np.linspace(0.0, 1.0, ni)
     r = np.linspace(0.0, 0.1, nj)
