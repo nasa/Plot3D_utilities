@@ -25,8 +25,11 @@ Stages
                surface_ids=..., bcs=...) builds the FlatMesh, with BC
                tagging embedded directly in it.
 6. Verify    - every boundary face carries the BC type its YAML entry
-               declared, and total cell volume matches the duct's
-               analytic volume.
+               declared, and total cell volume matches an independent
+               per-cell volume computed directly from each block's own
+               geometry (plot3d.cell_volume_divergence) -- not an
+               analytic formula for this particular duct shape, since a
+               general x, y, z mesh has no such formula available.
 
 Run it with no arguments::
 
@@ -35,7 +38,7 @@ Run it with no arguments::
 import numpy as np
 import yaml
 
-from plot3d import Block, analytic_volume, connectivity_fast, flatten_mesh
+from plot3d import Block, cell_volume_divergence, connectivity_fast, flatten_mesh
 from plot3d.flatmesh import BC_INLET, BC_OUTLET, BC_WALL
 from plot3d.glennht import (
     Plot3DFlattenInletBC,
@@ -76,9 +79,7 @@ def build_blocks():
     shroud faces.
 
     Returns:
-        tuple: ``([block1, block2], x, r_wall)`` -- the split blocks, and
-        the axial/wall-radius arrays used to build them (for the analytic
-        volume check in stage 6).
+        List[Block]: ``[block1, block2]``, the split blocks.
     """
     x = np.linspace(0.0, LENGTH, N_AXIAL)
     r_wall = R0 + (R1 - R0) * x / LENGTH
@@ -98,7 +99,7 @@ def build_blocks():
     b2 = Block(np.ascontiguousarray(block.X[mid:]),
                np.ascontiguousarray(block.Y[mid:]),
                np.ascontiguousarray(block.Z[mid:]))
-    return [b1, b2], x, r_wall
+    return [b1, b2]
 
 
 def read_boundary_conditions(path):
@@ -124,7 +125,7 @@ def read_boundary_conditions(path):
 
 def main():
     print("Stage 1: build + split the duct into 2 blocks")
-    blocks, x, r_wall = build_blocks()
+    blocks = build_blocks()
     for i, b in enumerate(blocks):
         print(f"  block {i}: {b.IMAX} x {b.JMAX} x {b.KMAX}")
 
@@ -157,13 +158,20 @@ def main():
         assert np.all(fm.face_bc_type[mask] == bc_type), f"surface {sid} has the wrong BC type"
     print("  every boundary face carries the BC type its YAML entry declared")
 
+    # A general x, y, z mesh has no closed-form "analytic" volume to check
+    # against -- that only exists for a known parametric shape (e.g. this
+    # duct's body-of-revolution profile, via plot3d.analytic_volume). The
+    # geometry-agnostic cross-check instead recomputes each block's own
+    # cell volumes independently, straight from its corner nodes via the
+    # divergence theorem (plot3d.cell_volume_divergence), and compares
+    # that against flatten_mesh's own cell_volume.
     v_mesh = float(fm.cell_volume.sum())
-    v_exact = analytic_volume(x, r_wall) * WEDGE_DEG / 360.0
-    rel_err = abs(v_mesh / v_exact - 1.0)
-    print(f"  mesh volume     : {v_mesh:.6f}")
-    print(f"  analytic volume : {v_exact:.6f}  (full-revolve analytic_volume scaled to the wedge angle)")
-    print(f"  relative error  : {rel_err:.3e}")
-    assert rel_err < 1e-2
+    v_independent = sum(float(cell_volume_divergence(b).sum()) for b in blocks)
+    rel_err = abs(v_mesh / v_independent - 1.0)
+    print(f"  mesh volume (flatten_mesh)        : {v_mesh:.6f}")
+    print(f"  mesh volume (per-block divergence): {v_independent:.6f}")
+    print(f"  relative difference               : {rel_err:.3e}")
+    assert rel_err < 1e-9
 
     fm.to_vtu("duct_flat.vtu")
     print("\nWrote duct_flat.vtu -- open it in Paraview to inspect the solver-ready mesh.")

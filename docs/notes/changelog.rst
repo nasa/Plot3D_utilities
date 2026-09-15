@@ -12,11 +12,11 @@ Maintain release notes here so the published documentation reflects important ch
 
 Add a new section for each release and summarise highlights in bullet form.
 
-v1.13.0 - 2026-09-14
+v1.13.0 - 2026-09-15
 --------------------
 * Added ``meridional_flatten.py``: promotes the ``converge_diverge_duct``
   example's hand-rolled axisymmetric flatten + 2D finite-volume metrics
-  (``block_radius``, ``axisymmetry_error``, ``flatten_to_meridional``,
+  (``axisymmetry_error``, ``flatten_to_meridional``,
   ``node_count_reduction``, ``MeridionalMetrics``, ``build_metrics``,
   ``enclosed_volume``, ``analytic_volume``) into the published library.
   Deliberately distinct from ``flatmesh.flatten_mesh``/``FlatMesh``
@@ -25,6 +25,28 @@ v1.13.0 - 2026-09-14
   imports these from ``plot3d`` instead of defining them locally; behavior
   is unchanged (verified against the example's straight-pipe residual,
   axisymmetry-error, and duct-volume-vs-analytic-volume checks).
+* Added ``examples/multiblock_duct_flatten/``: a worked example of the
+  actual multi-block-mesh-to-CFD-solver pipeline (blocks + a YAML file
+  declaring inlet/outlet/wall surfaces in, a solver-agnostic, BC-tagged
+  ``FlatMesh`` out), composed entirely from existing ``connectivity_fast``,
+  ``glennht.tag_surfaces_geometric``, and ``flatten_mesh(..., bcs=...)``.
+* **Removed** ``flatmesh.write_flat_mesh``/``read_flat_mesh`` (exported
+  since an earlier release but with zero usage or test coverage anywhere
+  in this repo or its examples). Backward-incompatible for any caller
+  using them directly; everything else on ``FlatMesh``
+  (``to_hdf5``/``from_hdf5``, ``to_npz``/``from_npz``, ``to_vtu``,
+  ``summary``) is unaffected and still fully supported.
+* ``meridional_flatten.block_radius`` is no longer exported from the
+  top-level ``plot3d`` package (it was never called outside the module
+  itself); the function itself is unchanged and still used internally by
+  ``axisymmetry_error``/``flatten_to_meridional``.
+* Volume cross-checks in ``colab/Plot3D_Flatten.ipynb`` and
+  ``examples/multiblock_duct_flatten`` now also (or, where the mesh isn't
+  a known body of revolution, only) use ``mesh_quality.cell_volume_divergence``
+  -- a geometry-agnostic per-cell volume computed directly from each
+  block's own corner nodes via the divergence theorem -- rather than
+  relying solely on ``analytic_volume``, which only applies to a mesh with
+  a known axisymmetric profile.
 
 v1.12.0 - 2026-09-14
 --------------------

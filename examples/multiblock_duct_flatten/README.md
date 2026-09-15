@@ -37,8 +37,13 @@ in this directory.
    embedded directly in it (`.boundary_conditions`, `.face_bc_type`,
    `.point_bc_type`).
 6. **Verify** — every boundary face carries the BC type its YAML entry
-   declared, and the mesh's total cell volume matches the duct's
-   analytic volume to within discretization error.
+   declared, and the mesh's total cell volume (`fm.cell_volume.sum()`)
+   matches an independent per-cell volume computed directly from each
+   block's own corner nodes via the divergence theorem
+   (`plot3d.cell_volume_divergence`). This isn't an analytic formula
+   specific to this duct's shape — a general x, y, z mesh has no such
+   formula available — it's a geometry-agnostic self-consistency check
+   that works for any mesh.
 
 The script also writes `duct_flat.vtu`, openable in Paraview, so you can
 actually look at the tagged mesh.
