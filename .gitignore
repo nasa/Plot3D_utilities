@@ -1,6 +1,7 @@
 *.x
 *.g
 *.xyz
+*.vtu
 *.DS_Store
 
 # Python cache

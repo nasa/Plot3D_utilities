@@ -63,7 +63,6 @@ found, not the geometry.
 from __future__ import annotations
 
 import json
-import os
 from dataclasses import asdict, is_dataclass
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -76,8 +75,6 @@ from .periodicity import create_rotation_matrix
 __all__ = [
     "FlatMesh",
     "flatten_mesh",
-    "write_flat_mesh",
-    "read_flat_mesh",
 ]
 
 # ---------------------------------------------------------------------------
@@ -1696,51 +1693,3 @@ class FlatMesh:
                 name = self.surface_ids.get(int(sid), str(int(sid)))
                 lines.append(f"    id={int(sid)} ({name}): {int(cnt)}")
         return "\n".join(lines)
-
-
-# ---------------------------------------------------------------------------
-# Top-level convenience read/write
-# ---------------------------------------------------------------------------
-
-def write_flat_mesh(
-    blocks: List[Block],
-    matched_faces: List[Dict[str, Any]],
-    outer_faces: List[Dict[str, Any]],
-    path: str,
-    *,
-    periodic_faces: Optional[List[Dict[str, Any]]] = None,
-    periodicity: Optional[Dict[str, Any]] = None,
-    surface_ids: Optional[Dict[Any, str]] = None,
-    bcs: Optional[List[Any]] = None,
-    weld_tol: Optional[float] = None,
-) -> FlatMesh:
-    """Build a :class:`FlatMesh` via :func:`flatten_mesh` and write it,
-    dispatching the writer by ``path``'s extension (``.h5``, ``.npz``, or
-    ``.vtu``)."""
-    fm = flatten_mesh(
-        blocks, matched_faces, outer_faces,
-        periodic_faces=periodic_faces, periodicity=periodicity,
-        surface_ids=surface_ids, bcs=bcs, weld_tol=weld_tol,
-    )
-    ext = os.path.splitext(path)[1].lower()
-    if ext == ".h5":
-        fm.to_hdf5(path)
-    elif ext == ".npz":
-        fm.to_npz(path)
-    elif ext == ".vtu":
-        fm.to_vtu(path)
-    else:
-        raise ValueError(f"Unsupported extension {ext!r} for write_flat_mesh; use .h5, .npz, or .vtu")
-    return fm
-
-
-def read_flat_mesh(path: str) -> FlatMesh:
-    """Read a :class:`FlatMesh` previously written by :func:`write_flat_mesh`
-    (``.h5`` or ``.npz``; ``.vtu`` is write-only)."""
-    ext = os.path.splitext(path)[1].lower()
-    if ext == ".h5":
-        return FlatMesh.from_hdf5(path)
-    elif ext == ".npz":
-        return FlatMesh.from_npz(path)
-    else:
-        raise ValueError(f"Unsupported extension {ext!r} for read_flat_mesh; use .h5 or .npz")

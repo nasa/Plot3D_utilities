@@ -1,0 +1,25 @@
+# Boundary conditions for the two-block converging duct built by main.py.
+# Surface ids match plot3d.glennht.tag_surfaces_geometric's convention:
+#   1 = inlet (min axial extreme), 2 = outlet (max axial extreme),
+#   3 = everything else ("blade" by default -- here, the wedge's two
+#   angular cut planes), 4 = hub (min radius -- the centerline here),
+#   5 = shroud (max radius -- the duct's outer wall).
+boundary_conditions:
+  - name: inlet
+    type: inlet
+    surfaces: [1]
+    total_pressure: 200000.0
+    total_temperature: 500.0
+  - name: outlet
+    type: outlet
+    surfaces: [2]
+    back_pressure: 100000.0
+  - name: sector_cut
+    type: wall
+    surfaces: [3]
+  - name: axis
+    type: wall
+    surfaces: [4]
+  - name: duct_wall
+    type: wall
+    surfaces: [5]
