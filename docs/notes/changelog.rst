@@ -21,6 +21,9 @@ v1.14.1 - 2026-11-25
   stream, so line breaks may fall anywhere (across x/y/z and block
   boundaries). Fortran ``D`` exponents are accepted. Binary reading is
   unchanged.
+* Changed the publish workflow: pushing a ``v*`` tag now builds, publishes
+  to PyPI and creates the GitHub Release (the tag must match the
+  ``pyproject.toml`` version). The ``release: published`` trigger is removed.
 
 v1.14.0 - 2026-11-25
 --------------------
