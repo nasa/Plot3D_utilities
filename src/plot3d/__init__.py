@@ -37,4 +37,7 @@ from .mesh_quality import (
     cell_aspect_ratio, cell_skewness, cell_distinct_node_count, cell_centroid,
     block_handedness, make_block_right_handed,
     run_all, element_type_inventory,
+    ReversedFace, NonPositiveCell, FoldedEdge, MovedNode, RepairConstruction,
+    UntangleReport, Refusal, UntangleError, UNTANGLE_REPORT_LIMIT,
+    find_inverted_geometry, untangle_folded_lines, untangle_mesh, untangle_plot3d_file,
 )

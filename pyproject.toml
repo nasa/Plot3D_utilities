@@ -1,6 +1,6 @@
 [project]
 name = "plot3d"
-version = "1.13.0"
+version = "1.14.0"
 description = "Plot3D python utilities for reading and writing and also finding connectivity between blocks"
 authors = [{ name = "Paht Juangphanich", email = "paht.juangphanich@nasa.gov" }]
 readme = "README.md"
@@ -15,6 +15,9 @@ dependencies = [
     "matplotlib",
     "pyyaml",
 ]
+
+[project.scripts]
+plot3d-untangle = "plot3d.mesh_quality:main"
 
 [project.optional-dependencies]
 hdf5 = ["h5py"]

@@ -43,6 +43,7 @@ docstrings and type hints from the ``plot3d`` package.
    modules/facefunctions
    modules/graph
    modules/meridional_flatten
+   modules/mesh_quality
    modules/read
    modules/write
    modules/split_block

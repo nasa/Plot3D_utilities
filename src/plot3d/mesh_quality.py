@@ -10,6 +10,10 @@ CFD-readiness checks in ``tgs-py-grc/python/tgs_py/quality/``
 top of that reference are block handedness (left-handed / negative-Jacobian
 detection + fix) and per-cell negative-volume detection.
 
+`untangle_folded_lines` / `untangle_mesh` repair folded grid lines (a node
+placed beyond its successor, reversing interior faces) without moving any
+block-face node; the ``plot3d-untangle <mesh>`` command runs it on a file.
+
 Departure from the Rust source, deliberate: the per-cell metric kernels
 here (``cell_signed_volume``, ``cell_volume_divergence``, ``cell_aspect_ratio``,
 ``cell_skewness``, ...) are full-field numpy broadcasts over the whole
@@ -30,7 +34,7 @@ docstrings for the cross-reference.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional, Sequence, Tuple
 
@@ -310,6 +314,766 @@ def make_block_right_handed(block: Block) -> Tuple[Block, Optional[int]]:
     Y = np.flip(block.Y, axis=axis).copy()
     Z = np.flip(block.Z, axis=axis).copy()
     return Block(X, Y, Z), axis
+
+
+# =============================================================================
+# Folded grid lines — geometry-only detection and repair
+# =============================================================================
+#
+# A folded grid line is one whose edge between two consecutive nodes points
+# opposite to the same edge on the neighbouring parallel lines: a node has
+# been placed beyond its successor. The cells either side keep positive
+# volume, but the face between them sees its owner and neighbour centres on
+# the wrong sides (a.d <= 0), which a finite-volume solver must refuse. The
+# repair rebuilds the folded edge from its neighbours, moving only
+# block-interior nodes so block surfaces and inter-block point matches stay
+# bit-exact. No boundary-condition knowledge is used. Mirrors plot3d-rs
+# ``mesh_quality::untangle_folded_lines``.
+
+_AXIS_NAMES = ("i", "j", "k")
+
+
+@dataclass(frozen=True)
+class ReversedFace:
+    """An interior face whose area vector ``a`` does not point from its owner
+    cell toward its neighbour cell: ``cos(a, d) <= 0``, ``d`` the
+    owner-to-neighbour centre vector. ``a`` is ``0.5 (d1 x d2)`` from the
+    face diagonals; centres are 8-node means.
+    """
+
+    block: int
+    #: Face family: 0 = i-face, 1 = j-face, 2 = k-face.
+    axis: int
+    #: Owner cell ``(i, j, k)``; the neighbour is the next cell along ``axis``.
+    owner: Tuple[int, int, int]
+    #: ``cos(a, d)``, relative to the block's handedness.
+    cos: float
+
+
+@dataclass(frozen=True)
+class NonPositiveCell:
+    """A cell whose signed divergence-theorem volume, relative to the block's
+    handedness, is not ``> 0``."""
+
+    block: int
+    cell: Tuple[int, int, int]
+    volume: float
+
+
+@dataclass(frozen=True)
+class FoldedEdge:
+    """Edge ``start -> start + 1`` along ``axis`` whose vector ``e`` opposes
+    the mean ``m`` of the same edge on the unfolded neighbouring parallel
+    lines: ``e.m <= 0``."""
+
+    block: int
+    axis: int
+    start: Tuple[int, int, int]
+    #: ``e.m``.
+    dot: float
+
+
+class RepairConstruction(Enum):
+    """How a relocated node ``n`` on a folded edge ``n``-``a`` was placed
+    (``a`` the fixed anchor)."""
+
+    #: ``X(n) = X(a) - u``, ``u`` the mean ``n -> a`` edge over the healthy
+    #: neighbouring lines.
+    NEIGHBOUR_MEAN = "NeighbourMean"
+    #: Used when NEIGHBOUR_MEAN would fold the edge on the other side of
+    #: ``n``: ``X(n) = X(f) + r (X(a) - X(f))``, ``f`` the next node along
+    #: the line, ``r = |w| / (|w| + |u|)``, ``w`` the healthy mean
+    #: ``f -> n`` edge.
+    CHORD_REDISTRIBUTION = "ChordRedistribution"
+
+
+@dataclass(frozen=True)
+class MovedNode:
+    """One node relocated by `untangle_folded_lines`."""
+
+    block: int
+    node: Tuple[int, int, int]
+    old: Tuple[float, float, float]
+    new: Tuple[float, float, float]
+    displacement: float
+    construction: RepairConstruction
+
+
+#: Entries printed per list by `UntangleReport.format_report` and
+#: `UntangleError` before the rest are only counted.
+UNTANGLE_REPORT_LIMIT = 1000
+
+
+def _fmt_ijk(n) -> str:
+    return f"({n[0]},{n[1]},{n[2]})"
+
+
+def _fmt_xyz(p) -> str:
+    return f"({p[0]:.15e}, {p[1]:.15e}, {p[2]:.15e})"
+
+
+def _step(n, axis):
+    m = list(n)
+    m[axis] += 1
+    return tuple(m)
+
+
+def _edge_of_cell(axis, start, c) -> bool:
+    return start[axis] == c[axis] and all(
+        start[q] in (c[q], c[q] + 1) for q in range(3) if q != axis)
+
+
+class _Bounded:
+    """Appends at most `UNTANGLE_REPORT_LIMIT` lines of one kind, counting the rest."""
+
+    def __init__(self):
+        self.shown = 0
+        self.hidden = 0
+
+    def push(self, out: List[str], line) -> None:
+        if self.shown < UNTANGLE_REPORT_LIMIT:
+            out.append(line())
+            self.shown += 1
+        else:
+            self.hidden += 1
+
+    def tail(self, out: List[str], what: str) -> None:
+        if self.hidden:
+            out.append(f"  ... {self.hidden} more {what} not shown "
+                       f"(first {UNTANGLE_REPORT_LIMIT} listed)")
+
+
+@dataclass
+class UntangleReport:
+    """What `untangle_folded_lines` / `untangle_mesh` found and changed, per
+    block. `is_empty` for a mesh that needed no repair. Inside an
+    `UntangleError` it holds what was found before the refusal, and the
+    moves listed were planned, not applied."""
+
+    blocks_scanned: int = 0
+    reversed_faces: List[ReversedFace] = field(default_factory=list)
+    nonpositive_cells: List[NonPositiveCell] = field(default_factory=list)
+    folded_edges: List[FoldedEdge] = field(default_factory=list)
+    moved: List[MovedNode] = field(default_factory=list)
+    max_displacement: float = 0.0
+    #: Blocks whose repaired geometry was re-checked.
+    rechecked_blocks: List[int] = field(default_factory=list)
+    #: Offenders left after the repair (non-empty only in a refusal).
+    remaining_reversed_faces: List[ReversedFace] = field(default_factory=list)
+    remaining_nonpositive_cells: List[NonPositiveCell] = field(default_factory=list)
+
+    def is_empty(self) -> bool:
+        return not (self.reversed_faces or self.nonpositive_cells or self.folded_edges
+                    or self.moved or self.remaining_reversed_faces
+                    or self.remaining_nonpositive_cells)
+
+    def extend(self, other: "UntangleReport") -> None:
+        self.blocks_scanned += other.blocks_scanned
+        self.reversed_faces.extend(other.reversed_faces)
+        self.nonpositive_cells.extend(other.nonpositive_cells)
+        self.folded_edges.extend(other.folded_edges)
+        self.moved.extend(other.moved)
+        self.max_displacement = max(self.max_displacement, other.max_displacement)
+        self.rechecked_blocks.extend(other.rechecked_blocks)
+        self.remaining_reversed_faces.extend(other.remaining_reversed_faces)
+        self.remaining_nonpositive_cells.extend(other.remaining_nonpositive_cells)
+
+    def summary(self) -> str:
+        """The summary line."""
+        n_blocks = len({f.block for f in self.reversed_faces}
+                       | {c.block for c in self.nonpositive_cells})
+        return (
+            f"untangle folded grid lines: scanned {self.blocks_scanned} block(s); "
+            f"{len(self.reversed_faces)} reversed interior face(s) and "
+            f"{len(self.nonpositive_cells)} non-positive cell(s) in {n_blocks} block(s), "
+            f"localised to {len(self.folded_edges)} folded edge(s); "
+            f"{len(self.moved)} node(s) moved, max displacement {self.max_displacement:e}"
+        )
+
+    def format_report(self) -> str:
+        """Plain-text report: the `summary` line, then per block every
+        reversed face (owner -> neighbour cell, direction, cos(a,d), and the
+        folded edge and node it was localised to), every non-positive cell,
+        every moved node (old -> new, displacement, construction) and the
+        re-check result. Each list prints at most `UNTANGLE_REPORT_LIMIT`
+        entries and counts the rest. Same layout as plot3d-rs."""
+        out = [self.summary()]
+        faces, cells, moves, left = _Bounded(), _Bounded(), _Bounded(), _Bounded()
+        blocks = sorted({f.block for f in self.reversed_faces}
+                        | {c.block for c in self.nonpositive_cells}
+                        | {e.block for e in self.folded_edges}
+                        | {m.block for m in self.moved}
+                        | {f.block for f in self.remaining_reversed_faces}
+                        | {c.block for c in self.remaining_nonpositive_cells})
+        for b in blocks:
+            bf = [f for f in self.reversed_faces if f.block == b]
+            bc = [c for c in self.nonpositive_cells if c.block == b]
+            be = [e for e in self.folded_edges if e.block == b]
+            bm = [m for m in self.moved if m.block == b]
+            out.append("")
+            out.append(f"block {b}: {len(bf)} reversed face(s), {len(bc)} non-positive "
+                       f"cell(s), {len(be)} folded edge(s), {len(bm)} node(s) moved")
+
+            def localised(cs, be=be, bm=bm):
+                hits = []
+                for e in be:
+                    if not any(_edge_of_cell(e.axis, e.start, c) for c in cs):
+                        continue
+                    end = _step(e.start, e.axis)
+                    node = next((m.node for m in bm if m.node in (e.start, end)), None)
+                    moved = f", node {_fmt_ijk(node)} moved" if node is not None else ""
+                    hits.append(f"folded {_AXIS_NAMES[e.axis]}-edge "
+                                f"{_fmt_ijk(e.start)}-{_fmt_ijk(end)}{moved}")
+                return "; ".join(hits) if hits else "not localised to a folded edge"
+
+            for f in bf:
+                nb = _step(f.owner, f.axis)
+                faces.push(out, lambda f=f, nb=nb: (
+                    f"  reversed {_AXIS_NAMES[f.axis]}-face: cell {_fmt_ijk(f.owner)} -> "
+                    f"{_fmt_ijk(nb)}, cos(a,d) {f.cos:.4e}; {localised([f.owner, nb])}"))
+            for c in bc:
+                cells.push(out, lambda c=c: (
+                    f"  non-positive cell {_fmt_ijk(c.cell)}: volume {c.volume:e}; "
+                    f"{localised([c.cell])}"))
+            for m in bm:
+                moves.push(out, lambda m=m: (
+                    f"  moved node {_fmt_ijk(m.node)}: {_fmt_xyz(m.old)} -> {_fmt_xyz(m.new)}, "
+                    f"displacement {m.displacement:e} [{m.construction.value}]"))
+            rf = [f for f in self.remaining_reversed_faces if f.block == b]
+            rc = [c for c in self.remaining_nonpositive_cells if c.block == b]
+            if b in self.rechecked_blocks:
+                out.append(f"  re-check: {len(rf)} reversed face(s), {len(rc)} non-positive "
+                           "cell(s)")
+                for f in rf:
+                    left.push(out, lambda f=f: (
+                        f"    still reversed {_AXIS_NAMES[f.axis]}-face: cell "
+                        f"{_fmt_ijk(f.owner)} -> {_fmt_ijk(_step(f.owner, f.axis))}, "
+                        f"cos(a,d) {f.cos:.4e}"))
+                for c in rc:
+                    left.push(out, lambda c=c: (
+                        f"    still non-positive cell {_fmt_ijk(c.cell)}: volume {c.volume:e}"))
+            elif bf or bc:
+                out.append("  re-check: not run (refused before repair)")
+        faces.tail(out, "reversed face(s)")
+        cells.tail(out, "non-positive cell(s)")
+        moves.tail(out, "moved node(s)")
+        left.tail(out, "remaining offender(s)")
+        return "\n".join(out) + "\n"
+
+    def __str__(self) -> str:
+        return self.format_report()
+
+
+@dataclass(frozen=True)
+class Refusal:
+    """One reason a block was refused, located by block and node (or cell)
+    where possible."""
+
+    block: int
+    node: Optional[Tuple[int, int, int]]
+    reason: str
+
+
+class UntangleError(ValueError):
+    """`untangle_folded_lines` / `untangle_mesh` refused; nothing was
+    changed. ``refusals`` carries every refusal found, not only the first;
+    ``report`` what was detected (moves in it planned, not applied)."""
+
+    def __init__(self, refusals: List[Refusal], report: UntangleReport):
+        self.refusals = list(refusals)
+        self.report = report
+        super().__init__(self.format())
+
+    def format(self) -> str:
+        out = [
+            f"untangle folded grid lines REFUSED at {len(self.refusals)} location(s); "
+            "nothing was changed (moves below were planned, not applied)",
+            self.report.format_report().rstrip("\n"),
+            "",
+            "refusals:",
+        ]
+        shown = _Bounded()
+        for r in self.refusals:
+            shown.push(out, lambda r=r: (
+                f"  block {r.block} {_fmt_ijk(r.node)}: {r.reason}" if r.node is not None
+                else f"  block {r.block}: {r.reason}"))
+        shown.tail(out, "refusal(s)")
+        return "\n".join(out) + "\n"
+
+    def __str__(self) -> str:
+        return self.format()
+
+
+def _orientation_sign(block: Block) -> float:
+    """``-1`` for a left-handed block, else ``+1``: face area vectors and
+    divergence volumes flip sign with handedness, so both checks judge the
+    block as if `make_block_right_handed` had been applied."""
+    return -1.0 if block_handedness(block) == Handedness.LEFT_HANDED else 1.0
+
+
+def _nodes(block: Block) -> np.ndarray:
+    return np.stack([block.X, block.Y, block.Z], axis=-1).astype(np.float64)
+
+
+def _face_area_fields(P: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Area vectors ``0.5 (d1 x d2)`` of every i-, j- and k-face, with the
+    corner order of plot3d-rs ``metrics::compute_face_metrics`` (pointing
+    toward +i/+j/+k on a right-handed block). Shapes ``(I, NJ, NK, 3)``,
+    ``(NI, J, NK, 3)``, ``(NI, NJ, K, 3)``."""
+    # i-face: p0=(i,j,k) p1=(i,j+1,k) p2=(i,j+1,k+1) p3=(i,j,k+1)
+    si = 0.5 * _cross(P[:, 1:, 1:] - P[:, :-1, :-1], P[:, :-1, 1:] - P[:, 1:, :-1])
+    # j-face: p0=(i,j,k) p1=(i,j,k+1) p2=(i+1,j,k+1) p3=(i+1,j,k)
+    sj = 0.5 * _cross(P[1:, :, 1:] - P[:-1, :, :-1], P[1:, :, :-1] - P[:-1, :, 1:])
+    # k-face: p0=(i,j,k) p1=(i+1,j,k) p2=(i+1,j+1,k) p3=(i,j+1,k)
+    sk = 0.5 * _cross(P[1:, 1:, :] - P[:-1, :-1, :], P[:-1, 1:, :] - P[1:, :-1, :])
+    return si, sj, sk
+
+
+def find_inverted_geometry(
+    block: Block, block_index: int = 0
+) -> Tuple[List[ReversedFace], List[NonPositiveCell]]:
+    """Every reversed interior face and non-positive-volume cell of one block.
+
+    A face is reversed when ``cos(a, d) <= 0`` (see `ReversedFace`); a face
+    whose cosine is undefined (zero area, coincident centres, non-finite) is
+    not counted. A cell is non-positive when its signed `cell_volume_divergence`
+    is not ``> 0``. Both are relative to the block's handedness. A block with
+    fewer than two nodes on any axis has no cells and reports nothing.
+    """
+    if min(block.IMAX, block.JMAX, block.KMAX) < 2:
+        return [], []
+    s = _orientation_sign(block)
+    P = _nodes(block)
+    vol = s * cell_volume_divergence(block)
+    cells = [
+        NonPositiveCell(block_index, (int(i), int(j), int(k)), float(vol[i, j, k]))
+        for i, j, k in zip(*np.nonzero(~(vol > 0.0)))
+    ]
+    # Cell order in the report follows plot3d-rs: k outermost, i fastest.
+    cells.sort(key=lambda c: (c.cell[2], c.cell[1], c.cell[0]))
+
+    centres = cell_centroid(block)
+    si, sj, sk = _face_area_fields(P)
+    faces: List[ReversedFace] = []
+    for axis, area in enumerate((si, sj, sk)):
+        # Interior faces of this family: node planes 1..N-2 along `axis`.
+        sl = [slice(None)] * 3
+        sl[axis] = slice(1, -1)
+        a = area[tuple(sl)]
+        lo = [slice(None)] * 3
+        hi = [slice(None)] * 3
+        lo[axis] = slice(0, -1)
+        hi[axis] = slice(1, None)
+        d = centres[tuple(hi)] - centres[tuple(lo)]
+        with np.errstate(divide="ignore", invalid="ignore"):
+            nrm = np.sqrt(_dot(a, a) * _dot(d, d))
+            cos = s * _dot(a, d) / nrm
+        bad = (nrm > 0) & np.isfinite(cos) & (cos <= 0.0)
+        for i, j, k in zip(*np.nonzero(bad)):
+            faces.append(ReversedFace(block_index, axis, (int(i), int(j), int(k)),
+                                      float(cos[i, j, k])))
+    faces.sort(key=lambda f: (f.axis, f.owner[2], f.owner[1], f.owner[0]))
+    return faces, cells
+
+
+def _edge(P: np.ndarray, n: Tuple[int, int, int], axis: int) -> np.ndarray:
+    m = list(n)
+    m[axis] += 1
+    return P[tuple(m)] - P[tuple(n)]
+
+
+def _parallel_starts(dims, n, axis) -> List[Tuple[int, int, int]]:
+    out = []
+    for q in range(3):
+        if q == axis:
+            continue
+        if n[q] > 0:
+            m = list(n)
+            m[q] -= 1
+            out.append(tuple(m))
+        if n[q] + 1 < dims[q]:
+            m = list(n)
+            m[q] += 1
+            out.append(tuple(m))
+    return out
+
+
+def _healthy_parallel_mean(P, dims, folded, n, axis) -> Optional[np.ndarray]:
+    """Mean of the same edge over the neighbouring parallel lines not in
+    ``folded`` with non-zero length; ``None`` when there is none."""
+    acc = np.zeros(3)
+    count = 0
+    for s in _parallel_starts(dims, n, axis):
+        v = _edge(P, s, axis)
+        if (axis, s) not in folded and float(v @ v) > 0.0:
+            acc = acc + v
+            count += 1
+    return acc * (1.0 / count) if count else None
+
+
+def _edge_dot_healthy(P, dims, folded, n, axis) -> Optional[float]:
+    e = _edge(P, n, axis)
+    if float(e @ e) == 0.0:
+        return None
+    m = _healthy_parallel_mean(P, dims, folded, n, axis)
+    return None if m is None else float(e @ m)
+
+
+def _classify_folded_edges(P: np.ndarray) -> set:
+    """The folded edges ``(axis, (i, j, k))`` of a block. A first pass flags
+    every edge with ``e.m <= 0`` against the mean of all its neighbouring
+    parallel lines; flagged edges are then re-judged against the mean of
+    their unflagged neighbours only, until nothing changes (a large fold
+    drags the all-neighbour mean of the healthy lines next to it). An edge
+    with no unflagged neighbour stays flagged. The set only shrinks."""
+    dims = P.shape[:3]
+    folded = set()
+    for axis in range(3):
+        E = np.diff(P, axis=axis)
+        S = np.zeros_like(E)
+        C = np.zeros(E.shape[:3])
+        for q in range(3):
+            if q == axis:
+                continue
+            dst = [slice(None)] * 3
+            src = [slice(None)] * 3
+            dst[q], src[q] = slice(1, None), slice(0, -1)
+            S[tuple(dst)] += E[tuple(src)]
+            C[tuple(dst)] += 1
+            dst[q], src[q] = slice(0, -1), slice(1, None)
+            S[tuple(dst)] += E[tuple(src)]
+            C[tuple(dst)] += 1
+        with np.errstate(divide="ignore", invalid="ignore"):
+            m = S * (1.0 / C)[..., None]
+            dv = _dot(E, m)
+        flag = (_dot(E, E) > 0) & (C > 0) & (_dot(m, m) > 0) & np.isfinite(dv) & (dv <= 0)
+        for i, j, k in zip(*np.nonzero(flag)):
+            folded.add((axis, (int(i), int(j), int(k))))
+    while True:
+        keep = set()
+        for axis, n in folded:
+            v = _edge_dot_healthy(P, dims, folded, n, axis)
+            if v is None or not (v > 0.0):
+                keep.add((axis, n))
+        if len(keep) == len(folded):
+            return keep
+        folded = keep
+
+
+def _on_block_face(dims, n) -> bool:
+    return any(n[q] == 0 or n[q] + 1 == dims[q] for q in range(3))
+
+
+def _other_incident_edge_folded(dims, folded, n, exclude) -> bool:
+    for axis in range(3):
+        starts = []
+        if n[axis] + 1 < dims[axis]:
+            starts.append(tuple(n))
+        if n[axis] > 0:
+            m = list(n)
+            m[axis] -= 1
+            starts.append(tuple(m))
+        for s in starts:
+            if (axis, s) != exclude and (axis, s) in folded:
+                return True
+    return False
+
+
+def _place_folded_node(P, dims, folded, moved, anchor, axis, m):
+    """Position of ``moved`` on the folded edge to the fixed ``anchor``
+    (``m`` the healthy mean of that edge, oriented start -> start+1).
+    Returns ``(position, construction, nodes it is built from)`` or raises
+    ``ValueError`` with the refusal reason. Mirrors plot3d-rs
+    ``place_folded_node``."""
+    up = anchor[axis] > moved[axis]
+    u = m if up else -m  # healthy n -> a edge
+    xa = P[anchor]
+    p1 = xa - u
+    if up:
+        far = None
+        if moved[axis] > 0:
+            f = list(moved)
+            f[axis] -= 1
+            far = tuple(f)
+    else:
+        far = None
+        if moved[axis] + 1 < dims[axis]:
+            f = list(moved)
+            f[axis] += 1
+            far = tuple(f)
+    if far is None:
+        return p1, RepairConstruction.NEIGHBOUR_MEAN, [anchor]
+    w_start = far if up else moved
+    mw = _healthy_parallel_mean(P, dims, folded, w_start, axis)
+    if mw is None:
+        return p1, RepairConstruction.NEIGHBOUR_MEAN, [anchor]
+    w = mw if up else -mw  # healthy f -> n edge
+    xf = P[far]
+    if float((p1 - xf) @ w) > 0.0:
+        return p1, RepairConstruction.NEIGHBOUR_MEAN, [anchor]
+    c = xa - xf
+    if not (float(c @ w) > 0.0 and float(c @ u) > 0.0):
+        raise ValueError(
+            f"anchor ({anchor[0]},{anchor[1]},{anchor[2]}) does not lie beyond node "
+            f"({far[0]},{far[1]},{far[2]}) along the line; rebuilding the two edges "
+            "between them cannot unfold it"
+        )
+    lw, lu = float(np.sqrt(w @ w)), float(np.sqrt(u @ u))
+    r = lw / (lw + lu)
+    return xf + r * c, RepairConstruction.CHORD_REDISTRIBUTION, [anchor, far]
+
+
+def untangle_folded_lines(block: Block, block_index: int = 0) -> Tuple[Block, UntangleReport]:
+    """Repair folded grid lines in one block, using geometry only.
+
+    1. **Detect** reversed interior faces and non-positive cells
+       (`find_inverted_geometry`). None found: an exact copy of the block is
+       returned with an empty report.
+    2. **Localise** to the edges of the affected cells whose vector opposes
+       the mean of the same edge on the unfolded neighbouring parallel lines.
+    3. **Repair** each folded edge by relocating one endpoint and keeping the
+       other (the anchor) fixed. A node on any block face (an index at 0 or
+       max) is never moved, so surfaces and inter-block point matches stay
+       exact. With one endpoint on a block face the face node is the anchor;
+       with both interior, the endpoint whose other incident edges are not
+       folded. The relocated node takes the healthy neighbouring lines' mean
+       edge (`RepairConstruction.NEIGHBOUR_MEAN`), or, where that would fold
+       the next edge along the line, sits on the chord to the next node in
+       the neighbours' edge-length ratio
+       (`RepairConstruction.CHORD_REDISTRIBUTION`).
+    4. **Re-check**: no reversed face and no non-positive cell may remain.
+
+    Raises `UntangleError` (no partial fix, naming every block and node):
+    geometry not localisable to a folded edge; a folded edge with both
+    endpoints on block faces; an ambiguous anchor; no healthy neighbouring
+    line; an anchor that does not lie beyond the next node along the line;
+    two different relocations of one node, or one built from a moved node;
+    any inverted geometry left after the repair.
+
+    Mirrors plot3d-rs ``mesh_quality::untangle_folded_lines``.
+    """
+    faces, cells = find_inverted_geometry(block, block_index)
+    if not faces and not cells:
+        return (Block(block.X.copy(), block.Y.copy(), block.Z.copy()),
+                UntangleReport(blocks_scanned=1))
+
+    P = _nodes(block)
+    dims = P.shape[:3]
+    candidates = set()
+
+    def add_cell_edges(c):
+        for axis in range(3):
+            p, q = (axis + 1) % 3, (axis + 2) % 3
+            for dp in (0, 1):
+                for dq in (0, 1):
+                    s = list(c)
+                    s[p] += dp
+                    s[q] += dq
+                    candidates.add((axis, tuple(s)))
+
+    for f in faces:
+        add_cell_edges(f.owner)
+        nb = list(f.owner)
+        nb[f.axis] += 1
+        add_cell_edges(tuple(nb))
+    for c in cells:
+        add_cell_edges(c.cell)
+
+    folded = _classify_folded_edges(P)
+    # Same order as plot3d-rs's BTreeSet<(axis, [i, j, k])>.
+    folded_edges = []
+    for axis, start in sorted(candidates & folded):
+        dv = _edge_dot_healthy(P, dims, folded, start, axis)
+        if dv is None:
+            dv = 0.0
+        folded_edges.append(FoldedEdge(block_index, axis, start, dv))
+    report = UntangleReport(blocks_scanned=1, reversed_faces=faces,
+                            nonpositive_cells=cells, folded_edges=folded_edges)
+
+    refusals: List[Refusal] = []
+    if not folded_edges:
+        for f in faces:
+            refusals.append(Refusal(
+                block_index, f.owner,
+                f"reversed {_AXIS_NAMES[f.axis]}-face (owner cell, cos {f.cos:.4e}) is not "
+                "localisable to a folded grid-line edge"))
+        for c in cells:
+            refusals.append(Refusal(
+                block_index, c.cell,
+                f"non-positive cell (volume {c.volume:e}) is not localisable to a folded "
+                "grid-line edge"))
+        raise UntangleError(refusals, report)
+
+    moves = {}  # node -> (position, construction, built-from nodes)
+    for fe in folded_edges:
+        axis = fe.axis
+        n0 = fe.start
+        n1 = list(n0)
+        n1[axis] += 1
+        n1 = tuple(n1)
+        m = _healthy_parallel_mean(P, dims, folded, n0, axis)
+        if m is None:
+            refusals.append(Refusal(
+                block_index, n0,
+                f"folded {_AXIS_NAMES[axis]}-edge has no healthy neighbouring line to "
+                "rebuild it from"))
+            continue
+        f0, f1 = _on_block_face(dims, n0), _on_block_face(dims, n1)
+        if f0 and f1:
+            refusals.append(Refusal(
+                block_index, n0,
+                f"folded {_AXIS_NAMES[axis]}-edge has both endpoints on block faces; "
+                "block-face nodes are never moved"))
+            continue
+        if f0:
+            moved, anchor = n1, n0
+        elif f1:
+            moved, anchor = n0, n1
+        else:
+            key = (axis, n0)
+            o0 = _other_incident_edge_folded(dims, folded, n0, key)
+            o1 = _other_incident_edge_folded(dims, folded, n1, key)
+            if o0 and not o1:
+                moved, anchor = n0, n1
+            elif o1 and not o0:
+                moved, anchor = n1, n0
+            else:
+                refusals.append(Refusal(
+                    block_index, n0,
+                    f"folded {_AXIS_NAMES[axis]}-edge with both endpoints interior has no "
+                    "unambiguous anchor (other folded edges at both or neither endpoint)"))
+                continue
+        try:
+            plan = _place_folded_node(P, dims, folded, moved, anchor, axis, m)
+        except ValueError as exc:
+            refusals.append(Refusal(block_index, moved, str(exc)))
+            continue
+        if moved in moves:
+            if not np.array_equal(moves[moved][0], plan[0]):
+                refusals.append(Refusal(
+                    block_index, moved,
+                    "two folded edges ask for different relocations of this node"))
+        else:
+            moves[moved] = plan
+    for node, (_, _, built_from) in sorted(moves.items()):
+        for f in built_from:
+            if f in moves:
+                refusals.append(Refusal(
+                    block_index, node,
+                    f"relocation is built from node ({f[0]},{f[1]},{f[2]}), which is "
+                    "itself relocated"))
+    for node, (new, construction, _) in sorted(moves.items()):
+        old = P[node]
+        disp = float(np.sqrt(np.sum((new - old) ** 2)))
+        report.max_displacement = max(report.max_displacement, disp)
+        report.moved.append(MovedNode(
+            block_index, node, tuple(float(v) for v in old), tuple(float(v) for v in new),
+            disp, construction))
+    if refusals:
+        raise UntangleError(refusals, report)
+
+    X, Y, Z = block.X.copy(), block.Y.copy(), block.Z.copy()
+    for m in report.moved:
+        X[m.node], Y[m.node], Z[m.node] = m.new
+    repaired = Block(X, Y, Z)
+
+    faces_after, cells_after = find_inverted_geometry(repaired, block_index)
+    report.rechecked_blocks.append(block_index)
+    if not faces_after and not cells_after:
+        return repaired, report
+    for f in faces_after:
+        refusals.append(Refusal(
+            block_index, f.owner,
+            f"{_AXIS_NAMES[f.axis]}-face cell {_fmt_ijk(f.owner)} -> "
+            f"{_fmt_ijk(_step(f.owner, f.axis))} still reversed after repair, "
+            f"cos(a,d) {f.cos:.4e}"))
+    for c in cells_after:
+        refusals.append(Refusal(
+            block_index, c.cell,
+            f"cell still non-positive after repair, volume {c.volume:e}"))
+    report.remaining_reversed_faces = faces_after
+    report.remaining_nonpositive_cells = cells_after
+    raise UntangleError(refusals, report)
+
+
+def untangle_mesh(blocks: Sequence[Block]) -> Tuple[List[Block], UntangleReport]:
+    """`untangle_folded_lines` over every block (block index = position).
+    All-or-nothing: if any block is refused, `UntangleError` carries every
+    block's refusals and the report of every block (moves planned, not
+    applied), and no repaired mesh is returned."""
+    out: List[Block] = []
+    report = UntangleReport()
+    refusals: List[Refusal] = []
+    for bi, b in enumerate(blocks):
+        try:
+            rb, rep = untangle_folded_lines(b, bi)
+        except UntangleError as exc:
+            refusals.extend(exc.refusals)
+            report.extend(exc.report)
+            continue
+        out.append(rb)
+        report.extend(rep)
+    if refusals:
+        raise UntangleError(refusals, report)
+    return out, report
+
+
+def untangle_plot3d_file(filename: str, out_filename: Optional[str] = None,
+                         report_filename: Optional[str] = None) -> UntangleReport:
+    """Read a Plot3D file, `untangle_mesh` it, and write
+    ``<stem>_untangled<ext>`` plus ``<stem>_untangled_report.txt`` next to
+    it (or to the given paths), in the input's detected format. Refuses to
+    overwrite an existing file. Raises `UntangleError` if the mesh is
+    refused; only the report (with the refusal detail) is written then.
+    """
+    import os.path as osp
+    from .read import read_plot3D, _detect_plot3d_format
+    from .write import write_plot3D
+
+    stem, ext = osp.splitext(filename)
+    out_filename = out_filename or f"{stem}_untangled{ext}"
+    report_filename = report_filename or f"{stem}_untangled_report.txt"
+    for p in (out_filename, report_filename):
+        if osp.exists(p):
+            raise FileExistsError(f"refusing to overwrite existing {p}")
+
+    fmt = _detect_plot3d_format(filename)
+    blocks = read_plot3D(filename, binary=fmt["binary"], big_endian=fmt["big_endian"],
+                         read_double=fmt["read_double"], fortran=fmt["fortran"])
+    try:
+        repaired, report = untangle_mesh(blocks)
+    except UntangleError as exc:
+        with open(report_filename, "w") as f:
+            f.write(f"input:  {filename}\noutput: none (refused)\n\n{exc}")
+        raise
+    write_plot3D(out_filename, repaired, binary=fmt["binary"], big_endian=fmt["big_endian"],
+                 double_precision=fmt["read_double"], fortran=fmt["fortran"])
+    with open(report_filename, "w") as f:
+        f.write(f"input:  {filename}\noutput: {out_filename}\n\n")
+        f.write(report.format_report())
+    return report
+
+
+def main(argv: Optional[Sequence[str]] = None) -> int:
+    """Entry point of the ``plot3d-untangle <mesh>`` command: untangles folded
+    grid lines in a Plot3D file (see `untangle_plot3d_file`) and prints the
+    report. Returns ``1`` on a refusal or an existing output file."""
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        prog="plot3d-untangle",
+        description="Untangle folded grid lines in a Plot3D mesh; writes "
+                    "<stem>_untangled<ext> and <stem>_untangled_report.txt.")
+    parser.add_argument("mesh", help="input Plot3D file (format auto-detected)")
+    parser.add_argument("-o", "--output", default=None, help="output mesh path")
+    args = parser.parse_args(argv)
+    try:
+        report = untangle_plot3d_file(args.mesh, args.output)
+    except (UntangleError, FileExistsError) as exc:
+        print(exc)
+        return 1
+    print(report.format_report(), end="")
+    return 0
 
 
 # =============================================================================
