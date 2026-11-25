@@ -12,6 +12,16 @@ Maintain release notes here so the published documentation reflects important ch
 
 Add a new section for each release and summarise highlights in bullet form.
 
+v1.14.1 - 2026-11-25
+--------------------
+* Fixed ``read_plot3D`` for formatted (ASCII) files: the reader consumed whole
+  lines per coordinate array and discarded the remainder of a line when an
+  array ended mid-line, corrupting every later array and failing with a
+  reshape error. ASCII files are now parsed as one whitespace-delimited token
+  stream, so line breaks may fall anywhere (across x/y/z and block
+  boundaries). Fortran ``D`` exponents are accepted. Binary reading is
+  unchanged.
+
 v1.14.0 - 2026-11-25
 --------------------
 * Added ``mesh_quality.untangle_folded_lines`` / ``untangle_mesh``: a

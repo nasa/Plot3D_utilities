@@ -125,3 +125,40 @@ def test_fortran_reader_raises_on_unexpected_record_size():
         with pytest.raises(ValueError, match="Unexpected Fortran record size"):
             read_plot3D(path, binary=True, big_endian=big_endian,
                         read_double=True, fortran=True)
+
+
+def test_ascii_multiblock_arbitrary_line_breaks(tmp_path):
+    """ASCII reader parses a token stream: 5 values per line, running across
+    x->y->z and block->block, with Fortran D exponents."""
+    import numpy as np
+    dims = [(3, 2, 2), (2, 3, 4)]
+    expected = []
+    vals = []
+    base = 0.0
+    for (ni, nj, nk) in dims:
+        n = ni * nj * nk
+        arrs = []
+        for _ in range(3):
+            flat = base + np.arange(n) * 0.25 - 1.5
+            base += 1000.0
+            vals.extend(flat.tolist())
+            arrs.append(flat.reshape((nk, nj, ni)).transpose(2, 1, 0))
+        expected.append(arrs)
+    toks = [f"{v:.6E}".replace("E", "D") if i % 2 else f"{v:.6E}" for i, v in enumerate(vals)]
+    path = tmp_path / "ascii.p3d"
+    with open(path, "w") as f:
+        f.write(f"{len(dims)}\n")
+        for d in dims:
+            f.write("  %d  %d  %d\n" % d)
+        for i in range(0, len(toks), 5):
+            f.write(" ".join(toks[i:i + 5]) + "\n")
+    blocks = read_plot3D(str(path), binary=False, big_endian=False,
+                         read_double=True, fortran=False)
+    assert len(blocks) == 2
+    for blk, (ex, ey, ez), d in zip(blocks, expected, dims):
+        assert blk.X.shape == d
+        np.testing.assert_array_equal(blk.X, ex)
+        np.testing.assert_array_equal(blk.Y, ey)
+        np.testing.assert_array_equal(blk.Z, ez)
+    auto = read_plot3D(str(path))
+    np.testing.assert_array_equal(auto[1].Z, expected[1][2])

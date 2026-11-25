@@ -63,6 +63,63 @@ def __read_plot3D_chunk_ASCII(f,IMAX:int,JMAX:int,KMAX:int):
     A = np.array(values[:n], dtype=np.float64)
     return A.reshape((KMAX, JMAX, IMAX)).transpose(2, 1, 0).copy()
 
+def _read_plot3D_ascii(filename:str):
+    """Reads a formatted Plot3D file by parsing it as one whitespace-delimited token stream.
+
+    Line breaks carry no meaning: ``nblocks``, then ``ni nj nk`` per block, then
+    for each block x, y, z (i-fastest) with any number of values per line.
+    Fortran ``D`` exponents are accepted.
+    """
+    chunk_bytes = 1 << 26
+    with open(filename, 'rb') as f:
+        header = []
+        nblocks = None
+        while nblocks is None or len(header) < 1 + 3 * nblocks:
+            line = f.readline()
+            if not line:
+                raise ValueError("Unexpected end of ASCII Plot3D header")
+            header.extend(int(w) for w in line.split())
+            if nblocks is None and header:
+                nblocks = header[0]
+        dims = np.array(header[1:1 + 3 * nblocks], dtype=np.int64).reshape(nblocks, 3)
+        sizes = dims.prod(axis=1)
+        total = int(3 * sizes.sum())
+
+        parts = []
+        carry = b''
+        while True:
+            data = f.read(chunk_bytes)
+            buf = carry + data
+            if data:
+                cut = max(buf.rfind(b' '), buf.rfind(b'\n'), buf.rfind(b'\t'), buf.rfind(b'\r'))
+                if cut < 0:
+                    carry = buf
+                    continue
+                carry = buf[cut + 1:]
+                buf = buf[:cut + 1]
+            else:
+                carry = b''
+            if b'D' in buf or b'd' in buf:
+                buf = buf.replace(b'D', b'E').replace(b'd', b'e')
+            if buf.strip():
+                parts.append(np.fromstring(buf, dtype=np.float64, sep=' '))
+            if not data:
+                break
+        values = np.concatenate(parts) if parts else np.empty(0)
+    if values.size < total:
+        raise ValueError(f"ASCII Plot3D file has {values.size} coordinate values, expected {total}")
+
+    blocks = []
+    pos = 0
+    for b in tqdm(range(nblocks), desc="Reading ASCII blocks", unit="block"):
+        ni, nj, nk = (int(v) for v in dims[b])
+        n = ni * nj * nk
+        xyz = [values[pos + m * n:pos + (m + 1) * n].reshape((nk, nj, ni)).transpose(2, 1, 0).copy()
+               for m in range(3)]
+        pos += 3 * n
+        blocks.append(Block(*xyz))
+    return blocks
+
 def read_ap_nasa(filename:str):
     """Reads an AP NASA File and converts it to Block format which can be exported to a plot3d file
         AP NASA file represents a single block. The first 7 integers are il,jl,kl,ile,ite,jtip,nbld
@@ -308,21 +365,5 @@ def read_plot3D(filename:str, binary:Optional[bool]=None, big_endian:Optional[bo
                     b_temp = Block(X,Y,Z)
                     blocks.append(b_temp)
         else:
-            with open(filename,'r') as f:
-                nblocks = int(f.readline())
-                IMAX = list(); JMAX = list(); KMAX = list()
-
-                for b in range(nblocks):
-                    IJK = f.readline().replace('\n','').split(' ')
-                    tokens = [int(w) for w in IJK if w]
-                    IMAX.append(tokens[0])
-                    JMAX.append(tokens[1])
-                    KMAX.append(tokens[2])
-
-                for b in tqdm(range(nblocks), desc="Reading ASCII blocks", unit="block"):
-                    X = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
-                    Y = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
-                    Z = __read_plot3D_chunk_ASCII(f,IMAX[b],JMAX[b],KMAX[b])
-                    b_temp = Block(X,Y,Z)
-                    blocks.append(b_temp)
+            blocks = _read_plot3D_ascii(filename)
     return blocks
